@@ -30,11 +30,13 @@ following gates remain `BLOCKED` in `.rebuild-kit/progress.json`:
 - `G_API_CONTRACT` and `G_LIVE_BUDGET`: no authorized live wire/usage evidence;
 - `G_HUMAN_CONTENT_REVIEW`: no human reviewer signature.
 
-## T26 dependency gap
+## T26 and local privacy boundary
 
-The project currently has no codelab HTTP routes or persistent code-run/data
-export/deletion boundary. T26 is therefore recorded as `BLOCKED` under its
-own allowed-path rules; T28 does not invent a second API or treat local
-fixtures as a replacement. Once the codelab application boundary is approved,
-T28 must add owner-scoped export/deletion tests and repeat the full cross-user
-matrix against those real routes.
+T26 now has a minimal owner-scoped CodeLab application boundary. T28 covers
+that real local surface with `/api/v1/me/data-export` and
+`/api/v1/me/deletion-requests`: export is authenticated and owner-scoped;
+deletion is CSRF-protected, idempotent, and deletes only the explicitly named
+`CODELAB_ONLY` local drafts/runs. Local learning evidence outside that scope
+is not silently claimed deleted. The response keeps
+`platform_status=NOT_CONNECTED/NOT_REQUESTED`, so a local request is not
+reported as Knodo deletion or retention confirmation.

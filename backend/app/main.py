@@ -23,6 +23,7 @@ from app.modules.identity.middleware import SameOriginCsrfMiddleware
 from app.modules.identity.router import router as identity_router
 from app.modules.learning.growth_router import router as growth_router
 from app.modules.memory.router import router as memory_router
+from app.modules.privacy.router import router as privacy_router
 from app.modules.recommendation.router import router as recommendation_router
 from app.modules.resources.animation_router import router as animation_router
 from app.modules.resources.router import admin_router as resources_admin_router
@@ -76,6 +77,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(resources_router, prefix="/api/v1")
     application.include_router(animation_router, prefix="/api/v1")
     application.include_router(authoring_router, prefix="/api/v1")
+    application.include_router(privacy_router, prefix="/api/v1")
     application.include_router(resources_admin_router, prefix="/api/v1")
     return application
 

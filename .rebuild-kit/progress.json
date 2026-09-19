@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T28",
+  "current_task": "T29",
   "gates": {
     "G_API_CONTRACT": {
       "status": "BLOCKED",
@@ -1434,29 +1434,40 @@
       "note": "本地 provider-unavailable/主动录音/取消/可编辑转写/文本回退边界完成；真实 ASR/TTS 未验证，不能标 VOICE_READY。"
     },
     "T28": {
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "evidence": [
         "docs/acceptance/T28.md",
         "docs/security/LOCAL_SECURITY_BOUNDARIES.md",
         "backend/tests/security/test_static_security_boundaries.py",
-        "docs/acceptance/T26.md"
+        "backend/tests/security/test_codelab_privacy.py",
+        "backend/app/modules/privacy/router.py",
+        "backend/alembic/versions/0016_privacy_requests.py",
+        "docs/acceptance/T26.md",
+        "contracts/openapi.identity.json"
       ],
       "verification": [
         {
           "type": "regression",
-          "command": "pytest backend/tests -q",
+          "command": "PYTHONPATH=. backend/.venv/bin/pytest backend/tests -q",
           "exit_code": 0,
-          "tests_passed": 328,
-          "note": "Existing CSRF/owner/answer/resource/memory/authoring/security paths remain green."
+          "tests_passed": 332,
+          "note": "Existing CSRF/owner/answer/resource/memory/authoring/security paths and T26 runner bridge remain green."
         },
         {
           "type": "automated",
-          "command": "pytest backend/tests/security/test_static_security_boundaries.py -q",
+          "command": "pytest backend/tests/security/test_static_security_boundaries.py backend/tests/security/test_codelab_privacy.py -q",
           "exit_code": 0,
-          "tests_passed": 3
+          "tests_passed": 4,
+          "note": "Secret/socket static boundaries, owner-scoped export, CSRF deletion, idempotency and cross-account preservation."
+        },
+        {
+          "type": "contract",
+          "command": "identity OpenAPI exporter + diff + openapi-typescript regeneration",
+          "exit_code": 0,
+          "note": "The new /me privacy routes are included in the generated identity contract."
         }
       ],
-      "note": "T26 依赖已解除；现有 CSRF/owner/版本/秘密隔离回归保持通过，仍需补齐 codelab run 与 draft 的数据导出/删除 API 及跨账号矩阵。外部隔离/条款/预算/人审门禁保持 BLOCKED。"
+      "note": "本地安全与窄范围隐私治理通过：CodeLab 数据导出/删除只作用于本人和 CODELAB_ONLY 本地范围；平台删除、外部隔离、条款、预算、人审门禁保持 BLOCKED。"
     },
     "T29": {
       "status": "NOT_STARTED",

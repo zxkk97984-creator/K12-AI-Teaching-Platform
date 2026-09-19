@@ -48,7 +48,7 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         )
     finally:
         await connection.close()
-    assert revision == "0015_codelab_runs"
+    assert revision == "0016_privacy_requests"
     assert {
         "identity_users",
         "auth_sessions",
@@ -97,6 +97,7 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "codelab_task_revisions",
         "codelab_code_drafts",
         "codelab_code_runs",
+        "privacy_deletion_requests",
     } <= {row["tablename"] for row in tables}
     constraint_names = {row["conname"] for row in constraints}
     assert {
@@ -176,6 +177,8 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "ck_codelab_run_execution_status",
         "ck_codelab_run_correctness_status",
         "ck_codelab_run_feedback_status",
+        "ck_privacy_delete_status",
+        "ck_privacy_delete_platform_status",
     } <= constraint_names
 
 
@@ -200,7 +203,7 @@ async def test_clean_test_baseline_upgrade_is_idempotent(test_settings):
         )
     finally:
         await connection.close()
-    assert revision == "0015_codelab_runs"
+    assert revision == "0016_privacy_requests"
     assert {
         "content_chapter_revisions_immutable",
         "content_review_state_guard",
