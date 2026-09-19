@@ -13,9 +13,10 @@
   affected animation spec was rerun with explicit T06 fixtures and passed 1/1. Formal human-reviewed
   senior animation content remains an external requirement.
 - T31: BLOCKED by G_API_CONTRACT and G_LIVE_BUDGET; offline eval framework is committed.
-- T32: BLOCKED/草稿; report and demo docs are committed.
-- T33: BLOCKED by T31/T32 and G_HUMAN_CONTENT_REVIEW; latest implementation checkpoint is 5821daa,
-  and the final handoff pointer is 5fe79f4.
+- T32: DONE as the required draft deliverable; report, demo and integration docs are committed, with
+  T31 live metrics explicitly marked pending.
+- T33: BLOCKED by T31 and G_HUMAN_CONTENT_REVIEW; T32 draft delivery is complete. Latest implementation
+  checkpoint is 5821daa, and the final handoff pointer will follow the current documentation commit.
 
 ## Safe local commands
 

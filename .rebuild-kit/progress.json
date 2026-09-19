@@ -1597,7 +1597,7 @@
       "note": "离线评测框架已完成；真实 Knodo 质量、usage、成本和人工判断必须等待 G_API_CONTRACT/G_LIVE_BUDGET 及人审授权。"
     },
     "T32": {
-      "status": "BLOCKED",
+      "status": "DONE",
       "evidence": [
         "docs/acceptance/T32.md",
         "docs/competition/REPORT_DRAFT.md",
@@ -1614,7 +1614,7 @@
           "note": "报告/演示/集成文档均明确区分 fixture、真实 Docker、真实 Knodo、人审和未验证。"
         }
       ],
-      "note": "参赛报告草稿与可执行演示已生成；T30 本地合成控制器已复核，但因 T31 真实平台门禁和正式人审未完成，不登记正式发布报告 DONE。"
+      "note": "参赛报告草稿、可执行演示和集成文档已生成并通过 kit 校验；按原卡要求保留 T31 真实指标/平台门禁为待验收。T32 DONE 仅表示草稿交付，不表示正式发布。"
     },
     "T33": {
       "status": "BLOCKED",
@@ -1639,7 +1639,7 @@
           "note": "交接材料与证据路径生成；正式发布 checklist 保留未完成项。"
         }
       ],
-      "note": "最终交接材料完成；T31/T32、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等阻塞未解除，不能正式放行。"
+      "note": "最终交接材料完成；T31、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等阻塞未解除，不能正式放行。"
     },
     "O01": {
       "status": "NOT_STARTED",
