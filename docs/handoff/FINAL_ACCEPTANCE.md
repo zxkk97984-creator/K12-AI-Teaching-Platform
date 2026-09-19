@@ -7,6 +7,31 @@ local demo covers lesson/conversation fixture flow, practice, resources, CodeLab
 privacy boundaries, responsive browser flows, the deterministic animation controller on an explicitly
 marked synthetic fixture, and real Docker runner isolation.
 
+## User-operable local path
+
+1. Inject the already-authorized development/test database and session settings through the secure
+   environment, then run `./scripts/bootstrap.sh`. Do not place passwords, PATs, cookies, or student
+   data in the repository. To provision demo accounts, set the six `T05_DEMO_*_USERNAME/PASSWORD`
+   variables documented by `scripts/bootstrap.sh`; otherwise use the controlled synthetic accounts
+   created by the test/bootstrap harness.
+2. Sign in with a synthetic profile and open `/courses`. The course list and chapter reader are
+   stage/revision filtered; use the profile's `PRIMARY_LOWER`, `PRIMARY_UPPER`, `JUNIOR`, or `SENIOR`
+   stage to verify the corresponding entry. A stage label is not evidence that the formal content has
+   been human-reviewed.
+3. Follow `/lessons` → `/practice` → `/growth` or `/learn`: start a lesson, answer a deterministic
+   exercise, inspect feedback/evidence, and use the projected next step. Refresh and use pause/resume
+   where applicable to verify the persistent local session.
+4. For CodeLab open `/code?task=temperature-converter`, run an intentional syntax/logic error, then
+   correct it. With the T24 loopback runner available, the result is a trusted Docker score plus
+   separately labelled fixture feedback; without it the UI must show `UNAVAILABLE` and never execute
+   code on the API host.
+5. Open `/resources` for the controlled Word/PPT/video flow and `/animations` for the explicitly
+   marked development/test fixture. Formal profile content, live Knodo calls, and human review remain
+   separate gates.
+
+The full repeatable command list and current exit codes are in `LOCAL_BUILD_COMPLETE.md` and
+`docs/acceptance/T30.md`.
+
 ## Cannot be claimed
 
 It is not a live Knodo integration, not a verified paid-model cost result, not a human-approved

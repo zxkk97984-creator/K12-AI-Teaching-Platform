@@ -18,6 +18,21 @@
 - T33: BLOCKED by T31 and G_HUMAN_CONTENT_REVIEW; T32 draft delivery is complete. Latest implementation
   checkpoint is 5821daa, and the handoff state update is eab362a.
 
+## Recovery facts
+
+- Repository: `/home/zxk/Projects/K12`, branch `main`, no remote, no uncommitted files at the last
+  checkpoint (`11d6211`).
+- Implementation checkpoint: `5821daa`; T32/status handoff checkpoint: `eab362a`; pointer-only
+  documentation revisions follow them in local history.
+- Load only the existing secure environment through the documented scripts (for example the local
+  test harness); do not print or copy any values from it. No root `.env`, PAT, cookie, database dump,
+  upload, or browser storage belongs in Git.
+- No K12 API, Vite, Playwright, runner, or migration process was active at handoff. The historical
+  `.herdr-control/shared-test.lock` is retained as recovery evidence; do not delete or claim it was
+  released by this session.
+- Continue from `.rebuild-kit/progress.json`, `docs/acceptance/T31.md`, `T32.md`, `T33.md`, and the
+  Knodo checklist. T11/T13/T31 require external contract/budget evidence before any live attempt.
+
 ## Safe local commands
 
     ./scripts/doctor.sh
