@@ -30,6 +30,9 @@
 - No K12 API, Vite, Playwright, runner, or migration process was active at handoff. The historical
   `.herdr-control/shared-test.lock` is retained as recovery evidence; do not delete or claim it was
   released by this session.
+- The latest `./scripts/check.sh` exited 1 at the read-only CareerMate source audit because that
+  external reference tree's HEAD/tree/status/untracked state drifted. Preserve the failure; do not
+  reset, checkout, delete, or bypass the old reference tree. K12-specific evidence remains in T30/T31.
 - Continue from `.rebuild-kit/progress.json`, `docs/acceptance/T31.md`, `T32.md`, `T33.md`, and the
   Knodo checklist. T11/T13/T31 require external contract/budget evidence before any live attempt.
 

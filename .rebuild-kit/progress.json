@@ -1643,9 +1643,15 @@
           "command": "./scripts/doctor.sh; APP_ENV=development ./scripts/bootstrap.sh (twice)",
           "exit_code": 0,
           "note": "doctor、双 PostgreSQL、前端构建和两次 bootstrap 通过；legacy/T06/CodeLab 均 REUSE，无重复创建；未启动 Knodo 或常驻 API/web/runner。"
+        },
+        {
+          "type": "external_audit",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "note": "CareerMate 只读 source-audit 检测外部 HEAD/tree/status/untracked 漂移后 fail-closed；未修改 K12 工作树，失败保留。"
         }
       ],
-      "note": "本地最终重复验收已通过；T31、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等外部阻塞未解除，不能正式放行。"
+      "note": "K12 本地最终重复验收已通过；另有 CareerMate 只读 source-audit 外部漂移失败需保留。T31、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等外部阻塞未解除，不能正式放行。"
     },
     "O01": {
       "status": "NOT_STARTED",

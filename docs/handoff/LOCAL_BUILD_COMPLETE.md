@@ -22,6 +22,7 @@ frontend 101 passed、既有 browser 21 passed + 1 explicit skip，以及本轮�
 | `./scripts/runner-live-test.sh` | 0 | 真实 Docker runner 5 passed |
 | `python3 evals/run_offline.py --output docs/acceptance/T31-offline-report.json` | 0 | 16 个合成评测样例 |
 | `./scripts/verify-live.sh` | 3 | 按门禁 fail-closed；未读取 PAT/未发起网络调用 |
+| `./scripts/check.sh` | 1 | 只读 CareerMate source-audit 检测外部 HEAD/tree/status/untracked 漂移后 fail-closed；未修改 K12 工作树 |
 
 验收由本单 Agent 完成第一遍实现和同一 Agent 的第二遍针对性复核；第二遍不是独立 Agent
 审核。用户最终验收尚待进行。
@@ -33,6 +34,8 @@ frontend 101 passed、既有 browser 21 passed + 1 explicit skip，以及本轮�
 - T31 真实 Knodo Bot/Skill/wire/usage/cost/人工教学质量未运行；
   G_API_CONTRACT 和 G_LIVE_BUDGET BLOCKED。
 - G_AGENT_ISOLATION、G_K12_TERMS、G_HUMAN_CONTENT_REVIEW 仍 BLOCKED。
+- 完整 `scripts/check.sh` 还保留 CareerMate 只读源审计的外部漂移失败；这不是 K12 源码修复项，
+  不能删除记录或用 `|| true` 绕过。
 
 因此当前可写“本地范围建设完成，等待外部配置、人审和用户最终验收”；这句话不解除
 G_* 门禁，也不把合成 fixture 通过等同教学质量或正式发布。
