@@ -4,7 +4,7 @@
 
 - 目标目录：/home/zxk/Projects/K12
 - 当前本地 Git 分支：main；无远端、无 push、无历史重写。
-- 最近提交：5fe79f4（交接指针更新；实现检查点 5821daa）；前序本地 readiness 提交 778315c，T32/T33 文档提交 dcb55a2，T31 提交 dec81d8，T30 提交 ff0a926，T29 提交 0a40876。
+- 最近提交：eab362a（T32 草稿交付与最终状态更新；实现检查点 5821daa）；前序本地 readiness 提交 778315c，T32/T33 文档提交 dcb55a2，T31 提交 dec81d8，T30 提交 ff0a926，T29 提交 0a40876。
 - 本轮唯一源码/测试/进度/Git 写入者：当前单 Agent；旧 Herdr/A-B/旧仓库只读。
 - 发布范围：synthetic_competition_prototype_until_authorized。
 
