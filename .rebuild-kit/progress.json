@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T23",
+  "current_task": "T25",
   "gates": {
     "G_API_CONTRACT": {
       "status": "BLOCKED",
@@ -1279,16 +1279,57 @@
       "note": "单 Agent 第一遍实现与第二遍自我复核均通过；可信 oracle/JSON 合同/幂等导入/0014 不可变修订完成。T24 真实隔离 runner 未完成，不由 T23 代替。"
     },
     "T24": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T24.md",
+        "runner/Dockerfile",
+        "runner/image.lock",
+        "runner/container/worker.py",
+        "runner/host/runner.py",
+        "backend/tests/test_runner_contracts.py",
+        "backend/tests/integrations/test_runner_docker.py",
+        "scripts/build-runner.sh",
+        "scripts/runner-live-test.sh",
+        "docs/operations/RUNNER_T24.md"
+      ],
+      "verification": [
+        {
+          "type": "runtime",
+          "command": "./scripts/build-runner.sh",
+          "exit_code": 0
+        },
+        {
+          "type": "runtime",
+          "command": "set -a; . /tmp/t20-env.sh; set +a; ./scripts/runner-live-test.sh",
+          "exit_code": 0,
+          "tests_passed": 5,
+          "data": "synthetic code; real local Docker"
+        },
+        {
+          "type": "automated",
+          "command": "pytest backend/tests/test_runner_contracts.py -q",
+          "exit_code": 0,
+          "tests_passed": 4
+        },
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q",
+          "exit_code": 0,
+          "tests_passed": 316
+        },
+        {
+          "type": "automated",
+          "command": "ruff check backend runner && ruff format --check backend runner",
+          "exit_code": 0
+        }
+      ],
+      "note": "单 Agent 第一遍实现与第二遍自我复核均通过；真实 Docker 5/5；网络/非 root/只读/cap-drop/资源/输出/租约清理已实测。T25 负责判分与辅导桥接。"
     },
     "T25": {
-      "status": "NOT_STARTED",
+      "status": "IN_PROGRESS",
       "evidence": [],
       "verification": [],
-      "note": ""
+      "note": "T24 完成后由单 Agent 连续接续；本轮尚未实现 T25。"
     },
     "T26": {
       "status": "NOT_STARTED",
