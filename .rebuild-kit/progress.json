@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T25",
+  "current_task": "T27",
   "gates": {
     "G_API_CONTRACT": {
       "status": "BLOCKED",
@@ -1362,16 +1362,27 @@
       "note": "单 Agent 第一遍实现与第二遍自我复核通过；可信结果与 AI 反馈独立、snapshot/owner/line refs 校验成立。真实 Knodo CODE_FEEDBACK 未运行，门禁保持 BLOCKED。"
     },
     "T26": {
+      "status": "BLOCKED",
+      "evidence": [
+        "docs/acceptance/T26.md",
+        "docs/acceptance/T24.md",
+        "docs/acceptance/T25.md"
+      ],
+      "verification": [
+        {
+          "type": "static",
+          "command": "inspect existing codelab routes/models/DTOs and T26 allowed paths",
+          "exit_code": 0,
+          "note": "No codelab HTTP/API persistence boundary exists; adding it exceeds the current card boundary."
+        }
+      ],
+      "note": "BLOCKED：缺少可供前端调用的 code task/run/feedback API、持久快照与 CodeMirror 依赖；不以 localStorage/mock/假成功替代 QA27/QA14/QA31。"
+    },
+    "T27": {
       "status": "IN_PROGRESS",
       "evidence": [],
       "verification": [],
-      "note": "T25 完成后由单 Agent 连续接续；本轮尚未实现 T26。"
-    },
-    "T27": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "note": "T26 本地阻塞后，继续推进不依赖 codelab API 的语音边界本地范围。"
     },
     "T28": {
       "status": "NOT_STARTED",
