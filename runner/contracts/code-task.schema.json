@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://k12.local/contracts/code-task.v1.schema.json",
+  "title": "K12 trusted code task definition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "revision",
+    "status",
+    "is_test_fixture",
+    "review_status",
+    "title",
+    "description",
+    "starter_code",
+    "entrypoint",
+    "io_contract",
+    "examples",
+    "test_manifest",
+    "rubric",
+    "chapter_binding",
+    "source"
+  ],
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "PUBLISHED"}}},
+      "then": {"properties": {"review_status": {"const": "HUMAN_REVIEWED"}}}
+    },
+    {
+      "if": {"properties": {"source": {"properties": {"source_kind": {"const": "SYNTHETIC_FIXTURE"}}}}},
+      "then": {"properties": {"is_test_fixture": {"const": true}}}
+    }
+  ],
+  "properties": {
+    "schema_version": {"const": "k12.code-task.v1"},
+    "task_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$"},
+    "revision": {"type": "integer", "minimum": 1},
+    "status": {"enum": ["DRAFT", "PUBLISHED", "ARCHIVED"]},
+    "is_test_fixture": {"type": "boolean"},
+    "review_status": {"enum": ["UNREVIEWED", "HUMAN_REVIEWED"]},
+    "title": {"type": "string", "minLength": 1, "maxLength": 200},
+    "description": {"type": "string", "minLength": 1, "maxLength": 12000},
+    "starter_code": {"type": "string", "minLength": 1, "maxLength": 20000},
+    "entrypoint": {"type": "string", "pattern": "^[a-zA-Z_][a-zA-Z0-9_]{0,63}$"},
+    "io_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "language", "input_schema", "output_schema", "limits", "errors"],
+      "properties": {
+        "protocol": {"const": "function-json.v1"},
+        "language": {"const": "python"},
+        "input_schema": {"type": "object"},
+        "output_schema": {"type": "object"},
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_input_bytes", "max_output_bytes", "timeout_ms"],
+          "properties": {
+            "max_input_bytes": {"type": "integer", "minimum": 1, "maximum": 1048576},
+            "max_output_bytes": {"type": "integer", "minimum": 1, "maximum": 1048576},
+            "timeout_ms": {"type": "integer", "minimum": 1, "maximum": 30000}
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {"enum": ["INVALID_JSON", "INVALID_INPUT", "STUDENT_EXCEPTION", "TIMEOUT", "OUTPUT_LIMIT", "SYSTEM_ERROR"]},
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "examples": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["input", "output"],
+        "properties": {
+          "input": {"type": "object"},
+          "output": {}
+        }
+      }
+    },
+    "test_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oracle_boundary", "public_groups", "hidden_case_count", "hidden_cases_sha256"],
+      "properties": {
+        "oracle_boundary": {"const": "TRUSTED_RUNNER_ONLY"},
+        "public_groups": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "dimension", "max_score", "case_count"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_-]{0,31}$"},
+              "name": {"type": "string", "minLength": 1, "maxLength": 120},
+              "dimension": {"enum": ["F", "R"]},
+              "max_score": {"type": "number", "exclusiveMinimum": 0},
+              "case_count": {"type": "integer", "minimum": 1}
+            }
+          }
+        },
+        "hidden_case_count": {"type": "integer", "minimum": 1},
+        "hidden_cases_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "deterministic_dimensions", "score_scale", "ai_feedback_non_authoritative"],
+      "properties": {
+        "version": {"const": "k12.codelab.rubric.v1"},
+        "deterministic_dimensions": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "max_score"],
+            "properties": {
+              "id": {"enum": ["F", "R"]},
+              "max_score": {"type": "number", "exclusiveMinimum": 0}
+            }
+          }
+        },
+        "score_scale": {"const": 70},
+        "ai_feedback_non_authoritative": {"const": true}
+      }
+    },
+    "chapter_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release_key", "course_slug", "chapter_slug", "revision", "stage", "knowledge_point_slugs"],
+      "properties": {
+        "release_key": {"type": "string", "minLength": 1},
+        "course_slug": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
+        "chapter_slug": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
+        "revision": {"type": "integer", "minimum": 1},
+        "stage": {"enum": ["PRIMARY_LOWER", "PRIMARY_UPPER", "JUNIOR", "SENIOR"]},
+        "knowledge_point_slugs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_kind", "source_commit", "source_path", "legacy_payload_sha256", "reference_solution_sha256", "legacy_test_groups_sha256"],
+      "properties": {
+        "source_kind": {"enum": ["LEGACY_REUSED", "SYNTHETIC_FIXTURE"]},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_path": {"type": "string", "minLength": 1},
+        "legacy_payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "reference_solution_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "legacy_test_groups_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

@@ -34,5 +34,6 @@ done
 (
   cd backend
   uv run --locked alembic -c alembic.ini upgrade head
+  uv run --locked python -m app.modules.codelab.importer --catalog-root ../curriculum/code-tasks
 )
 printf 'PASS: isolated dependencies and PostgreSQL services are ready.\n'

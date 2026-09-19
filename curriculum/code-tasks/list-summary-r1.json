@@ -1,0 +1,72 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "list-summary",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": false,
+  "review_status": "UNREVIEWED",
+  "title": "数据统计：一组数字的摘要",
+  "description": "编写函数 summarize(numbers)，返回 count、sum、max、min、mean 五个统计字段。空列表返回 count=0、sum=0，其余三个字段为 null。",
+  "starter_code": "def summarize(numbers):\n    # 在这里写下你的代码\n    pass\n",
+  "entrypoint": "summarize",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numbers"],
+      "properties": {"numbers": {"type": "array", "maxItems": 100, "items": {"type": "number"}}}
+    },
+    "output_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "sum", "max", "min", "mean"],
+      "properties": {
+        "count": {"type": "integer", "minimum": 0},
+        "sum": {"type": "number"},
+        "max": {"type": ["number", "null"]},
+        "min": {"type": ["number", "null"]},
+        "mean": {"type": ["number", "null"]}
+      }
+    },
+    "limits": {"max_input_bytes": 8192, "max_output_bytes": 4096, "timeout_ms": 1000},
+    "errors": ["INVALID_JSON", "INVALID_INPUT", "STUDENT_EXCEPTION", "TIMEOUT", "OUTPUT_LIMIT", "SYSTEM_ERROR"]
+  },
+  "examples": [
+    {"input": {"numbers": [1, 2, 3]}, "output": {"count": 3, "sum": 6, "max": 3, "min": 1, "mean": 2}},
+    {"input": {"numbers": []}, "output": {"count": 0, "sum": 0, "max": null, "min": null, "mean": null}}
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {"id": "F1", "name": "常规统计", "dimension": "F", "max_score": 30, "case_count": 2},
+      {"id": "F2", "name": "负数与单个元素", "dimension": "F", "max_score": 30, "case_count": 2},
+      {"id": "R1", "name": "空列表边界", "dimension": "R", "max_score": 10, "case_count": 1}
+    ],
+    "hidden_case_count": 5,
+    "hidden_cases_sha256": "e33ffbd40043b10fd49a2de48a53bd5419f1d8c6422fcee08fa161812609c077"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [{"id": "F", "max_score": 60}, {"id": "R", "max_score": 10}],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "python-first-steps",
+    "chapter_slug": "ch05",
+    "revision": 1,
+    "stage": "JUNIOR",
+    "knowledge_point_slugs": ["variable", "condition-if", "loop"]
+  },
+  "source": {
+    "source_kind": "LEGACY_REUSED",
+    "source_commit": "696364ff54c99f711e1cddd7364c9ac4d5282943",
+    "source_path": "backend/data/codelab/tasks/list-summary.json",
+    "legacy_payload_sha256": "ec1aa7ac575312cf86c564ebf4dadb0d31ce60b3d11fb506ddc184bb067985d8",
+    "reference_solution_sha256": "9d10a2bcf7b65023c3217da3491062c45d4c86a57e439fc3e701649ad9c4eb79",
+    "legacy_test_groups_sha256": "a825a055472af1f9030ac0ceb2fd7731d68bbe2946497d50e933b970b837bc19"
+  }
+}

@@ -1227,10 +1227,56 @@
       "note": "A 独立复核 PASS（2026-09-19T23:4x+08:00）：生成/审校/发布解耦与人审硬门禁实测成立；诚实边界（无平台生成能力主张、G_HUMAN_CONTENT_REVIEW 仍 BLOCKED）。M4 全部卡片完成。 | A 阶段验收复现测试自反缺陷；发最小修复单 23896ba1-8f81-442e-bf9e-68bcfcc6fbb1（attempt2）。 | A 复核 attempt2 PASS（2026-09-20T00:02:45+08:00）：测试自反断言已改为 gate 不变量；后端 293 全绿。"
     },
     "T23": {
-      "status": "IN_PROGRESS",
-      "evidence": [],
-      "verification": [],
-      "note": "A 派发 dispatch 5484f19f-7430-4a8f-91ec-de44d7ace2e2 attempt 1（M5 首卡）。"
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T23.md",
+        "docs/migration/CODE_TASK_MIGRATION.md",
+        "curriculum/code-tasks/temperature-converter-r1.json",
+        "curriculum/code-tasks/list-summary-r1.json",
+        "curriculum/code-tasks/binary-search-r1.json",
+        "runner/contracts/code-task.schema.json",
+        "runner/contracts/grading-result.schema.json",
+        "backend/app/modules/codelab/",
+        "backend/alembic/versions/0014_codelab_tasks.py"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "pytest backend/tests -q",
+          "exit_code": 0,
+          "tests_passed": 308
+        },
+        {
+          "type": "automated",
+          "command": "pytest T23 contracts/import/migration tests",
+          "exit_code": 0,
+          "tests_passed": 18
+        },
+        {
+          "type": "automated",
+          "command": "python3 contracts/test_contracts.py -v",
+          "exit_code": 0,
+          "tests_passed": 38
+        },
+        {
+          "type": "automated",
+          "command": "ruff check backend && ruff format --check backend",
+          "exit_code": 0
+        },
+        {
+          "type": "browser",
+          "command": "/tmp/t22-run-e2e-full.sh",
+          "exit_code": 0,
+          "tests_passed": 21
+        },
+        {
+          "type": "frontend",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 98
+        }
+      ],
+      "note": "单 Agent 第一遍实现与第二遍自我复核均通过；可信 oracle/JSON 合同/幂等导入/0014 不可变修订完成。T24 真实隔离 runner 未完成，不由 T23 代替。"
     },
     "T24": {
       "status": "NOT_STARTED",

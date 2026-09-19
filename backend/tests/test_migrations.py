@@ -48,7 +48,7 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         )
     finally:
         await connection.close()
-    assert revision == "0013_authoring_guards"
+    assert revision == "0014_codelab_tasks"
     assert {
         "identity_users",
         "auth_sessions",
@@ -94,6 +94,7 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "authoring_artifacts",
         "authoring_reviews",
         "authoring_publications",
+        "codelab_task_revisions",
     } <= {row["tablename"] for row in tables}
     constraint_names = {row["conname"] for row in constraints}
     assert {
@@ -157,6 +158,14 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "ck_authoring_reviews_decision",
         "ck_authoring_publications_revision",
         "ck_authoring_publications_sha256",
+        "ck_codelab_task_revision_positive",
+        "ck_codelab_task_status",
+        "ck_codelab_task_review_status",
+        "ck_codelab_task_io_contract_object",
+        "ck_codelab_task_examples_array",
+        "ck_codelab_task_manifest_object",
+        "ck_codelab_task_binding_object",
+        "ck_codelab_task_definition_sha256",
     } <= constraint_names
 
 
@@ -181,13 +190,14 @@ async def test_clean_test_baseline_upgrade_is_idempotent(test_settings):
         )
     finally:
         await connection.close()
-    assert revision == "0013_authoring_guards"
+    assert revision == "0014_codelab_tasks"
     assert {
         "content_chapter_revisions_immutable",
         "content_review_state_guard",
         "resource_publication_guard_trigger",
         "authoring_human_approval_guard",
         "authoring_publication_guard",
+        "codelab_task_revisions_immutable",
     } <= {row["tgname"] for row in triggers}
 
 

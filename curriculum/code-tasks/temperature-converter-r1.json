@@ -1,0 +1,62 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "temperature-converter",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": false,
+  "review_status": "UNREVIEWED",
+  "title": "温度换算：摄氏度转华氏度",
+  "description": "编写函数 celsius_to_fahrenheit(celsius)，把摄氏度换算成华氏度。支持负数与小数输入。华氏度 = 摄氏度 × 9 ÷ 5 + 32。",
+  "starter_code": "def celsius_to_fahrenheit(celsius):\n    # 在这里写下你的代码\n    pass\n",
+  "entrypoint": "celsius_to_fahrenheit",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["celsius"],
+      "properties": {"celsius": {"type": "number"}}
+    },
+    "output_schema": {"type": "number"},
+    "limits": {"max_input_bytes": 4096, "max_output_bytes": 4096, "timeout_ms": 1000},
+    "errors": ["INVALID_JSON", "INVALID_INPUT", "STUDENT_EXCEPTION", "TIMEOUT", "OUTPUT_LIMIT", "SYSTEM_ERROR"]
+  },
+  "examples": [
+    {"input": {"celsius": 0}, "output": 32},
+    {"input": {"celsius": 100}, "output": 212},
+    {"input": {"celsius": -40}, "output": -40}
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {"id": "F1", "name": "基本换算", "dimension": "F", "max_score": 30, "case_count": 3},
+      {"id": "F2", "name": "负数与小数", "dimension": "F", "max_score": 30, "case_count": 3},
+      {"id": "R1", "name": "返回值为数值", "dimension": "R", "max_score": 10, "case_count": 2}
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "a602dcb32e9d9f7856a1891693657dafddd88435a128a2ea2c2ff5fb5a23a190"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [{"id": "F", "max_score": 60}, {"id": "R", "max_score": 10}],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "python-first-steps",
+    "chapter_slug": "ch05",
+    "revision": 1,
+    "stage": "JUNIOR",
+    "knowledge_point_slugs": ["variable", "condition-if", "loop", "random-number"]
+  },
+  "source": {
+    "source_kind": "LEGACY_REUSED",
+    "source_commit": "696364ff54c99f711e1cddd7364c9ac4d5282943",
+    "source_path": "backend/data/codelab/tasks/temperature-converter.json",
+    "legacy_payload_sha256": "29ba55d7ae412e01aa704f206068fda24f2ae13f259dfaa42df55cd4293d5258",
+    "reference_solution_sha256": "36c1c0b43adaaa372fdb79a8b4c048de7d6ab1ea72171b06600ce8d5c9fd62d4",
+    "legacy_test_groups_sha256": "58926a34fb27651d56a8ea903c0bbe72ae730e4cc7157f8c4de58b673b09473f"
+  }
+}

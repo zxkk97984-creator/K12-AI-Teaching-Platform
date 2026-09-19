@@ -1,0 +1,65 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "binary-search",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": false,
+  "review_status": "UNREVIEWED",
+  "title": "算法思维：二分查找",
+  "description": "编写函数 binary_search(items, target)，在一个从小到大排好序且没有重复元素的列表中查找 target。找到返回下标，找不到或列表为空返回 -1。",
+  "starter_code": "def binary_search(items, target):\n    # 在这里写下你的代码\n    pass\n",
+  "entrypoint": "binary_search",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items", "target"],
+      "properties": {
+        "items": {"type": "array", "maxItems": 100, "items": {"type": "number"}},
+        "target": {"type": "number"}
+      }
+    },
+    "output_schema": {"type": "integer", "minimum": -1},
+    "limits": {"max_input_bytes": 8192, "max_output_bytes": 4096, "timeout_ms": 1000},
+    "errors": ["INVALID_JSON", "INVALID_INPUT", "STUDENT_EXCEPTION", "TIMEOUT", "OUTPUT_LIMIT", "SYSTEM_ERROR"]
+  },
+  "examples": [
+    {"input": {"items": [1, 3, 5, 7, 9], "target": 7}, "output": 3},
+    {"input": {"items": [1, 3, 5, 7, 9], "target": 4}, "output": -1},
+    {"input": {"items": [], "target": 5}, "output": -1}
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {"id": "F1", "name": "找到目标", "dimension": "F", "max_score": 30, "case_count": 3},
+      {"id": "F2", "name": "找不到与边界", "dimension": "F", "max_score": 30, "case_count": 4},
+      {"id": "R1", "name": "空列表不崩溃", "dimension": "R", "max_score": 10, "case_count": 1}
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "bab37c60ba7134d59947b5d808aad9b96e7dd6c7f60229f6073cda63edf29f99"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [{"id": "F", "max_score": 60}, {"id": "R", "max_score": 10}],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "algorithm-everyday",
+    "chapter_slug": "ch03",
+    "revision": 1,
+    "stage": "SENIOR",
+    "knowledge_point_slugs": ["binary-search", "time-complexity", "sorting-algorithm"]
+  },
+  "source": {
+    "source_kind": "LEGACY_REUSED",
+    "source_commit": "696364ff54c99f711e1cddd7364c9ac4d5282943",
+    "source_path": "backend/data/codelab/tasks/binary-search.json",
+    "legacy_payload_sha256": "0703a2482047150adeab1b9f8a12fca199a87660c3d7a6938c7dddd5bd0f8c17",
+    "reference_solution_sha256": "899dc43ad0a8cc8c86588a165f6a67550d306052cfa787675551384f72586530",
+    "legacy_test_groups_sha256": "142eaaeac3f7590fc17d9d86b41396978ed450fa23e54b7ea786f0ecea9c5f06"
+  }
+}
