@@ -14,7 +14,8 @@
   senior animation content remains an external requirement.
 - T31: BLOCKED by G_API_CONTRACT and G_LIVE_BUDGET; offline eval framework is committed.
 - T32: BLOCKED/草稿; report and demo docs are committed.
-- T33: BLOCKED by T31/T32 and G_HUMAN_CONTENT_REVIEW; latest local checkpoint is 5821daa.
+- T33: BLOCKED by T31/T32 and G_HUMAN_CONTENT_REVIEW; latest implementation checkpoint is 5821daa,
+  and the final handoff pointer is 5fe79f4.
 
 ## Safe local commands
 
