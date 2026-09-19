@@ -1,0 +1,52 @@
+.voice-composer {
+  border: 1px solid #d7dce3;
+  border-radius: 10px;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  background: #fbfcfe;
+}
+
+.voice-composer__header,
+.voice-composer__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.voice-composer__status,
+.voice-composer__reason,
+.voice-composer__tts {
+  margin: 0;
+  color: #5b6472;
+  font-size: 13px;
+}
+
+.voice-composer__badge {
+  border: 1px solid #d7dce3;
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: #5b6472;
+  font-size: 12px;
+}
+
+.voice-composer__draft {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.voice-composer__draft textarea {
+  min-height: 72px;
+  border: 1px solid #d7dce3;
+  border-radius: 6px;
+  padding: 8px;
+  font: inherit;
+}
+
+.voice-composer__error {
+  margin: 0;
+  color: #8c1d1d;
+  font-size: 13px;
+}

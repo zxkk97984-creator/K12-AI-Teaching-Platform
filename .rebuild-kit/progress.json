@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T27",
+  "current_task": "T28",
   "gates": {
     "G_API_CONTRACT": {
       "status": "BLOCKED",
@@ -1379,16 +1379,41 @@
       "note": "BLOCKED：缺少可供前端调用的 code task/run/feedback API、持久快照与 CodeMirror 依赖；不以 localStorage/mock/假成功替代 QA27/QA14/QA31。"
     },
     "T27": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T27.md",
+        "docs/operations/VOICE_T27.md",
+        "backend/app/modules/voice/capability.py",
+        "backend/tests/test_voice_capability.py",
+        "frontend/src/features/voice/VoiceComposer.tsx",
+        "frontend/src/features/voice/voice.test.tsx"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "pytest backend/tests/test_voice_capability.py -q",
+          "exit_code": 0,
+          "tests_passed": 1
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 101
+        },
+        {
+          "type": "automated",
+          "command": "ruff check backend/app/modules/voice backend/tests/test_voice_capability.py",
+          "exit_code": 0
+        }
+      ],
+      "note": "本地 provider-unavailable/主动录音/取消/可编辑转写/文本回退边界完成；真实 ASR/TTS 未验证，不能标 VOICE_READY。"
+    },
+    "T28": {
       "status": "IN_PROGRESS",
       "evidence": [],
       "verification": [],
-      "note": "T26 本地阻塞后，继续推进不依赖 codelab API 的语音边界本地范围。"
-    },
-    "T28": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "note": "T27 完成后由单 Agent 连续接续。"
     },
     "T29": {
       "status": "NOT_STARTED",
