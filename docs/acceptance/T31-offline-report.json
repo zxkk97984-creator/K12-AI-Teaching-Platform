@@ -1,0 +1,30 @@
+{
+  "schema_version": "k12.teaching.eval-report.v1",
+  "eval_set": "t31-local-v1",
+  "mode": "OFFLINE_SYNTHETIC_NOT_KNODO",
+  "cases": 16,
+  "by_stage": {
+    "JUNIOR": 4,
+    "PRIMARY_LOWER": 4,
+    "PRIMARY_UPPER": 4,
+    "SENIOR": 4
+  },
+  "by_category": {
+    "active_opening": 4,
+    "code_guidance": 2,
+    "no_source_boundary": 2,
+    "source_supported_explanation": 4,
+    "wrong_answer_feedback": 4
+  },
+  "rubric_dimensions": [
+    "factuality",
+    "source_support",
+    "age_fit",
+    "pedagogical_actionability",
+    "safety_boundary"
+  ],
+  "automated_only": true,
+  "human_review": "NOT_RUN",
+  "live_platform": "BLOCKED_G_API_CONTRACT_AND_G_LIVE_BUDGET",
+  "learning_effect_claim": "FORBIDDEN"
+}

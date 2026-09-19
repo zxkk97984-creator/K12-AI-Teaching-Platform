@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T30",
+  "current_task": "T31",
   "gates": {
     "G_API_CONTRACT": {
       "status": "BLOCKED",
@@ -1550,10 +1550,32 @@
       "note": "离线/真实 PG/浏览器/真实 Docker 可执行范围通过；animation 控制器仍因缺真实人审发布前置 BLOCKED，故不登记 DONE。"
     },
     "T31": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "status": "BLOCKED",
+      "evidence": [
+        "docs/acceptance/T31.md",
+        "docs/acceptance/T31-offline-report.json",
+        "evals/teaching_cases.jsonl",
+        "evals/rubric.v1.json",
+        "evals/run_offline.py",
+        "scripts/verify-live.sh",
+        "docs/integrations/knodo/GATE_REGISTER.md"
+      ],
+      "verification": [
+        {
+          "type": "offline_eval",
+          "command": "python3 evals/run_offline.py --output docs/acceptance/T31-offline-report.json",
+          "exit_code": 0,
+          "cases": 16,
+          "note": "四学段/五类别覆盖；automated_only=true，human review NOT_RUN。"
+        },
+        {
+          "type": "gate",
+          "command": "./scripts/verify-live.sh",
+          "exit_code": 3,
+          "note": "Fail-closed because G_API_CONTRACT and G_LIVE_BUDGET remain BLOCKED; no PAT/network read or call."
+        }
+      ],
+      "note": "离线评测框架已完成；真实 Knodo 质量、usage、成本和人工判断必须等待 G_API_CONTRACT/G_LIVE_BUDGET 及人审授权。"
     },
     "T32": {
       "status": "NOT_STARTED",
