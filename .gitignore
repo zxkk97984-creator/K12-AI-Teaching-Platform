@@ -23,6 +23,8 @@ frontend/vite.config.d.ts
 
 # Local runtime data, uploads, databases, and generated evidence
 backend/storage/
+storage/
+platform/knodo/bundles/authoring/
 **/uploads/
 *.db
 *.sqlite

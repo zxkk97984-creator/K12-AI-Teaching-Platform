@@ -24,7 +24,7 @@ const VIEWPORTS = [
   { name: "1280", width: 1280, height: 900 },
 ];
 
-const EVIDENCE = "../.herdr-control/evidence";
+const EVIDENCE = "docs/acceptance/t30-evidence";
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");

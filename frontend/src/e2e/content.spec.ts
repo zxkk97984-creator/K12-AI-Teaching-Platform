@@ -122,7 +122,7 @@ test("reader adapts to 390/820/1280 without horizontal overflow", async ({ page 
   await expect(page.getByTestId("chapter-reader")).toBeVisible();
 
   await page.screenshot({
-    path: "../docs/design/screenshots/t08-course-list-1280.png",
+    path: "docs/acceptance/t30-evidence/t08-course-list-1280.png",
     fullPage: false,
   });
 
@@ -135,7 +135,7 @@ test("reader adapts to 390/820/1280 without horizontal overflow", async ({ page 
     expect(overflow, `viewport ${viewport.name}px must not overflow`).toBeLessThanOrEqual(1);
     await expect(page.getByTestId("chapter-reader")).toBeVisible();
     await page.screenshot({
-      path: `../docs/design/screenshots/t08-reader-${viewport.name}.png`,
+      path: `docs/acceptance/t30-evidence/t08-reader-${viewport.name}.png`,
       fullPage: true,
     });
   }

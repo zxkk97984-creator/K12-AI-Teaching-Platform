@@ -18,7 +18,7 @@ const studentB = {
   password: process.env.E2E_STUDENT_B_PASSWORD ?? "",
 };
 
-const EVIDENCE = "../.herdr-control/evidence";
+const EVIDENCE = "docs/acceptance/t30-evidence";
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");

@@ -1509,10 +1509,45 @@
       "note": "本地干净部署与唯一初始化完成；真实 runner/Knodo/生产恢复和公网发布仍未验证。"
     },
     "T30": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "status": "BLOCKED",
+      "evidence": [
+        "docs/acceptance/T30.md",
+        "scripts/verify.sh",
+        "docs/acceptance/t30-evidence",
+        "frontend/src/e2e/animation.spec.ts",
+        "frontend/src/e2e/resources.spec.ts",
+        "frontend/src/e2e/growth.spec.ts",
+        "frontend/src/e2e/learn.spec.ts"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "PYTHONPATH=. backend/.venv/bin/pytest backend/tests -q",
+          "exit_code": 0,
+          "tests_passed": 333
+        },
+        {
+          "type": "frontend",
+          "command": "npm test && npm run typecheck && npm run build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 101
+        },
+        {
+          "type": "browser",
+          "command": "playwright test src/e2e --config frontend/playwright.config.ts --reporter=line",
+          "exit_code": 0,
+          "tests_passed": 21,
+          "tests_skipped": 1,
+          "note": "animation 先验证未发布空态后显式 SKIP；不把缺少 human-approved senior chapter 当作控制器通过。"
+        },
+        {
+          "type": "live_docker",
+          "command": "./scripts/runner-live-test.sh",
+          "exit_code": 0,
+          "tests_passed": 5
+        }
+      ],
+      "note": "离线/真实 PG/浏览器/真实 Docker 可执行范围通过；animation 控制器仍因缺真实人审发布前置 BLOCKED，故不登记 DONE。"
     },
     "T31": {
       "status": "NOT_STARTED",

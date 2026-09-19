@@ -11,15 +11,15 @@ import { expect, test, type Page } from "@playwright/test";
  */
 
 const studentA = {
-  username: process.env.E2E_STUDENT_A_USERNAME ?? "",
-  password: process.env.E2E_STUDENT_A_PASSWORD ?? "",
+  username: process.env.E2E_GROWTH_STUDENT ?? process.env.E2E_STUDENT_A_USERNAME ?? "",
+  password: process.env.E2E_GROWTH_STUDENT_PASSWORD ?? process.env.E2E_STUDENT_A_PASSWORD ?? "",
 };
 const studentB = {
   username: process.env.E2E_STUDENT_B_USERNAME ?? "",
   password: process.env.E2E_STUDENT_B_PASSWORD ?? "",
 };
 
-const EVIDENCE = "../.herdr-control/evidence";
+const EVIDENCE = "docs/acceptance/t30-evidence";
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
@@ -25,8 +26,12 @@ const otherStage = {
   password: process.env.E2E_T20_SENIOR_PASSWORD ?? "",
 };
 
-const EVIDENCE = "../.herdr-control/evidence";
-const FIXTURES = "../backend/tests/fixtures/t20";
+const EVIDENCE = "docs/acceptance/t30-evidence";
+const FIXTURES = resolve(process.cwd(), "backend/tests/fixtures/t20");
+const RUN_ID = `t30-${Date.now()}`;
+const DOC_TITLE = `合成 Word 资源 ${RUN_ID}`;
+const SLIDES_TITLE = `合成 PPT 资源 ${RUN_ID}`;
+const VIDEO_TITLE = `合成教学视频 ${RUN_ID}`;
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");
@@ -69,20 +74,20 @@ test("real docx/pptx/video open for a student, then withdrawal kills the old lin
   await expect(page).toHaveURL(/\/$/);
 
   await registerAndPublish(page, {
-    slug: "e2e-t20-doc",
-    title: "合成 Word 资源",
+    slug: `${RUN_ID}-doc`,
+    title: DOC_TITLE,
     kind: "WORD",
     file: "synthetic-lesson.docx",
   });
   await registerAndPublish(page, {
-    slug: "e2e-t20-slides",
-    title: "合成 PPT 资源",
+    slug: `${RUN_ID}-slides`,
+    title: SLIDES_TITLE,
     kind: "SLIDES",
     file: "synthetic-slides.pptx",
   });
   const videoRow = await registerAndPublish(page, {
-    slug: "e2e-t20-video",
-    title: "合成教学视频",
+    slug: `${RUN_ID}-video`,
+    title: VIDEO_TITLE,
     kind: "VIDEO",
     file: "synthetic-clip.mp4",
   });
@@ -94,7 +99,7 @@ test("real docx/pptx/video open for a student, then withdrawal kills the old lin
   await expect(page.getByTestId("resource-grid")).toBeVisible({ timeout: 15_000 });
 
   const docCard = page.locator('[data-testid^="resource-card-"]', {
-    hasText: "合成 Word 资源",
+    hasText: DOC_TITLE,
   });
   await expect(docCard).toBeVisible();
 
@@ -120,7 +125,7 @@ test("real docx/pptx/video open for a student, then withdrawal kills the old lin
 
   // the video really decodes and reaches its end
   const videoCard = page.locator('[data-testid^="resource-card-"]', {
-    hasText: "合成教学视频",
+    hasText: VIDEO_TITLE,
   });
   const video = videoCard.locator("video");
   await expect(video).toBeVisible({ timeout: 20_000 });
@@ -164,7 +169,7 @@ test("real docx/pptx/video open for a student, then withdrawal kills the old lin
   await signIn(page, otherStage);
   await page.goto("/resources");
   await expect(page.getByTestId("resource-library")).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByText("合成教学视频")).toHaveCount(0);
+  await expect(page.getByText(VIDEO_TITLE)).toHaveCount(0);
 
   // ---- withdrawal: the old links stop working for the enrolled student
   await signIn(page, admin);
@@ -176,12 +181,12 @@ test("real docx/pptx/video open for a student, then withdrawal kills the old lin
   const withdrawnDirect = await page.request.get("/api/v1/resources");
   expect(withdrawnDirect.status()).toBe(200);
   const body = await withdrawnDirect.json();
-  expect(body.items.some((item: { title: string }) => item.title === "合成教学视频")).toBe(false);
+  expect(body.items.some((item: { title: string }) => item.title === VIDEO_TITLE)).toBe(false);
 
   const stale = await page.request.get(ticketHref!);
   expect([403, 404]).toContain(stale.status());
 
   await page.goto("/resources");
   await expect(page.getByTestId("resource-grid")).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByText("合成教学视频")).toHaveCount(0);
+  await expect(page.getByText(VIDEO_TITLE)).toHaveCount(0);
 });

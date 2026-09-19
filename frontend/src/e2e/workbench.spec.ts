@@ -60,7 +60,7 @@ test("workbench shell adapts to 390/820/1280 without overflow and keeps honest s
       await expect(page.getByTestId("lesson-canvas")).toBeVisible();
     }
     await page.screenshot({
-      path: `../docs/design/screenshots/t07-workbench-${viewport.name}.png`,
+      path: `docs/acceptance/t30-evidence/t07-workbench-${viewport.name}.png`,
       fullPage: true,
     });
   }
@@ -109,7 +109,7 @@ test("junior student gets the compact density with more panels on screen", async
   await expect(page.getByTestId("workbench-shell")).toHaveAttribute("data-density", "compact");
   await expect(page.getByTestId("compact-panels")).toBeVisible();
   await page.screenshot({
-    path: "../docs/design/screenshots/t07-workbench-compact-1280.png",
+    path: "docs/acceptance/t30-evidence/t07-workbench-compact-1280.png",
     fullPage: true,
   });
 });

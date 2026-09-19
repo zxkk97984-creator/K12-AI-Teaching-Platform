@@ -62,7 +62,7 @@ test("A session persists, revokes on logout, and cannot become B", async ({ page
     headers: { Origin: "https://evil.example", "X-CSRF-Token": "bad" },
   });
   expect(rejected.status()).toBe(403);
-  await page.screenshot({ path: "../docs/acceptance/t05-browser-redacted.png", fullPage: true });
+  await page.screenshot({ path: "docs/acceptance/t30-evidence/t05-browser-redacted.png", fullPage: true });
 });
 
 test("settings shows a real service-unavailable state", async ({ page }) => {

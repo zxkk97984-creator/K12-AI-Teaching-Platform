@@ -19,7 +19,7 @@ const student = {
   password: process.env.E2E_T22_STUDENT_PASSWORD ?? "",
 };
 const revisionId = process.env.E2E_T22_REVISION ?? "";
-const EVIDENCE = "../.herdr-control/evidence";
+const EVIDENCE = "docs/acceptance/t30-evidence";
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");
