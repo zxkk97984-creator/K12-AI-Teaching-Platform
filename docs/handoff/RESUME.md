@@ -20,8 +20,7 @@
 
 ## Recovery facts
 
-- Repository: `/home/zxk/Projects/K12`, branch `main`, no remote, no uncommitted files at the last
-  checkpoint (`11d6211`).
+- Repository: `/home/zxk/Projects/K12`, branch `main`, no remote, and the handoff worktree is clean.
 - Implementation checkpoint: `5821daa`; T32/status handoff checkpoint: `eab362a`; pointer-only
   documentation revisions follow them in local history.
 - Load only the existing secure environment through the documented scripts (for example the local
