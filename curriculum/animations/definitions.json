@@ -151,6 +151,69 @@
         }
       },
       "defaults": { "values": [2, 4, 6, 8], "target": 6 }
+    },
+    {
+      "id": "anim-sort-bubble-fixture-v1",
+      "template": "SORT_STEPS",
+      "title": "（合成）冒泡排序：相邻比较与交换",
+      "summary": "显式合成夹具：仅开发/测试 profile 可见，且必须标注未审校。",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "course_slug": "t06-fixture-course",
+      "chapter_slug": "ch02",
+      "chapter_revision": 1,
+      "knowledge_points": ["fixture-notice"],
+      "objectives": ["（合成夹具）验证排序动画控制器"],
+      "source_kind": "SYNTHETIC_FIXTURE",
+      "license_code": "SYNTHETIC-FIXTURE",
+      "review_status": "UNREVIEWED",
+      "reviewer": null,
+      "publication_status": "DRAFT",
+      "is_test_fixture": true,
+      "text_alternative": "冒泡排序合成夹具的替代文字说明，仅用于开发测试。",
+      "preconditions": ["输入可以包含重复值"],
+      "param_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "required": ["values"],
+        "properties": {
+          "values": { "type": "int_array", "min_items": 1, "max_items": 12, "min_value": -99, "max_value": 999 }
+        }
+      },
+      "defaults": { "values": [5, 2, 9, 1, 5, 6] }
+    },
+    {
+      "id": "anim-binary-search-fixture-junior-v1",
+      "template": "BINARY_SEARCH",
+      "title": "（合成）二分查找：区间对半收缩",
+      "summary": "显式合成夹具：仅开发/测试 profile 可见，且必须标注未审校。",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "course_slug": "t06-fixture-course",
+      "chapter_slug": "ch02",
+      "chapter_revision": 1,
+      "knowledge_points": ["fixture-notice"],
+      "objectives": ["（合成夹具）验证区间收缩的渲染与边界"],
+      "source_kind": "SYNTHETIC_FIXTURE",
+      "license_code": "SYNTHETIC-FIXTURE",
+      "review_status": "UNREVIEWED",
+      "reviewer": null,
+      "publication_status": "DRAFT",
+      "is_test_fixture": true,
+      "text_alternative": "合成夹具的替代文字说明，仅用于开发测试。",
+      "preconditions": ["数组必须已按非降序排序"],
+      "param_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "required": ["values", "target"],
+        "properties": {
+          "values": { "type": "int_array", "min_items": 1, "max_items": 12, "min_value": -99, "max_value": 999 },
+          "target": { "type": "int", "min_value": -99, "max_value": 999 }
+        }
+      },
+      "defaults": { "values": [1, 3, 5, 7, 9, 11], "target": 7 }
     }
   ]
 }

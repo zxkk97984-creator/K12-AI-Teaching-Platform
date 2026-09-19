@@ -7,6 +7,7 @@
 - [x] bootstrap migration/content/CodeLab import idempotence.
 - [x] API/worker/web/storage readiness and runner disabled state honest.
 - [x] Backend/frontend/contract/browser/real Docker evidence recorded.
+- [x] Deterministic animation controls rerun on explicitly marked synthetic fixtures; formal human review remains separate.
 - [x] Secrets, cookies, real student data and runtime uploads excluded from Git.
 
 ## Required before any real platform claim
@@ -16,7 +17,7 @@
 - [ ] G_AGENT_ISOLATION: session/file/memory/tool/runtime identity and revocation evidence.
 - [ ] G_K12_TERMS: competition tenant and under-16 processing arrangement.
 - [ ] G_HUMAN_CONTENT_REVIEW: four stage examples and formal resources signed by real reviewers.
-- [ ] T30 animation control rerun with the approved senior chapter.
+- [ ] Formal animation/content rerun with an approved senior chapter (synthetic fixture rerun is recorded separately above).
 - [ ] T31 live synthetic sample and human rubric review.
 - [ ] T33 repeat acceptance and user sign-off.
 

@@ -57,6 +57,8 @@ SENIOR_ANIMATION = "anim-sort-bubble-v1"
 SEARCH_ANIMATION = "anim-binary-search-v1"
 DRAFT_ANIMATION = "anim-sort-bubble-draft-v1"
 FIXTURE_ANIMATION = "anim-binary-search-fixture-v1"
+SORT_FIXTURE_ANIMATION = "anim-sort-bubble-fixture-v1"
+BINARY_JUNIOR_FIXTURE_ANIMATION = "anim-binary-search-fixture-junior-v1"
 PASSWORD = "synthetic-T21-Pass-1234"
 
 
@@ -370,7 +372,8 @@ async def test_production_session_injects_only_visible_animation_ids(
     for value in allowed:
         assert isinstance(value, str) and value.isascii()
 
-    # a junior learner gets none of the senior animations
+    # a junior learner gets only the explicitly bound development fixture,
+    # never the senior formal animations
     await import_package(content_session, load_package(FIXTURE_PACKAGE), dry_run=False)
     junior = await create_synthetic_user(
         aclient.settings,
@@ -388,7 +391,12 @@ async def test_production_session_injects_only_visible_animation_ids(
             await revision_by_slug(content_session, "t06-fixture-course", "ch02", 1)
         ).chapter_id,
     )
-    assert junior_session.context["allowed_animation_ids"] == []
+    assert junior_session.context["allowed_animation_ids"] == [
+        SORT_FIXTURE_ANIMATION,
+        BINARY_JUNIOR_FIXTURE_ANIMATION,
+    ]
+    assert SENIOR_ANIMATION not in junior_session.context["allowed_animation_ids"]
+    assert SEARCH_ANIMATION not in junior_session.context["allowed_animation_ids"]
 
 
 @pytest.mark.asyncio

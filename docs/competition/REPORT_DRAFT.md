@@ -33,7 +33,7 @@ API。系统架构见 plans/02_架构与数据边界.md，证据见 T24/T29 报�
 | --- | --- | --- |
 | 教学对话/主动课堂 | T14/T17/T30 lesson/conversation 浏览器与后端 | fixture 教学链路通过；真实 Knodo NOT_RUN |
 | Word/PPT/video 资源 | T20 真实合成文件上传、下载、播放、撤回；T30 截图 | 本地资源闭环通过；正式内容/人审未通过 |
-| 确定性动画 | T21 后端边界测试；T30 空态 browser check | 注册/参数/安全边界通过；控制器 browser 需人审 senior chapter |
+| 确定性动画 | T21 后端边界测试；T30 synthetic fixture browser 1 passed、390/1280 截图 | 注册/参数/安全边界和本地控制器通过；正式内容仍需人审 senior chapter |
 | 在线编程 | T23–T26、T30 CodeLab、T24 Docker 5 tests | 本地真实 Docker/可信判分通过；AI feedback 为 fixture |
 | 趣味练习 | T15–T18、T30 practice browser | 本地题目快照/提示/判分/证据通过；教学效果未验证 |
 
@@ -46,7 +46,7 @@ API。系统架构见 plans/02_架构与数据边界.md，证据见 T24/T29 报�
 - PRIMARY_LOWER：开发合成 fixture 可演示结构；正式低龄样章待真实内容审校。
 - PRIMARY_UPPER：规划中“比较与排序”方向；正式内容待生产/审校。
 - JUNIOR：legacy python-first-steps/ch05 revision 1 已按来源导入，发布/人审状态仍按数据库事实。
-- SENIOR：legacy algorithm-everyday/ch03 revision 1 已按来源导入；T30 动画交互因缺人审发布前置显式 skip。
+- SENIOR：legacy algorithm-everyday/ch03 revision 1 已按来源导入；正式动画内容仍待人审；T30 控制器使用 T06 合成 fixture 完成本地复核。
 
 不把 stage label、fixture 通过或模型输出当成人工审校/适龄证明。
 

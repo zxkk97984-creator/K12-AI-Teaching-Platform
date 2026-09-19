@@ -15,8 +15,9 @@
    活动与刷新恢复；强调这是本地 fixture，不是 Knodo 真实教师。
 3. 打开 /practice：答错、提示、再答、刷新；展示服务端快照和确定性结果。
 4. 打开 /resources：用 T20 合成 Word/PPT/video 展示下载、视频播放、stage 过滤和撤回后旧入口失效。
-5. 打开 /animations：展示已发布动画时的单步/暂停/重置；若当前没有 human-approved senior chapter，
-   展示“没有已发布动画”的 fail-closed 空态，不伪造控制器。
+5. 打开 /animations：在 development/test profile 选择明确标注的合成 fixture，展示单步/暂停/重置、
+   文字替代说明和低动效；正式 profile 若没有 human-approved senior chapter，展示“没有已发布动画”的
+   fail-closed 空态，不把 fixture 当正式内容。
 6. 打开 /code?task=temperature-converter：错误实现 → PARTIAL/10 → 修正 →真实 Docker runner
    PASSED/70 → fixture feedback；强调 AI feedback 不改 deterministic score。
 7. 打开 /growth 和 /learn：展示证据、记忆确认/质疑/遗忘、下一步投影；不展示掌握度百分比或排行榜。

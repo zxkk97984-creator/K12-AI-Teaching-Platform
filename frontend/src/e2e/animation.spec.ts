@@ -10,9 +10,9 @@ import { expect, test, type Page } from "@playwright/test";
  * server-filtered catalogue; no static image stands in for a played animation.
  */
 
-const senior = {
-  username: process.env.E2E_T21_STUDENT ?? "",
-  password: process.env.E2E_T21_STUDENT_PASSWORD ?? "",
+const lower = {
+  username: process.env.E2E_T21_LOWER ?? "",
+  password: process.env.E2E_T21_LOWER_PASSWORD ?? "",
 };
 const junior = {
   username: process.env.E2E_T21_JUNIOR ?? "",
@@ -42,12 +42,8 @@ test("deterministic animation: play/pause/step/reset, highlight & narration stay
   page,
 }) => {
   test.slow();
-  await signIn(page, senior);
+  await signIn(page, junior);
   await page.goto("/animations");
-  if ((await page.getByTestId("animation-picker").count()) === 0) {
-    await expect(page.getByText("你所在学段目前没有已发布的动画")).toBeVisible();
-    test.skip(true, "requires a human-approved published senior chapter in the local fixture");
-  }
   await expect(page.getByTestId("animation-picker")).toBeVisible({ timeout: 15_000 });
 
   // ---- sorting template
@@ -105,7 +101,9 @@ test("deterministic animation: play/pause/step/reset, highlight & narration stay
   await page.getByTestId("animation-pause").click();
 
   // ---- binary search template: interval shrinks and stays legal
-  await page.getByTestId("animation-select").selectOption("anim-binary-search-v1");
+  await page
+    .getByTestId("animation-select")
+    .selectOption("anim-binary-search-fixture-junior-v1");
   await page.getByTestId("animation-values").fill("1,3,5,7,9,11");
   await page.getByTestId("animation-target").fill("9");
   await generate(page);
@@ -143,7 +141,7 @@ test("deterministic animation: play/pause/step/reset, highlight & narration stay
   // back to the sorting template: unsorted values are legal there (only the
   // binary-search precondition refuses them), and the text alternative is
   // always available even in the low-motion case
-  await page.getByTestId("animation-select").selectOption("anim-sort-bubble-v1");
+  await page.getByTestId("animation-select").selectOption("anim-sort-bubble-fixture-v1");
   await page.getByTestId("animation-values").fill("5,2,9,1");
   await generate(page);
   await expect(page.getByTestId("animation-text-alternative")).toContainText("冒泡排序");
@@ -177,8 +175,8 @@ test("deterministic animation: play/pause/step/reset, highlight & narration stay
     JSON.stringify(before.evidence_counts ?? before),
   );
 
-  // ---- a junior student never sees a senior animation
-  await signIn(page, junior);
+  // ---- a lower-stage student never sees the junior fixture
+  await signIn(page, lower);
   await page.goto("/animations");
   await expect(page.getByTestId("animation-page")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByTestId("animation-empty-state")).toBeVisible({ timeout: 15_000 });

@@ -7,6 +7,6 @@
 
 1. 只允许两种模板：`SORT_STEPS`（冒泡排序）与 `BINARY_SEARCH`（二分查找）。未知模板一律被后端丢弃（fail-closed）。
 2. Teacher 只能**选择已登记 ID**，或提交**通过 schema 校验的参数**；非法 ID、未知参数键、超长数组、越界数值都被拒绝。
-3. `publication_status != PUBLISHED` 且非显式合成夹具的定义不会出现在学生端；合成夹具（`is_test_fixture=true`）只在开发/测试 profile 可见，且界面必须标注「测试内容，未作人工教学审校」。
+3. `publication_status != PUBLISHED` 且非显式合成夹具的定义不会出现在学生端；合成夹具（`is_test_fixture=true`）只在开发/测试 profile 可见，且界面必须标注「测试内容，未作人工教学审校」。T30 使用 `anim-sort-bubble-fixture-v1` 和 `anim-binary-search-fixture-junior-v1` 绑定 T06 合成章节验证控制器，不能替代正式 senior 人审动画。
 4. 定义绑定的章节是真实存在的课程章节；章节自身不可见（未发布/撤回/跨学段）时，动画也不会被提供（复用内容权限真相）。
 5. 这里不是「模型生成动画」：模型只能选 ID 或填参数，不能提供代码、外链或任意 HTML。

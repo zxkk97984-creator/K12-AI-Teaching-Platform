@@ -9,7 +9,7 @@
 | Resources | T30 real synthetic docx/pptx/video browser flow | READY |
 | Practice/lesson/growth/next step | T17–T19 backend/browser evidence; T30 browser | READY |
 | CodeLab | T23–T26, T30 browser, T24 Docker live | READY in synthetic/local scope |
-| Animation controls | T21 backend boundaries; T30 empty-state browser only | BLOCKED: human-approved senior chapter |
+| Animation controls | T21 backend boundaries; T30 synthetic fixture browser 1 passed with 390/1280 screenshots | READY in synthetic/local scope; formal senior content review still BLOCKED |
 | Voice | T27 honest unavailable/fallback boundary | NOT_PROVIDED |
 | Knodo live quality/cost | T31 offline rubric only | BLOCKED: API contract/budget |
 | Formal four-stage content review | no real signatures | BLOCKED |

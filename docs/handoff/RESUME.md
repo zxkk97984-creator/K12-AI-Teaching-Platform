@@ -9,10 +9,13 @@
 
 ## Current task state
 
-- T30: BLOCKED only for the explicit animation human-review prerequisite; 21 browser tests passed.
+- T30: local synthetic scope DONE; baseline browser matrix was 21 passed + 1 historical skip, then the
+  affected animation spec was rerun with explicit T06 fixtures and passed 1/1. Formal human-reviewed
+  senior animation content remains an external requirement.
 - T31: BLOCKED by G_API_CONTRACT and G_LIVE_BUDGET; offline eval framework is committed.
 - T32: BLOCKED/草稿; report and demo docs are committed.
-- T33: BLOCKED by T31/T32 and G_HUMAN_CONTENT_REVIEW; latest handoff commit is 981ce93.
+- T33: BLOCKED by T31/T32 and G_HUMAN_CONTENT_REVIEW; latest committed handoff is 778315c, with
+  the current animation fixture/docs diff to commit after final checks.
 
 ## Safe local commands
 

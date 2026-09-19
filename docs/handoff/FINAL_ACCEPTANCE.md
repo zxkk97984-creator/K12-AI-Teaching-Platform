@@ -4,14 +4,15 @@
 
 The project can be started from the clean bootstrap path with synthetic accounts/content. The
 local demo covers lesson/conversation fixture flow, practice, resources, CodeLab, growth/next-step,
-privacy boundaries, responsive browser flows and real Docker runner isolation.
+privacy boundaries, responsive browser flows, the deterministic animation controller on an explicitly
+marked synthetic fixture, and real Docker runner isolation.
 
 ## Cannot be claimed
 
 It is not a live Knodo integration, not a verified paid-model cost result, not a human-approved
 four-stage course release, not a real-under-16 student product, not proof of platform deletion or
-tenant isolation, and not evidence of learning-effect improvement. The animation controller remains
-blocked on a real human-approved senior chapter in the T30 browser matrix.
+tenant isolation, and not evidence of learning-effect improvement. The animation fixture is not a
+human-approved senior chapter and cannot be used as formal content-release evidence.
 
 ## Gate state
 

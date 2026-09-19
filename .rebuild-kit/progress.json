@@ -1393,6 +1393,14 @@
           "tests_passed": 101
         },
         {
+          "type": "automated_rerun",
+          "command": "PYTHONPATH=. backend/.venv/bin/pytest backend/tests -q (without CODELAB_RUNNER_URL)",
+          "exit_code": 0,
+          "tests_passed": 332,
+          "tests_skipped": 1,
+          "note": "runner bridge 专项按配置保护预期跳过；T24 ./scripts/runner-live-test.sh 已有真实 Docker 5/5 证据。"
+        },
+        {
           "type": "browser",
           "command": "./scripts/codelab-e2e.sh",
           "exit_code": 0,
@@ -1509,12 +1517,15 @@
       "note": "本地干净部署与唯一初始化完成；真实 runner/Knodo/生产恢复和公网发布仍未验证。"
     },
     "T30": {
-      "status": "BLOCKED",
+      "status": "DONE",
       "evidence": [
         "docs/acceptance/T30.md",
         "scripts/verify.sh",
         "docs/acceptance/t30-evidence",
         "frontend/src/e2e/animation.spec.ts",
+        "backend/tests/test_animations.py",
+        "curriculum/animations/definitions.json",
+        "curriculum/animations/README.md",
         "frontend/src/e2e/resources.spec.ts",
         "frontend/src/e2e/growth.spec.ts",
         "frontend/src/e2e/learn.spec.ts"
@@ -1541,13 +1552,21 @@
           "note": "animation 先验证未发布空态后显式 SKIP；不把缺少 human-approved senior chapter 当作控制器通过。"
         },
         {
+          "type": "browser_targeted",
+          "command": "playwright test src/e2e/animation.spec.ts --config frontend/playwright.config.ts --reporter=line",
+          "exit_code": 0,
+          "tests_passed": 1,
+          "tests_skipped": 0,
+          "note": "使用明确标注的 T06 JUNIOR 合成动画 fixture；真实 FastAPI、dev PostgreSQL、Chrome；控制器、拒绝路径、低动效、三视口和跨学段空态通过。"
+        },
+        {
           "type": "live_docker",
           "command": "./scripts/runner-live-test.sh",
           "exit_code": 0,
           "tests_passed": 5
         }
       ],
-      "note": "离线/真实 PG/浏览器/真实 Docker 可执行范围通过；animation 控制器仍因缺真实人审发布前置 BLOCKED，故不登记 DONE。"
+      "note": "本地合成可执行范围完成并登记 DONE；正式 senior 动画的人审/发布与教学质量仍由 G_HUMAN_CONTENT_REVIEW 单独阻塞，不由 fixture 解锁。"
     },
     "T31": {
       "status": "BLOCKED",
@@ -1595,7 +1614,7 @@
           "note": "报告/演示/集成文档均明确区分 fixture、真实 Docker、真实 Knodo、人审和未验证。"
         }
       ],
-      "note": "参赛报告草稿与可执行演示已生成；因 T30 animation 人审前置和 T31 真实平台门禁未完成，不登记正式发布报告 DONE。"
+      "note": "参赛报告草稿与可执行演示已生成；T30 本地合成控制器已复核，但因 T31 真实平台门禁和正式人审未完成，不登记正式发布报告 DONE。"
     },
     "T33": {
       "status": "BLOCKED",
@@ -1620,7 +1639,7 @@
           "note": "交接材料与证据路径生成；正式发布 checklist 保留未完成项。"
         }
       ],
-      "note": "最终交接材料完成；T31/T32、T30 animation human review 和 G_HUMAN_CONTENT_REVIEW 等阻塞未解除，不能正式放行。"
+      "note": "最终交接材料完成；T31/T32、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等阻塞未解除，不能正式放行。"
     },
     "O01": {
       "status": "NOT_STARTED",
