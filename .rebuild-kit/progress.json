@@ -1655,6 +1655,12 @@
           "command": "validate_evidence.py; validate_plan.py; contracts/test_contracts.py; identity OpenAPI diff; ruff check/format; openapi-typescript diff",
           "exit_code": 0,
           "note": "source-audit 之后可独立运行的 K12 检查全部通过。"
+        },
+        {
+          "type": "requirement_audit",
+          "command": "docs/acceptance/T33.md QA01/QA34/QA35/QA36/QA40 matrix",
+          "exit_code": 0,
+          "note": "逐项区分 local pass、fixture pass、live NOT_RUN、human NOT_VERIFIED 和 draft；未将外部门禁自动转 PASS。"
         }
       ],
       "note": "K12 本地最终重复验收已通过；另有 CareerMate 只读 source-audit 外部漂移失败需保留。T31、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等外部阻塞未解除，不能正式放行。"
