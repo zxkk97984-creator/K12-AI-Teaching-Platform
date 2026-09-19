@@ -1410,10 +1410,29 @@
       "note": "本地 provider-unavailable/主动录音/取消/可编辑转写/文本回退边界完成；真实 ASR/TTS 未验证，不能标 VOICE_READY。"
     },
     "T28": {
-      "status": "IN_PROGRESS",
-      "evidence": [],
-      "verification": [],
-      "note": "T27 完成后由单 Agent 连续接续。"
+      "status": "BLOCKED",
+      "evidence": [
+        "docs/acceptance/T28.md",
+        "docs/security/LOCAL_SECURITY_BOUNDARIES.md",
+        "backend/tests/security/test_static_security_boundaries.py",
+        "docs/acceptance/T26.md"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q",
+          "exit_code": 0,
+          "tests_passed": 328,
+          "note": "Existing CSRF/owner/answer/resource/memory/authoring/security paths remain green."
+        },
+        {
+          "type": "automated",
+          "command": "pytest backend/tests/security/test_static_security_boundaries.py -q",
+          "exit_code": 0,
+          "tests_passed": 3
+        }
+      ],
+      "note": "BLOCKED：T26 缺少真实 codelab API/持久 run/数据导出删除边界；本地安全证据已登记，外部隔离/条款/预算/人审门禁保持 BLOCKED。"
     },
     "T29": {
       "status": "NOT_STARTED",
