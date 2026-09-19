@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T29",
+  "current_task": "T30",
   "gates": {
     "G_API_CONTRACT": {
       "status": "BLOCKED",
@@ -1470,10 +1470,43 @@
       "note": "本地安全与窄范围隐私治理通过：CodeLab 数据导出/删除只作用于本人和 CODELAB_ONLY 本地范围；平台删除、外部隔离、条款、预算、人审门禁保持 BLOCKED。"
     },
     "T29": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T29.md",
+        "docs/operations/DEPLOYMENT_T29.md",
+        "scripts/bootstrap.sh",
+        "backend/app/jobs/worker.py",
+        "backend/Dockerfile",
+        "frontend/Dockerfile",
+        "compose.yaml"
+      ],
+      "verification": [
+        {
+          "type": "deployment",
+          "command": "./scripts/bootstrap.sh twice",
+          "exit_code": 0,
+          "note": "Migrations/content/CodeLab import were idempotent; no fixture/demo path in production."
+        },
+        {
+          "type": "automated",
+          "command": "pytest backend/tests/test_health.py backend/tests/test_worker.py backend/tests/test_knodo_config.py -q",
+          "exit_code": 0,
+          "tests_passed": 12
+        },
+        {
+          "type": "container",
+          "command": "docker compose config --quiet; docker compose build api worker web; docker compose up -d api worker web",
+          "exit_code": 0,
+          "note": "API healthy, worker running, web running, independent PG services healthy."
+        },
+        {
+          "type": "runtime",
+          "command": "GET /health/live and /health/ready on API 18081 and web 15173",
+          "exit_code": 0,
+          "note": "live=ok; ready database=ok, runner=disabled, storage=ok."
+        }
+      ],
+      "note": "本地干净部署与唯一初始化完成；真实 runner/Knodo/生产恢复和公网发布仍未验证。"
     },
     "T30": {
       "status": "NOT_STARTED",

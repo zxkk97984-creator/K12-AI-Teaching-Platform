@@ -8,8 +8,8 @@ export default defineConfig({
     port: 15173,
     strictPort: true,
     proxy: {
-      "/health": "http://127.0.0.1:18081",
-      "/api": "http://127.0.0.1:18081",
+      "/health": process.env.VITE_API_PROXY_TARGET ?? "http://127.0.0.1:18081",
+      "/api": process.env.VITE_API_PROXY_TARGET ?? "http://127.0.0.1:18081",
     },
   },
   test: {

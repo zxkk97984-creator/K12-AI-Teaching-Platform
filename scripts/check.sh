@@ -2,6 +2,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
 
 : "${TEST_DATABASE_URL:?TEST_DATABASE_URL is required; tests refuse non-isolated databases}"
 : "${APP_SESSION_SECRET:?APP_SESSION_SECRET is required}"

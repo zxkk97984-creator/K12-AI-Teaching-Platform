@@ -22,6 +22,12 @@ check "docker client" docker --version
 check "docker compose" docker compose version
 check "docker daemon" docker info
 
+if [ -n "${CODELAB_RUNNER_URL:-}" ]; then
+  check "codelab runner control plane" curl -fsS "${CODELAB_RUNNER_URL%/}/health"
+else
+  printf 'INFO codelab runner is disabled; CodeLab will report UNAVAILABLE\n'
+fi
+
 for port in 15173 18081 55433 55434; do
   if timeout 0.3 bash -c "</dev/tcp/127.0.0.1/$port" 2>/dev/null; then
     printf 'INFO port %s is already listening; do not kill it\n' "$port"

@@ -1,0 +1,17 @@
+.git
+.codex
+.herdr-control
+**/.venv
+!backend/.venv/
+!backend/.venv/lib/
+!backend/.venv/lib/python3.12/
+!backend/.venv/lib/python3.12/site-packages/
+**/node_modules
+frontend/dist
+!frontend/dist/
+!frontend/dist/**
+frontend/test-results
+backend/storage
+**/__pycache__
+**/*.pyc
+*.log

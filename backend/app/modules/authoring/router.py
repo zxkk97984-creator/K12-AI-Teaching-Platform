@@ -191,7 +191,7 @@ async def create_authoring_job(
     except AuthoringError as error:
         # fail closed before any job row exists (missing/withdrawn/no material)
         _raise(error)
-    if job.status == "QUEUED":
+    if job.status == "QUEUED" and settings.authoring_autorun:
         _schedule(settings, job.id)
     return _job_dto(job)
 
@@ -231,7 +231,9 @@ async def retry_authoring_job(
         job = await retry_job(db, job=job)
     except AuthoringError as error:
         _raise(error)
-    _schedule(_settings(request), job.id)
+    settings = _settings(request)
+    if settings.authoring_autorun:
+        _schedule(settings, job.id)
     return _job_dto(job)
 
 

@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     gateway_timeout_seconds: float = Field(default=20.0, ge=1.0, le=120.0)
     gateway_max_output_bytes: int = Field(default=262144, ge=1024, le=4194304)
     teaching_autorun: bool = True  # API schedules the in-process worker per run
+    authoring_autorun: bool = True  # API schedules the in-process Designer worker per job
     teaching_fixture_delay_seconds: float = Field(default=0.0, ge=0.0, le=10.0)
     teaching_lease_seconds: int = Field(default=60, ge=10, le=600)
     teaching_sse_poll_seconds: float = Field(default=0.25, ge=0.02, le=2.0)

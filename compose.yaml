@@ -35,8 +35,84 @@ services:
       retries: 30
     restart: "no"
 
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: postgresql+asyncpg://k12r1_app:${POSTGRES_DEV_PASSWORD}@postgres-dev:5432/k12r1_dev
+      TEST_DATABASE_URL: postgresql+asyncpg://k12r1_test:${POSTGRES_TEST_PASSWORD}@postgres-test:5432/k12r1_test
+      APP_SESSION_SECRET: ${APP_SESSION_SECRET:?APP_SESSION_SECRET is required}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://127.0.0.1:15173}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      GATEWAY_MODE: ${GATEWAY_MODE:-disabled}
+      TEACHING_AUTORUN: ${TEACHING_AUTORUN:-false}
+      AUTHORING_AUTORUN: ${AUTHORING_AUTORUN:-false}
+      CODELAB_RUNNER_URL: ${CODELAB_RUNNER_URL:-}
+      CODELAB_RUNNER_TOKEN: ${CODELAB_RUNNER_TOKEN:-}
+      RESOURCE_STORAGE_ROOT: /app/backend/storage/resources
+      AUTHORING_ARTIFACT_ROOT: /app/backend/storage/authoring
+      AUTHORING_BUNDLE_ROOT: /app/backend/storage/authoring-bundles
+    ports:
+      - "127.0.0.1:18081:18081"
+    volumes:
+      - k12r1-app-storage:/app/backend/storage
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:18081/health/ready', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: "no"
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["python", "-m", "app.jobs.worker"]
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: postgresql+asyncpg://k12r1_app:${POSTGRES_DEV_PASSWORD}@postgres-dev:5432/k12r1_dev
+      TEST_DATABASE_URL: postgresql+asyncpg://k12r1_test:${POSTGRES_TEST_PASSWORD}@postgres-test:5432/k12r1_test
+      APP_SESSION_SECRET: ${APP_SESSION_SECRET:?APP_SESSION_SECRET is required}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://127.0.0.1:15173}
+      GATEWAY_MODE: ${GATEWAY_MODE:-disabled}
+      TEACHING_AUTORUN: "false"
+      AUTHORING_AUTORUN: "false"
+      CODELAB_RUNNER_URL: ${CODELAB_RUNNER_URL:-}
+      CODELAB_RUNNER_TOKEN: ${CODELAB_RUNNER_TOKEN:-}
+      RESOURCE_STORAGE_ROOT: /app/backend/storage/resources
+      AUTHORING_ARTIFACT_ROOT: /app/backend/storage/authoring
+      AUTHORING_BUNDLE_ROOT: /app/backend/storage/authoring-bundles
+      WORKER_POLL_SECONDS: ${WORKER_POLL_SECONDS:-1}
+    volumes:
+      - k12r1-app-storage:/app/backend/storage
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+    restart: "no"
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    environment:
+      VITE_API_PROXY_TARGET: http://api:18081
+    ports:
+      - "127.0.0.1:15173:15173"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: "no"
+
 volumes:
   k12r1-postgres-dev-data:
     name: k12r1-postgres-dev-data
   k12r1-postgres-test-data:
     name: k12r1-postgres-test-data
+  k12r1-app-storage:
+    name: k12r1-app-storage
