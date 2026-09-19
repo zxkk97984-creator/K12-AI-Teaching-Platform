@@ -1,0 +1,12 @@
+# T09 交付资产 SHA256 清单（生成于打包后；权威逐条清单见 release 目录内的 SHA256SUMS）
+ef42a2b5027392337566953f253611f44e416ee8b5b7cf3d3f9423146f068d3c  platform/knodo/releases/knodo-assets-1.0.0/bundles-classroom.zip
+0e1110336a448e1363cd513bb5035f80a6cff1018292d0bfd719b7d74664896b  platform/knodo/releases/knodo-assets-1.0.0/deployment-manifest.json
+f95fd0d712df8d3791c81f6b2957fa8d16707e07108f5d8f0765f8d7d1caca9f  platform/knodo/releases/knodo-assets-1.0.0/designer-v1.zip
+7e7f62b1982d5ce6f066449d67bf0f77791d19e11baadf50d1c3621c8e6cb580  platform/knodo/releases/knodo-assets-1.0.0/release-manifest.json
+78db77b7ad9a1a3ef8cf39b66f8f282c8558bc25325d32e59deb4f83ebb7130d  platform/knodo/releases/knodo-assets-1.0.0/skill-k12-assessment-author.zip
+10dd9006a171987dba94a1d485970156773e110dddf3cc21e86995b1bba04068  platform/knodo/releases/knodo-assets-1.0.0/skill-k12-content-author.zip
+3aae0b731435d62a21fe8d8bb9cc1b1ac0039687ac0ebf5d7c76506573d71d18  platform/knodo/releases/knodo-assets-1.0.0/skill-k12-teaching-core.zip
+e2f4012b3d4fd0fa8823f3de18cdc64f40c402203749cc8f6642ed5602a5f38f  platform/knodo/releases/knodo-assets-1.0.0/tutor-v1.zip
+e311c1aa839a3dcad5a37ff1d39416fc46b6b72665b2f4864f61bb03fecde3fe  platform/knodo/VERSION.json
+0e1110336a448e1363cd513bb5035f80a6cff1018292d0bfd719b7d74664896b  platform/knodo/deployment-manifest.json
+dce7c3d94da9129296b7b8d8013f5b876f8b2fcab5be6e92316ec4c96c7014d2  platform/knodo/bundles/manifest.json

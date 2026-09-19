@@ -1,0 +1,87 @@
+{
+  "schema_version": "k12.knodo.classroom-item.v1",
+  "source_id": "chapter:t06-fixture-course/ch01",
+  "binding": {
+    "chapter_uuid": null,
+    "resolved_by": "local_app",
+    "note": "文件系统镜像不含数据库 UUID；由本地应用在部署时绑定。"
+  },
+  "course": {
+    "slug": "t06-fixture-course",
+    "title": "T06 合成夹具课程（非教学）",
+    "topic": "合成测试"
+  },
+  "chapter": {
+    "slug": "ch01",
+    "title": "合成样例：谁在按规则做事",
+    "revision": 1,
+    "stage": "PRIMARY_LOWER",
+    "grade_min": 1,
+    "grade_max": 3,
+    "objectives": [
+      "确认合成内容带有测试标识",
+      "确认正式运行不会加载合成内容"
+    ],
+    "knowledge_points": [
+      {
+        "slug": "fixture-notice",
+        "name": "测试内容标识",
+        "topic": "合成测试",
+        "description": "合成夹具必须始终带有测试标识，并且不能进入正式发布目录。"
+      }
+    ],
+    "blocks": [
+      {
+        "text": "合成样例：谁在按规则做事",
+        "type": "TITLE"
+      },
+      {
+        "text": "这是一段合成测试课文，只用于检查系统流程是否工作，不是给同学正式上课的内容。",
+        "type": "PARAGRAPH"
+      },
+      {
+        "key": "section-1",
+        "text": "看图想一想",
+        "type": "SECTION"
+      },
+      {
+        "alt": "两个方框和一条箭头，用来示意“按步骤做事”的顺序",
+        "caption": "合成的示意图描述：先看，再判断，最后动手",
+        "type": "FIGURE"
+      },
+      {
+        "example": {
+          "label": "试一试",
+          "text": "在开发环境刷新页面，检查提示文字是否仍然可见。"
+        },
+        "text": "合成内容必须一直标明“测试内容，未作人工教学审校”，并且不能出现在正式发布目录里。",
+        "title": "测试知识卡",
+        "type": "KNOWLEDGE_CARD"
+      },
+      {
+        "text": "如果看到这段话，说明当前运行在开发或测试环境，而不是正式课程。",
+        "title": "提醒",
+        "type": "CALLOUT"
+      }
+    ]
+  },
+  "provenance": {
+    "release_key": "synthetic-t06-fixtures-v1",
+    "release_manifest_hash": "762a2dd3c9ffd14aa2b6fee2ac66bc7bbca8ab4cc289a986ab7e8ab82c7354ff",
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "is_test_fixture": true,
+    "source_commit": "0000000000000000000000000000000000000000",
+    "source_path": "courses/t06-fixture-course/chapters/ch01.json",
+    "license_code": "SYNTHETIC-FIXTURE"
+  },
+  "review": {
+    "review_status": "UNREVIEWED",
+    "publication_status": "DRAFT",
+    "human_reviewed": false
+  },
+  "usage": {
+    "for_real_students": false,
+    "notice": "测试内容，未作人工教学审校"
+  },
+  "content_hash": "b6ab2827a2b1fc9324093c5f52d4bfcb778f534af04d8874fccac1f8925b3ad9"
+}

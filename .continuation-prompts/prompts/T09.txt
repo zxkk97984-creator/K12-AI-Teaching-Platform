@@ -1,0 +1,81 @@
+任务：T09｜生成两类Bot与三份Skill交付资产
+工作目录固定：/home/zxk/Projects/K12
+原任务卡：.rebuild-kit/tasks/T09.md
+本轮只完成这一任务，不自行进入下一项或重建整个项目。
+
+【从当前项目恢复，不从零再写】
+用户报告T00—T05已完成。先读实际AGENTS、.continuation-prompts/COMMON_RULES.md、原progress/TASKS、原卡指定材料和前置验收。T03已冻结协议及T05现场实现优先于这里的示例字段。
+复用sl_session/sl_csrf、服务端可撤销会话、grade可空与四stage、base_revision、OpenAPI生成类型；新写接口继续受认证/Origin/CSRF保护。保持FastAPI/Python3.12+React/TS/Vite+独立PostgreSQL+Knodo两类Bot，不改Next.js、不直接连模型作教师兜底。
+开发/测试库用已核对的独立配置（T05记录55433/55434）；测试拒绝检查在写入前。根.env仍未创建、持久配置待用户处理时不得擅自造密码/重建卷。非Git状态先做受限源码检查点；不git init/add/commit/push，不修改旧项目。
+本Prompt不是授权平台花费、人类签审或真实学生开放；门禁证据不足保持BLOCKED。只更新实际原progress对应任务，不使用任何模板覆盖它。
+
+【精确前置与门禁】
+前置：T03, T06
+门禁：原表未列硬门禁；真实外联/花费/人审/开放仍须单独授权
+先检查前置DONE且证据文件实际可读，门禁PASS有真实适用来源。当前卡已DONE就不重做，核实后选择后续卡。局部代码有了但任务验收未过不能只推进current_task。
+
+【原任务卡原文——保持其目标、范围与验收】
+# T09｜生成两类Bot与三份Skill交付资产
+
+阶段：M2；前置任务：T03, T06；外部门禁：无（涉及真实调用仍需单独授权）。
+
+## 本轮目标
+生成两类Bot与三份Skill交付资产。只完成本卡边界，不因发现其他问题全仓重构。
+
+## 必读材料
+- `.rebuild-kit/plans/03_Knodo配置与接入.md`
+- `.rebuild-kit/plans/05_迁移与内容生产.md`
+- `.rebuild-kit/AGENTS.template.md`与`progress.json`当前项；前置任务的实际证据报告。
+
+## 允许修改的新项目范围
+- `platform/knodo/`
+- `scripts/package-knodo.*`
+- `docs/integrations/knodo/`
+
+如基础依赖/生成契约必须同步变更，先在本卡报告说明最小影响范围；旧仓库始终只读。测试和必要迁移可与本任务一并修改，不能改无关模块。
+
+## 执行步骤
+1. 将Tutor/Designer系统提示词、教学/题稿/教研Skill迁入platform/knodo，以contract版本组织。
+2. 生成受控课堂知识bundle与Designer包，隐藏答案/测试不混入Tutor。
+3. 生成上传包、配置清单、SHA清单和手工创建步骤；角色不依赖native subagents。
+4. 有授权平台操作时按官方菜单创建/验证；无则保留NOT_DEPLOYED并列待人工项，不影响资产任务完成。
+
+## 验收
+- 包中每个Skill根有SKILL.md，frontmatter正确，引用文件存在，无密钥/真实学生数据。
+- 部署manifest精确区分文件已打包与Bot已发布/已实测。
+- 对应通用场景：QA16, QA35。将其落为实际断言/操作，不只复制编号。
+
+## 禁止与边界
+不把zip当成整个Bot可一键官方导入；不创建大量学生账号/工作空间。
+
+## 交付与继续
+在`docs/acceptance/T09.md`记录：输入基线、实际变更文件、为什么改、命令与exitcode、数据/服务类型、失败与修复、未验证部分、回滚方式。截图/日志使用真实路径且脱敏。
+更新`.rebuild-kit/progress.json`的T09：状态、证据路径与验证类型；没跑不能填通过。未满足门禁则BLOCKED，解释缺什么并选择不依赖此门禁的任务。
+本轮不自动提交/推送，不删除失败证据，不自动扩展调用预算。完成后只给出实际结果和下个可执行任务。
+
+【本次续作补充——原卡步骤的具体落实，不是新赛题要求】
+1. 以T03五份语义契约为源，核对Tutor的TEACH_TURN/CODE_FEEDBACK与Designer的QUIZ_DRAFT/LESSON_PACKAGE_DRAFT；不要发明官方子智能体或工作流节点。
+2. 把原包两份系统提示词与三份Skill作为工作资产复制到平台配置目录，记录版本和hash；技能仍为k12-teaching-core、k12-assessment-author、k12-content-author，不合并/重编号。
+3. 输出Teacher可读的受控章节知识包、Designer私有资料边界、manifest与来源ID；标准答案、参考解、隐藏测试、原始学生档案不能进入Teacher共享资料。
+4. 检查每个Skill的SKILL.md元信息、相对引用、Schema副本及样例一致，生成安全ZIP；系统提示词与Skill是分别配置的资产，不声称整个ZIP就是官方一键Bot导入。
+5. 编写适用租户的人工配置步骤、需核对的模型/AgentOS/工具/历史/记忆权限；没有权限与配置依据时只记PACKAGED/NOT_DEPLOYED，不写已创建BotID。
+6. 若已有获授权真实配置，只记录实际部署与哈希、知识版本，不执行未授权付费测试。平台菜单变化核对当时官方资料，不修改本地教学协议迁就猜测。
+
+【本轮重点反例与集成断言】
+1. 三份Skill ZIP解包安全、引用存在、无绝对路径/越界条目/密钥；schema与冻结副本一致。
+2. Tutor与Designer的答案资料/会话边界有明确清单，Teacher包不含隐藏答案。
+3. 没有平台实际操作时部署状态仍未部署；资产生成验收不冒充Skill在线加载或教学效果通过。
+
+【原QA语义对应表】
+| ID | 场景 | 可观察预期 |
+|---|---|---|
+| QA16 | Designer产出题稿 | 答案只进入服务端；题量/题型/来源满足约束 |
+| QA35 | 真Knodo目标Bot/Skill/来源 | 有平台执行标识与本地run关联，不只凭回复自称 |
+将上述语义落实为实际测试/人工操作；QA表不是预填通过记录。
+
+【验收与停点】
+此任务可以完成本地交付资产而保持所有真实性门禁BLOCKED；不能因缺PAT阻止打包，也不能因打包成功解锁真实调用。
+按当前锁定脚本执行本卡测试与受影响回归；涉及身份/DTO/写入时保留T05负向与会话回归，涉及UI时用真实浏览器并打开截图检查。没有实际运行就记NOT_RUN/限制，不抄T05或旧项目测试数量。
+写docs/acceptance/T09.md：基线、改动、命令/exitcode、测试环境与数据类型、首次失败/修复、真实Knodo或fixture/真实Docker分别说明、未验证、回滚、下一可执行项。验收失败不删断言改期望骗绿。
+只在原卡实际满足时标DONE；否则沿用原进度状态与verification写清阻塞。外部条件缺少时不循环追问同一事项，不造PASS，可选择其他依赖已满足任务。
+现在从读取本卡依赖和相关源码开始，完成范围内的实现和验证，不只输出另一个计划。

@@ -1,0 +1,142 @@
+.next-page {
+  width: min(880px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 24px 0 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.next-header h1 {
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  margin: 6px 0 8px;
+}
+
+.next-eyebrow {
+  margin: 0;
+  color: var(--sl-primary-ink);
+  font-size: var(--sl-text-xs);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.next-muted {
+  color: var(--sl-text-muted);
+  font-size: var(--sl-text-sm);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.next-error {
+  border: 1px solid var(--sl-danger-ink);
+  background: var(--sl-danger-soft);
+  color: var(--sl-danger-ink);
+  border-radius: var(--sl-radius-sm);
+  padding: 12px 14px;
+  margin: 0;
+}
+
+.next-ok {
+  background: var(--sl-ok-soft);
+  color: var(--sl-ok-ink);
+  border-radius: var(--sl-radius-sm);
+  padding: 10px 12px;
+  margin: 0;
+  font-size: var(--sl-text-sm);
+}
+
+.next-card {
+  background: var(--sl-surface);
+  border: var(--sl-border);
+  border-radius: var(--sl-radius-md);
+  box-shadow: var(--sl-shadow-soft);
+  padding: clamp(16px, 4vw, 26px);
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.next-card-primary {
+  border: 2px solid var(--sl-primary);
+}
+
+.next-card h2 {
+  margin: 0;
+  font-size: var(--sl-text-xl);
+  overflow-wrap: anywhere;
+}
+
+.next-meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.next-chip {
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-weight: 800;
+  font-size: var(--sl-text-xs);
+  background: var(--sl-primary-soft);
+  color: var(--sl-primary-ink);
+}
+
+.next-evidence ul,
+.next-basis,
+.next-notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  font-size: var(--sl-text-sm);
+}
+
+.next-feedback-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.next-evidence li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px dashed #dbe4ef;
+  padding-top: 8px;
+}
+
+.next-basis li,
+.next-notes li {
+  color: var(--sl-text-muted);
+}
+
+.next-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.next-section-title {
+  margin: 18px 0 0;
+  font-size: var(--sl-text-lg);
+}
+
+.next-footer {
+  margin-top: 6px;
+}
+
+@media (max-width: 520px) {
+  .next-page {
+    width: calc(100% - 20px);
+  }
+
+  .next-actions button {
+    width: 100%;
+  }
+}

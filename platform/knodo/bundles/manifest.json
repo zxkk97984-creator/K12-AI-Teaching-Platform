@@ -1,0 +1,50 @@
+{
+  "schema_version": "k12.knodo.bundle-manifest.v1",
+  "release_id": "knodo-assets-1.0.0",
+  "bundle_kind": "TEST_FIXTURE_BUNDLE",
+  "for_real_students": false,
+  "formal_bundle_status": "NOT_AVAILABLE",
+  "formal_bundle_requirement": "需要 HUMAN_APPROVED + PUBLISHED 的课程修订；当前仓库没有通过真实人工审校的内容",
+  "tutor_visible": [
+    {
+      "source_id": "chapter:t06-fixture-course/ch01",
+      "revision": 1,
+      "stage": "PRIMARY_LOWER",
+      "sha256": "6d113923d1bbc7d45d7052593e6b3dcefa81213e7ff292224d8942ec649d8f20",
+      "path": "platform/knodo/bundles/classroom/content/t06-fixture-course/ch01-r1.json",
+      "is_test_fixture": true
+    },
+    {
+      "source_id": "chapter:t06-fixture-course/ch02",
+      "revision": 1,
+      "stage": "JUNIOR",
+      "sha256": "ea0434a7c21c5796899602c696e95244ca56e37da8c0a99c26827fd4c9287c6f",
+      "path": "platform/knodo/bundles/classroom/content/t06-fixture-course/ch02-r1.json",
+      "is_test_fixture": true
+    }
+  ],
+  "designer_private": {
+    "boundary_doc": "designer-private/BOUNDARY.md",
+    "manifest": "designer-private/boundary-manifest.json",
+    "included_items": [],
+    "shipped_as_zip": false,
+    "note": "答案/解析/隐藏测试/参考解不进入任何随包发布目录"
+  },
+  "separation": {
+    "tutor_visible_count": 2,
+    "designer_private_count": 0,
+    "answers_in_tutor_bundle": false
+  },
+  "excluded_sources": [
+    {
+      "release_key": "legacy-k12-696364f-pending-review",
+      "chapter": "algorithm-everyday/ch03",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "legacy-k12-696364f-pending-review",
+      "chapter": "python-first-steps/ch05",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    }
+  ]
+}

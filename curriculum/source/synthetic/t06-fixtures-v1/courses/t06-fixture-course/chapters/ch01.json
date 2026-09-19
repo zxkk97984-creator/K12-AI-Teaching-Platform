@@ -1,0 +1,40 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch01",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "合成样例：谁在按规则做事"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "这是一段合成测试课文，只用于检查系统流程是否工作，不是给同学正式上课的内容。"
+    },
+    {
+      "type": "SECTION",
+      "key": "section-1",
+      "text": "看图想一想"
+    },
+    {
+      "type": "FIGURE",
+      "alt": "两个方框和一条箭头，用来示意“按步骤做事”的顺序",
+      "caption": "合成的示意图描述：先看，再判断，最后动手"
+    },
+    {
+      "type": "KNOWLEDGE_CARD",
+      "title": "测试知识卡",
+      "text": "合成内容必须一直标明“测试内容，未作人工教学审校”，并且不能出现在正式发布目录里。",
+      "example": {
+        "label": "试一试",
+        "text": "在开发环境刷新页面，检查提示文字是否仍然可见。"
+      }
+    },
+    {
+      "type": "CALLOUT",
+      "title": "提醒",
+      "text": "如果看到这段话，说明当前运行在开发或测试环境，而不是正式课程。"
+    }
+  ],
+  "observed_knowledge_point_marks": []
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "k12.knodo.bot-profile.v1",
+  "role": "designer",
+  "display_name": "霜铃·教研助手",
+  "workspace_hint": "sl-design-studio（建议名；部署时以租户实际 workspace_id 登记）",
+  "operations": [
+    "QUIZ_DRAFT",
+    "LESSON_PACKAGE_DRAFT"
+  ],
+  "contracts": [
+    "designer-request.schema.json",
+    "quiz-draft.schema.json",
+    "lesson-package-draft.schema.json"
+  ],
+  "skills": [
+    "k12-assessment-author",
+    "k12-content-author"
+  ],
+  "system_prompt": "system-prompt.md",
+  "response_mode": "BUFFERED_STRUCTURED",
+  "native_subagents_required": false,
+  "may_receive": [
+    "章节 ID/版本/学段",
+    "objective_ids",
+    "quiz_spec（题型/数量/难度）",
+    "allowed_resource_ids",
+    "聚合后的误区摘要（不含学生身份）"
+  ],
+  "must_not_receive": [
+    "真实学生身份或联系方式",
+    "完整学生聊天记录",
+    "其他学生数据",
+    "涉及学生隐私的原始材料",
+    "密钥或环境变量"
+  ],
+  "deployment_status": "NOT_DEPLOYED",
+  "bot_id": null,
+  "note": "题稿中的答案/解析只作为服务端私有字段返回；Designer 会话与学生 Tutor 会话不共享。"
+}

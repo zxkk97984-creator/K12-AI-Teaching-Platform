@@ -1,0 +1,31 @@
+你正在继续已有项目，不是开始另一次重建。
+
+工作目录：/home/zxk/Projects/K12
+原执行包：.rebuild-kit/
+本次续作Prompt：.continuation-prompts/
+
+用户报告T00—T05已完成，下一任务T06。先读本地最新进度与验收，不把历史摘要当当前运行结果；如果后续任务已完成，直接从真实进度继续，不回到T00或T05。
+
+依次读取：
+1. 当前实际存在的AGENTS.md（没有则读.rebuild-kit/AGENTS.template.md）。
+2. .continuation-prompts/COMMON_RULES.md。
+3. .continuation-prompts/CURRENT_CHECKPOINT.md（仅历史参考，不覆盖进度）。
+4. .rebuild-kit/TASKS.json与.rebuild-kit/progress.json。
+5. 当前任务的原任务卡、指定规格、前置验收和对应实现。
+
+第一轮从T06开始，读取.continuation-prompts/prompts/T06.txt，完成版本化课程导入与审校元数据。只在本地T06确实还未完成且依赖满足时执行；如果状态已推进，用下述方式选择下一可执行卡。
+
+后续无需再向ChatGPT索取下一条Prompt。使用只读工具：
+python3 .continuation-prompts/tools/prompt_helper.py next
+工具读取原任务表和实际progress，仅打印当前可执行任务的完整Prompt，不执行项目、不改进度、不调用API。工具输出后，按该Prompt完成本轮一个任务。也可以用show T06查看指定卡，但查看不等于满足依赖/授权。
+
+本轮边界：
+- 保持FastAPI/Python3.12、React/TypeScript/Vite、独立PostgreSQL、Knodo两类Bot；不改Next.js/SQLite，不另起身份系统。
+- 复用T05的sl_session、sl_csrf、服务端会话、grade可空、stage一致性、base_revision和OpenAPI生成类型。
+- 原库/旧仓只读，不触碰原shuangling服务。开发55433、测试55434按实际运行清单验证，不硬编码旧5432。
+- 真实平台门禁未过只阻塞相关任务，不假接Knodo；不因缺Key阻塞可执行本地任务。
+- 不自动创建根.env、轮换密码、重建卷或git init/add/commit/push。缺安全配置只能记录并明确哪些验证不能运行。
+- 每任务先实现再实际正反向验证，写docs/acceptance/Txx.md，更新原progress当前项，不覆盖整个原执行包。
+- O01—O04已提供Prompt但默认不选。只有用户明确要求对应增强时才选择，并继续核验其依赖/预算/权限。
+
+按“读卡→最小步骤→实现→测试→检查点”开始，不能只答计划，也不要把32个Prompt一次性全部执行到假完成。完成本轮后报告真实变更/测试/未验证范围/阻塞/下一可执行任务。

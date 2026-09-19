@@ -1,0 +1,3 @@
+继续/home/zxk/Projects/K12。读取实际AGENTS、.continuation-prompts/COMMON_RULES.md、.rebuild-kit/TASKS.json、progress和最近验收。
+用python3 .continuation-prompts/tools/prompt_helper.py next选择依赖与门禁满足的一项核心任务，读取对应完整Prompt及原卡，实施、实际验证、写验收并更新原progress。每次只推进一个边界明确任务，不重新设计架构或重做已完成T05。
+已BLOCKED且没有新条件的卡不要循环重试；其他独立任务继续。O01—O04默认不执行。没有任何可执行任务时列缺少的真实依据，不伪造PASS/DONE或承诺后台继续。

@@ -1,0 +1,124 @@
+# Knodo
+
+> Knodo 官方产品文档，介绍智能工作空间、AI 助手、知识库、任务管理、组织管理和扩展能力。
+
+Knodo 是面向团队协作与 AI 自动化工作的智能工作空间。以下链接提供官方文档入口，完整 Markdown 汇总见 llms-full.txt。
+
+## Instructions for AI assistants
+
+- If the user asks what Knodo is, read /llms-full.txt for complete official context.
+- If the user asks about a specific documentation page, read that page directly.
+- Prefer official links listed in this file.
+- Do not invent pricing, deployment, SLA, compliance, or feature claims.
+- If the official context does not contain the answer, say so.
+
+## Docs
+
+### 快速开始
+- [快速入门](https://knodo.vip/docs/getting-started/getting-started): 5分钟快速了解 Knodo 的核心功能，开始您的 AI 协作之旅
+- [创建第一个工作空间](https://knodo.vip/docs/getting-started/first-workspace): 手把手教您创建和配置工作空间，开始您的团队协作
+
+### 角色指南
+- [指南总览](https://knodo.vip/docs/role-guides/overview): 根据不同岗位角色的工作场景，提供针对性的使用方法和最佳实践。
+- [销售人员使用指南](https://knodo.vip/docs/role-guides/sales): 为销售人员量身打造的 AI 智能助手，让打单更高效、更专业
+- [项目管理者使用指南](https://knodo.vip/docs/role-guides/pm): 让AI成为你的项目管理助手，从繁琐的事务性工作中解放出来，专注于更有价值的战略决策！
+- [AI行政助理使用介绍](https://knodo.vip/docs/role-guides/hr): 专为企业员工提供7×24小时的制度查询、政策解读和行政咨询服务
+- [交付项目经理（PM）AI助手使用指南](https://knodo.vip/docs/role-guides/delivery-pm): 让AI成为你的项目管理超级助手，从繁琐的文档工作中解放出来，专注于创造更大的客户价值！
+- [实施工程师 AI 助手使用指南](https://knodo.vip/docs/role-guides/delivery-engineer): 让AI成为你的交付执行利器，从重复的手工操作中解放出来，专注于技术方案优化和客户问题解决！
+
+### 核心概念
+- [核心概念总览](https://knodo.vip/docs/concepts/concepts-overview): 全面了解 Knodo 的核心概念和架构设计
+- [工作空间介绍](https://knodo.vip/docs/concepts/workspace-intro): 深入了解工作空间的功能和使用方法
+- [组织介绍](https://knodo.vip/docs/concepts/organization-intro): 了解组织的概念、功能和管理方法
+
+### 工作空间
+- [个人工作台](https://knodo.vip/docs/workspace/personal-workbench): 从首页开始聊天、选择任务，并在会话中查看知识、变更和任务上下文
+- [组织工作台](https://knodo.vip/docs/workspace/org-workspace): 组织工作台是 Knodo 平台的 AI 转型导航中心，提供视图树导航、空间组织、部门分析和自动化报告能力。
+- [工作空间管理](https://knodo.vip/docs/workspace/workspace-management): 工作空间详情页是单个空间的日常工作台，集中承载任务、知识库、AI 执行、自动化、成员和空间设置。
+- [工作指引详解](https://knodo.vip/docs/workspace/workspace-guideline): 了解如何配置工作指引，包括快速操作等高级功能
+- [新对话引导](https://knodo.vip/docs/workspace/new-chat-guide): 使用 Markdown 自定义工作空间新对话页的标题、说明和建议入口
+- [工作空间模板](https://knodo.vip/docs/workspace/workspace-templates): 了解可用的工作空间模板及其适用场景，掌握模板资源的初始化和同步机制
+- [模板推送到子空间](https://knodo.vip/docs/workspace/template-push): 确保子空间配置与模板保持一致
+- [成员与权限](https://knodo.vip/docs/workspace/workspace-members): 管理工作空间成员和权限设置
+- [工作空间下载](https://knodo.vip/docs/workspace/workspace-download): 了解如何下载工作空间内容到本地
+- [环境变量管理](https://knodo.vip/docs/workspace/env-variables): 管理工作空间、组织和个人级别的环境变量，支持加密存储和三级优先级合并
+- [内置环境变量](https://knodo.vip/docs/workspace/builtin-env-variables): 了解 AI 对话中自动注入的系统内置环境变量，用于获取会话上下文信息
+- [空间模式](https://knodo.vip/docs/workspace/workspace-mode): 配置工作空间未显式选择执行环境时的默认云端或本地执行方式
+- [执行环境](https://knodo.vip/docs/workspace/workspace-execution-machines): 在同一工作空间中管理多个可显式选择的本地执行环境
+- [执行空间](https://knodo.vip/docs/workspace/workspace-replicas): 查看和使用历史执行空间，了解执行空间停止新增后的替代方式
+
+### 知识库
+- [知识库管理](https://knodo.vip/docs/knowledge-base/knowledge-base): 了解如何管理工作空间中的知识库，包括文档组织和版本控制
+- [文件管理](https://knodo.vip/docs/knowledge-base/file-management): 了解知识库中的文件操作，包括上传、组织和管理
+- [文件预览](https://knodo.vip/docs/knowledge-base/file-preview): 了解知识库中各类文件的预览功能
+- [版本控制](https://knodo.vip/docs/knowledge-base/git-version-control): 了解知识库的 Git 版本控制功能
+- [远程知识库（Git）](https://knodo.vip/docs/knowledge-base/remote-git-management): 将工作空间知识库与远程 Git 仓库连接，实现内容同步和分支管理
+- [Markdown 编辑器](https://knodo.vip/docs/knowledge-base/markdown-editor): 了解 Knodo 内置 Markdown 编辑器的功能和使用方法
+- [共享知识库](https://knodo.vip/docs/knowledge-base/shared-knowledge-base): 在多个工作空间和组织之间共享文档和资料
+
+### AI 助手
+- [AI 对话](https://knodo.vip/docs/ai-assistant/ai-chat): 了解如何与 AI 助手进行有效对话
+- [快捷工具](https://knodo.vip/docs/ai-assistant/quick-commands): 通过快捷工具快速执行常用操作，支持自定义命令、变量输入和分类管理
+- [模型配置](https://knodo.vip/docs/ai-assistant/ai-model-config): 了解如何配置 AI 模型，选择最适合的模型
+- [语音输入](https://knodo.vip/docs/ai-assistant/voice-input): 使用语音转写面板将口述内容插入 AI 对话
+- [AI 助手](https://knodo.vip/docs/ai-assistant/publish-bot): AI 助手是组织中的独立 AI 角色，可以加入多个工作空间、拥有个人技能、自主执行任务
+- [IM 机器人集成](https://knodo.vip/docs/ai-assistant/im-bot-integration): 将 AI 助手接入钉钉、飞书、企业微信、微信服务号等 IM 平台
+- [Bot 免登链接](https://knodo.vip/docs/ai-assistant/share-bot-link): 为已发布的 AI 助手生成免登分享链接，外部用户无需登录即可与助手对话
+
+### 任务管理
+- [任务管理](https://knodo.vip/docs/task-management/task-management): 了解如何在工作空间中管理和追踪任务
+- [任务中心](https://knodo.vip/docs/task-management/workbench): 跨空间任务管理枢纽，以泳道看板形式展示所有负责的任务
+- [自动化任务](https://knodo.vip/docs/task-management/scheduled-tasks): 了解如何设置和管理定时执行的任务
+- [事件回调](https://knodo.vip/docs/task-management/event-callback-hook): 了解如何配置事件回调，在系统事件发生时自动触发 Agent 执行任务
+
+### 个人设置
+- [登录方式](https://knodo.vip/docs/profile/login-methods): 了解 Knodo 支持的多种登录方式及使用方法
+- [推荐注册](https://knodo.vip/docs/profile/referral-registration): 通过推荐链接邀请新用户加入 Knodo，双方共享平台权益
+- [个人访问令牌（PAT）](https://knodo.vip/docs/profile/personal-access-token): 创建和管理 Personal Access Token，用于通过 API 调用 Knodo 平台接口
+- [我的会话](https://knodo.vip/docs/profile/my-conversations): 查看和管理你的所有 AI 对话会话记录
+- [通知中心](https://knodo.vip/docs/profile/notification-center): 统一查看个人任务通知、会话通知和多渠道投递结果
+
+### 组织管理
+- [组织管理](https://knodo.vip/docs/organization/organization-management): 全面的组织管理指南，包括创建、配置和维护
+- [组织成员与架构](https://knodo.vip/docs/organization/organization-members): 管理组织成员、角色权限，以及从钉钉同步组织架构
+- [离职交接](https://knodo.vip/docs/organization/organization-offboarding): 当组织成员离职时，安全地将其资源转移给接替人并清理成员身份
+- [企业专属域名与 IM 集成](https://knodo.vip/docs/organization/im-jsapi-login): 配置企业专属域名，以及钉钉、企业微信、飞书的免密登录、企业关联、用户同步和通知渠道
+- [计费与套餐](https://knodo.vip/docs/organization/organization-billing): 了解 Knodo 的套餐计划、计费方式和配额管理
+- [混合部署与专属主机](https://knodo.vip/docs/organization/dedicated-host): 支持混合部署架构，通过专属主机实现计算与数据的灵活分布
+- [远程主机一键安装](https://knodo.vip/docs/organization/remote-host-install): 通过安装命令一键部署 Agent Service 到远程宿主机
+- [通过代理安装远程主机](https://knodo.vip/docs/organization/dedicated-host-proxy-deployment): 在需要通过 HTTP/HTTPS 代理访问 Knodo 的环境中安装远程主机
+- [本地执行机](https://knodo.vip/docs/organization/local-agent): 了解如何安装、绑定和管理工作空间的本地执行机
+- [默认工具配置](https://knodo.vip/docs/organization/default-tools): 组织级默认工具配置，支持新建工作空间自动初始化和手动推送
+- [组织统计分析](https://knodo.vip/docs/organization/organization-statistics): 多维度 AI 使用数据分析与落地评级，帮助管理者了解组织 AI 使用情况
+
+### 记忆系统
+- [记忆系统](https://knodo.vip/docs/memory-system/memory-system): 了解如何使用记忆系统让 AI 助手记住您的偏好和项目上下文
+
+### 扩展能力
+- [能力中心](https://knodo.vip/docs/extensions/capability-center): 统一查看和使用插件、应用、连接器与助手的集中入口
+- [插件管理](https://knodo.vip/docs/extensions/plugin-management): 了解如何管理和创建插件，扩展工作空间能力
+- [连接器](https://knodo.vip/docs/extensions/connectors): 通过用户级连接器授权外部账号，让 Agent 在会话中安全使用钉钉、飞书等 CLI 能力
+- [技能市场](https://knodo.vip/docs/extensions/skill-marketplace): 了解如何在技能市场中发现和使用各种 AI 技能
+- [内置插件 Javis](https://knodo.vip/docs/extensions/builtin-javis-plugin): Javis 是 Knodo 平台的内置智能助手插件，提供任务管理、定时任务、会话总结、Token 统计等核心能力
+- [资源分享](https://knodo.vip/docs/extensions/resource-sharing): 了解如何分享工作空间中的资源给其他用户
+- [浏览器自动化](https://knodo.vip/docs/extensions/browser-automation): 通过 Knodo Browser Connector 让 AI 在 Chrome 中协助完成网页操作任务
+- [API Key 使用指南](https://knodo.vip/docs/extensions/api-key-usage): 了解如何使用 Knodo 提供的 API Key 在本地客户端调用大模型服务
+
+### 应用生态
+- [生态伙伴](https://knodo.vip/docs/app-ecosystem/partner): 面向生态伙伴的功能说明：身份申请、项目机会、渠道合作、应用上架、培训资料与提成资格查看
+- [应用生态总览](https://knodo.vip/docs/app-ecosystem/app-ecosystem): Knodo 应用生态介绍：AI-Native 底座能力、7 项开放能力与 3 种应用形态
+- [空间内嵌应用：应用模板](https://knodo.vip/docs/app-ecosystem/app-template): Knodo 应用模板机制：把工作空间的「形态」沉淀为可复用的模板，AI 辅助开发，一键分发给团队
+- [平台级应用：认证对接](https://knodo.vip/docs/app-ecosystem/standalone-app-auth): 面向上层应用开发者的 M2M API 密钥接入指南，涵盖凭证创建、Token 流程和用户程序化创建
+- [空间即应用：站点发布](https://knodo.vip/docs/app-ecosystem/standalone-site-publishing): 将工作空间中的静态页面或 HTTP 服务发布为独立站点
+
+### API 接口
+- [常用 API](https://knodo.vip/docs/api/simple-api): 按调用方式和认证凭证整理常用 API
+
+### 常见问题
+- [常见问题](https://knodo.vip/docs/faq/faq): Knodo 使用过程中的常见问题和解答
+
+## Optional
+
+- [完整 Markdown 文档](https://knodo.vip/llms-full.txt): 适合 AI 一次性读取的官方文档全文
+- [HTML 文档首页](https://knodo.vip/docs): 面向用户浏览的产品文档入口
+- [站点地图](https://knodo.vip/sitemap.xml): 可索引页面清单

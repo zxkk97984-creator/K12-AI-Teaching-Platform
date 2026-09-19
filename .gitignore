@@ -1,0 +1,52 @@
+.env
+.env.*
+!.env.example
+# Python/runtime environments and caches
+.venv/
+backend/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# JavaScript dependencies and build/runtime output
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/test-results/
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# Local runtime data, uploads, databases, and generated evidence
+backend/storage/
+**/uploads/
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.bak
+*.log
+.DS_Store
+.snapshots/
+
+# Dynamic multi-agent coordination state; durable summaries live under docs/
+.herdr-control/
+
+# Local agent/editor state and temporary files
+.agents/
+.codex/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Original planning attachments and binary skill bundles are kept locally
+# and reviewed separately from the source baseline.
+.rebuild-kit/references/*.docx
+.rebuild-kit/platform/*.zip
+.rebuild-kit/references/*.zip
+**/*.zip

@@ -1,0 +1,18 @@
+{
+  "description": "受检源码范围示例，B/A按当前任务收窄或补充实际存在路径；不是直接可执行的生产配置。不存在路径将报错，不自动猜目录。",
+  "paths": [
+    "backend/app",
+    "backend/tests",
+    "backend/alembic",
+    "frontend/src",
+    "contracts",
+    "scripts",
+    "platform/knodo",
+    "curriculum"
+  ],
+  "limits": {
+    "max_files": 15000,
+    "max_file_bytes": 33554432,
+    "max_total_bytes": 536870912
+  }
+}

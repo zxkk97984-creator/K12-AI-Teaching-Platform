@@ -1,0 +1,305 @@
+.wb-page {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--sl-space-5) var(--sl-space-4) var(--sl-space-6);
+}
+
+.workbench {
+  --wb-gap: var(--sl-space-4);
+  display: grid;
+  gap: var(--wb-gap);
+}
+
+.workbench[data-density="spacious"] {
+  --wb-gap: var(--sl-space-5);
+}
+
+.wb-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-4);
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.wb-brand {
+  min-width: 0;
+}
+
+.wb-brand__title {
+  margin: var(--sl-space-1) 0;
+  font-size: var(--sl-text-xl);
+  letter-spacing: -0.01em;
+}
+
+.wb-stage {
+  margin: 0;
+  color: var(--sl-text-muted);
+}
+
+.wb-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-3);
+  align-items: center;
+}
+
+.wb-mainnav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wb-mainnav__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: var(--sl-radius-sm);
+  color: var(--sl-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.wb-mainnav__item[aria-current="page"] {
+  background: var(--sl-primary-soft);
+  color: var(--sl-primary-ink);
+}
+
+.wb-mainnav__item[data-enabled="false"] {
+  background: var(--sl-neutral-soft);
+  color: var(--sl-text-muted);
+  cursor: not-allowed;
+}
+
+.wb-mainnav__tag {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--sl-warn-soft);
+  color: var(--sl-warn-ink);
+  font-size: var(--sl-text-xs);
+  font-weight: 700;
+}
+
+.wb-account {
+  display: flex;
+  gap: var(--sl-space-2);
+  align-items: center;
+}
+
+.wb-link {
+  color: var(--sl-primary-ink);
+  font-weight: 700;
+}
+
+.wb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-3);
+  align-items: center;
+}
+
+.wb-toolbar .wb-rail__toggle {
+  width: auto;
+  min-width: 96px;
+  padding: 0 var(--sl-space-4);
+}
+
+.wb-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.wb-tabs__tab {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #dbe4ef;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--sl-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wb-tabs__tab[aria-selected="true"] {
+  background: var(--sl-primary);
+  border-color: var(--sl-primary);
+  color: #fff;
+}
+
+.wb-body {
+  display: grid;
+  gap: var(--wb-gap);
+  align-items: start;
+}
+
+.wb-center {
+  display: grid;
+  gap: var(--wb-gap);
+  min-width: 0;
+}
+
+.wb-rail,
+.wb-canvas,
+.wb-teacher,
+.wb-activity,
+.wb-rail__content {
+  min-width: 0;
+}
+
+.wb-rail {
+  display: grid;
+  gap: var(--sl-space-2);
+  align-content: start;
+}
+
+.wb-rail__toggle {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid #dbe4ef;
+  border-radius: var(--sl-radius-sm);
+  background: #fff;
+  color: var(--sl-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wb-rail__content,
+.wb-canvas,
+.wb-teacher,
+.wb-activity {
+  padding: var(--sl-space-4);
+  border: var(--sl-border);
+  border-radius: var(--sl-radius-md);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-soft);
+}
+
+.wb-rail__content {
+  display: grid;
+  gap: var(--sl-space-3);
+  align-content: start;
+}
+
+.wb-canvas,
+.wb-teacher,
+.wb-activity {
+  display: grid;
+  gap: var(--sl-space-3);
+  align-content: start;
+}
+
+.wb-note {
+  margin: 0;
+  color: var(--sl-text-muted);
+  font-size: var(--sl-text-sm);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.wb-note--large {
+  font-size: var(--sl-text-base);
+}
+
+.wb-canvas__columns {
+  display: grid;
+  gap: var(--sl-space-3);
+}
+
+/* Low grades: fewer simultaneous actions, larger controls, more spacing. */
+.workbench[data-density="spacious"] .wb-rail__content,
+.workbench[data-density="spacious"] .wb-canvas,
+.workbench[data-density="spacious"] .wb-teacher,
+.workbench[data-density="spacious"] .wb-activity {
+  padding: var(--sl-space-5);
+}
+
+.workbench[data-density="spacious"] button,
+.workbench[data-density="spacious"] .wb-mainnav__item,
+.workbench[data-density="spacious"] .wb-link {
+  min-height: 52px;
+  font-size: var(--sl-text-base);
+}
+
+.workbench[data-density="spacious"] .wb-toolbar .wb-rail__toggle {
+  padding: 0 var(--sl-space-5);
+}
+
+.workbench[data-density="spacious"] .wb-mainnav__item {
+  padding: 12px 16px;
+}
+
+/* Narrow: single column, explicit tabs, chapter rail as an overlay. */
+@media (max-width: 1023.98px) {
+  .wb-body[data-active-tab="canvas"] .wb-activity,
+  .wb-body[data-active-tab="canvas"] .wb-teacher,
+  .wb-body[data-active-tab="teacher"] .wb-activity,
+  .wb-body[data-active-tab="teacher"] .wb-canvas,
+  .wb-body[data-active-tab="activity"] .wb-canvas,
+  .wb-body[data-active-tab="activity"] .wb-teacher {
+    display: none;
+  }
+
+  .wb-center {
+    display: contents;
+  }
+
+  .wb-rail {
+    display: none;
+  }
+
+  .wb-rail[data-open="true"] {
+    display: grid;
+    position: fixed;
+    inset: auto var(--sl-space-4) var(--sl-space-4);
+    z-index: 30;
+    max-height: 72vh;
+    overflow: auto;
+    padding: var(--sl-space-4);
+    border: var(--sl-border);
+    border-radius: var(--sl-radius-md);
+    background: var(--sl-surface);
+    box-shadow: var(--sl-shadow-card);
+  }
+}
+
+/* Desktop: three columns; the chapter rail collapses to a 72px strip. */
+@media (min-width: 1024px) {
+  /* All three regions are visible side by side, so the narrow-screen switcher
+     would be a control without a visible effect. */
+  .wb-tabs {
+    display: none;
+  }
+
+  .wb-body {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  }
+
+  .workbench[data-rail="open"] .wb-body {
+    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(260px, 320px);
+  }
+
+  .workbench[data-rail="closed"] .wb-rail {
+    display: none;
+  }
+}
+
+@media (min-width: 700px) {
+  .wb-canvas__columns {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.wb-frame {
+  display: grid;
+  gap: var(--sl-space-4);
+  max-width: 760px;
+  margin: 0 auto;
+}

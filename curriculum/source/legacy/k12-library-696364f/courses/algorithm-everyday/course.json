@@ -1,0 +1,58 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "algorithm-everyday",
+  "title": "藏在生活里的算法",
+  "topic": "算法思维",
+  "description": "用排序、查找与复杂度的眼光重新审视世界，掌握大 O 思想、贪心与分治的核心权衡。",
+  "knowledge_points": [
+    {
+      "slug": "binary-search",
+      "name": "二分查找",
+      "description": "二分查找在有序数据中每次排除一半候选，n 个元素最多约 log₂n 步即可定位目标。",
+      "topic": "算法思维"
+    },
+    {
+      "slug": "time-complexity",
+      "name": "时间复杂度",
+      "description": "时间复杂度描述算法运行步数随输入规模增长的趋势，用大 O 记号忽略常数与低阶项。",
+      "topic": "算法思维"
+    },
+    {
+      "slug": "sorting-algorithm",
+      "name": "排序算法",
+      "description": "排序是把一组数据按规则排好顺序的过程，不同排序算法在速度与空间上各有取舍。",
+      "topic": "算法思维"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch03",
+      "revision": 1,
+      "order_index": 3,
+      "title": "查找的智慧：二分的力量",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "说明二分查找的有序前提与每一步区间收缩过程",
+        "解释 log₂n 级别的效率并与线性查找对比",
+        "判断“先排序再二分”在多次查询场景下的取舍"
+      ],
+      "knowledge_points": [
+        "binary-search",
+        "time-complexity",
+        "sorting-algorithm"
+      ],
+      "license_code": "CC-BY",
+      "license_notes": "沿用旧 book.json 的 CC-BY 声明；人工复核前不得发布。",
+      "source": {
+        "source_commit": "696364ff54c99f711e1cddd7364c9ac4d5282943",
+        "source_path": "backend/data/library/books/algorithm-everyday/ch03.md",
+        "original_sha256": "4c755b84214130e8b896ccfb147a53b93a6f86a36a75b1d53aa4bc156c3770ab",
+        "conversion": "legacy-library-v1->k12.content.chapter-blocks.v1"
+      },
+      "content_file": "chapters/ch03.json",
+      "example_count": 0
+    }
+  ]
+}

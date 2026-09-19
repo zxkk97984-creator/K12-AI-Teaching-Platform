@@ -1,0 +1,156 @@
+{
+  "schema_version": "k12.animation.definitions.v1",
+  "notice": "受控定义：只有 SORT_STEPS / BINARY_SEARCH 两个模板，参数受限，无可执行代码。",
+  "limits": {
+    "max_items": 12,
+    "max_steps": 400,
+    "min_value": -99,
+    "max_value": 999
+  },
+  "definitions": [
+    {
+      "id": "anim-sort-bubble-v1",
+      "template": "SORT_STEPS",
+      "title": "冒泡排序：相邻比较与交换",
+      "summary": "每次比较相邻两个数，必要时交换；一轮结束后较大的数被移到末尾并固定下来。",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "course_slug": "algorithm-everyday",
+      "chapter_slug": "ch03",
+      "chapter_revision": 1,
+      "knowledge_points": ["sorting-algorithm"],
+      "objectives": [
+        "说明相邻比较与交换如何把当前最大值移到未排序区间末尾",
+        "说明每轮结束后「末尾若干个元素已就位」这一不变量"
+      ],
+      "source_kind": "NEW_SOURCE",
+      "license_code": "PROJECT-ORIGINAL",
+      "review_status": "HUMAN_APPROVED",
+      "reviewer": "human-content-reviewer",
+      "publication_status": "PUBLISHED",
+      "is_test_fixture": false,
+      "text_alternative": "冒泡排序从未排序区间左端开始，依次比较相邻两个数；左边比右边大就交换，一轮下来最大的数会「冒」到未排序区间最右端并固定。重复直到整个数组有序。",
+      "preconditions": ["允许重复值；重复值之间不区分先后"],
+      "param_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "required": ["values"],
+        "properties": {
+          "values": {
+            "type": "int_array",
+            "min_items": 1,
+            "max_items": 12,
+            "min_value": -99,
+            "max_value": 999
+          }
+        }
+      },
+      "defaults": { "values": [5, 2, 9, 1, 5, 6] }
+    },
+    {
+      "id": "anim-binary-search-v1",
+      "template": "BINARY_SEARCH",
+      "title": "二分查找：区间对半收缩",
+      "summary": "在已排序（非降序）数组上比较中间元素，根据大小关系把候选区间缩小一半。",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "course_slug": "algorithm-everyday",
+      "chapter_slug": "ch03",
+      "chapter_revision": 1,
+      "knowledge_points": ["binary-search", "time-complexity"],
+      "objectives": [
+        "说明二分查找要求数组已排序这一前提",
+        "描述每一步候选区间如何缩小，并解释为何最多约 log₂n 步"
+      ],
+      "source_kind": "NEW_SOURCE",
+      "license_code": "PROJECT-ORIGINAL",
+      "review_status": "HUMAN_APPROVED",
+      "reviewer": "human-content-reviewer",
+      "publication_status": "PUBLISHED",
+      "is_test_fixture": false,
+      "text_alternative": "二分查找先在已排序数组里看中间的元素：如果正好是目标就结束；如果目标更大，就把左半部分整体排除；如果更小，就排除右半部分。每比较一次候选范围就减半，所以最多约 log₂n 步。前提是数组已经排好序，否则这个推理不成立。",
+      "preconditions": ["数组必须已按非降序排序；未排序输入会被拒绝，不会演示错误过程"],
+      "param_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "required": ["values", "target"],
+        "properties": {
+          "values": {
+            "type": "int_array",
+            "min_items": 1,
+            "max_items": 12,
+            "min_value": -99,
+            "max_value": 999
+          },
+          "target": { "type": "int", "min_value": -99, "max_value": 999 }
+        }
+      },
+      "defaults": { "values": [1, 3, 5, 7, 9, 11], "target": 7 }
+    },
+    {
+      "id": "anim-sort-bubble-draft-v1",
+      "template": "SORT_STEPS",
+      "title": "（草稿）冒泡排序：相邻比较与交换",
+      "summary": "未审校草稿：不得出现在学生端。",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "course_slug": "algorithm-everyday",
+      "chapter_slug": "ch03",
+      "chapter_revision": 1,
+      "knowledge_points": ["sorting-algorithm"],
+      "objectives": ["（草稿）"],
+      "source_kind": "NEW_SOURCE",
+      "license_code": "PROJECT-ORIGINAL",
+      "review_status": "UNREVIEWED",
+      "reviewer": null,
+      "publication_status": "DRAFT",
+      "is_test_fixture": false,
+      "text_alternative": "草稿内容，不提供给学生。",
+      "preconditions": [],
+      "param_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "required": ["values"],
+        "properties": {
+          "values": { "type": "int_array", "min_items": 1, "max_items": 12, "min_value": -99, "max_value": 999 }
+        }
+      },
+      "defaults": { "values": [3, 1, 2] }
+    },
+    {
+      "id": "anim-binary-search-fixture-v1",
+      "template": "BINARY_SEARCH",
+      "title": "（合成）二分查找：区间对半收缩",
+      "summary": "显式合成夹具：仅开发/测试 profile 可见，且必须标注未审校。",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "course_slug": "algorithm-everyday",
+      "chapter_slug": "ch03",
+      "chapter_revision": 1,
+      "knowledge_points": ["binary-search"],
+      "objectives": ["（合成夹具）验证区间收缩的渲染与边界"],
+      "source_kind": "SYNTHETIC_FIXTURE",
+      "license_code": "SYNTHETIC-FIXTURE",
+      "review_status": "UNREVIEWED",
+      "reviewer": null,
+      "publication_status": "DRAFT",
+      "is_test_fixture": true,
+      "text_alternative": "合成夹具的替代文字说明，仅用于开发测试。",
+      "preconditions": ["数组必须已按非降序排序"],
+      "param_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "required": ["values", "target"],
+        "properties": {
+          "values": { "type": "int_array", "min_items": 1, "max_items": 12, "min_value": -99, "max_value": 999 },
+          "target": { "type": "int", "min_value": -99, "max_value": 999 }
+        }
+      },
+      "defaults": { "values": [2, 4, 6, 8], "target": 6 }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "document_kind": "EVIDENCE_TEMPLATE_NOT_REQUEST_BODY",
+  "status": "UNVERIFIED",
+  "official_sources": [],
+  "checked_at": null,
+  "tenant_platform_origin": null,
+  "auth_scheme": {
+    "known_from_public_docs": "Authorization: Bearer <PAT>",
+    "verified_for_tenant": false
+  },
+  "bot_chat": {
+    "method": "POST",
+    "path_from_public_docs": "/api/v1/bots/{botId}/chat/completions",
+    "first_request_redacted": null,
+    "continue_request_redacted": null,
+    "response_redacted": null,
+    "stream_events_redacted": null,
+    "bot_workspace_binding": null,
+    "history_semantics": null,
+    "idempotency_supported": null,
+    "cancel_semantics": null,
+    "usage_fields": null,
+    "rate_limits": null,
+    "file_download_contract": null
+  },
+  "actual_model_id": null,
+  "actual_agent_os": null,
+  "platform_permissions_verified": false,
+  "notes": [
+    "本文件不是可发送的请求，不包含可执行API参数。",
+    "必须从正式文档/真实脱敏结果填写；未知保留null。"
+  ]
+}

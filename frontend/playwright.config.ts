@@ -1,0 +1,21 @@
+import { defineConfig } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./src/e2e",
+  timeout: 45_000,
+  workers: 1,
+  retries: 0,
+  reporter: [
+    ["line"],
+    ["json", { outputFile: "../docs/acceptance/t05-playwright-report.json" }],
+  ],
+  use: {
+    baseURL: "http://127.0.0.1:15173",
+    browserName: "chromium",
+    channel: "chrome",
+    headless: true,
+    trace: "off",
+    video: "off",
+    screenshot: "off",
+  },
+});

@@ -1,0 +1,37 @@
+{
+  "status": "NOT_DEPLOYED",
+  "bot_roles": {
+    "tutor": {
+      "bot_id": null,
+      "workspace_id": null,
+      "operations": [
+        "TEACH_TURN",
+        "CODE_FEEDBACK"
+      ],
+      "config_hash": null,
+      "knowledge_bundle_hash": null
+    },
+    "designer": {
+      "bot_id": null,
+      "workspace_id": null,
+      "operations": [
+        "QUIZ_DRAFT",
+        "LESSON_PACKAGE_DRAFT"
+      ],
+      "config_hash": null,
+      "knowledge_bundle_hash": null
+    }
+  },
+  "agent_os": null,
+  "runtime_model_id": null,
+  "native_subagents_required": false,
+  "response_mode": "BUFFERED_STRUCTURED",
+  "actual_permissions_reviewed": false,
+  "fixture_is_not_live": true,
+  "source_schema_versions": [
+    "k12.teaching.request.v1",
+    "k12.teaching.response.v1",
+    "k12.quiz.draft.v1",
+    "k12.lesson.package.draft.v1"
+  ]
+}

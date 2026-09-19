@@ -1,0 +1,56 @@
+{
+  "schema_version": "k12.lesson.package.draft.v1",
+  "request_id": "synthetic-package-001",
+  "chapter_id": "synthetic-sort-chapter",
+  "curriculum_revision": "synthetic-chapter-v1",
+  "stage": "PRIMARY_UPPER",
+  "title": "合成示例：比较相邻数字",
+  "objectives": [
+    "观察一次相邻比较和交换"
+  ],
+  "teaching_script": "先比较队列前两项，再观察交换是否改变第三项。本示例不是正式教材。",
+  "activities": [
+    {
+      "kind": "ANIMATION",
+      "instruction": "单步观察3和1交换位置。",
+      "suggested_resource_id": "synthetic-animation-001"
+    }
+  ],
+  "animation_specs": [
+    {
+      "template": "ADJACENT_SORT",
+      "values": [
+        3,
+        1,
+        2
+      ],
+      "target": null,
+      "narration": "比较3和1，交换它们；这一过程只是完整排序中的一步。",
+      "source_refs": [
+        {
+          "source_id": "synthetic-source-001",
+          "revision": "synthetic-chapter-v1",
+          "locator": "example:paragraph-1"
+        }
+      ]
+    }
+  ],
+  "asset_requests": [
+    {
+      "kind": "PPT",
+      "description": "待制作的一页相邻比较示意课件。",
+      "status": "NOT_PROVIDED",
+      "source_requirement": "自有图示和本节已审校来源。"
+    }
+  ],
+  "source_refs": [
+    {
+      "source_id": "synthetic-source-001",
+      "revision": "synthetic-chapter-v1",
+      "locator": "example:paragraph-1"
+    }
+  ],
+  "warnings": [
+    "PPT未提供，动画规格不是视频文件，待人工审校。"
+  ]
+}

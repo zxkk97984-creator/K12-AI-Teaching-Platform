@@ -1,0 +1,1320 @@
+{
+  "schema_version": "k12.rebuild.progress.v1",
+  "target_root": "/home/zxk/Projects/K12",
+  "release_scope": "synthetic_competition_prototype_until_authorized",
+  "current_task": "T23",
+  "gates": {
+    "G_API_CONTRACT": {
+      "status": "BLOCKED",
+      "owner": "团队/执行Agent依据官方证据",
+      "evidence": [
+        "docs/integrations/knodo/CONTRACT_DISCOVERY.md",
+        "docs/integrations/knodo/knodo-wire-evidence.json",
+        "docs/integrations/knodo/source-snapshots/manifest.json"
+      ],
+      "note": "公开文档已确认部分路由和字段；仍缺受权租户的脱敏真实请求/响应、取消/幂等/限额与完整SSE证据。"
+    },
+    "G_LIVE_BUDGET": {
+      "status": "BLOCKED",
+      "owner": "用户授权",
+      "evidence": [],
+      "note": "需明确模型调用次数/费用或积分上限及授权用途，配置了Key不等于允许消费。"
+    },
+    "G_AGENT_ISOLATION": {
+      "status": "BLOCKED",
+      "owner": "团队技术验收",
+      "evidence": [],
+      "note": "真实会话/文件/记忆/工具/执行身份隔离尚未验证。"
+    },
+    "G_K12_TERMS": {
+      "status": "BLOCKED",
+      "owner": "用户/赛题组/平台",
+      "evidence": [
+        "docs/integrations/knodo/source-snapshots/privacy.html"
+      ],
+      "note": "公开隐私政策明确服务不面向16岁以下未成年人；比赛租户及下游K12安排未确认。"
+    },
+    "G_HUMAN_CONTENT_REVIEW": {
+      "status": "BLOCKED",
+      "owner": "真实内容审校者",
+      "evidence": [],
+      "note": "四档示范课与正式资源需要真实审校记录；Agent不能代签。"
+    }
+  },
+  "tasks": {
+    "T00": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T00.md",
+        "docs/discovery/SOURCE_AUDIT.md",
+        "source_roots.json",
+        "docs/discovery/validate_source_audit.py"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "python3 docs/discovery/validate_source_audit.py",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "python3 .rebuild-kit/tools/validate_kit.py",
+          "exit_code": 0
+        }
+      ],
+      "note": "旧仓库 HEAD/untracked 资产不变；空 .git/.agents/.codex 在首次观察后由环境外部消失，执行 Agent 未触碰，详见验收限制。"
+    },
+    "T01": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T01.md",
+        "docs/discovery/REQUIREMENTS_MATRIX.md",
+        "docs/discovery/MIGRATION_SCOPE.md",
+        "docs/discovery/COURSE_INVENTORY.md",
+        "curriculum/planning/SHOWCASE_CHAPTERS.md",
+        "curriculum/planning/validate_plan.py"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "python3 curriculum/planning/validate_plan.py",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "python3 -m unittest discover -s curriculum/planning -p test_*.py -v",
+          "exit_code": 0
+        }
+      ],
+      "note": "R1五类明确、O01绘本延后；两档小学内容标记新作，两档旧章按不可变commit登记；人审门禁未通过。"
+    },
+    "T02": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T02.md",
+        "docs/integrations/knodo/CONTRACT_DISCOVERY.md",
+        "docs/integrations/knodo/knodo-wire-evidence.json",
+        "docs/integrations/knodo/GATE_REGISTER.md",
+        "docs/integrations/knodo/source-snapshots/manifest.json"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "python3 docs/integrations/knodo/validate_evidence.py",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "sha256sum -c docs/integrations/knodo/source-snapshots/SHA256SUMS",
+          "exit_code": 0
+        }
+      ],
+      "note": "公开文档和登录边界已取证；真实租户、PAT、预算、隔离、低龄适用和完整wire仍未知，相关门禁保持BLOCKED。"
+    },
+    "T03": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T03.md",
+        "docs/decisions/ADR-001-runtime-stack-and-boundaries.md",
+        "docs/decisions/ADR-002-bots-and-no-second-agent-loop.md",
+        "docs/decisions/ADR-003-ownership-revision-and-action-validation.md",
+        "docs/decisions/ADR-004-buffered-structured-delivery.md",
+        "docs/decisions/ADR-005-knowledge-and-data-authority.md",
+        "contracts/version.json",
+        "contracts/SHA256SUMS"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "python3 contracts/test_contracts.py -v",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "diff -rq contracts platform/knodo/contracts ...",
+          "exit_code": 0
+        }
+      ],
+      "note": "本地语义契约v1冻结；真实wire独立保持BLOCKED，未部署。"
+    },
+    "T04": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T04.md",
+        "docs/acceptance/T04-check.log",
+        "docs/acceptance/T04-negative-testdb.log",
+        "docs/acceptance/T04.runtime.json",
+        "backend/uv.lock",
+        "frontend/package-lock.json",
+        "compose.yaml"
+      ],
+      "verification": [
+        {
+          "type": "runtime",
+          "command": "./scripts/bootstrap.sh (twice)",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "./scripts/check.sh",
+          "exit_code": 0
+        },
+        {
+          "type": "runtime",
+          "command": "GET /health/live and GET /health/ready on 127.0.0.1:18081",
+          "exit_code": 0,
+          "http_status": 200
+        },
+        {
+          "type": "negative",
+          "command": "pytest without TEST_DATABASE_URL",
+          "exit_code": 4,
+          "expected_failure": true
+        }
+      ],
+      "note": "独立PG 55433/55434容器healthy；FastAPI/Vite实际启动并完成HTTP验证；旧容器和旧端口未触碰。"
+    },
+    "T05": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T05.md",
+        "docs/acceptance/T05-check.log",
+        "docs/acceptance/T05-browser.log",
+        "docs/acceptance/t05-playwright-report.json",
+        "docs/acceptance/t05-browser-redacted.png",
+        "docs/acceptance/T05-negative-missing-testdb.log",
+        "docs/acceptance/T05-negative-dev-db.log",
+        "docs/acceptance/T05.runtime.json",
+        "contracts/openapi.identity.json",
+        "frontend/src/shared/types/generated/identity.ts",
+        "backend/alembic/versions/0001_identity.py",
+        "backend/alembic/versions/0002_identity_constraints.py"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "./scripts/check.sh",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "uv run --project backend --locked pytest backend/tests -q",
+          "exit_code": 0,
+          "tests_passed": 28
+        },
+        {
+          "type": "automated",
+          "command": "npm test --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 3
+        },
+        {
+          "type": "browser",
+          "command": "./scripts/identity-e2e.sh",
+          "exit_code": 0,
+          "tests_passed": 2
+        },
+        {
+          "type": "runtime",
+          "command": "APP_ENV=development GET /health/ready on 127.0.0.1:18081",
+          "exit_code": 0,
+          "http_status": 200
+        },
+        {
+          "type": "negative",
+          "command": "pytest/check without TEST_DATABASE_URL",
+          "exit_code": 1,
+          "expected_failure": true
+        },
+        {
+          "type": "negative",
+          "command": "TEST_DATABASE_URL points at development database",
+          "exit_code": 1,
+          "expected_failure": true
+        },
+        {
+          "type": "integrity",
+          "command": "sha256sum -c .snapshots/T05-before-20260918/SHA256SUMS",
+          "exit_code": 0
+        }
+      ],
+      "note": "本地会话/CSRF/四档/偏好已完成；开发库55433与测试库55434分别验证。未调用Knodo，未开放真实未成年人注册；五个真实性门禁保持BLOCKED。"
+    },
+    "T06": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T06.md",
+        "docs/acceptance/T06-check.log",
+        "docs/acceptance/T06-check.first-failure.log",
+        "docs/acceptance/T06-import.log",
+        "docs/acceptance/T06-dev-import-first.log",
+        "docs/acceptance/T06-dev-import-second.log",
+        "docs/acceptance/T06-negative-missing-testdb.log",
+        "docs/acceptance/T06-negative-dev-db.log",
+        "docs/acceptance/T06.runtime.json",
+        "docs/migration/CONTENT_MIGRATION_MANIFEST.md",
+        "curriculum/source/legacy/k12-library-696364f/release.json",
+        "curriculum/source/synthetic/t06-fixtures-v1/release.json",
+        "backend/alembic/versions/0003_content_library.py",
+        "backend/app/modules/content/importer.py",
+        "backend/app/modules/content/service.py",
+        "backend/app/scripts/import_content.py"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "./scripts/check.sh",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "uv run --project backend --locked pytest backend/tests -q",
+          "exit_code": 0,
+          "tests_passed": 56,
+          "t06_tests_passed": 28
+        },
+        {
+          "type": "automated",
+          "command": "python3 contracts/test_contracts.py -v",
+          "exit_code": 0,
+          "tests_passed": 38
+        },
+        {
+          "type": "automated",
+          "command": "npm test --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 3
+        },
+        {
+          "type": "runtime",
+          "command": "python -m app.scripts.import_content import --release-dir curriculum/source/legacy/k12-library-696364f --apply (twice)",
+          "exit_code": 0,
+          "note": "专用测试库 55434 与开发库 55433 分别执行；第二次全部 REUSE，行数不变；两库迁移均到达 0003_content_library。"
+        },
+        {
+          "type": "negative",
+          "command": "pytest without TEST_DATABASE_URL",
+          "exit_code": 4,
+          "expected_failure": true
+        },
+        {
+          "type": "negative",
+          "command": "TEST_DATABASE_URL points at the development database",
+          "exit_code": 4,
+          "expected_failure": true
+        },
+        {
+          "type": "integrity",
+          "command": "sha256sum -c .snapshots/T06-before-20260918/SHA256SUMS",
+          "exit_code": 0
+        }
+      ],
+      "note": "唯一幂等导入器支持 dry-run；修订不可变由数据库触发器保证；未审/撤回/跨学段/夹具内容对学生不可见；两章旧课为 UNREVIEWED/DRAFT，curriculum/published 为空。未调用 Knodo，未生成人工审校记录，五个真实性门禁保持 BLOCKED。"
+    },
+    "T07": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T07.md",
+        "docs/design/UI_SPEC.md",
+        "docs/design/screenshots/t07-workbench-390.png",
+        "docs/design/screenshots/t07-workbench-820.png",
+        "docs/design/screenshots/t07-workbench-1280.png",
+        "docs/design/screenshots/t07-workbench-compact-1280.png",
+        "docs/design/t07-check.log",
+        "docs/design/t07-playwright-run.log",
+        "docs/design/t07-playwright-run.first-failure.log",
+        "docs/design/t07-backend-regression.log",
+        ".herdr-control/supervisor/reviews/b3d77965-3c82-4e9a-8707-aa10fc30b920.json"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "npm test --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 14
+        },
+        {
+          "type": "automated",
+          "command": "npm run typecheck --prefix frontend",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "npm run build --prefix frontend",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "openapi-typescript generate + diff (identity)",
+          "exit_code": 0
+        },
+        {
+          "type": "regression",
+          "command": "backend pytest tests -q (k12r1_test:55434)",
+          "exit_code": 0,
+          "tests_passed": 56
+        },
+        {
+          "type": "browser",
+          "command": "playwright workbench.spec.ts (real Chrome, dev API+DB)",
+          "exit_code": 0,
+          "tests_passed": 4,
+          "note": "A 独立重跑，与 B 自测一致；截图重生成后字节一致"
+        },
+        {
+          "type": "integrity",
+          "command": "review-start vs review-end manifest (46 files)",
+          "exit_code": 0,
+          "note": "0 changed / 0 missing"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T00:38:57+08:00）：范围未越界、无伪造数据、教师区诚实禁用、三档视口与键盘焦点实测通过；dev 库仅新增 3 个合成 demo 账号。"
+    },
+    "T08": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T08.md",
+        "contracts/openapi.content.json",
+        "frontend/src/shared/types/generated/content.ts",
+        "docs/design/screenshots/t08-reader-390.png",
+        "docs/design/screenshots/t08-reader-820.png",
+        "docs/design/screenshots/t08-reader-1280.png",
+        "docs/design/screenshots/t08-course-list-1280.png",
+        "docs/design/t08-check.log",
+        "docs/design/t08-playwright-run.log",
+        ".herdr-control/supervisor/reviews/e5a00a7b-f924-4080-885a-1cb0d75c2b07.json"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "./scripts/check.sh",
+          "exit_code": 0,
+          "note": "脚本未修改；含 identity openapi 字节 diff"
+        },
+        {
+          "type": "regression",
+          "command": "backend pytest tests -q (k12r1_test:55434)",
+          "exit_code": 0,
+          "tests_passed": 72
+        },
+        {
+          "type": "automated",
+          "command": "npm test --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 25
+        },
+        {
+          "type": "automated",
+          "command": "npm run typecheck / build --prefix frontend",
+          "exit_code": 0
+        },
+        {
+          "type": "contract",
+          "command": "content openapi export + diff",
+          "exit_code": 0
+        },
+        {
+          "type": "contract",
+          "command": "identity openapi export + diff vs frozen contract",
+          "exit_code": 0,
+          "note": "字节一致"
+        },
+        {
+          "type": "browser",
+          "command": "playwright content.spec.ts (real Chrome, dev API+DB)",
+          "exit_code": 0,
+          "tests_passed": 5,
+          "note": "A 独立重跑；截图由 A 重生成（字节有差异，源码未变）"
+        },
+        {
+          "type": "integrity",
+          "command": "after-executor manifest 55 files re-hash",
+          "exit_code": 0,
+          "note": "0 changed / 0 missing；4 张截图差异为 A 重跑所致"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T01:54:08+08:00）：可见性/越权/上下文/幂等事件/契约字节稳定/真实浏览器链全部实测通过；M1 原任务至此全部 DONE。"
+    },
+    "T09": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T09.md",
+        "platform/knodo/deployment-manifest.json",
+        "platform/knodo/releases/knodo-assets-1.0.0/SHA256SUMS",
+        "platform/knodo/bundles/manifest.json",
+        "platform/knodo/bundles/designer-private/BOUNDARY.md",
+        "docs/integrations/knodo/DEPLOYMENT_GUIDE.md",
+        "docs/integrations/knodo/ASSET_BOUNDARIES.md",
+        "docs/integrations/knodo/t09-check.log",
+        "docs/integrations/knodo/t09-check.first-failure.log",
+        "scripts/package-knodo.py",
+        ".herdr-control/supervisor/reviews/0642a8f5-fd9f-46e3-9cc3-5d4902f843a6.json"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "python3 scripts/package-knodo.py verify",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "python3 scripts/package-knodo.py scan",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "python3 scripts/package-knodo.py selftest",
+          "exit_code": 0,
+          "note": "5 反例 + 1 干净对照"
+        },
+        {
+          "type": "automated",
+          "command": "python3 scripts/package-knodo.py build (x2 determinism)",
+          "exit_code": 0,
+          "note": "A 重跑：6 ZIP 字节一致"
+        },
+        {
+          "type": "integrity",
+          "command": "release SHA256SUMS recompute + A ZIP inspection",
+          "exit_code": 0,
+          "note": "8/8 哈希；无越界/密钥"
+        },
+        {
+          "type": "regression",
+          "command": "./scripts/check.sh",
+          "exit_code": 0,
+          "note": "A 独立重跑：38 契约 + 72 后端 + 25 前端 + identity 契约字节一致"
+        },
+        {
+          "type": "manual",
+          "command": "deployment manifest review",
+          "exit_code": 0,
+          "note": "PACKAGED/NOT_DEPLOYED；无伪造 Bot ID"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T16:44:10+08:00）：资产可复现打包、ZIP 安全、Skill/契约一致、课堂包无答案；真实部署与 QA35 如实 NOT_RUN。"
+    },
+    "T10": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T10.md",
+        "backend/app/integrations/knodo/gateway.py",
+        "backend/app/integrations/knodo/operations.py",
+        "backend/app/integrations/knodo/types.py",
+        "backend/app/integrations/knodo/transport.py",
+        "backend/app/integrations/knodo/fixture.py",
+        "backend/app/integrations/knodo/redaction.py",
+        "backend/app/integrations/knodo/router.py",
+        "backend/app/integrations/knodo/schema_models.py",
+        "backend/app/integrations/knodo/errors.py",
+        "backend/tests/test_knodo_gateway.py",
+        "backend/tests/test_knodo_transport.py",
+        "backend/tests/test_knodo_config.py",
+        "backend/tests/test_knodo_concurrency.py",
+        "backend/tests/test_knodo_schema_fidelity.py",
+        ".herdr-control/supervisor/reviews/4c5beb22-19c3-4d4c-ba21-d62ba38de461.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, k12r1_test:55434)",
+          "exit_code": 0,
+          "tests_passed": 159
+        },
+        {
+          "type": "contract",
+          "command": "identity + content openapi export + diff",
+          "exit_code": 0,
+          "note": "两份均字节一致"
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 25
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 91 files re-hash",
+          "exit_code": 0,
+          "note": "0 changed"
+        },
+        {
+          "type": "negative",
+          "command": "unknown operation / schema mismatch / timeout / cancel / output limit / status codes",
+          "exit_code": 0,
+          "note": "全部进入可预测错误分类，无隐藏回退"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅 source-audit 腿因外部 CareerMate 工作树变更失败（HEAD 未变）；其余步骤 A 已逐项验证通过"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T17:07:42+08:00）：四 operation/fail-closed/无回退/usage 隔离/脱敏限额均实测；check.sh 因外部仓库变更在 source-audit 腿阻塞（非本卡缺陷，已上报）。"
+    },
+    "T11": {
+      "status": "BLOCKED",
+      "evidence": [
+        "docs/integrations/knodo/GATE_REGISTER.md",
+        "docs/integrations/knodo/CONTRACT_DISCOVERY.md",
+        "contracts/knodo-wire-evidence.template.json"
+      ],
+      "verification": [
+        {
+          "type": "blocked",
+          "command": "gate check: G_API_CONTRACT",
+          "exit_code": null,
+          "note": "缺受权租户的脱敏真实请求/响应、取消/幂等/限额与完整 SSE 证据；公开文档不足以实现 wire mapper。"
+        },
+        {
+          "type": "blocked",
+          "command": "gate check: G_LIVE_BUDGET",
+          "exit_code": null,
+          "note": "无模型调用次数/费用(积分)上限与用途授权；配置 Key 不等于允许消费。"
+        },
+        {
+          "type": "automated",
+          "command": "N/A (未派发实现)",
+          "exit_code": null,
+          "note": "按原卡要求：门禁未过必须 BLOCKED，不生成“可运行假 mapper”冒充真实接入。"
+        }
+      ],
+      "note": "A 于 2026-09-19T17:07:51+08:00 登记 BLOCKED：原卡硬门禁 G_API_CONTRACT 与 G_LIVE_BUDGET 仍缺外部证据/授权；T11 不派发、不实现假 mapper。解除条件：用户提供受权租户脱敏 wire 证据与明确预算上限。"
+    },
+    "T12": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T12.md",
+        "backend/app/modules/teaching/service.py",
+        "backend/app/modules/teaching/router.py",
+        "backend/app/modules/teaching/models.py",
+        "backend/app/modules/teaching/validation.py",
+        "backend/app/jobs/teaching_worker.py",
+        "backend/alembic/versions/0005_teaching_runs.py",
+        "backend/tests/test_teaching_runs.py",
+        "backend/tests/test_teaching_delivery.py",
+        "frontend/src/features/conversation/ConversationPage.tsx",
+        "frontend/src/e2e/conversation.spec.ts",
+        ".herdr-control/supervisor/reviews/80edf1df-1003-428b-b535-fa29baa8d987.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, 55434)",
+          "exit_code": 0,
+          "tests_passed": 177
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 29
+        },
+        {
+          "type": "contract",
+          "command": "identity + content openapi export + diff",
+          "exit_code": 0,
+          "note": "两份字节一致；38 契约用例 OK"
+        },
+        {
+          "type": "browser",
+          "command": "playwright conversation.spec.ts (real Chrome, fixture gateway, dev DB)",
+          "exit_code": 0,
+          "tests_passed": 2,
+          "note": "A 用新合成账号独立重跑：202→SSE→done→reload 与 cancel→CANCELLED"
+        },
+        {
+          "type": "negative",
+          "command": "idempotency conflict / concurrent same-intent / expired lease / STALE / owner isolation / bad payload / save failure / UPSTREAM_UNKNOWN",
+          "exit_code": 0,
+          "note": "均由 18 项新增后端测试覆盖并通过"
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 50 files re-hash",
+          "exit_code": 0,
+          "note": "0 changed"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅 source-audit 腿因外部 CareerMate 变更失败（HEAD 未变）；项目腿全部通过"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T17:58:16+08:00）：短事务/DB 幂等/租约守卫/owner 隔离/校验后落库/SSE 与取消均实测；存在外部 check.sh 阻塞（非本卡）与一次 ACK 缺失流程偏差（已记录）。"
+    },
+    "T13": {
+      "status": "BLOCKED",
+      "evidence": [
+        "docs/integrations/knodo/GATE_REGISTER.md",
+        ".herdr-control/blocked/T11.json",
+        "docs/acceptance/T12.md"
+      ],
+      "verification": [
+        {
+          "type": "blocked",
+          "command": "dependency check: T11",
+          "exit_code": null,
+          "note": "T11 因 G_API_CONTRACT/G_LIVE_BUDGET BLOCKED，未实现真实 wire mapper；T13 依赖其输出。"
+        },
+        {
+          "type": "blocked",
+          "command": "gate check: G_API_CONTRACT, G_LIVE_BUDGET",
+          "exit_code": null,
+          "note": "缺受权租户脱敏 wire 证据与明确预算上限。"
+        },
+        {
+          "type": "automated",
+          "command": "N/A (未派发实现)",
+          "exit_code": null,
+          "note": "按原卡：门禁未过必须 BLOCKED，不得用 fixture 冒充真实 Knodo 接入或教学效果。"
+        }
+      ],
+      "note": "A 于 2026-09-19T17:58:25+08:00 登记 BLOCKED：依赖 T11 未完成（门禁）且本卡自身门禁未过。解除条件：T11 真实 mapper 通过 + 预算/租户证据到位。"
+    },
+    "T14": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T14.md",
+        "backend/app/modules/learning/policy.py",
+        "backend/app/modules/learning/service.py",
+        "backend/app/modules/learning/models.py",
+        "backend/app/modules/teaching/service.py",
+        "backend/alembic/versions/0006_learning_phase.py",
+        "backend/tests/test_teaching_phase.py",
+        "frontend/src/features/lesson/LessonPage.tsx",
+        "frontend/src/e2e/lesson.spec.ts",
+        ".herdr-control/supervisor/reviews/6ed661df-b5e8-43d7-87d5-9f98afcd97d7.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, 55434)",
+          "exit_code": 0,
+          "tests_passed": 209
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 34
+        },
+        {
+          "type": "contract",
+          "command": "contracts + identity/content openapi diff",
+          "exit_code": 0,
+          "note": "38 OK；两份字节一致"
+        },
+        {
+          "type": "browser",
+          "command": "playwright src/e2e full suite (real Chrome, dev DB, fixture gateway)",
+          "exit_code": 0,
+          "tests_passed": 14
+        },
+        {
+          "type": "negative",
+          "command": "QA04 boundary / proactive off / refresh+double tab ENTER / skip / late run after policy change / completion gate",
+          "exit_code": 0,
+          "note": "由 32 项新增后端测试 + lesson e2e 覆盖并通过"
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 58 files re-hash",
+          "exit_code": 0,
+          "note": "0 changed"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅外部 CareerMate source-audit 腿失败"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T18:43:44+08:00）：适龄策略下游差异/证据封顶/主动开场幂等/偏好开关/phase 与 lifecycle 分离/完成门禁均实测；遗留 frontend/t14-debug.mjs 待 B 清理。"
+    },
+    "T15": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T15.md",
+        "backend/app/modules/assessment/service.py",
+        "backend/app/modules/assessment/validation.py",
+        "backend/app/modules/assessment/specs.py",
+        "backend/app/modules/assessment/models.py",
+        "backend/app/modules/assessment/dto.py",
+        "backend/app/modules/assessment/router.py",
+        "backend/alembic/versions/0007_assessment_quiz.py",
+        ".herdr-control/supervisor/reviews/26cfd585-6ea5-446b-a4a4-eba6748650ec.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, 55434)",
+          "exit_code": 0,
+          "tests_passed": 231
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 34
+        },
+        {
+          "type": "contract",
+          "command": "contracts + SHA256SUMS + identity/content openapi diff",
+          "exit_code": 0,
+          "note": "38 OK；7/7；两份字节一致"
+        },
+        {
+          "type": "negative",
+          "command": "QA12/13/16/17 反例 + 伪审核字段 + 跨章来源 + Tutor/Designer 隔离",
+          "exit_code": 0,
+          "note": "22 项新增后端测试覆盖"
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 121 files re-hash",
+          "exit_code": 0,
+          "note": "0 changed"
+        },
+        {
+          "type": "cleanup",
+          "command": "rm frontend/t14-debug.mjs（授权）",
+          "exit_code": 0
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅外部 CareerMate source-audit 腿失败"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T19:00:43+08:00）：题稿严格校验/状态机/答案服务端留存/Designer 隔离均实测；遗留调试文件已按授权清理。"
+    },
+    "T16": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T16.md",
+        "backend/app/modules/assessment/quiz_service.py",
+        "backend/app/modules/assessment/quiz_router.py",
+        "backend/alembic/versions/0008_quiz_sessions.py",
+        "backend/tests/test_quiz_sessions.py",
+        "backend/tests/test_quiz_scoring.py",
+        ".herdr-control/supervisor/reviews/dc2f4293-5ead-45be-94e3-a2549a21bc5a.json",
+        "docs/acceptance/T16-repair-attempt2.md",
+        ".herdr-control/supervisor/reviews/a7b6070c-3b50-471d-ba4e-35f979734bdf.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, 55434)",
+          "exit_code": 0,
+          "tests_passed": 246
+        },
+        {
+          "type": "automated",
+          "command": "npm test --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 34
+        },
+        {
+          "type": "contract",
+          "command": "contracts + identity/content openapi diff",
+          "exit_code": 0,
+          "note": "38 OK；两份字节一致"
+        },
+        {
+          "type": "negative",
+          "command": "答案隐藏/伪造is_correct/跨学生/重复作答/提示上限/并发完成/SYSTEM_FAILURE",
+          "exit_code": 0,
+          "note": "15 项新增后端测试覆盖"
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 79 files re-hash",
+          "exit_code": 0,
+          "note": "0 changed"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅外部 CareerMate source-audit 腿失败"
+        },
+        {
+          "type": "repair",
+          "command": "T16 attempt 2: DTO id + API regression",
+          "exit_code": 0,
+          "tests_passed": 247,
+          "note": "A 复核：quiz_dto 仅加 id；新回归验证 DTO id→作答/提示 200、他人 404；契约字节不变"
+        }
+      ],
+      "note": "A 复核：原验收 PASS + T17 集成阻塞已由 attempt 2 最小修复（DTO 暴露 question id，247 tests）并复核通过（2026-09-19T19:32:15+08:00）。"
+    },
+    "T17": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T17.md",
+        "frontend/src/features/quiz/QuizCard.tsx",
+        "frontend/src/features/quiz/cache.ts",
+        "frontend/src/pages/practice/PracticePage.tsx",
+        "frontend/src/e2e/practice.spec.ts",
+        ".herdr-control/evidence/T17-ordering-390.png",
+        ".herdr-control/evidence/T17-practice-result-390.png",
+        ".herdr-control/evidence/T17-first-failure-e2e.log",
+        ".herdr-control/supervisor/reviews/d6894fb7-a7db-4a65-832b-0828e9d17e71.json"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 50
+        },
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, 55434)",
+          "exit_code": 0,
+          "tests_passed": 247
+        },
+        {
+          "type": "contract",
+          "command": "contracts + identity/content openapi diff",
+          "exit_code": 0,
+          "note": "38 OK；两份字节一致"
+        },
+        {
+          "type": "browser",
+          "command": "playwright src/e2e full suite (real Chrome, dev DB, fixture)",
+          "exit_code": 0,
+          "tests_passed": 16
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 25 files re-hash",
+          "exit_code": 0,
+          "note": "0 changed"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅外部 CareerMate source-audit 腿失败"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T19:53:43+08:00）：练习闭环/键盘排序/服务端判分/刷新恢复/换号清 cache/回同一课堂均实测；会话创建无服务端幂等键的残余风险已披露并记录。"
+    },
+    "T18": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T18.md",
+        "backend/app/modules/learning/projection.py",
+        "backend/app/modules/memory/service.py",
+        "backend/app/modules/memory/models.py",
+        "backend/app/modules/memory/router.py",
+        "backend/alembic/versions/0009_growth_memory.py",
+        "backend/tests/test_growth_memory.py",
+        "frontend/src/features/growth/GrowthPage.tsx",
+        "frontend/src/e2e/growth.spec.ts",
+        ".herdr-control/evidence/T18-growth-390.png",
+        ".herdr-control/evidence/T18-growth-forgotten-390.png",
+        ".herdr-control/supervisor/reviews/19d975a4-5461-4c4d-a8eb-f7233c5cca92.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, 55434)",
+          "exit_code": 0,
+          "tests_passed": 255
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 58
+        },
+        {
+          "type": "contract",
+          "command": "contracts + identity/content openapi diff",
+          "exit_code": 0,
+          "note": "38 OK；两份字节一致"
+        },
+        {
+          "type": "browser",
+          "command": "playwright src/e2e full suite (real Chrome, dev DB)",
+          "exit_code": 0,
+          "tests_passed": 17
+        },
+        {
+          "type": "negative",
+          "command": "去重/owner 404/stale 409/CSRF 403/遗忘后重放不复活/GET 不生成",
+          "exit_code": 0,
+          "note": "8 项新增后端测试 + 成长链 e2e"
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 66 files re-hash + context.py 冻结哈希比对",
+          "exit_code": 0,
+          "note": "0 changed；context.py 与 T14 冻结一致"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅外部 CareerMate source-audit 腿失败"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T20:36:59+08:00）：证据去重/定性观察版本/记忆状态机/遗忘不注入/owner 隔离/无伪百分比均实测；含 3 次真实失败修复与 1 次越界自查回滚。"
+    },
+    "T19": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T19.md",
+        "backend/app/modules/recommendation/decision.py",
+        "backend/app/modules/recommendation/service.py",
+        "backend/app/modules/recommendation/models.py",
+        "backend/app/modules/recommendation/router.py",
+        "backend/app/jobs/teaching_worker.py",
+        "backend/alembic/versions/0010_recommendation.py",
+        "backend/tests/test_recommendation.py",
+        "frontend/src/features/learning-next/NextStepPage.tsx",
+        "frontend/src/features/learning-next/api.ts",
+        "frontend/src/features/learning-next/learning-next.test.tsx",
+        "frontend/src/e2e/learn.spec.ts",
+        ".herdr-control/supervisor/reviews/a2f7e84c-ae14-4a55-bfd5-8afcd44cc657.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, 55434)",
+          "exit_code": 0,
+          "tests_passed": 262
+        },
+        {
+          "type": "negative",
+          "command": "pytest backend/tests/test_recommendation.py -q",
+          "exit_code": 0,
+          "tests_passed": 7,
+          "note": "只读纯 GET/事件改决策；提示跳过不算掌握；撤回证据+DISPUTED 记忆退出；stale 409；owner 隔离+CSRF；worker 单 run 重算"
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 68
+        },
+        {
+          "type": "contract",
+          "command": "contracts + identity/content openapi diff",
+          "exit_code": 0,
+          "note": "38 OK；两份字节一致"
+        },
+        {
+          "type": "browser",
+          "command": "playwright src/e2e full suite (真 Chrome, dev DB, fixture gateway)",
+          "exit_code": 0,
+          "tests_passed": 18
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 61 files re-hash",
+          "exit_code": 0,
+          "note": "0 changed / 0 missing；冻结后无写入"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅外部 CareerMate source-audit 腿失败；项目腿 19/20 通过"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T21:24+08:00）：统一决策源/事件重算/GET 只读/evidence 与规则版本/stale 与撤回处置/owner 隔离均实测；A 全量 Playwright 18/18。"
+    },
+    "T20": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T20.md",
+        "backend/app/modules/resources/service.py",
+        "backend/app/modules/resources/models.py",
+        "backend/app/modules/resources/router.py",
+        "backend/app/modules/resources/schemas.py",
+        "backend/app/core/storage/uploads.py",
+        "backend/app/core/storage/local.py",
+        "backend/app/core/storage/sniff.py",
+        "backend/app/core/storage/tickets.py",
+        "backend/app/core/storage/keys.py",
+        "backend/app/modules/teaching/context.py",
+        "backend/app/modules/teaching/service.py",
+        "backend/alembic/versions/0011_resources.py",
+        "backend/tests/test_resources.py",
+        "backend/tests/fixtures/t20/synthetic-lesson.docx",
+        "backend/tests/fixtures/t20/synthetic-slides.pptx",
+        "backend/tests/fixtures/t20/synthetic-clip.mp4",
+        "frontend/src/features/resources/",
+        "frontend/src/pages/admin/",
+        "frontend/src/e2e/resources.spec.ts",
+        ".herdr-control/supervisor/reviews/f0d94d69-634c-4392-9c10-08f0e100b172.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (APP_ENV=test, 55434)",
+          "exit_code": 0,
+          "tests_passed": 273
+        },
+        {
+          "type": "negative",
+          "command": "pytest backend/tests/test_resources.py -q",
+          "exit_code": 0,
+          "tests_passed": 11,
+          "note": "伪MIME/超大/穿越/未发布/撤回/跨学段/跨owner/缺文件/主动内容/票据不落库"
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 79
+        },
+        {
+          "type": "contract",
+          "command": "identity+content OpenAPI 字节 diff + contracts",
+          "exit_code": 0,
+          "note": "两份 IDENTICAL；38 OK"
+        },
+        {
+          "type": "browser",
+          "command": "playwright src/e2e full（A 自建 harness，真 Chrome+dev PG）",
+          "exit_code": 0,
+          "tests_passed": 19
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest attempt2 79 files + 素材真伪(ffprobe/unzip/MANIFEST)",
+          "exit_code": 0,
+          "note": "0 漂移；docx/pptx 真 OOXML；mp4 h264+aac 2.0s"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/check.sh",
+          "exit_code": 1,
+          "expected_failure": true,
+          "note": "仅外部 CareerMate source-audit 腿"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T22:16+08:00，attempt2）：attempt1 单点缺陷（R7 Tutor 注入缺失）经最小修复后完整成立；真实素材可开/可播、权限与撤回语义、票据不落库、storage_key 不外泄均实测。"
+    },
+    "T21": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T21.md",
+        "frontend/src/features/animation/AnimationPage.tsx",
+        "frontend/src/features/animation/AnimationPlayer.tsx",
+        "frontend/src/features/animation/templates.ts",
+        "frontend/src/e2e/animation.spec.ts",
+        "curriculum/animations/definitions.json",
+        "backend/app/modules/resources/animation_service.py",
+        "backend/app/modules/resources/animation_router.py",
+        "backend/app/modules/teaching/context.py",
+        "backend/app/modules/teaching/service.py",
+        "backend/tests/test_animations.py",
+        ".herdr-control/supervisor/reviews/ad51f1d3-1ab7-4d78-bf3d-23302021b91f.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (55434)",
+          "exit_code": 0,
+          "tests_passed": 283
+        },
+        {
+          "type": "determinism",
+          "command": "node --experimental-strip-types 三跑对比 + 边界脚本",
+          "exit_code": 0,
+          "note": "6 组输入逐字节一致；空数组拒绝；二分未命中 NOT_FOUND"
+        },
+        {
+          "type": "negative",
+          "command": "pytest tests/test_animations.py -q",
+          "exit_code": 0,
+          "tests_passed": 10,
+          "note": "非法模板/超长参数/未发布/跨学段/无注入不回退 block id/fail-closed"
+        },
+        {
+          "type": "automated",
+          "command": "npm test/typecheck/build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 98
+        },
+        {
+          "type": "contract",
+          "command": "identity+content OpenAPI diff + contracts",
+          "exit_code": 0,
+          "note": "IDENTICAL x2；OK"
+        },
+        {
+          "type": "browser",
+          "command": "playwright src/e2e full（A 自建 harness）",
+          "exit_code": 0,
+          "tests_passed": 20
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest attempt2 142 files",
+          "exit_code": 0,
+          "note": "0 漂移；白名单外 0 变化"
+        }
+      ],
+      "note": "A 独立复核 PASS（attempt2，2026-09-19T22:5x+08:00）：attempt1 单点（Tutor 动画白名单）经最小注入闭环；确定性与无任意执行面实测。"
+    },
+    "T22": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T22.md",
+        "backend/app/modules/authoring/service.py",
+        "backend/app/modules/authoring/models.py",
+        "backend/app/modules/authoring/router.py",
+        "backend/app/jobs/authoring_worker.py",
+        "backend/alembic/versions/0012_authoring.py",
+        "backend/alembic/versions/0013_authoring_guards.py",
+        "backend/tests/test_authoring.py",
+        "frontend/src/pages/admin/",
+        "frontend/src/e2e/authoring.spec.ts",
+        ".herdr-control/supervisor/reviews/2a12e600-b54e-4981-9f7d-78be37a48cfa.json"
+      ],
+      "verification": [
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q (55434)",
+          "exit_code": 0,
+          "tests_passed": 293
+        },
+        {
+          "type": "negative",
+          "command": "pytest tests/test_authoring.py -q",
+          "exit_code": 0,
+          "tests_passed": 10,
+          "note": "自批拒绝/缺产物 409/重试预算/幂等/越权"
+        },
+        {
+          "type": "contract",
+          "command": "OpenAPI 字节 diff + contracts",
+          "exit_code": 0,
+          "note": "IDENTICAL x2；OK"
+        },
+        {
+          "type": "browser",
+          "command": "playwright full（A 自建 harness）",
+          "exit_code": 0,
+          "tests_passed": 21
+        },
+        {
+          "type": "integrity",
+          "command": "after-manifest 138 files",
+          "exit_code": 0,
+          "note": "0 漂移；越界 0"
+        }
+      ],
+      "note": "A 独立复核 PASS（2026-09-19T23:4x+08:00）：生成/审校/发布解耦与人审硬门禁实测成立；诚实边界（无平台生成能力主张、G_HUMAN_CONTENT_REVIEW 仍 BLOCKED）。M4 全部卡片完成。 | A 阶段验收复现测试自反缺陷；发最小修复单 23896ba1-8f81-442e-bf9e-68bcfcc6fbb1（attempt2）。 | A 复核 attempt2 PASS（2026-09-20T00:02:45+08:00）：测试自反断言已改为 gate 不变量；后端 293 全绿。"
+    },
+    "T23": {
+      "status": "IN_PROGRESS",
+      "evidence": [],
+      "verification": [],
+      "note": "A 派发 dispatch 5484f19f-7430-4a8f-91ec-de44d7ace2e2 attempt 1（M5 首卡）。"
+    },
+    "T24": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T25": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T26": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T27": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T28": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T29": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T30": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T31": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T32": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "T33": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "O01": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "O02": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "O03": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    },
+    "O04": {
+      "status": "NOT_STARTED",
+      "evidence": [],
+      "verification": [],
+      "note": ""
+    }
+  }
+}

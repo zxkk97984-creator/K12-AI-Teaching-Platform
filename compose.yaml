@@ -1,0 +1,42 @@
+name: k12r1
+
+services:
+  postgres-dev:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: k12r1_dev
+      POSTGRES_USER: k12r1_app
+      POSTGRES_PASSWORD: ${POSTGRES_DEV_PASSWORD:?POSTGRES_DEV_PASSWORD is required}
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - k12r1-postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U k12r1_app -d k12r1_dev"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    restart: "no"
+
+  postgres-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: k12r1_test
+      POSTGRES_USER: k12r1_test
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD:?POSTGRES_TEST_PASSWORD is required}
+    ports:
+      - "127.0.0.1:55434:5432"
+    volumes:
+      - k12r1-postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U k12r1_test -d k12r1_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    restart: "no"
+
+volumes:
+  k12r1-postgres-dev-data:
+    name: k12r1-postgres-dev-data
+  k12r1-postgres-test-data:
+    name: k12r1-postgres-test-data

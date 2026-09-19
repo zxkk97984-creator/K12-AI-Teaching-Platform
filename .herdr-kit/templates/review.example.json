@@ -1,0 +1,15 @@
+{
+  "example_only": true,
+  "dispatch_id": "COPY_VALID_DISPATCH_ID",
+  "task_id": "T06",
+  "attempt": 1,
+  "review_outcome": "NOT_RUN",
+  "review_report": null,
+  "before_manifest_sha256": null,
+  "after_manifest_sha256": null,
+  "required_checks": [],
+  "confirmed_defects": [],
+  "evidence_gaps": [],
+  "unconfirmed_risks": [],
+  "note": "必需检查完整且哈希稳定才可PASS；复核结果与登记progress分步骤。"
+}

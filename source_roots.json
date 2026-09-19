@@ -1,0 +1,184 @@
+{
+  "schema_version": "k12.source-roots.v1",
+  "captured_at": "2026-09-18T12:38:24+08:00",
+  "target_root": "/home/zxk/Projects/K12",
+  "target_realpath": "/home/zxk/Projects/K12",
+  "target_git": {
+    "path": "/home/zxk/Projects/K12/.git",
+    "is_repository": false,
+    "exists": false,
+    "note": "12:33 初始现场观察时存在空 .git、.agents、.codex 目录；12:38 T00 写入阶段复核时三者均已不存在。执行 Agent 未删除、移动或初始化它们；不得重新创建或把该变化归因于 Git 操作。"
+  },
+  "target_preserved_entries": [
+    {
+      "path": ".rebuild-kit",
+      "type": "directory",
+      "mode": "drwxrwxr-x",
+      "uid": 1000,
+      "gid": 1000,
+      "size": 4096,
+      "mtime_ns": 1789705544667740078
+    }
+  ],
+  "sources": [
+    {
+      "name": "K12-Learning-platform",
+      "path_requested": "/home/zxk/Projects/K12-Learning-platform",
+      "realpath": "/home/zxk/Projects/K12-Learning-platform",
+      "is_directory": true,
+      "is_repository": true,
+      "remote_origin": "https://github.com/zxkk97984-creator/K12-Learning-platform.git",
+      "branch": "master",
+      "head": "696364ff54c99f711e1cddd7364c9ac4d5282943",
+      "tree": "9934960af86236f3f13a8f1040d6d3fcebfdff3b",
+      "upstream": "origin/master",
+      "ahead_behind": "0\t0",
+      "status_entries": [
+        {
+          "code": "??",
+          "path": ".playwright-mcp/"
+        },
+        {
+          "code": "??",
+          "path": "backend/空"
+        },
+        {
+          "code": "??",
+          "path": "docs/handoff/"
+        },
+        {
+          "code": "??",
+          "path": "移动杯赛题(2).docx"
+        },
+        {
+          "code": "??",
+          "path": "移动杯项目深度交接_Prompt.txt"
+        }
+      ],
+      "tracked_status_count": 0,
+      "untracked_status_count": 5,
+      "untracked_snapshot": [
+        {
+          "path": ".playwright-mcp/",
+          "exists": true,
+          "type": "directory",
+          "mode": "drwxrwxr-x",
+          "tree_sha256": "66027dd16be97b403edcf4eefdbca724a60f44e43408a062bbff7b38d14a0346",
+          "file_count": 35,
+          "total_bytes": 269455
+        },
+        {
+          "path": "backend/空",
+          "exists": true,
+          "type": "file",
+          "size": 4,
+          "mode": "-rw-rw-r--",
+          "sha256": "a737da4882749cf1706e40662641df964aeb7fb3311242782663c76ad8fb3593"
+        },
+        {
+          "path": "docs/handoff/",
+          "exists": true,
+          "type": "directory",
+          "mode": "drwxrwxr-x",
+          "tree_sha256": "ff558ee9c9161eb6d0795820714d1cefad0179568d476b81202b48514a27d3dc",
+          "file_count": 1,
+          "total_bytes": 194250
+        },
+        {
+          "path": "移动杯赛题(2).docx",
+          "exists": true,
+          "type": "file",
+          "size": 190164,
+          "mode": "-rw-r--r--",
+          "sha256": "bd66194ca0a1857cdf901bc6a2015901fb36fd4045089d42fad0a38492e9c9ae"
+        },
+        {
+          "path": "移动杯项目深度交接_Prompt.txt",
+          "exists": true,
+          "type": "file",
+          "size": 21726,
+          "mode": "-rw-rw-r--",
+          "sha256": "ae27b1baacd482edbf0408a1ced18aeb9f8e8cdf8b0de040da241b8500852780"
+        }
+      ]
+    },
+    {
+      "name": "CareerMate",
+      "path_requested": "/home/zxk/Projects/CareerMate",
+      "realpath": "/home/zxk/Projects/CareerMate",
+      "is_directory": true,
+      "is_repository": true,
+      "remote_origin": "https://github.com/zxkk97984-creator/CareerMate.git",
+      "branch": "master",
+      "head": "724c00f943f277fa75f29dcc47bdf8e93e201eda",
+      "tree": "cb75941aa8ee0ee890178ab74c0730f5a8d5c146",
+      "upstream": "origin/master",
+      "ahead_behind": "0\t0",
+      "status_entries": [
+        {
+          "code": "??",
+          "path": "docs/MCP对接方案与实现说明.docx"
+        },
+        {
+          "code": "??",
+          "path": "docs/MCP对接方案与实现说明.md"
+        },
+        {
+          "code": "??",
+          "path": "docs/MCP对接方案与实现说明.pdf"
+        },
+        {
+          "code": "??",
+          "path": "docs/architecture-figure/"
+        }
+      ],
+      "tracked_status_count": 0,
+      "untracked_status_count": 4,
+      "untracked_snapshot": [
+        {
+          "path": "docs/MCP对接方案与实现说明.docx",
+          "exists": true,
+          "type": "file",
+          "size": 292347,
+          "mode": "-rw-rw-r--",
+          "sha256": "4cdcd864b766142ce8c909f135242de6ca044583f25f82fbc948e360427a0992"
+        },
+        {
+          "path": "docs/MCP对接方案与实现说明.md",
+          "exists": true,
+          "type": "file",
+          "size": 15670,
+          "mode": "-rw-rw-r--",
+          "sha256": "efa8c6b6a2d43ad97decdf79b3da47f792be4f6a8002c9f288fd36b8bb464407"
+        },
+        {
+          "path": "docs/MCP对接方案与实现说明.pdf",
+          "exists": true,
+          "type": "file",
+          "size": 906057,
+          "mode": "-rw-rw-r--",
+          "sha256": "21d4c0a759558b3095dfc06f48e8e0931029f4ded08616dd6ddefc7a63ea0452"
+        },
+        {
+          "path": "docs/architecture-figure/",
+          "exists": true,
+          "type": "directory",
+          "mode": "drwxrwxr-x",
+          "tree_sha256": "dea3c37069a75a8c544afb10e23a11353aa894b4e6adca588cb4cf814a8d5c05",
+          "file_count": 7,
+          "total_bytes": 1688737
+        }
+      ]
+    }
+  ],
+  "read_boundary": {
+    "old_repositories": "read-only; no seed/start/test/reset/clean/pull",
+    "new_project_write_root": "/home/zxk/Projects/K12",
+    "secrets": "no .env contents read; no PAT/cookie/key values collected"
+  },
+  "target_observed_then_absent": [
+    ".git",
+    ".agents",
+    ".codex"
+  ]
+}

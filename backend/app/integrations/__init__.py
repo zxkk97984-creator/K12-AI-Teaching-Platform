@@ -1,0 +1,1 @@
+"""External integrations (outbound adapters)."""

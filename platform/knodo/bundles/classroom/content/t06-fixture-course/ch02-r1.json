@@ -1,0 +1,77 @@
+{
+  "schema_version": "k12.knodo.classroom-item.v1",
+  "source_id": "chapter:t06-fixture-course/ch02",
+  "binding": {
+    "chapter_uuid": null,
+    "resolved_by": "local_app",
+    "note": "文件系统镜像不含数据库 UUID；由本地应用在部署时绑定。"
+  },
+  "course": {
+    "slug": "t06-fixture-course",
+    "title": "T06 合成夹具课程（非教学）",
+    "topic": "合成测试"
+  },
+  "chapter": {
+    "slug": "ch02",
+    "title": "合成样例：只确定学段时怎么匹配",
+    "revision": 1,
+    "stage": "JUNIOR",
+    "grade_min": null,
+    "grade_max": null,
+    "objectives": [
+      "确认只填学段时仍能匹配章节",
+      "确认没有年级时不会推断年级"
+    ],
+    "knowledge_points": [
+      {
+        "slug": "fixture-notice",
+        "name": "测试内容标识",
+        "topic": "合成测试",
+        "description": "合成夹具必须始终带有测试标识，并且不能进入正式发布目录。"
+      }
+    ],
+    "blocks": [
+      {
+        "text": "合成样例：只确定学段时怎么匹配",
+        "type": "TITLE"
+      },
+      {
+        "key": "section-1",
+        "text": "为什么有这一章",
+        "type": "SECTION"
+      },
+      {
+        "text": "这一章同样是合成内容，用来验证“学生只填了学段、没有填年级”时的匹配规则。",
+        "type": "PARAGRAPH"
+      },
+      {
+        "text": "它没有任何真实教学含义，任何测试结论都不能当作课程质量结论。",
+        "type": "PARAGRAPH"
+      },
+      {
+        "text": "没有年级时只按学段匹配，不推断学生年级，也不把缺少年级当成任意年级。",
+        "title": "测试要点",
+        "type": "KNOWLEDGE_CARD"
+      }
+    ]
+  },
+  "provenance": {
+    "release_key": "synthetic-t06-fixtures-v1",
+    "release_manifest_hash": "762a2dd3c9ffd14aa2b6fee2ac66bc7bbca8ab4cc289a986ab7e8ab82c7354ff",
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "is_test_fixture": true,
+    "source_commit": "0000000000000000000000000000000000000000",
+    "source_path": "courses/t06-fixture-course/chapters/ch02.json",
+    "license_code": "SYNTHETIC-FIXTURE"
+  },
+  "review": {
+    "review_status": "UNREVIEWED",
+    "publication_status": "DRAFT",
+    "human_reviewed": false
+  },
+  "usage": {
+    "for_real_students": false,
+    "notice": "测试内容，未作人工教学审校"
+  },
+  "content_hash": "1680f53a053d9d32d69bc13fbb1b13530c49a229bed32b6845dda7614680f530"
+}

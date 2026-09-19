@@ -1,0 +1,54 @@
+{
+  "schema_version": "k12.teaching.request.v1",
+  "request_id": "synthetic-request-001",
+  "lesson_session_id": "synthetic-lesson-A",
+  "base_revision": 0,
+  "curriculum_revision": "synthetic-chapter-v1",
+  "policy_revision": "stage-policy-v1",
+  "operation": "TEACH_TURN",
+  "event": "ENTER",
+  "current_phase": "ORIENT",
+  "learner": {
+    "stage": "PRIMARY_UPPER",
+    "grade": 5,
+    "preferred_style": "VISUAL"
+  },
+  "chapter": {
+    "id": "synthetic-sort-chapter",
+    "title": "协议测试：相邻比较",
+    "objective_ids": [
+      "synthetic-objective-compare"
+    ]
+  },
+  "knowledge_context": [
+    {
+      "source_id": "synthetic-source-001",
+      "revision": "synthetic-chapter-v1",
+      "locator": "example:paragraph-1",
+      "text": "这是合成协议样例，不是旧项目教材。给定队列[3,1,2]，比较前两个数，若左边较大则交换，得到[1,3,2]。一次比较不等于整个排序完成。"
+    }
+  ],
+  "evidence": [],
+  "allowed_actions": [
+    "OFFER_QUIZ",
+    "OPEN_ANIMATION"
+  ],
+  "allowed_resource_ids": [],
+  "allowed_animation_ids": [
+    "synthetic-animation-001"
+  ],
+  "allowed_code_task_ids": [],
+  "allowed_phase_suggestions": [
+    "EXPLAIN",
+    "CHECK"
+  ],
+  "limits": {
+    "max_quiz_questions": 2,
+    "allowed_difficulties": [
+      "EASY"
+    ],
+    "max_reply_chars": 800
+  },
+  "student_input": "",
+  "code_feedback_facts": null
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "k12.knodo.designer-private-manifest.v1",
+  "boundary_doc": "BOUNDARY.md",
+  "may_contain": [
+    "quiz_answer_keys",
+    "quiz_explanations",
+    "hidden_tests",
+    "reference_solutions",
+    "deidentified_misconception_summaries"
+  ],
+  "must_not_contain": [
+    "raw_student_identity",
+    "full_chat_logs",
+    "other_students_data",
+    "secrets_or_env",
+    "unlicensed_external_material"
+  ],
+  "included_in_this_release": [],
+  "answer_handling": {
+    "returns_only_in_private_schema": true,
+    "student_visible_projection_generated_by": "local_backend",
+    "projection_must_exclude": ["answer", "explanation", "hidden_tests", "reference_solution"]
+  },
+  "separation_from_tutor_bundle": "独立目录 + 独立 ZIP；课堂 bundle 的构建脚本拒绝非 fixture 且未经 HUMAN_APPROVED+PUBLISHED 的内容"
+}

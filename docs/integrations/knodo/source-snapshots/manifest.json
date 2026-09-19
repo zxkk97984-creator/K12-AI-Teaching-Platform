@@ -1,0 +1,47 @@
+{
+  "schema_version": "k12.knodo.public-doc-snapshot.v1",
+  "retrieved_at": "2026-09-18T12:41:06+08:00",
+  "network": "unauthenticated public HTTPS GET",
+  "files": {
+    "getting-started": {
+      "url": "https://knodo.vip/docs/getting-started/getting-started",
+      "http_status": 200,
+      "final_url": "https://knodo.vip/docs/getting-started/getting-started",
+      "content_type": "text/html",
+      "bytes": 665330,
+      "sha256": "beb896db7998499c502d4b300e9d9cd4b7618eef396549a5fc43d763af20a48e"
+    },
+    "privacy": {
+      "url": "https://knodo.vip/privacy",
+      "http_status": 200,
+      "final_url": "https://knodo.vip/privacy",
+      "content_type": "text/html",
+      "bytes": 73433,
+      "sha256": "c7406c93b596dd6a9197866fc8899527bdfa92c6cb413b853cb1c6026db88234"
+    },
+    "llms": {
+      "url": "https://knodo.vip/llms.txt",
+      "http_status": 200,
+      "final_url": "https://knodo.vip/llms.txt",
+      "content_type": "text/plain",
+      "bytes": 12847,
+      "sha256": "f8dab3cf5fc5ca9a8fde2cfdee47e892705e962559c196af46511ef59042bf91"
+    },
+    "llms-full": {
+      "url": "https://knodo.vip/llms-full.txt",
+      "http_status": 200,
+      "final_url": "https://knodo.vip/llms-full.txt",
+      "content_type": "text/plain",
+      "bytes": 746901,
+      "sha256": "d18b76247807ac06e7098c19f50816e3655b5cafc2d6f39af4914491e63e1fe0"
+    }
+  },
+  "login_required_page": {
+    "url": "https://knodo.vip/docs/api/simple-api",
+    "http_status": 200,
+    "redirect_status": 307,
+    "final_url": "https://knodo.vip/login?callbackUrl=%2Fdocs%2Fapi%2Fsimple-api",
+    "body_saved": false,
+    "reason": "页面需登录；只保留重定向和响应头事实，不提取浏览器会话。"
+  }
+}

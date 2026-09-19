@@ -1,0 +1,45 @@
+.admin-resources {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.admin-resource-form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  align-items: end;
+  margin: 16px 0;
+}
+
+.admin-resource-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.admin-resource-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-size: 0.9rem;
+}
+
+.admin-resource-table th,
+.admin-resource-table td {
+  border-bottom: 1px solid #e3e7ee;
+  padding: 8px;
+  text-align: left;
+}
+
+.admin-resource-table button {
+  margin-right: 6px;
+}
+
+.admin-error {
+  color: #a02020;
+  background: #fdecec;
+  border-radius: 8px;
+  padding: 8px;
+}

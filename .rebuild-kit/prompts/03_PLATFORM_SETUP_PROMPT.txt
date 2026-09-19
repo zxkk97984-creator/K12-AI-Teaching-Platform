@@ -1,0 +1,7 @@
+请依据本执行包platform/中的两类Bot提示词、三份Skill和plans/03_Knodo配置与接入.md，在我有权访问的Knodo比赛空间配置霜铃原型。
+先核对账号、AgentOS、实际可用模型、插件继承和外部权限；不使用编码模型昵称猜runtime model_id。初期只使用合成学生与授权课程。
+创建/配置Tutor和Designer两个角色，分别只接相应operation；Tutor不能访问答案库、隐藏测试、其他学生历史或我的开发目录。无需原生子Agent编排。先检查是否已存在同角色同版本，避免重复创建。
+系统提示词填写Bot本身的字段，不依赖空间工作指引自动合并。Skill ZIP是技能包不是整Bot导入包；按平台实际菜单配置，草稿验证后发布并新开会话。同步课程release/hash和Bot配置manifest，所有真ID只记录实际值。
+没有权限执行的步骤只记录NOT_DEPLOYED，不称已创建。不要改组织全局模型/插件，不给平台挂载/home、生产数据库或PAT明文。任何收费测试需有预算证据；没有则完成配置材料并停止真实调用。
+取得完整官方Bot Chat首轮/续聊/响应/SSE/取消/用量/错误契约的脱敏示例，填写contracts/knodo-wire-evidence.template.json的工作副本；禁止根据路径猜字段。
+交付配置差异、实际Bot/space/runtime/version、课程bundle hash、权限检查、未通过门禁以及下一步真实测试清单；不输出秘密。

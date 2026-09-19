@@ -1,0 +1,69 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "t06-fixture-course",
+  "title": "T06 合成夹具课程（非教学）",
+  "topic": "合成测试",
+  "description": "只用于开发和自动化测试的合成课程，用来说明内容结构、学段匹配和审校状态如何工作。",
+  "knowledge_points": [
+    {
+      "slug": "fixture-notice",
+      "name": "测试内容标识",
+      "topic": "合成测试",
+      "description": "合成夹具必须始终带有测试标识，并且不能进入正式发布目录。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch01",
+      "revision": 1,
+      "order_index": 1,
+      "title": "合成样例：谁在按规则做事",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "确认合成内容带有测试标识",
+        "确认正式运行不会加载合成内容"
+      ],
+      "knowledge_points": [
+        "fixture-notice"
+      ],
+      "license_code": "SYNTHETIC-FIXTURE",
+      "license_notes": "项目自造文本，无外部素材。",
+      "source": {
+        "source_commit": "0000000000000000000000000000000000000000",
+        "source_path": "courses/t06-fixture-course/chapters/ch01.json",
+        "original_sha256": "ca2a05a8ba8a5af4e2717d3512c43d95f37ab612254347890f7611a0e0c58b52",
+        "conversion": "synthetic-original-not-from-upstream"
+      },
+      "content_file": "chapters/ch01.json",
+      "example_count": 1
+    },
+    {
+      "stable_slug": "ch02",
+      "revision": 1,
+      "order_index": 2,
+      "title": "合成样例：只确定学段时怎么匹配",
+      "stage": "JUNIOR",
+      "grade_min": null,
+      "grade_max": null,
+      "objectives": [
+        "确认只填学段时仍能匹配章节",
+        "确认没有年级时不会推断年级"
+      ],
+      "knowledge_points": [
+        "fixture-notice"
+      ],
+      "license_code": "SYNTHETIC-FIXTURE",
+      "license_notes": "项目自造文本，无外部素材。",
+      "source": {
+        "source_commit": "0000000000000000000000000000000000000000",
+        "source_path": "courses/t06-fixture-course/chapters/ch02.json",
+        "original_sha256": "eefad4b7a64471ac8500bc71d349cbad08de6855e8ca4c4ebc4d8306011ddd0c",
+        "conversion": "synthetic-original-not-from-upstream"
+      },
+      "content_file": "chapters/ch02.json",
+      "example_count": 0
+    }
+  ]
+}

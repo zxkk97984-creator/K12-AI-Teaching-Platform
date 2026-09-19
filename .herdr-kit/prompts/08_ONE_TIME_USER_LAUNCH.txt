@@ -1,0 +1,8 @@
+【先发给执行者窗格B】
+切换为双Agent模式。你只实施A派发的任务，不写.rebuild-kit/progress.json，也不自行进入下一项。
+请完整读取 .herdr-kit/prompts/02_EXECUTOR_BOOT.txt 并执行。先完成规则与Herdr身份就绪登记，尚未收到有效dispatch时不开始T06。旧的单Agent进度更新规则按本次ROLE_OVERRIDE转交A。
+
+【再发给监督者窗格A】
+你负责监督派工与独立验收，B是我已经打开的执行者窗格，不要再创建重复Agent。
+请完整读取 .herdr-kit/prompts/01_SUPERVISOR_BOOT.txt 并执行。沿用已定产品/技术/任务计划；业务代码只由B写，原progress只由你在复核后更新。
+本批范围M1剩余任务（本机若仍到T05则从T06开始；已推进则恢复实际进度），每项审后再下一项，阶段末集成验收并汇报暂停。不能把这句话当作平台付费、凭据、人工审校或公开上线授权。

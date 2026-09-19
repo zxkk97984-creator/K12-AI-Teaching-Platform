@@ -1,0 +1,65 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "python-first-steps",
+  "title": "Python 第一步：从打印到循环",
+  "topic": "编程",
+  "description": "从第一行 print 出发，学会变量、条件与循环，最后亲手做出一个能玩的猜数字游戏。",
+  "knowledge_points": [
+    {
+      "slug": "variable",
+      "name": "变量",
+      "description": "变量是给数据起的名字，程序可以随时用它取回或更新保存的值。",
+      "topic": "编程"
+    },
+    {
+      "slug": "condition-if",
+      "name": "条件判断",
+      "description": "if 语句根据条件是否成立，让程序在不同做法之间选择一条路执行。",
+      "topic": "编程"
+    },
+    {
+      "slug": "loop",
+      "name": "循环",
+      "description": "循环让计算机重复执行某段代码，直到满足停止条件为止。",
+      "topic": "编程"
+    },
+    {
+      "slug": "random-number",
+      "name": "随机数",
+      "description": "随机数是无法提前确定的数，程序里常用它来制造变化和惊喜。",
+      "topic": "编程"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch05",
+      "revision": 1,
+      "order_index": 5,
+      "title": "小项目：猜数字游戏",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "把变量、条件与循环组合成一个可运行的小项目",
+        "读懂并修复 SyntaxError、TypeError、IndentationError 这类真实报错",
+        "运行游戏并解释随机数与分支逻辑各自的作用"
+      ],
+      "knowledge_points": [
+        "variable",
+        "condition-if",
+        "loop",
+        "random-number"
+      ],
+      "license_code": "CC-BY",
+      "license_notes": "沿用旧 book.json 的 CC-BY 声明；人工复核前不得发布。",
+      "source": {
+        "source_commit": "696364ff54c99f711e1cddd7364c9ac4d5282943",
+        "source_path": "backend/data/library/books/python-first-steps/ch05.md",
+        "original_sha256": "5714a715aab3318f6b7e8edca20c5234f0bd4d37878848fc5f91255e4d4f47bc",
+        "conversion": "legacy-library-v1->k12.content.chapter-blocks.v1"
+      },
+      "content_file": "chapters/ch05.json",
+      "example_count": 2
+    }
+  ]
+}

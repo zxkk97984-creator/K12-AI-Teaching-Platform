@@ -1,0 +1,384 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "k12.quiz.draft.v1"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "chapter_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "curriculum_revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "stage": {
+      "enum": [
+        "PRIMARY_LOWER",
+        "PRIMARY_UPPER",
+        "JUNIOR",
+        "SENIOR"
+      ]
+    },
+    "difficulty": {
+      "enum": [
+        "EASY",
+        "MEDIUM",
+        "HARD"
+      ]
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "question_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "objective_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "stem": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1200
+              },
+              "explanation": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1800
+              },
+              "hints": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "source_refs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "revision": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "locator": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    }
+                  },
+                  "required": [
+                    "source_id",
+                    "revision",
+                    "locator"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 4,
+                "uniqueItems": true
+              },
+              "type": {
+                "const": "SINGLE_CHOICE"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 40
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "text"
+                  ]
+                },
+                "minItems": 2,
+                "maxItems": 6
+              },
+              "correct_answer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              }
+            },
+            "required": [
+              "question_key",
+              "objective_id",
+              "stem",
+              "explanation",
+              "hints",
+              "source_refs",
+              "type",
+              "options",
+              "correct_answer"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "question_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "objective_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "stem": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1200
+              },
+              "explanation": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1800
+              },
+              "hints": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "source_refs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "revision": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "locator": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    }
+                  },
+                  "required": [
+                    "source_id",
+                    "revision",
+                    "locator"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 4,
+                "uniqueItems": true
+              },
+              "type": {
+                "const": "TRUE_FALSE"
+              },
+              "correct_answer": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "question_key",
+              "objective_id",
+              "stem",
+              "explanation",
+              "hints",
+              "source_refs",
+              "type",
+              "correct_answer"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "question_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "objective_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "stem": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1200
+              },
+              "explanation": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1800
+              },
+              "hints": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "source_refs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "revision": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "locator": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    }
+                  },
+                  "required": [
+                    "source_id",
+                    "revision",
+                    "locator"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 4,
+                "uniqueItems": true
+              },
+              "type": {
+                "const": "ORDERING"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 40
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "text"
+                  ]
+                },
+                "minItems": 2,
+                "maxItems": 8
+              },
+              "correct_order": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "minItems": 2,
+                "maxItems": 8,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "question_key",
+              "objective_id",
+              "stem",
+              "explanation",
+              "hints",
+              "source_refs",
+              "type",
+              "items",
+              "correct_order"
+            ]
+          }
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 5
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 400
+      },
+      "minItems": 0,
+      "maxItems": 8
+    }
+  },
+  "required": [
+    "schema_version",
+    "request_id",
+    "chapter_id",
+    "curriculum_revision",
+    "stage",
+    "difficulty",
+    "questions",
+    "warnings"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Designer题目草稿；永远不直接返回学生，不含人工审核状态"
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "k12.content.release.v1",
+  "release_key": "synthetic-t06-fixtures-v1",
+  "source_kind": "SYNTHETIC_FIXTURE",
+  "is_test_fixture": true,
+  "description": "T06 合成课程夹具：只用于开发/测试流程验证，永不发布，也不代表真实教学审校。",
+  "license_code": "SYNTHETIC-FIXTURE",
+  "license_notes": "项目自造测试文本，没有外部版权素材，不进入正式发布目录。",
+  "course_files": [
+    "courses/t06-fixture-course/course.json"
+  ]
+}

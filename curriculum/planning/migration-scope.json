@@ -1,0 +1,192 @@
+{
+  "schema_version": "k12.migration-scope.v1",
+  "source_commit": "696364ff54c99f711e1cddd7364c9ac4d5282943",
+  "allowed_dispositions": [
+    "REUSE",
+    "REBUILD",
+    "DEFER",
+    "REMOVE"
+  ],
+  "items": [
+    {
+      "capability": "账号登录、档案、偏好、头像",
+      "disposition": "REBUILD",
+      "reason": "保留需求，重建服务端会话、权限和四档学段模型",
+      "destination": "identity + settings",
+      "task_ids": [
+        "T05"
+      ]
+    },
+    {
+      "capability": "三档学段与年级派生",
+      "disposition": "REBUILD",
+      "reason": "旧实现把1–6合并；新实现四档并保留未知年级",
+      "destination": "stage policy + server validation",
+      "task_ids": [
+        "T01",
+        "T05"
+      ]
+    },
+    {
+      "capability": "25本课程、章节、静态图解",
+      "disposition": "REUSE",
+      "reason": "精选课程资产需带来源、许可证、修订和审校状态迁移，不复制整仓运行结构",
+      "destination": "curriculum source/published",
+      "task_ids": [
+        "T01",
+        "T06"
+      ]
+    },
+    {
+      "capability": "课程阅读与选中文本解释",
+      "disposition": "REBUILD",
+      "reason": "保留需求，重新核对chapter/block所有者和版本边界",
+      "destination": "content + teaching",
+      "task_ids": [
+        "T06",
+        "T08",
+        "T14"
+      ]
+    },
+    {
+      "capability": "桌宠、拖拽、换装",
+      "disposition": "DEFER",
+      "reason": "可选呈现，不计教学动画，不能阻塞核心教学闭环",
+      "destination": "optional presentation",
+      "task_ids": []
+    },
+    {
+      "capability": "教师人格切换",
+      "disposition": "REBUILD",
+      "reason": "展示语气可保留，但不能覆盖学段策略和安全规则",
+      "destination": "teacher presentation policy",
+      "task_ids": [
+        "T14"
+      ]
+    },
+    {
+      "capability": "聊天历史与长对话",
+      "disposition": "REBUILD",
+      "reason": "本地消息为权威，Knodo会话为远端绑定；答案不能进入Tutor共享历史",
+      "destination": "conversation + knodo binding",
+      "task_ids": [
+        "T10",
+        "T12"
+      ]
+    },
+    {
+      "capability": "出题、判分、提示、错题",
+      "disposition": "REBUILD",
+      "reason": "保留快照和确定性判分思想，重建题目所有权、答案隔离和提示状态",
+      "destination": "assessment + learning",
+      "task_ids": [
+        "T15",
+        "T16",
+        "T17",
+        "T18"
+      ]
+    },
+    {
+      "capability": "阅读进度、显式完成、时长",
+      "disposition": "REBUILD",
+      "reason": "完成活动与掌握证据分离，滚到底或耗时不等于掌握",
+      "destination": "learning events",
+      "task_ids": [
+        "T14",
+        "T18"
+      ]
+    },
+    {
+      "capability": "记忆、证据质疑、编辑、遗忘",
+      "disposition": "REBUILD",
+      "reason": "保留可追溯和用户控制，简化为证据投影与候选确认",
+      "destination": "memory",
+      "task_ids": [
+        "T18"
+      ]
+    },
+    {
+      "capability": "Episodes/agent.md导出",
+      "disposition": "DEFER",
+      "reason": "成长时间线保留；Markdown导出不是R1核心，避免第二套记忆系统",
+      "destination": "growth export",
+      "task_ids": [
+        "T18"
+      ]
+    },
+    {
+      "capability": "推荐与唯一下一步",
+      "disposition": "REBUILD",
+      "reason": "由真实答题、提示、完成和偏好驱动，GET只读并给理由",
+      "destination": "recommendation",
+      "task_ids": [
+        "T19"
+      ]
+    },
+    {
+      "capability": "自建Embedding/RAG与旧向量",
+      "disposition": "REMOVE",
+      "reason": "不迁移运行实现；课程上下文由版本化知识包和本地受控选择提供",
+      "destination": "Knodo knowledge bundle + local context builder",
+      "task_ids": [
+        "T06",
+        "T09"
+      ]
+    },
+    {
+      "capability": "PostgreSQL任务队列与Worker",
+      "disposition": "REBUILD",
+      "reason": "保留可靠机制，重建幂等、租约、重试、死信和心跳",
+      "destination": "jobs",
+      "task_ids": [
+        "T12",
+        "T29"
+      ]
+    },
+    {
+      "capability": "语音ASR/TTS",
+      "disposition": "DEFER",
+      "reason": "文本主链路先行；无真实验证时不显示为可用",
+      "destination": "voice adapter",
+      "task_ids": [
+        "T27"
+      ]
+    },
+    {
+      "capability": "CodeLab、沙箱与可信判分",
+      "disposition": "REUSE",
+      "reason": "复用任务素材和确定性测试思想；运行与判分在隔离runner重验",
+      "destination": "codelab + runner",
+      "task_ids": [
+        "T23",
+        "T24",
+        "T25",
+        "T26"
+      ]
+    },
+    {
+      "capability": "后台课程管理",
+      "disposition": "REBUILD",
+      "reason": "重建草稿、来源、发布、资源、Bot版本和审核日志",
+      "destination": "authoring + admin",
+      "task_ids": [
+        "T06",
+        "T22"
+      ]
+    },
+    {
+      "capability": "MinIO/Redis等基础设施声明",
+      "disposition": "REMOVE",
+      "reason": "R1没有明确存储/缓存需求时不部署占位基础设施",
+      "destination": "none; introduce only with ADR/evidence",
+      "task_ids": []
+    },
+    {
+      "capability": "旧迁移、旧数据库、未审题、缓存",
+      "disposition": "REMOVE",
+      "reason": "不迁入新权威库；只按清单迁移可追溯课程和测试思想",
+      "destination": "none",
+      "task_ids": []
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "k12.knodo.classroom-bundle.v1",
+  "bundle_kind": "TEST_FIXTURE_BUNDLE",
+  "for_real_students": false,
+  "notice": "测试内容，未作人工教学审校",
+  "release_id": "knodo-assets-1.0.0",
+  "items": [
+    {
+      "source_id": "chapter:t06-fixture-course/ch01",
+      "revision": 1,
+      "stage": "PRIMARY_LOWER",
+      "sha256": "6d113923d1bbc7d45d7052593e6b3dcefa81213e7ff292224d8942ec649d8f20",
+      "path": "platform/knodo/bundles/classroom/content/t06-fixture-course/ch01-r1.json",
+      "is_test_fixture": true
+    },
+    {
+      "source_id": "chapter:t06-fixture-course/ch02",
+      "revision": 1,
+      "stage": "JUNIOR",
+      "sha256": "ea0434a7c21c5796899602c696e95244ca56e37da8c0a99c26827fd4c9287c6f",
+      "path": "platform/knodo/bundles/classroom/content/t06-fixture-course/ch02-r1.json",
+      "is_test_fixture": true
+    }
+  ],
+  "contains_answer_material": false
+}

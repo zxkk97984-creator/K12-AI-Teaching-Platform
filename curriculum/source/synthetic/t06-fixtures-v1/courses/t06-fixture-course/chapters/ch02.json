@@ -1,0 +1,30 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch02",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "合成样例：只确定学段时怎么匹配"
+    },
+    {
+      "type": "SECTION",
+      "key": "section-1",
+      "text": "为什么有这一章"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "这一章同样是合成内容，用来验证“学生只填了学段、没有填年级”时的匹配规则。"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "它没有任何真实教学含义，任何测试结论都不能当作课程质量结论。"
+    },
+    {
+      "type": "KNOWLEDGE_CARD",
+      "title": "测试要点",
+      "text": "没有年级时只按学段匹配，不推断学生年级，也不把缺少年级当成任意年级。"
+    }
+  ],
+  "observed_knowledge_point_marks": []
+}

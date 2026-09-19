@@ -1,0 +1,16 @@
+{
+  "example_only": true,
+  "dispatch_id": "COPY_VALID_DISPATCH_ID",
+  "task_id": "T06",
+  "attempt": 1,
+  "outcome": "SUBMITTED",
+  "writer_stopped": false,
+  "required_checks_complete": false,
+  "manifest_path": null,
+  "manifest_sha256": null,
+  "self_test_report": "docs/acceptance/T06.md",
+  "commands": [],
+  "runtime_inventory": [],
+  "limitations": [],
+  "note": "writer_stopped和checks_complete只能写真实事实；此文件不会更新业务progress。"
+}

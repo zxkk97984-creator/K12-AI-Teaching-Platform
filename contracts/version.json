@@ -1,0 +1,12 @@
+{
+  "schema_version": "k12.local-contract-version.v1",
+  "contract_version": "1.0.0",
+  "schemas": [
+    "designer-request.schema.json",
+    "lesson-package-draft.schema.json",
+    "quiz-draft.schema.json",
+    "teaching-request.schema.json",
+    "teaching-response.schema.json"
+  ],
+  "wire_status": "LOCAL_SEMANTIC_ONLY_NOT_KNODO_HTTP"
+}

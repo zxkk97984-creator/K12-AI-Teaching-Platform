@@ -1,0 +1,183 @@
+{
+  "schema_version": "k12.knodo.wire-evidence.v1",
+  "document_kind": "EVIDENCE_RECORD_NOT_REQUEST_BODY",
+  "status": "PUBLIC_DOCS_RECORDED_TENANT_UNVERIFIED",
+  "checked_at": "2026-09-18T12:41:06+08:00",
+  "official_sources": [
+    {
+      "id": "KN-DOC-LLMS",
+      "title": "Knodo llms-full 公共文档快照",
+      "url": "https://knodo.vip/llms-full.txt",
+      "snapshot": "source-snapshots/llms-full.txt",
+      "sha256": "d18b76247807ac06e7098c19f50816e3655b5cafc2d6f39af4914491e63e1fe0",
+      "line_anchors": {
+        "chat_submit": "18698",
+        "chat_stream": "18760",
+        "bot_chat": "19035",
+        "usage": "19112"
+      }
+    },
+    {
+      "id": "KN-DOC-INDEX",
+      "title": "Knodo llms.txt 文档索引",
+      "url": "https://knodo.vip/llms.txt",
+      "snapshot": "source-snapshots/llms.txt",
+      "sha256": "f8dab3cf5fc5ca9a8fde2cfdee47e892705e962559c196af46511ef59042bf91"
+    },
+    {
+      "id": "KN-DOC-GETTING-STARTED",
+      "title": "Knodo 快速入门",
+      "url": "https://knodo.vip/docs/getting-started/getting-started",
+      "snapshot": "source-snapshots/getting-started.html",
+      "sha256": "beb896db7998499c502d4b300e9d9cd4b7618eef396549a5fc43d763af20a48e"
+    },
+    {
+      "id": "KN-PRIVACY",
+      "title": "Knodo 隐私政策",
+      "url": "https://knodo.vip/privacy",
+      "snapshot": "source-snapshots/privacy.html",
+      "sha256": "c7406c93b596dd6a9197866fc8899527bdfa92c6cb413b853cb1c6026db88234",
+      "note": "第10节原文：服务不面向16岁以下未成年人。"
+    },
+    {
+      "id": "KN-SIMPLE-API",
+      "title": "常用API页面登录边界",
+      "url": "https://knodo.vip/docs/api/simple-api",
+      "snapshot": "source-snapshots/simple-api.headers.txt",
+      "body_saved": false,
+      "redirect_status": 307,
+      "final_url": "https://knodo.vip/login?callbackUrl=%2Fdocs%2Fapi%2Fsimple-api"
+    }
+  ],
+  "tenant_platform_origin": null,
+  "auth_scheme": {
+    "public_documented": "服务端/脚本调用使用 Authorization: Bearer <PAT>；PAT代表创建者本人并沿用当前业务权限。",
+    "bot_chat_user_requirement": "公开文档写明接口要求用户已登录且能访问目标 Bot。",
+    "verified_for_tenant": false,
+    "student_identity_equivalent": false
+  },
+  "bot_chat": {
+    "method": "POST",
+    "path_from_public_docs": "/api/v1/bots/{botId}/chat/completions",
+    "tenant_verified": false,
+    "public_documented_request_fields": {
+      "messages": {
+        "type": "array",
+        "required": true,
+        "note": "公开文档称OpenAI格式消息数组"
+      },
+      "model": {
+        "type": "string",
+        "required": false,
+        "note": "兼容字段，实际使用Bot配置模型"
+      },
+      "stream": {
+        "type": "boolean",
+        "required": false
+      },
+      "conversationId": {
+        "type": "string",
+        "required": false,
+        "note": "公开文档称用于继续已有会话"
+      },
+      "permissionMode": {
+        "type": "string",
+        "required": false,
+        "note": "公开文档默认bypassPermissions"
+      },
+      "includeToolResults": {
+        "type": "boolean",
+        "required": false
+      }
+    },
+    "first_request_redacted": null,
+    "continue_request_redacted": null,
+    "response_redacted": null,
+    "stream_events_redacted": null,
+    "public_documented_response_fields": [
+      "id",
+      "object",
+      "created",
+      "model",
+      "choices",
+      "choices[].message.role",
+      "choices[].message.content",
+      "choices[].finish_reason",
+      "usage.prompt_tokens",
+      "usage.completion_tokens",
+      "usage.total_tokens",
+      "conversationId"
+    ],
+    "public_documented_stream": "stream=true 时返回 OpenAI 兼容 SSE；公开快照未给出完整逐事件 schema。",
+    "bot_workspace_binding": null,
+    "history_semantics": {
+      "status": "PARTIAL_PUBLIC_DOCS",
+      "known": "conversationId可用于下次请求继续会话；另有会话消息/状态查询路由。",
+      "unknown": [
+        "Bot Chat continuation live behavior",
+        "历史消息是否包含工具结果",
+        "跨用户访问边界"
+      ]
+    },
+    "idempotency_supported": null,
+    "cancel_semantics": null,
+    "usage_fields": {
+      "status": "PUBLIC_DOCUMENTED_UNVERIFIED",
+      "fields": [
+        "prompt_tokens",
+        "completion_tokens",
+        "total_tokens"
+      ],
+      "cost_currency": null
+    },
+    "rate_limits": null,
+    "file_download_contract": null
+  },
+  "related_platform_routes_public_only": {
+    "submit": "POST /api/v1/workspaces/{workspaceId}/chat/submit",
+    "stream": "GET /api/v1/workspaces/{workspaceId}/chat/conversations/{conversationId}/stream",
+    "messages": "GET /api/v1/workspaces/{workspaceId}/chat/conversations/{conversationId}/messages",
+    "status": "GET /api/v1/workspaces/{workspaceId}/chat/conversations/{conversationId}/status",
+    "note": "存在路径和部分字段不等于本项目已选择或已完成 tenant 联调。"
+  },
+  "actual_model_id": null,
+  "actual_agent_os": null,
+  "platform_permissions_verified": false,
+  "gates": {
+    "G_API_CONTRACT": {
+      "status": "BLOCKED",
+      "reason": "缺受权租户下的脱敏真实请求/响应、取消/幂等/限额语义与SSE完整实测。",
+      "evidence": [
+        "docs/integrations/knodo/CONTRACT_DISCOVERY.md",
+        "docs/integrations/knodo/knodo-wire-evidence.json"
+      ]
+    },
+    "G_LIVE_BUDGET": {
+      "status": "BLOCKED",
+      "reason": "没有用户授权的请求次数、积分或费用上限；本机有OPENAI_API_KEY也不授权Knodo消费。",
+      "evidence": []
+    },
+    "G_AGENT_ISOLATION": {
+      "status": "BLOCKED",
+      "reason": "尚未验证会话、文件、记忆、工具、运行身份和撤销边界。",
+      "evidence": []
+    },
+    "G_K12_TERMS": {
+      "status": "BLOCKED",
+      "reason": "公开隐私政策明确服务不面向16岁以下未成年人；比赛租户、下游K12和数据处理安排未获书面确认。",
+      "evidence": [
+        "source-snapshots/privacy.html"
+      ]
+    },
+    "G_HUMAN_CONTENT_REVIEW": {
+      "status": "BLOCKED",
+      "reason": "四档示范章与正式资源尚无真实审校者签名。",
+      "evidence": []
+    }
+  },
+  "notes": [
+    "本文件不是可发送请求，不包含PAT或Cookie。",
+    "所有标为tenant_verified的字段必须来自授权租户的脱敏实测；当前均为false/null/unknown。",
+    "不得把本地teaching/designer JSON当作Knodo HTTP请求体。"
+  ]
+}

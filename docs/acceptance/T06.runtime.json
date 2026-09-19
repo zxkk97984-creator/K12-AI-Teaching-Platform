@@ -1,0 +1,75 @@
+{
+  "schema_version": "k12.acceptance.runtime.v1",
+  "task": "T06",
+  "date": "2026-09-18",
+  "workspace": "/home/zxk/Projects/K12",
+  "root_git_repository": false,
+  "root_env_file_present": false,
+  "temporary_config": {
+    "path": "/tmp/k12r1-t06.env",
+    "mode": "600",
+    "contains_real_values": true,
+    "committed_or_published": false,
+    "note": "T05 的 /tmp/k12r1-t05.env 已不存在；本轮从既有容器的创建时环境恢复数据库口令（未轮换、未重建卷、未打印口令），并为本轮生成新的 APP_SESSION_SECRET。"
+  },
+  "containers": [
+    {"name": "k12r1-postgres-dev-1", "state": "running/healthy", "host_port": 55433, "volume_reused": true},
+    {"name": "k12r1-postgres-test-1", "state": "running/healthy", "host_port": 55434, "volume_reused": true}
+  ],
+  "old_projects_touched": false,
+  "databases": {
+    "development": {
+      "host": "127.0.0.1",
+      "port": 55433,
+      "database": "k12r1_dev",
+      "alembic_before": "0002_identity_constraints",
+      "alembic_after": "0003_content_library"
+    },
+    "test": {
+      "host": "127.0.0.1",
+      "port": 55434,
+      "database": "k12r1_test",
+      "alembic_before": "0002_identity_constraints",
+      "alembic_after": "0003_content_library"
+    }
+  },
+  "content_import": {
+    "legacy_release": "legacy-k12-696364f-pending-review",
+    "legacy_source_commit": "696364ff54c99f711e1cddd7364c9ac4d5282943",
+    "test_db_after_two_applies": {
+      "courses": 2,
+      "chapters": 2,
+      "revisions": 2,
+      "knowledge_points": 7,
+      "knowledge_point_links": 7,
+      "releases": 1,
+      "review_states": 2,
+      "published": 0
+    },
+    "development_db_after_two_applies": {
+      "courses": 2,
+      "chapters": 2,
+      "revisions": 2,
+      "knowledge_points": 7,
+      "knowledge_point_links": 7,
+      "releases": 1,
+      "published": 0
+    },
+    "review_status": "UNREVIEWED",
+    "publication_status": "DRAFT",
+    "published_directory_files": 0
+  },
+  "checks": {
+    "backend_tests_passed": 56,
+    "t06_tests_passed": 28,
+    "contracts_passed": 38,
+    "frontend_tests_passed": 3,
+    "check_script_exit_code": 0
+  },
+  "not_run": [
+    "真实 Knodo 调用（G_API_CONTRACT / G_LIVE_BUDGET 仍 BLOCKED）",
+    "真实人工内容审校与 PUBLISHED（G_HUMAN_CONTENT_REVIEW 仍 BLOCKED）",
+    "生产 HTTPS/Secure Cookie（本轮无内容 HTTP 入口，沿用 T05 结论）",
+    "浏览器端内容目录 UI（属于 T07/T08 范围）"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "k12.teaching.response.v1",
+  "request_id": "synthetic-request-001",
+  "lesson_session_id": "synthetic-lesson-A",
+  "base_revision": 0,
+  "curriculum_revision": "synthetic-chapter-v1",
+  "message_markdown": "先观察3、1、2这支小队。我们只比较前两个数：3比1大，把它们交换后，就成为1、3、2。这一步还没有把全队排好。",
+  "source_refs": [
+    {
+      "source_id": "synthetic-source-001",
+      "revision": "synthetic-chapter-v1",
+      "locator": "example:paragraph-1"
+    }
+  ],
+  "evidence_refs": [],
+  "followup_question": "交换前两个数后，哪个数到了最前面？",
+  "action": {
+    "type": "OPEN_ANIMATION",
+    "resource_id": "synthetic-animation-001"
+  },
+  "phase_suggestion": "EXPLAIN",
+  "warnings": []
+}

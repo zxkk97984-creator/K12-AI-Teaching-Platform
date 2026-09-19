@@ -1,0 +1,56 @@
+{
+  "schema_version": "k12.knodo.deployment-manifest.v1",
+  "release_id": "knodo-assets-1.0.0",
+  "artifact_status": "PACKAGED",
+  "deployment_status": "NOT_DEPLOYED",
+  "deployment_verified": false,
+  "bot_roles": {
+    "tutor": {
+      "bot_id": null,
+      "workspace_id": null,
+      "operations": [
+        "TEACH_TURN",
+        "CODE_FEEDBACK"
+      ],
+      "skills": [
+        "k12-teaching-core"
+      ],
+      "packaged_config_hash": "e2f4012b3d4fd0fa8823f3de18cdc64f40c402203749cc8f6642ed5602a5f38f",
+      "packaged_knowledge_bundle_hash": "ef42a2b5027392337566953f253611f44e416ee8b5b7cf3d3f9423146f068d3c",
+      "deployed_config_hash": null,
+      "deployment_verified": false
+    },
+    "designer": {
+      "bot_id": null,
+      "workspace_id": null,
+      "operations": [
+        "QUIZ_DRAFT",
+        "LESSON_PACKAGE_DRAFT"
+      ],
+      "skills": [
+        "k12-assessment-author",
+        "k12-content-author"
+      ],
+      "packaged_config_hash": "f95fd0d712df8d3791c81f6b2957fa8d16707e07108f5d8f0765f8d7d1caca9f",
+      "packaged_knowledge_bundle_hash": null,
+      "deployed_config_hash": null,
+      "deployment_verified": false
+    }
+  },
+  "agent_os": null,
+  "runtime_model_id": null,
+  "native_subagents_required": false,
+  "response_mode": "BUFFERED_STRUCTURED",
+  "actual_permissions_reviewed": false,
+  "fixture_is_not_live": true,
+  "gates_snapshot": {
+    "G_API_CONTRACT": "BLOCKED",
+    "G_LIVE_BUDGET": "BLOCKED",
+    "G_AGENT_ISOLATION": "BLOCKED",
+    "G_K12_TERMS": "BLOCKED",
+    "G_HUMAN_CONTENT_REVIEW": "BLOCKED"
+  },
+  "not_deployed_reason": "本卡无平台操作授权：未创建 Bot、未上传 Skill、未验证租户读取。",
+  "manual_steps_ref": "docs/integrations/knodo/DEPLOYMENT_GUIDE.md",
+  "boundaries_ref": "docs/integrations/knodo/ASSET_BOUNDARIES.md"
+}

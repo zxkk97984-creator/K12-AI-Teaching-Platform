@@ -1,0 +1,13 @@
+{
+  "schema_version": "k12.content.release.v1",
+  "release_key": "legacy-k12-696364f-pending-review",
+  "source_kind": "LEGACY_REUSED",
+  "is_test_fixture": false,
+  "description": "从只读旧仓库 K12-Learning-platform commit 696364f 精选的示范章节转换稿。",
+  "license_code": "CC-BY",
+  "license_notes": "旧 book.json 声明 CC-BY；出版社/作者与许可复核尚未完成，保持 DRAFT 等待真实人工审校。",
+  "course_files": [
+    "courses/python-first-steps/course.json",
+    "courses/algorithm-everyday/course.json"
+  ]
+}

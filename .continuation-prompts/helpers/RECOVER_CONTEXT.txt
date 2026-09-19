@@ -1,0 +1,4 @@
+这是上下文恢复，不是新的重建。目标/home/zxk/Projects/K12。
+读取AGENTS、.rebuild-kit/progress.json与TASKS.json、最近验收、.continuation-prompts/COMMON_RULES.md和当前原卡及续作Prompt；再检查相关实际文件/迁移head/运行清单。
+先用不超过10行说明已经完成、当前任务、仍阻塞、下一步和不能改变的边界，再继续当前可执行工作。若代码/状态与历史摘要矛盾，以核对证据修正并保留原因；不要覆盖progress为初始模板、重跑T00—T05全量审计或猜测已做的内容。
+临时配置不存在时不能凭空找回密码；只检查既定安全入口，不打印秘密、不扫描无关目录、不擅自git init。

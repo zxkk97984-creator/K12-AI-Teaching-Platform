@@ -1,0 +1,77 @@
+.admin-authoring {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.admin-authoring__lead {
+  color: #444;
+  line-height: 1.6;
+}
+
+.admin-authoring__card {
+  border: 1px solid #d9dee7;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 18px;
+  background: #fff;
+}
+
+.admin-authoring__row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.admin-authoring__facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  margin: 12px 0;
+}
+
+.admin-authoring__facts dt {
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-authoring__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 16px;
+}
+
+.admin-authoring__table th,
+.admin-authoring__table td {
+  border: 1px solid #e3e7ee;
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.admin-authoring__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-all;
+}
+
+.admin-authoring__notice {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.admin-authoring__status {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #eef7ee;
+  color: #1f5f2a;
+}
+
+.admin-authoring__error {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fdecec;
+  color: #8f2020;
+}

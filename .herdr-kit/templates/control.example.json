@@ -1,0 +1,27 @@
+{
+  "example_only": true,
+  "schema_version": "k12.herdr.control.v1",
+  "project_root": "/home/zxk/Projects/K12",
+  "revision": 0,
+  "batch": {
+    "mode": "STAGE_BATCH",
+    "milestone": "M1",
+    "explicit_optional_ids": [],
+    "user_authorization_ref": null
+  },
+  "roles": {
+    "supervisor": {
+      "herdr_target": null,
+      "ready_ack": null
+    },
+    "executor": {
+      "herdr_target": null,
+      "ready_ack": null
+    }
+  },
+  "active_dispatch_id": null,
+  "state": "NOT_INITIALIZED",
+  "active_task_id": null,
+  "last_applied_decision": null,
+  "note": "模板不可直接当活跃控制记录；A依据现场和双方ACK新建，不覆盖已有control。"
+}

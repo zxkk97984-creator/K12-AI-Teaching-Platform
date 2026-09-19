@@ -1,0 +1,9 @@
+{
+  "schema_version": "k12.knodo.package-version.v1",
+  "package_version": "1.0.0",
+  "release_id": "knodo-assets-1.0.0",
+  "contract_version": "1.0.0",
+  "contract_source": "contracts/version.json",
+  "wire_status": "LOCAL_SEMANTIC_ONLY_NOT_KNODO_HTTP",
+  "note": "版本化本地交付资产；不是 Knodo 官方一键导入包，也不代表任何 Bot/Skill 已在线可用。"
+}

@@ -1,0 +1,6 @@
+继续 /home/zxk/Projects/K12 的Knodo重建，不重新选型，不覆盖已有实现。
+先检查工作区与用户新修改，读取.rebuild-kit/AGENTS.template.md、progress.json、TASKS.json和上个任务验收记录。
+运行 python .rebuild-kit/tools/task_prompt.py next 获取下一个依赖与外部门禁满足的任务卡；该工具仅打印提示，不代表任务已完成。
+阅读当前卡列出的规格和实际相关代码，完成一个任务的实现、测试与验收报告。平台门禁未满足则保持BLOCKED，继续独立离线任务；不得拿fixture冒充Knodo真实接入。任何DONE必须有docs/acceptance对应证据，禁止自行签署付费预算/人工审校/K12条款。
+若上轮留有IN_PROGRESS/FAILED任务，先检查并恢复它，不直接创建重复模块。不得修改旧repo、不杀旧服务、不删数据、不自动提交。
+完成后更新progress.json，报告本轮变更、真实测试、未验证范围、下个任务；不要只重新输出计划。

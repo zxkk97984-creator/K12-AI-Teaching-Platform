@@ -1,0 +1,49 @@
+test_binary_search_unsorted (test_contracts.DesignerTests.test_binary_search_unsorted) ... ok
+test_count (test_contracts.DesignerTests.test_count) ... ok
+test_designer_operation_contract (test_contracts.DesignerTests.test_designer_operation_contract) ... ok
+test_duplicate_option (test_contracts.DesignerTests.test_duplicate_option) ... ok
+test_false_review (test_contracts.DesignerTests.test_false_review) ... ok
+test_hint_count (test_contracts.DesignerTests.test_hint_count) ... ok
+test_objective (test_contracts.DesignerTests.test_objective) ... ok
+test_ordering_missing_item (test_contracts.DesignerTests.test_ordering_missing_item) ... ok
+test_package_fake_production (test_contracts.DesignerTests.test_package_fake_production) ... ok
+test_package_fake_resource (test_contracts.DesignerTests.test_package_fake_resource) ... ok
+test_package_template (test_contracts.DesignerTests.test_package_template) ... ok
+test_package_valid (test_contracts.DesignerTests.test_package_valid) ... ok
+test_quiz_valid (test_contracts.DesignerTests.test_quiz_valid) ... ok
+test_source (test_contracts.DesignerTests.test_source) ... ok
+test_type_not_allowed (test_contracts.DesignerTests.test_type_not_allowed) ... ok
+test_wrong_answer_key (test_contracts.DesignerTests.test_wrong_answer_key) ... ok
+test_wrong_binding (test_contracts.DesignerTests.test_wrong_binding) ... ok
+test_bad_grades (test_contracts.TeachingTests.test_bad_grades) ... ok
+test_binding_keys (test_contracts.TeachingTests.test_binding_keys) ... ok
+test_code_not_in_allowlist (test_contracts.TeachingTests.test_code_not_in_allowlist) ... ok
+test_code_without_facts (test_contracts.TeachingTests.test_code_without_facts) ... ok
+test_each_stage_boundary (test_contracts.TeachingTests.test_each_stage_boundary) ... ok
+test_evidence_foreign (test_contracts.TeachingTests.test_evidence_foreign) ... ok
+test_model_cannot_complete (test_contracts.TeachingTests.test_model_cannot_complete) ... ok
+test_null_action (test_contracts.TeachingTests.test_null_action) ... ok
+test_nullable_grade (test_contracts.TeachingTests.test_nullable_grade) ... ok
+test_quiz_bounds (test_contracts.TeachingTests.test_quiz_bounds) ... ok
+test_quiz_valid (test_contracts.TeachingTests.test_quiz_valid) ... ok
+test_reply_budget (test_contracts.TeachingTests.test_reply_budget) ... ok
+test_resource_not_in_allowlist (test_contracts.TeachingTests.test_resource_not_in_allowlist) ... ok
+test_source_triplet (test_contracts.TeachingTests.test_source_triplet) ... ok
+test_stage_mismatch (test_contracts.TeachingTests.test_stage_mismatch) ... ok
+test_unallowed_phase (test_contracts.TeachingTests.test_unallowed_phase) ... ok
+test_unauthorized_action (test_contracts.TeachingTests.test_unauthorized_action) ... ok
+test_unknown_action (test_contracts.TeachingTests.test_unknown_action) ... ok
+test_unknown_animation (test_contracts.TeachingTests.test_unknown_animation) ... ok
+test_unknown_top_field (test_contracts.TeachingTests.test_unknown_top_field) ... ok
+test_valid (test_contracts.TeachingTests.test_valid) ... ok
+test_api_gate_blocks_live (test_task_prompt.TaskSchedulingTests.test_api_gate_blocks_live) ... ok
+test_dependency_blocks (test_task_prompt.TaskSchedulingTests.test_dependency_blocks) ... ok
+test_done_without_evidence_blocks (test_task_prompt.TaskSchedulingTests.test_done_without_evidence_blocks) ... ok
+test_initial_task_ready (test_task_prompt.TaskSchedulingTests.test_initial_task_ready) ... ok
+test_offline_task_not_blocked_by_live_gates (test_task_prompt.TaskSchedulingTests.test_offline_task_not_blocked_by_live_gates) ... ok
+test_pass_without_gate_evidence_blocks (test_task_prompt.TaskSchedulingTests.test_pass_without_gate_evidence_blocks) ... ok
+
+----------------------------------------------------------------------
+Ran 44 tests in 1.760s
+
+OK

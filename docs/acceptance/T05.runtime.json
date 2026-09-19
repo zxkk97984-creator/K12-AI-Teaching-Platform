@@ -1,0 +1,64 @@
+{
+  "schema_version": "k12.t05.runtime-evidence.v1",
+  "captured_at": "2026-09-18T13:16:43+08:00",
+  "runtime": {
+    "python": "Python 3.12.13",
+    "node": "v24.19.0",
+    "npm": "11.17.0",
+    "uv": "uv 0.12.3 (x86_64-unknown-linux-gnu)",
+    "playwright": "Version 1.63.0"
+  },
+  "databases": {
+    "development": {
+      "database": "k12r1_dev",
+      "revision": "0002_identity_constraints",
+      "host": "127.0.0.1",
+      "host_port": 55433
+    },
+    "test": {
+      "database": "k12r1_test",
+      "revision": "0002_identity_constraints",
+      "host": "127.0.0.1",
+      "host_port": 55434
+    }
+  },
+  "endpoints": [
+    "GET /api/v1/auth/csrf",
+    "POST /api/v1/auth/login",
+    "POST /api/v1/auth/logout",
+    "GET /api/v1/me",
+    "PATCH /api/v1/me/profile",
+    "PATCH /api/v1/me/preferences",
+    "GET /api/v1/admin/identity/status"
+  ],
+  "test_results": {
+    "backend_pytest": 28,
+    "contract_tests": 38,
+    "frontend_vitest": 3,
+    "playwright_e2e": 2,
+    "unified_check_exit": 0,
+    "browser_e2e_exit": 0
+  },
+  "artifacts": {
+    "snapshot": ".snapshots/T05-before-20260918",
+    "snapshot_files": 65,
+    "pack_integrity": "only progress.json differs",
+    "check_log_sha256": "1bc2e4c1616ed65d592305f4b6ff1ee03f754322996960e01303ed187e305441",
+    "browser_log_sha256": "5fe0d49d77d743562a0e44a6bcbe5747cd0c0d388dddde6df3f623ad3b45ede9",
+    "browser_screenshot_sha256": "8d89720d08d3c8921a7f8fd4db53ed09337953ab42509af979bcc054057e9207",
+    "openapi_sha256": "e0ffe8d35515f0e6562e08e3f8969d846b71415ebe44dcf751e9ae33ede6e58d",
+    "generated_types_sha256": "4890271471a1a583c96f7c502d523f66ed47bd9e3ebf12e883ac937e3d9cff91"
+  },
+  "configuration": {
+    "root_env": "ABSENT_NOT_CREATED",
+    "temporary_env": "/tmp/k12r1-t05.env mode 0600",
+    "persistent_secret_recovery": "PENDING_USER_ACTION"
+  },
+  "gates": {
+    "G_API_CONTRACT": "BLOCKED",
+    "G_LIVE_BUDGET": "BLOCKED",
+    "G_AGENT_ISOLATION": "BLOCKED",
+    "G_K12_TERMS": "BLOCKED",
+    "G_HUMAN_CONTENT_REVIEW": "BLOCKED"
+  }
+}
