@@ -23,6 +23,7 @@ frontend 101 passed、既有 browser 21 passed + 1 explicit skip，以及本轮�
 | `python3 evals/run_offline.py --output docs/acceptance/T31-offline-report.json` | 0 | 16 个合成评测样例 |
 | `./scripts/verify-live.sh` | 3 | 按门禁 fail-closed；未读取 PAT/未发起网络调用 |
 | `./scripts/check.sh` | 1 | 只读 CareerMate source-audit 检测外部 HEAD/tree/status/untracked 漂移后 fail-closed；未修改 K12 工作树 |
+| source-audit 之后的 K12 checks | 0 | public evidence、plan、contracts、OpenAPI、ruff 和生成类型全部通过 |
 
 验收由本单 Agent 完成第一遍实现和同一 Agent 的第二遍针对性复核；第二遍不是独立 Agent
 审核。用户最终验收尚待进行。

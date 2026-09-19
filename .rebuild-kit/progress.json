@@ -1649,6 +1649,12 @@
           "command": "./scripts/check.sh",
           "exit_code": 1,
           "note": "CareerMate 只读 source-audit 检测外部 HEAD/tree/status/untracked 漂移后 fail-closed；未修改 K12 工作树，失败保留。"
+        },
+        {
+          "type": "post_audit_k12_checks",
+          "command": "validate_evidence.py; validate_plan.py; contracts/test_contracts.py; identity OpenAPI diff; ruff check/format; openapi-typescript diff",
+          "exit_code": 0,
+          "note": "source-audit 之后可独立运行的 K12 检查全部通过。"
         }
       ],
       "note": "K12 本地最终重复验收已通过；另有 CareerMate 只读 source-audit 外部漂移失败需保留。T31、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等外部阻塞未解除，不能正式放行。"
