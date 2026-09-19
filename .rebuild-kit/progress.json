@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T31",
+  "current_task": "T33",
   "gates": {
     "G_API_CONTRACT": {
       "status": "BLOCKED",
@@ -1578,16 +1578,47 @@
       "note": "离线评测框架已完成；真实 Knodo 质量、usage、成本和人工判断必须等待 G_API_CONTRACT/G_LIVE_BUDGET 及人审授权。"
     },
     "T32": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "status": "BLOCKED",
+      "evidence": [
+        "docs/acceptance/T32.md",
+        "docs/competition/REPORT_DRAFT.md",
+        "docs/competition/DEMO_SCRIPT.md",
+        "docs/operations/COMPETITION_INTEGRATION.md",
+        "docs/acceptance/T30.md",
+        "docs/acceptance/T31.md"
+      ],
+      "verification": [
+        {
+          "type": "documentation",
+          "command": "python3 .rebuild-kit/tools/validate_kit.py",
+          "exit_code": 0,
+          "note": "报告/演示/集成文档均明确区分 fixture、真实 Docker、真实 Knodo、人审和未验证。"
+        }
+      ],
+      "note": "参赛报告草稿与可执行演示已生成；因 T30 animation 人审前置和 T31 真实平台门禁未完成，不登记正式发布报告 DONE。"
     },
     "T33": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "status": "BLOCKED",
+      "evidence": [
+        "docs/acceptance/T33.md",
+        "docs/handoff/PROJECT_HANDOFF_NEW.md",
+        "docs/handoff/RELEASE_CHECKLIST.md",
+        "docs/handoff/RESUME.md",
+        "docs/handoff/KNODO_FINALIZATION_CHECKLIST.md",
+        "docs/handoff/FINAL_ACCEPTANCE.md",
+        "docs/acceptance/T30.md",
+        "docs/acceptance/T31.md",
+        "docs/acceptance/T32.md"
+      ],
+      "verification": [
+        {
+          "type": "handoff",
+          "command": "python3 .rebuild-kit/tools/validate_kit.py",
+          "exit_code": 0,
+          "note": "交接材料与证据路径生成；正式发布 checklist 保留未完成项。"
+        }
+      ],
+      "note": "最终交接材料完成；T31/T32、T30 animation human review 和 G_HUMAN_CONTENT_REVIEW 等阻塞未解除，不能正式放行。"
     },
     "O01": {
       "status": "NOT_STARTED",
