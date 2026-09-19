@@ -1326,16 +1326,46 @@
       "note": "单 Agent 第一遍实现与第二遍自我复核均通过；真实 Docker 5/5；网络/非 root/只读/cap-drop/资源/输出/租约清理已实测。T25 负责判分与辅导桥接。"
     },
     "T25": {
+      "status": "DONE",
+      "evidence": [
+        "docs/acceptance/T25.md",
+        "backend/app/modules/codelab/feedback.py",
+        "backend/tests/test_codelab_feedback.py",
+        "contracts/teaching-request.schema.json",
+        "backend/app/integrations/knodo/operations.py"
+      ],
+      "verification": [
+        {
+          "type": "automated",
+          "command": "pytest T25 feedback/contract/grading/import/runner tests",
+          "exit_code": 0,
+          "tests_passed": 26
+        },
+        {
+          "type": "regression",
+          "command": "pytest backend/tests -q",
+          "exit_code": 0,
+          "tests_passed": 324
+        },
+        {
+          "type": "automated",
+          "command": "ruff check backend runner && ruff format --check backend runner",
+          "exit_code": 0
+        },
+        {
+          "type": "fixture",
+          "command": "Operation.CODE_FEEDBACK via local FixtureGateway",
+          "exit_code": 0,
+          "note": "Synthetic fixture only; not real Knodo evidence."
+        }
+      ],
+      "note": "单 Agent 第一遍实现与第二遍自我复核通过；可信结果与 AI 反馈独立、snapshot/owner/line refs 校验成立。真实 Knodo CODE_FEEDBACK 未运行，门禁保持 BLOCKED。"
+    },
+    "T26": {
       "status": "IN_PROGRESS",
       "evidence": [],
       "verification": [],
-      "note": "T24 完成后由单 Agent 连续接续；本轮尚未实现 T25。"
-    },
-    "T26": {
-      "status": "NOT_STARTED",
-      "evidence": [],
-      "verification": [],
-      "note": ""
+      "note": "T25 完成后由单 Agent 连续接续；本轮尚未实现 T26。"
     },
     "T27": {
       "status": "NOT_STARTED",
