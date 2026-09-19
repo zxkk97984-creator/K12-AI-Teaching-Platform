@@ -15,8 +15,9 @@
 - T31: BLOCKED by G_API_CONTRACT and G_LIVE_BUDGET; offline eval framework is committed.
 - T32: DONE as the required draft deliverable; report, demo and integration docs are committed, with
   T31 live metrics explicitly marked pending.
-- T33: BLOCKED by T31 and G_HUMAN_CONTENT_REVIEW; T32 draft delivery is complete. Latest implementation
-  checkpoint is 5821daa, and the handoff state update is eab362a.
+- T33: BLOCKED by T31 and G_HUMAN_CONTENT_REVIEW; T32 draft delivery is complete, and the local
+  doctor/bootstrap repeat check passed twice. Latest implementation checkpoint is 5821daa, and the
+  handoff state update is eab362a.
 
 ## Recovery facts
 

@@ -1637,9 +1637,15 @@
           "command": "python3 .rebuild-kit/tools/validate_kit.py",
           "exit_code": 0,
           "note": "交接材料与证据路径生成；正式发布 checklist 保留未完成项。"
+        },
+        {
+          "type": "runtime_repeat",
+          "command": "./scripts/doctor.sh; APP_ENV=development ./scripts/bootstrap.sh (twice)",
+          "exit_code": 0,
+          "note": "doctor、双 PostgreSQL、前端构建和两次 bootstrap 通过；legacy/T06/CodeLab 均 REUSE，无重复创建；未启动 Knodo 或常驻 API/web/runner。"
         }
       ],
-      "note": "最终交接材料完成；T31、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等阻塞未解除，不能正式放行。"
+      "note": "本地最终重复验收已通过；T31、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等外部阻塞未解除，不能正式放行。"
     },
     "O01": {
       "status": "NOT_STARTED",
