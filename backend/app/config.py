@@ -65,6 +65,9 @@ class Settings(BaseSettings):
     authoring_bundle_root: str = Field(
         default="platform/knodo/bundles/authoring", min_length=1, max_length=400
     )
+    # T26 local bridge: FastAPI never owns Docker; a loopback runner process does.
+    codelab_runner_url: str | None = None
+    codelab_runner_token: str | None = None
 
     @model_validator(mode="after")
     def validate_runtime(self) -> Settings:

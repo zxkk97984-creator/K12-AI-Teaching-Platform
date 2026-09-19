@@ -17,6 +17,7 @@ from app.jobs.teaching_worker import recover_runs
 from app.modules.assessment.quiz_router import router as quiz_router
 from app.modules.assessment.router import router as assessment_router
 from app.modules.authoring.router import router as authoring_router
+from app.modules.codelab.router import router as codelab_router
 from app.modules.content.router import router as content_router
 from app.modules.identity.middleware import SameOriginCsrfMiddleware
 from app.modules.identity.router import router as identity_router
@@ -64,6 +65,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(health_router)
     application.include_router(identity_router, prefix="/api/v1")
     application.include_router(content_router, prefix="/api/v1")
+    application.include_router(codelab_router, prefix="/api/v1")
     application.include_router(ai_gateway_router, prefix="/api/v1")
     application.include_router(teaching_router, prefix="/api/v1")
     application.include_router(assessment_router, prefix="/api/v1")

@@ -48,7 +48,7 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         )
     finally:
         await connection.close()
-    assert revision == "0014_codelab_tasks"
+    assert revision == "0015_codelab_runs"
     assert {
         "identity_users",
         "auth_sessions",
@@ -95,6 +95,8 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "authoring_reviews",
         "authoring_publications",
         "codelab_task_revisions",
+        "codelab_code_drafts",
+        "codelab_code_runs",
     } <= {row["tablename"] for row in tables}
     constraint_names = {row["conname"] for row in constraints}
     assert {
@@ -166,6 +168,14 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "ck_codelab_task_manifest_object",
         "ck_codelab_task_binding_object",
         "ck_codelab_task_definition_sha256",
+        "ck_codelab_draft_revision_positive",
+        "ck_codelab_draft_code_sha256",
+        "ck_codelab_run_revision_positive",
+        "ck_codelab_run_code_sha256",
+        "ck_codelab_run_status",
+        "ck_codelab_run_execution_status",
+        "ck_codelab_run_correctness_status",
+        "ck_codelab_run_feedback_status",
     } <= constraint_names
 
 
@@ -190,7 +200,7 @@ async def test_clean_test_baseline_upgrade_is_idempotent(test_settings):
         )
     finally:
         await connection.close()
-    assert revision == "0014_codelab_tasks"
+    assert revision == "0015_codelab_runs"
     assert {
         "content_chapter_revisions_immutable",
         "content_review_state_guard",

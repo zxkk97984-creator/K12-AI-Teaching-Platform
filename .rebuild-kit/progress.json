@@ -1362,21 +1362,45 @@
       "note": "单 Agent 第一遍实现与第二遍自我复核通过；可信结果与 AI 反馈独立、snapshot/owner/line refs 校验成立。真实 Knodo CODE_FEEDBACK 未运行，门禁保持 BLOCKED。"
     },
     "T26": {
-      "status": "BLOCKED",
+      "status": "DONE",
       "evidence": [
         "docs/acceptance/T26.md",
         "docs/acceptance/T24.md",
-        "docs/acceptance/T25.md"
+        "docs/acceptance/T25.md",
+        "backend/alembic/versions/0015_codelab_runs.py",
+        "backend/app/modules/codelab/router.py",
+        "frontend/src/features/codelab/CodeEditor.tsx",
+        "frontend/src/pages/code/CodeLabPage.tsx",
+        "frontend/src/e2e/codelab.spec.ts",
+        "docs/acceptance/T26-browser.log"
       ],
       "verification": [
         {
           "type": "static",
-          "command": "inspect existing codelab routes/models/DTOs and T26 allowed paths",
+          "command": "backend/.venv/bin/ruff check and ruff format --check on new CodeLab files",
+          "exit_code": 0
+        },
+        {
+          "type": "automated",
+          "command": "PYTHONPATH=. backend/.venv/bin/pytest backend/tests -q",
           "exit_code": 0,
-          "note": "No codelab HTTP/API persistence boundary exists; adding it exceeds the current card boundary."
+          "tests_passed": 331
+        },
+        {
+          "type": "frontend",
+          "command": "npm test && npm run typecheck && npm run build --prefix frontend",
+          "exit_code": 0,
+          "tests_passed": 101
+        },
+        {
+          "type": "browser",
+          "command": "./scripts/codelab-e2e.sh",
+          "exit_code": 0,
+          "tests_passed": 1,
+          "note": "真实 loopback runner -> Docker -> trusted grade；错误实现 PARTIAL/10，修正后 PASSED/70，fixture feedback 单独展示。"
         }
       ],
-      "note": "BLOCKED：缺少可供前端调用的 code task/run/feedback API、持久快照与 CodeMirror 依赖；不以 localStorage/mock/假成功替代 QA27/QA14/QA31。"
+      "note": "本地合成 CodeLab 闭环完成；必要最小 API/迁移/CodeMirror 范围已补齐。真实 Knodo、人审、条款、预算、隔离和正式学生入口仍保持门禁阻塞。"
     },
     "T27": {
       "status": "DONE",
@@ -1410,7 +1434,7 @@
       "note": "本地 provider-unavailable/主动录音/取消/可编辑转写/文本回退边界完成；真实 ASR/TTS 未验证，不能标 VOICE_READY。"
     },
     "T28": {
-      "status": "BLOCKED",
+      "status": "IN_PROGRESS",
       "evidence": [
         "docs/acceptance/T28.md",
         "docs/security/LOCAL_SECURITY_BOUNDARIES.md",
@@ -1432,7 +1456,7 @@
           "tests_passed": 3
         }
       ],
-      "note": "BLOCKED：T26 缺少真实 codelab API/持久 run/数据导出删除边界；本地安全证据已登记，外部隔离/条款/预算/人审门禁保持 BLOCKED。"
+      "note": "T26 依赖已解除；现有 CSRF/owner/版本/秘密隔离回归保持通过，仍需补齐 codelab run 与 draft 的数据导出/删除 API 及跨账号矩阵。外部隔离/条款/预算/人审门禁保持 BLOCKED。"
     },
     "T29": {
       "status": "NOT_STARTED",

@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { Home } from "./pages/Home";
 import { LoginPage } from "./pages/login/LoginPage";
@@ -20,6 +20,10 @@ import { AdminAuthoringPage } from "./pages/admin/AdminAuthoringPage";
 import "./styles.css";
 import { navigate } from "./features/identity/session";
 
+const CodeLabPage = lazy(() =>
+  import("./pages/code/CodeLabPage").then((module) => ({ default: module.CodeLabPage })),
+);
+
 function route() {
   const path = window.location.pathname;
   if (path.startsWith("/login")) return <LoginPage />;
@@ -32,6 +36,13 @@ function route() {
   if (path.startsWith("/learn")) return <NextStepPage />;
   if (path.startsWith("/admin/authoring")) return <AdminAuthoringPage />;
   if (path.startsWith("/admin/resources")) return <AdminResourcesPage />;
+  if (path.startsWith("/code")) {
+    return (
+      <Suspense fallback={<main>正在加载 CodeLab…</main>}>
+        <CodeLabPage />
+      </Suspense>
+    );
+  }
   if (path.startsWith("/animations")) return <AnimationPage />;
   if (path.startsWith("/resources")) return <ResourceLibraryPage />;
   if (path.startsWith("/conversations")) return <ConversationPage />;
