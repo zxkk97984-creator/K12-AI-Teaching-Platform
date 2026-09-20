@@ -359,7 +359,13 @@ async def acquire_lease(
 
 
 async def record_binding(
-    db: AsyncSession, *, run: AgentRun, remote_kind: str, remote_id: str
+    db: AsyncSession,
+    *,
+    run: AgentRun,
+    remote_kind: str,
+    remote_id: str,
+    remote_scope: str | None = None,
+    remote_metadata: dict[str, Any] | None = None,
 ) -> None:
     existing = await db.scalar(select(RemoteBinding).where(RemoteBinding.run_id == run.id))
     if existing is None:
@@ -369,9 +375,36 @@ async def record_binding(
                 owner_user_id=run.owner_user_id,
                 remote_kind=remote_kind,
                 remote_id=remote_id,
+                remote_scope=remote_scope,
+                remote_metadata=remote_metadata,
             )
         )
         await db.commit()
+
+
+async def reusable_remote_conversation(
+    db: AsyncSession,
+    *,
+    run: AgentRun,
+    remote_scope: str,
+) -> str | None:
+    """Return only a successful same-owner/session/target Knodo binding."""
+
+    return await db.scalar(
+        select(RemoteBinding.remote_id)
+        .join(AgentRun, AgentRun.id == RemoteBinding.run_id)
+        .where(
+            RemoteBinding.run_id != run.id,
+            RemoteBinding.owner_user_id == run.owner_user_id,
+            RemoteBinding.remote_kind == "KNODO",
+            RemoteBinding.remote_scope == remote_scope,
+            AgentRun.owner_user_id == run.owner_user_id,
+            AgentRun.session_id == run.session_id,
+            AgentRun.status == RunStatus.SUCCEEDED.value,
+        )
+        .order_by(AgentRun.completed_at.desc().nullslast(), RemoteBinding.created_at.desc())
+        .limit(1)
+    )
 
 
 async def finalize_run(
@@ -401,6 +434,8 @@ async def finalize_run(
         status = run.status  # read before rollback expires the instance
         await db.rollback()
         return status
+    if gateway_invocation_id is not None:
+        run.gateway_invocation_id = gateway_invocation_id
     if (
         run.lease_token != lease_token
         or run.lease_expires_at is None
@@ -453,7 +488,6 @@ async def finalize_run(
     await db.flush()
     run.status = RunStatus.SUCCEEDED.value
     run.result_message_id = message.id
-    run.gateway_invocation_id = gateway_invocation_id
     run.completed_at = now
     run.lease_token = None
     session = await db.scalar(

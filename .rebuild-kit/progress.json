@@ -580,7 +580,7 @@
           "type": "automated",
           "command": "pytest T11 integration mapper/runtime + affected T10 gateway tests",
           "exit_code": 0,
-          "note": "27 integration passed；116 affected gateway passed、1 DB-fixture endpoint deselected。"
+          "note": "31 integration passed；120 affected gateway passed、1 DB-fixture endpoint deselected；失败响应保留远端conversation审计元数据。"
         },
         {
           "type": "contract",
@@ -664,31 +664,35 @@
     "T13": {
       "status": "BLOCKED",
       "evidence": [
+        "docs/acceptance/T13.md",
         "docs/integrations/knodo/GATE_REGISTER.md",
-        ".herdr-control/blocked/T11.json",
-        "docs/acceptance/T12.md"
+        "docs/acceptance/T11.md",
+        "docs/acceptance/T12.md",
+        "backend/alembic/versions/0017_knodo_remote_bindings.py",
+        "backend/tests/integrations/test_knodo_persistent_binding.py",
+        "backend/tests/integrations/test_knodo_binding_query.py"
       ],
       "verification": [
         {
           "type": "blocked",
           "command": "dependency check: T11",
-          "exit_code": null,
-          "note": "T11 因 G_API_CONTRACT/G_LIVE_BUDGET BLOCKED，未实现真实 wire mapper；T13 依赖其输出。"
-        },
-        {
-          "type": "blocked",
-          "command": "gate check: G_API_CONTRACT, G_LIVE_BUDGET",
-          "exit_code": null,
-          "note": "缺受权租户脱敏 wire 证据与明确预算上限。"
+          "exit_code": 2,
+          "note": "T11 mapper 已实现，但当前进程不可见 KNODO_PAT；真实请求0/20，真实冒烟未执行。"
         },
         {
           "type": "automated",
-          "command": "N/A (未派发实现)",
+          "command": "T11 mapper/runtime tests + continuation binding query test + affected gateway regression",
+          "exit_code": 0,
+          "note": "31 + 1 passed；合并相关无数据库回归121 passed；1个依赖DB fixture的状态端点 deselected。"
+        },
+        {
+          "type": "blocked",
+          "command": "test_knodo_persistent_binding.py + real browser/Knodo vertical slice",
           "exit_code": null,
-          "note": "按原卡：门禁未过必须 BLOCKED，不得用 fixture 冒充真实 Knodo 接入或教学效果。"
+          "note": "4项PostgreSQL测试已编写但专用55434测试库未运行；Edge扩展读取超时；真实竖切NOT_RUN。"
         }
       ],
-      "note": "A 于 2026-09-19T17:58:25+08:00 登记 BLOCKED：依赖 T11 未完成（门禁）且本卡自身门禁未过。解除条件：T11 真实 mapper 通过 + 预算/租户证据到位。"
+      "note": "持久conversationId、owner/session/target scope隔离、失败审计与目标变化失效的本地前置已实现；T11真实冒烟、PostgreSQL集成测试和浏览器真平台竖切未完成，因此保持BLOCKED。"
     },
     "T14": {
       "status": "DONE",

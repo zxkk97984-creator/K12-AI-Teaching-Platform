@@ -36,6 +36,7 @@ from app.modules.teaching.service import (
     acquire_lease,
     finalize_run,
     record_binding,
+    reusable_remote_conversation,
 )
 from app.modules.teaching.validation import build_card, validate_assistant_output
 
@@ -117,6 +118,16 @@ async def execute_run(
         allowance = session.fixture_allowance
         student_input = await _student_input(db, run)
         operation = Operation(run.operation)
+        continuation_scope = gateway.continuation_scope(operation)
+        remote_conversation_id = (
+            await reusable_remote_conversation(
+                db,
+                run=run,
+                remote_scope=continuation_scope,
+            )
+            if continuation_scope is not None
+            else None
+        )
         stage = session.stage
         grade = session.grade
         base_revision = session.base_revision
@@ -163,39 +174,54 @@ async def execute_run(
         timeout_seconds=settings.gateway_timeout_seconds,
         cancel=signal,
         delay_seconds=settings.teaching_fixture_delay_seconds or None,
+        remote_conversation_id=remote_conversation_id,
     )
     fixture = result.mode == "fixture"
 
     async with factory() as db:
-        if result.status is GatewayStatus.CANCELLED:
+        remote_metadata = (
+            result.remote_metadata if isinstance(result.remote_metadata, dict) else None
+        )
+        remote_id = (
+            result.invocation_id
+            if fixture
+            else (remote_metadata.get("conversation_id") if remote_metadata is not None else None)
+        )
+        if isinstance(remote_id, str) and remote_id:
             await record_binding(
                 db,
                 run=run,
                 remote_kind="FIXTURE" if fixture else "KNODO",
-                remote_id=result.invocation_id,
+                remote_id=remote_id,
+                remote_scope=continuation_scope if not fixture else None,
+                remote_metadata=remote_metadata,
             )
+        if result.status is GatewayStatus.CANCELLED:
             status = await finalize_run(
-                db, run_id=run_id, lease_token=token, error_category=None, assistant=None
+                db,
+                run_id=run_id,
+                lease_token=token,
+                error_category=None,
+                assistant=None,
+                gateway_invocation_id=result.invocation_id,
             )
             return status
         if result.status in (GatewayStatus.FAILED,):
             category = result.error.category.value if result.error else "UNKNOWN"
-            await record_binding(
-                db,
-                run=run,
-                remote_kind="FIXTURE" if fixture else "KNODO",
-                remote_id=result.invocation_id,
-            )
-            return await finalize_run(db, run_id=run_id, lease_token=token, error_category=category)
-        if result.status is GatewayStatus.INSUFFICIENT_EVIDENCE or result.output is None:
-            await record_binding(
-                db,
-                run=run,
-                remote_kind="FIXTURE" if fixture else "KNODO",
-                remote_id=result.invocation_id,
-            )
             return await finalize_run(
-                db, run_id=run_id, lease_token=token, error_category="INSUFFICIENT_EVIDENCE"
+                db,
+                run_id=run_id,
+                lease_token=token,
+                error_category=category,
+                gateway_invocation_id=result.invocation_id,
+            )
+        if result.status is GatewayStatus.INSUFFICIENT_EVIDENCE or result.output is None:
+            return await finalize_run(
+                db,
+                run_id=run_id,
+                lease_token=token,
+                error_category="INSUFFICIENT_EVIDENCE",
+                gateway_invocation_id=result.invocation_id,
             )
 
         problems = validate_assistant_output(
@@ -204,15 +230,13 @@ async def execute_run(
             context=context,
             fixture_allowance=allowance,
         )
-        await record_binding(
-            db,
-            run=run,
-            remote_kind="FIXTURE" if fixture else "KNODO",
-            remote_id=result.invocation_id,
-        )
         if problems:
             return await finalize_run(
-                db, run_id=run_id, lease_token=token, error_category=problems[0]
+                db,
+                run_id=run_id,
+                lease_token=token,
+                error_category=problems[0],
+                gateway_invocation_id=result.invocation_id,
             )
         card = build_card(result.output, fixture=fixture)
         try:

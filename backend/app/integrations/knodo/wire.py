@@ -95,6 +95,23 @@ class KnodoWireMapper:
         if closer is not None:
             await closer()
 
+    def continuation_scope(self, operation: Operation, *, contract_version: str) -> str:
+        """Identity of a remote conversation's safe reuse boundary.
+
+        Changing role, Bot, workspace, wire profile, or local semantic contract
+        creates a new scope, so an old conversation cannot be reused silently.
+        """
+
+        role = OPERATION_SPECS[operation].role
+        target = self._targets[role]
+        return (
+            "knodo-bot-chat-v1"
+            f"|contract={contract_version}"
+            f"|role={role}"
+            f"|workspace={target.workspace_id}"
+            f"|bot={target.bot_id}"
+        )
+
     async def invoke(
         self,
         operation: Operation,
@@ -227,12 +244,31 @@ class KnodoWireMapper:
         ):
             return _invalid("KNODO_RESPONSE_SHAPE_INVALID", outcome.upstream_calls)
         if finish_reason != "stop":
+            metadata = _remote_metadata(
+                operation=operation,
+                target=target,
+                wire=wire,
+                completion_id=completion_id,
+                conversation_id=conversation_id,
+                model=model,
+                finish_reason=finish_reason,
+            )
             reason = (
                 "KNODO_RESPONSE_REPORTED_ERROR"
                 if finish_reason == "error"
                 else "KNODO_RESPONSE_INCOMPLETE"
             )
-            return _invalid(reason, outcome.upstream_calls)
+            return _invalid(reason, outcome.upstream_calls, remote_metadata=metadata)
+
+        metadata = _remote_metadata(
+            operation=operation,
+            target=target,
+            wire=wire,
+            completion_id=completion_id,
+            conversation_id=conversation_id,
+            model=model,
+            finish_reason=finish_reason,
+        )
 
         try:
             semantic = json.loads(message["content"])
@@ -240,28 +276,14 @@ class KnodoWireMapper:
             return _invalid(
                 "KNODO_ASSISTANT_CONTENT_NOT_JSON_OBJECT",
                 outcome.upstream_calls,
+                remote_metadata=metadata,
             )
         if not isinstance(semantic, dict):
             return _invalid(
                 "KNODO_ASSISTANT_CONTENT_NOT_JSON_OBJECT",
                 outcome.upstream_calls,
+                remote_metadata=metadata,
             )
-
-        usage = wire.get("usage") if isinstance(wire.get("usage"), dict) else {}
-        role = OPERATION_SPECS[operation].role
-        metadata = {
-            "provider": "knodo",
-            "role": role,
-            "bot_id": target.bot_id,
-            "workspace_id": target.workspace_id,
-            "completion_id": completion_id,
-            "conversation_id": conversation_id,
-            "model": model,
-            "finish_reason": finish_reason,
-            "prompt_tokens": _nonnegative_int(usage.get("prompt_tokens")),
-            "completion_tokens": _nonnegative_int(usage.get("completion_tokens")),
-            "total_tokens": _nonnegative_int(usage.get("total_tokens")),
-        }
         return BackendOutcome(
             payload=semantic,
             upstream_calls=outcome.upstream_calls,
@@ -297,6 +319,32 @@ def _nonnegative_int(value: Any) -> int | None:
     return value
 
 
+def _remote_metadata(
+    *,
+    operation: Operation,
+    target: KnodoTarget,
+    wire: dict[str, Any],
+    completion_id: str,
+    conversation_id: str,
+    model: str,
+    finish_reason: str,
+) -> dict[str, Any]:
+    usage = wire.get("usage") if isinstance(wire.get("usage"), dict) else {}
+    return {
+        "provider": "knodo",
+        "role": OPERATION_SPECS[operation].role,
+        "bot_id": target.bot_id,
+        "workspace_id": target.workspace_id,
+        "completion_id": completion_id,
+        "conversation_id": conversation_id,
+        "model": model,
+        "finish_reason": finish_reason,
+        "prompt_tokens": _nonnegative_int(usage.get("prompt_tokens")),
+        "completion_tokens": _nonnegative_int(usage.get("completion_tokens")),
+        "total_tokens": _nonnegative_int(usage.get("total_tokens")),
+    }
+
+
 def _valid_conversation_id(value: Any) -> bool:
     # Official docs define this as a string but do not publish a character
     # grammar. Keep it opaque; reject only unsafe controls and unreasonable
@@ -308,10 +356,16 @@ def _valid_conversation_id(value: Any) -> bool:
     )
 
 
-def _invalid(reason: str, upstream_calls: int) -> BackendOutcome:
+def _invalid(
+    reason: str,
+    upstream_calls: int,
+    *,
+    remote_metadata: dict[str, Any] | None = None,
+) -> BackendOutcome:
     return BackendOutcome(
         error=GatewayError(GatewayErrorCategory.VALIDATION, reason),
         upstream_calls=upstream_calls,
+        remote_metadata=remote_metadata,
     )
 
 

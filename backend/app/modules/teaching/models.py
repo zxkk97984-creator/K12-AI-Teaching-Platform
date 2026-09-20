@@ -221,7 +221,9 @@ class RemoteBinding(Base):
         index=True,
     )
     remote_kind: Mapped[str] = mapped_column(String(16), nullable=False)
-    remote_id: Mapped[str] = mapped_column(String(120), nullable=False)
+    remote_id: Mapped[str] = mapped_column(String(300), nullable=False)
+    remote_scope: Mapped[str | None] = mapped_column(String(400))
+    remote_metadata: Mapped[dict | None] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

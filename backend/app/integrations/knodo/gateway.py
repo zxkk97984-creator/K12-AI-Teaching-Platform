@@ -106,6 +106,19 @@ class AgentGateway:
         if closer is not None:
             await closer()
 
+    def continuation_scope(self, operation: str | Operation) -> str | None:
+        builder = getattr(self._backend, "continuation_scope", None)
+        if builder is None:
+            return None
+        try:
+            parsed = parse_operation(operation)
+        except UnknownOperation:
+            return None
+        contract_version = self.registry.contract_version
+        if not contract_version:
+            return None
+        return builder(parsed, contract_version=contract_version)
+
     # -- status ---------------------------------------------------------- #
     @property
     def status(self) -> GatewayRuntimeStatus:
@@ -136,7 +149,12 @@ class AgentGateway:
         started = time.perf_counter()
         input_bytes = self._byte_length(payload)
 
-        def fail(error: GatewayError, *, upstream_calls: int = 0) -> GatewayResult:
+        def fail(
+            error: GatewayError,
+            *,
+            upstream_calls: int = 0,
+            remote_metadata: dict[str, Any] | None = None,
+        ) -> GatewayResult:
             return self._result(
                 invocation_id=invocation_id,
                 operation=self._safe_operation(operation),
@@ -147,6 +165,7 @@ class AgentGateway:
                 input_bytes=input_bytes or 0,
                 output_bytes=0,
                 upstream_calls=upstream_calls,
+                remote_metadata=remote_metadata,
             )
 
         if self._backend is None:
@@ -194,22 +213,31 @@ class AgentGateway:
                 upstream_calls=outcome.upstream_calls,
             )
         if outcome.error is not None:
-            return fail(outcome.error, upstream_calls=outcome.upstream_calls)
+            return fail(
+                outcome.error,
+                upstream_calls=outcome.upstream_calls,
+                remote_metadata=outcome.remote_metadata,
+            )
 
         payload_out = outcome.payload or {}
         output_bytes = self._byte_length(payload_out)
         if output_bytes is None:
-            return fail(GatewayError(GatewayErrorCategory.VALIDATION, "OUTPUT_NOT_SERIALIZABLE"))
+            return fail(
+                GatewayError(GatewayErrorCategory.VALIDATION, "OUTPUT_NOT_SERIALIZABLE"),
+                remote_metadata=outcome.remote_metadata,
+            )
         if output_bytes > self.max_output_bytes:
             return fail(
                 GatewayError(GatewayErrorCategory.OUTPUT_LIMIT, "OUTPUT_LIMIT_EXCEEDED"),
                 upstream_calls=outcome.upstream_calls,
+                remote_metadata=outcome.remote_metadata,
             )
         response_problems = self.registry.validate_response(parsed, payload_out)
         if response_problems:
             return fail(
                 GatewayError(GatewayErrorCategory.VALIDATION, "RESPONSE_SCHEMA_MISMATCH"),
                 upstream_calls=outcome.upstream_calls,
+                remote_metadata=outcome.remote_metadata,
             )
 
         return self._result(

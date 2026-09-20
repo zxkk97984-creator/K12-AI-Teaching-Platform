@@ -53,8 +53,8 @@ cd /home/zxk/Projects/K12
 
 1. 审查 `live-smoke.redacted.json`，确认无 PAT、Cookie、完整私人正文或真实学生数据。
 2. 将租户实测的 Bot/workspace/runtime/model/续聊结果写回 T11 证据；不能只凭 HTTP 200。
-3. T13 用同一合成课程跑真实一课闭环，并把后端拥有的 `conversationId` 持久绑定到本地 session；
-   两个合成学生必须隔离。
+3. T13 用同一合成课程跑真实一课闭环，验证已实现的后端 `conversationId` 持久绑定；两个合成学生
+   必须保持隔离。
 4. T13 后运行相关真实回归，再执行 T31 固定四学段评测；所有真实调用继续使用同一个 20 次账本。
 5. 根据真实结果补 T32 参赛文档，最后做 T33 放行复核。
 

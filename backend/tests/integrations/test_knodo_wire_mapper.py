@@ -13,7 +13,9 @@ from typing import Any
 import pytest
 
 from app.integrations.knodo.budget import FileRequestBudget
+from app.integrations.knodo.gateway import AgentGateway
 from app.integrations.knodo.operations import Operation
+from app.integrations.knodo.schema_models import default_registry
 from app.integrations.knodo.types import BackendOutcome
 from app.integrations.knodo.wire import (
     InMemoryRequestBudget,
@@ -314,6 +316,62 @@ async def test_http_200_business_or_shape_failures_are_not_success(
 
 
 @pytest.mark.asyncio
+async def test_invalid_assistant_content_preserves_remote_conversation_metadata() -> None:
+    wire_payload = completion(
+        example("teaching-response"),
+        choices=[
+            {
+                "index": 0,
+                "message": {"role": "assistant", "content": "not-json"},
+                "finish_reason": "stop",
+            }
+        ],
+    )
+    value, _ = mapper(BackendOutcome(payload=wire_payload, upstream_calls=1))
+
+    outcome = await value.invoke(
+        Operation.TEACH_TURN,
+        example("teaching-request"),
+        timeout_seconds=5,
+    )
+
+    assert outcome.error is not None
+    assert outcome.remote_metadata is not None
+    assert outcome.remote_metadata["conversation_id"] == "conv_synthetic_001"
+
+
+@pytest.mark.asyncio
+async def test_gateway_failure_preserves_metadata_needed_to_avoid_orphaned_conversation() -> None:
+    metadata = {
+        "provider": "knodo",
+        "conversation_id": "conv_synthetic_accepted_but_invalid",
+    }
+
+    class InvalidSemanticBackend:
+        async def invoke(self, operation, request, **kwargs):
+            return BackendOutcome(
+                payload={"not": "a teaching response"},
+                upstream_calls=1,
+                remote_metadata=metadata,
+            )
+
+    gateway = AgentGateway(
+        mode="knodo",
+        registry=default_registry(),
+        backend=InvalidSemanticBackend(),  # type: ignore[arg-type]
+        timeout_seconds=5,
+        max_output_bytes=262_144,
+    )
+
+    result = await gateway.invoke(Operation.TEACH_TURN, example("teaching-request"))
+
+    assert result.status.value == "FAILED"
+    assert result.error is not None
+    assert result.error.reason_code == "RESPONSE_SCHEMA_MISMATCH"
+    assert result.remote_metadata == metadata
+
+
+@pytest.mark.asyncio
 async def test_budget_is_reserved_before_send_and_exhaustion_is_fail_closed() -> None:
     budget = InMemoryRequestBudget(1)
     value, transport = mapper(
@@ -364,6 +422,43 @@ def test_mapper_rejects_unsafe_or_non_origin_base_urls(bad_value: str) -> None:
             transport=RecordingTransport(BackendOutcome(payload={})),
             budget=InMemoryRequestBudget(1),
         )
+
+
+def test_continuation_scope_is_server_owned_and_invalidates_on_target_change() -> None:
+    value, _ = mapper(BackendOutcome(payload={}))
+
+    teach_scope = value.continuation_scope(Operation.TEACH_TURN, contract_version="1.0.0")
+    code_scope = value.continuation_scope(Operation.CODE_FEEDBACK, contract_version="1.0.0")
+    designer_scope = value.continuation_scope(Operation.QUIZ_DRAFT, contract_version="1.0.0")
+
+    assert teach_scope == code_scope
+    assert teach_scope != designer_scope
+    assert "tutor-bot-synthetic" in teach_scope
+    assert "tutor-workspace-synthetic" in teach_scope
+    assert SYNTHETIC_PAT not in teach_scope
+
+    changed_target, _ = mapper(BackendOutcome(payload={}))
+    changed_target._targets["tutor"] = KnodoTarget(  # type: ignore[index]
+        bot_id="replacement-tutor-bot",
+        workspace_id="tutor-workspace-synthetic",
+    )
+    assert (
+        changed_target.continuation_scope(Operation.TEACH_TURN, contract_version="1.0.0")
+        != teach_scope
+    )
+
+
+def test_agent_gateway_exposes_no_continuation_scope_for_fixture() -> None:
+    gateway = AgentGateway(
+        mode="fixture",
+        registry=default_registry(),
+        backend=None,
+        timeout_seconds=5,
+        max_output_bytes=262_144,
+        unavailable_reason="synthetic",
+    )
+
+    assert gateway.continuation_scope(Operation.TEACH_TURN) is None
 
 
 @pytest.mark.asyncio

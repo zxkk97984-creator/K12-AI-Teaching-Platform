@@ -46,9 +46,14 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         constraints = await connection.fetch(
             "SELECT conname FROM pg_constraint WHERE contype = 'c' ORDER BY conname"
         )
+        binding_columns = await connection.fetch(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = 'public' AND table_name = 'teaching_remote_bindings'"
+        )
     finally:
         await connection.close()
-    assert revision == "0016_privacy_requests"
+    assert revision == "0017_knodo_remote_bindings"
+    assert {"remote_scope", "remote_metadata"} <= {row["column_name"] for row in binding_columns}
     assert {
         "identity_users",
         "auth_sessions",
@@ -203,7 +208,7 @@ async def test_clean_test_baseline_upgrade_is_idempotent(test_settings):
         )
     finally:
         await connection.close()
-    assert revision == "0016_privacy_requests"
+    assert revision == "0017_knodo_remote_bindings"
     assert {
         "content_chapter_revisions_immutable",
         "content_review_state_guard",
