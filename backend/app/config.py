@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -37,6 +38,24 @@ class Settings(BaseSettings):
     gateway_mode: Literal["disabled", "fixture", "knodo"] = "disabled"
     knodo_base_url: str | None = None
     knodo_token_env_var: str = Field(default="KNODO_PAT", min_length=1, max_length=64)
+    knodo_tutor_bot_id: str | None = Field(
+        default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$"
+    )
+    knodo_tutor_workspace_id: str | None = Field(
+        default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$"
+    )
+    knodo_designer_bot_id: str | None = Field(
+        default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$"
+    )
+    knodo_designer_workspace_id: str | None = Field(
+        default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$"
+    )
+    # Current T11/T13 authorisation is capped at 20 actual requests. Zero keeps
+    # live mode disabled; the durable ledger prevents restart-based expansion.
+    knodo_max_requests: int = Field(default=0, ge=0, le=20)
+    knodo_budget_ledger_path: str = Field(
+        default="storage/private/knodo-request-budget.json", min_length=1, max_length=400
+    )
     gateway_timeout_seconds: float = Field(default=20.0, ge=1.0, le=120.0)
     gateway_max_output_bytes: int = Field(default=262144, ge=1024, le=4194304)
     teaching_autorun: bool = True  # API schedules the in-process worker per run
@@ -86,12 +105,32 @@ class Settings(BaseSettings):
         if self.gateway_mode == "knodo":
             if not self.knodo_base_url:
                 raise ValueError("KNODO_BASE_URL is required when GATEWAY_MODE=knodo")
-            if not self.knodo_base_url.startswith(("http://", "https://")):
-                raise ValueError("KNODO_BASE_URL must be an absolute http(s) URL")
-            if self.app_env == "production" and not self.knodo_base_url.startswith("https://"):
-                raise ValueError("production KNODO_BASE_URL must use https")
+            parsed = urlsplit(self.knodo_base_url)
+            if (
+                parsed.scheme != "https"
+                or not parsed.hostname
+                or parsed.username is not None
+                or parsed.password is not None
+                or parsed.path not in ("", "/")
+                or parsed.query
+                or parsed.fragment
+            ):
+                raise ValueError("KNODO_BASE_URL must be a bare HTTPS origin")
             if not os.environ.get(self.knodo_token_env_var):
                 raise ValueError(f"{self.knodo_token_env_var} must be set when GATEWAY_MODE=knodo")
+            required_targets = {
+                "KNODO_TUTOR_BOT_ID": self.knodo_tutor_bot_id,
+                "KNODO_TUTOR_WORKSPACE_ID": self.knodo_tutor_workspace_id,
+                "KNODO_DESIGNER_BOT_ID": self.knodo_designer_bot_id,
+                "KNODO_DESIGNER_WORKSPACE_ID": self.knodo_designer_workspace_id,
+            }
+            missing = [name for name, value in required_targets.items() if not value]
+            if missing:
+                raise ValueError(
+                    f"required Knodo target configuration missing: {', '.join(missing)}"
+                )
+            if self.knodo_max_requests < 1:
+                raise ValueError("KNODO_MAX_REQUESTS must be positive when GATEWAY_MODE=knodo")
         return self
 
     @property

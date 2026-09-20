@@ -65,10 +65,13 @@ async def run_once(settings: Settings | None = None) -> dict[str, int]:
     recovered_authoring = await recover_authoring_jobs(runtime)
     teaching_ids, authoring_ids = await _queued_ids(runtime)
     gateway = build_gateway(runtime)
-    for run_id in teaching_ids:
-        await execute_run(runtime, gateway, run_id)
-    for job_id in authoring_ids:
-        await execute_job(runtime, uuid.UUID(job_id))
+    try:
+        for run_id in teaching_ids:
+            await execute_run(runtime, gateway, run_id)
+        for job_id in authoring_ids:
+            await execute_job(runtime, uuid.UUID(job_id))
+    finally:
+        await gateway.aclose()
     return {
         "recovered_teaching": recovered_teaching,
         "recovered_authoring": recovered_authoring,

@@ -10,9 +10,9 @@ Fail-closed rules (QA38):
 
 * ``disabled`` never falls back to fixture or a direct LLM call;
 * ``fixture`` is rejected in production (settings + defence in depth here);
-* ``knodo`` requires base URL, token and the frozen contract files, and stays
-  unavailable until T11 ships the evidence-backed wire mapper — it never
-  silently degrades to the fixture.
+* ``knodo`` requires a bare HTTPS origin, token, fixed Tutor/Designer targets,
+  a positive request cap and the frozen contract files; it never silently
+  degrades to the fixture.
 """
 
 from __future__ import annotations
@@ -24,6 +24,9 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Literal
 
+import httpx
+
+from app.integrations.knodo.budget import FileRequestBudget
 from app.integrations.knodo.errors import (
     GatewayError,
     GatewayErrorCategory,
@@ -40,6 +43,7 @@ from app.integrations.knodo.schema_models import (
     SchemaRegistry,
     default_registry,
 )
+from app.integrations.knodo.transport import HttpTransport
 from app.integrations.knodo.types import (
     GatewayErrorInfo,
     GatewayMode,
@@ -47,8 +51,9 @@ from app.integrations.knodo.types import (
     GatewayStatus,
     GatewayUsage,
 )
+from app.integrations.knodo.wire import KnodoTarget, KnodoWireMapper
 
-WIRE_MAPPER_STATUS = "NOT_IMPLEMENTED_T11"
+WIRE_MAPPER_STATUS = "KNODO_BOT_CHAT_V1"
 
 
 class GatewayConfigurationError(RuntimeError):
@@ -84,7 +89,7 @@ class AgentGateway:
         *,
         mode: GatewayMode,
         registry: SchemaRegistry,
-        backend: FixtureGateway | None = None,
+        backend: FixtureGateway | KnodoWireMapper | None = None,
         timeout_seconds: float,
         max_output_bytes: int,
         unavailable_reason: str | None = None,
@@ -95,6 +100,11 @@ class AgentGateway:
         self.timeout_seconds = timeout_seconds
         self.max_output_bytes = max_output_bytes
         self._unavailable_reason = unavailable_reason
+
+    async def aclose(self) -> None:
+        closer = getattr(self._backend, "aclose", None)
+        if closer is not None:
+            await closer()
 
     # -- status ---------------------------------------------------------- #
     @property
@@ -120,6 +130,7 @@ class AgentGateway:
         timeout_seconds: float | None = None,
         cancel: Any = None,
         delay_seconds: float | None = None,
+        remote_conversation_id: str | None = None,
     ) -> GatewayResult:
         invocation_id = str(uuid.uuid4())
         started = time.perf_counter()
@@ -166,6 +177,7 @@ class AgentGateway:
             timeout_seconds=timeout_seconds or self.timeout_seconds,
             cancel=cancel,
             delay_seconds=delay_seconds,
+            remote_conversation_id=remote_conversation_id,
         )
         if outcome.cancelled:
             return self._result(
@@ -214,6 +226,7 @@ class AgentGateway:
             input_bytes=input_bytes,
             output_bytes=output_bytes,
             upstream_calls=outcome.upstream_calls,
+            remote_metadata=outcome.remote_metadata,
         )
 
     # -- helpers --------------------------------------------------------- #
@@ -242,6 +255,7 @@ class AgentGateway:
         input_bytes: int,
         output_bytes: int,
         upstream_calls: int,
+        remote_metadata: dict[str, Any] | None = None,
     ) -> GatewayResult:
         fixture = self.mode == "fixture"
         return GatewayResult(
@@ -257,6 +271,7 @@ class AgentGateway:
                 duration_ms=int((time.perf_counter() - started) * 1000),
                 upstream_calls=upstream_calls,
             ),
+            remote_metadata=remote_metadata,
             fixture=fixture,
             fixture_notice=FIXTURE_NOTICE if fixture else None,
         )
@@ -304,13 +319,40 @@ def build_gateway(settings: Any) -> AgentGateway:
             raise GatewayConfigurationError(
                 f"environment variable {settings.knodo_token_env_var} is not set"
             )
-        # The wire mapper is T11 work: stay unavailable instead of guessing fields.
+        try:
+            targets = {
+                "tutor": KnodoTarget(
+                    bot_id=settings.knodo_tutor_bot_id,
+                    workspace_id=settings.knodo_tutor_workspace_id,
+                ),
+                "designer": KnodoTarget(
+                    bot_id=settings.knodo_designer_bot_id,
+                    workspace_id=settings.knodo_designer_workspace_id,
+                ),
+            }
+            budget = FileRequestBudget(
+                settings.knodo_budget_ledger_path,
+                max_requests=int(settings.knodo_max_requests),
+            )
+            # Redirects are intentionally disabled so credentials never follow
+            # an upstream Location header to a different origin. Environment
+            # proxy variables are ignored for the same credential boundary.
+            client = httpx.AsyncClient(follow_redirects=False, trust_env=False)
+            backend = KnodoWireMapper(
+                base_url=settings.knodo_base_url,
+                token=token,
+                targets=targets,
+                transport=HttpTransport(client, max_output_bytes=max_output_bytes),
+                budget=budget,
+            )
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise GatewayConfigurationError("invalid Knodo target or budget configuration") from exc
         return AgentGateway(
             mode="knodo",
             registry=registry,
+            backend=backend,
             timeout_seconds=timeout_seconds,
             max_output_bytes=max_output_bytes,
-            unavailable_reason="WIRE_MAPPER_NOT_IMPLEMENTED_T11",
         )
 
     raise GatewayConfigurationError(f"unsupported gateway mode: {mode!r}")

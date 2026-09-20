@@ -100,7 +100,9 @@ class FixtureGateway:
         timeout_seconds: float | None = None,
         cancel: asyncio.Event | None = None,
         delay_seconds: float | None = None,
+        remote_conversation_id: str | None = None,
     ) -> BackendOutcome:
+        del remote_conversation_id
         timeout = timeout_seconds or self.default_timeout_seconds
 
         if scenario is FixtureScenario.SUCCESS:

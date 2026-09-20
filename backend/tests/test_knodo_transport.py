@@ -50,6 +50,17 @@ class Handler:
         return httpx.Response(self.status, content=self.body, request=request)
 
 
+class CountingStream(httpx.AsyncByteStream):
+    def __init__(self, chunks: list[bytes]):
+        self.chunks = chunks
+        self.yielded = 0
+
+    async def __aiter__(self):
+        for chunk in self.chunks:
+            self.yielded += 1
+            yield chunk
+
+
 def build_transport(handler: Handler, *, max_output_bytes: int = 4096) -> HttpTransport:
     client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     return HttpTransport(client, max_output_bytes=max_output_bytes)
@@ -64,6 +75,7 @@ def build_transport(handler: Handler, *, max_output_bytes: int = 4096) -> HttpTr
         (429, "RATE"),
         (500, "SERVER"),
         (503, "SERVER"),
+        (302, "UNKNOWN"),
         (418, "UNKNOWN"),
     ],
 )
@@ -114,18 +126,47 @@ async def test_output_size_limit_is_enforced_before_parsing() -> None:
 
 
 @pytest.mark.asyncio
+async def test_output_limit_stops_reading_the_stream() -> None:
+    stream = CountingStream([b"x" * 600, b"y" * 600, b"z" * 600])
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, stream=stream, request=request)
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    transport = HttpTransport(client, max_output_bytes=1024)
+    outcome = await transport.send(make_request(), timeout_seconds=2)
+    await transport.aclose()
+
+    assert outcome.error is not None
+    assert outcome.error.reason_code == "UPSTREAM_OUTPUT_TOO_LARGE"
+    assert stream.yielded == 2
+
+
+@pytest.mark.asyncio
 async def test_timeout_becomes_a_predictable_error() -> None:
     handler = Handler(exc=httpx.ReadTimeout("synthetic timeout"))
     outcome = await build_transport(handler).send(make_request(), timeout_seconds=2)
     assert outcome.error is not None
     assert outcome.error.category.value == "TIMEOUT"
+    assert outcome.error.reason_code == "UPSTREAM_TIMEOUT_ACCEPTANCE_UNKNOWN"
     assert handler.calls == 1
 
     slow = Handler(delay=0.5)
     outcome = await build_transport(slow).send(make_request(), timeout_seconds=0.05)
     assert outcome.error is not None
     assert outcome.error.category.value == "TIMEOUT"
+    assert outcome.error.reason_code == "UPSTREAM_TIMEOUT_ACCEPTANCE_UNKNOWN"
     assert slow.calls == 1
+
+
+@pytest.mark.asyncio
+async def test_read_failure_is_accepted_unknown_and_never_retried() -> None:
+    handler = Handler(exc=httpx.ReadError("synthetic read failure after send"))
+    outcome = await build_transport(handler).send(make_request(), timeout_seconds=2)
+    assert outcome.error is not None
+    assert outcome.error.category.value == "UNKNOWN"
+    assert outcome.error.reason_code == "UPSTREAM_ACCEPTANCE_UNKNOWN"
+    assert handler.calls == 1
 
 
 @pytest.mark.asyncio

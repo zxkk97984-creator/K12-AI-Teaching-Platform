@@ -1,8 +1,8 @@
 # Knodo 契约调查（T02）
 
-核查时间：2026-09-18  
-状态：公开文档已取证；真实租户与完整 wire 仍未验证  
-结论：**不通过 `G_API_CONTRACT`，不进行付费或真实学生调用。**
+核查时间：2026-09-20
+状态：官方非流式 Bot Chat 契约已取证并实现；真实租户兼容性仍未验证
+结论：**`G_API_CONTRACT` 仅对本项目选定的 PAT + 非流式 Bot Chat 路径通过；远端取消、幂等和完整 SSE 不在实现范围。**
 
 ## 1. 已取得的公开证据
 
@@ -26,11 +26,13 @@
 - 相关通用 Chat 路由包括 submit、stream、messages、status，但它们是不同的调用方式，不能自动替代 Bot Chat 的续聊/取消语义。
 - 站点授权前缀不开放 chat SSE 和 Bot Chat `stream=true`；若使用流式，公开文档建议独立站点后台用 PAT 调平台 API，这仍需要真实租户验证。
 
-以上是“公开文档字段”，不是“本租户已验证 wire”。`knodo-wire-evidence.json` 中的 `tenant_verified` 为 false，真实请求、响应、SSE、取消、幂等和限额仍为 null/unknown。
+以上是“官方文档字段”，不是“本租户已验证 wire”。实现固定使用 `messages`、`stream=false`、
+`permissionMode=default`、`includeToolResults=false`；不发送 `model`，由 Bot 配置决定。续聊只使用后端保存的
+`conversationId`。`tenant_verified` 仍为 false，真实请求与租户错误行为等待受限冒烟。
 
 ## 3. 尚不能确认
 
-- 比赛租户的真实平台域名、workspace ID、Bot ID、AgentOS 和实际 model ID。
+- Bot 与 workspace 的实际绑定、Skill/知识包挂载快照，以及响应返回的实际 model ID。
 - PAT 对目标 Bot Chat 的真实 scope、速率、额度、错误码和请求 ID 语义。
 - `conversationId` 的生命周期、跨学生隔离、并发路由、重复请求、取消和恢复语义。
 - Bot Chat 流式事件、工具结果、usage 是否稳定、是否计费及失败后的可恢复状态。
@@ -47,12 +49,12 @@
 - 不因环境已配置任何 API Key 就调用 Knodo 或消耗额度。
 - 不用 fixture 结果宣称真实平台通过。
 
-## 5. 下一项真实联调所需输入
+## 5. 当前已取得的真实联调输入
 
-1. 受权比赛租户的脱敏平台域名、workspace ID、两个Bot的ID。
-2. 仅后端保存的PAT，以及明确允许的请求次数/积分/费用上限。
-3. 平台确认的运行时与模型 ID。
-4. 一份脱敏的首次请求、续聊、SSE、取消/超时/429错误响应记录。
-5. 平台/赛方对16岁以下适用、数据处理和人工审校的书面安排。
+1. 平台域名、两个 workspace ID、两个 Bot ID、AgentOS 与模型显示名已由用户提供并脱敏记录。
+2. 旧 PAT 已撤销；新 PAT 仅允许从服务端环境变量读取，当前执行进程尚不可见。
+3. T11/T13 合计最多 20 次真实请求；禁止自动重试、充值、升级或超额继续。
+4. 当前范围是成人参赛者与合成学生数据，不涉及真实未成年人或正式教学部署。
 
-在上述输入齐备前，T10/T11/T13只能使用离线假适配器并保持真实链路为BLOCKED。
+下一步只需让 `KNODO_PAT` 对运行脚本的同一进程可见，再执行一次不重试的五请求冒烟。完成前
+T11/T13 仍不能标记真实链路通过。

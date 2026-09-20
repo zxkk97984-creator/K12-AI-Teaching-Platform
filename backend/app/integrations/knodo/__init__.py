@@ -16,6 +16,7 @@ from app.integrations.knodo.operations import (
     parse_operation,
 )
 from app.integrations.knodo.types import GatewayResult, GatewayStatus, GatewayUsage
+from app.integrations.knodo.wire import KnodoTarget, KnodoWireMapper
 
 __all__ = [
     "AgentGateway",
@@ -27,6 +28,8 @@ __all__ = [
     "GatewayRuntimeStatus",
     "GatewayStatus",
     "GatewayUsage",
+    "KnodoTarget",
+    "KnodoWireMapper",
     "OPERATION_SPECS",
     "Operation",
     "TUTOR_OPERATIONS",

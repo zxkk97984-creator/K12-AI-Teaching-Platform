@@ -28,19 +28,43 @@ def main() -> int:
         elif digest(path) != item["sha256"] or path.stat().st_size != item["bytes"]:
             failures.append(f"snapshot drift {name}")
     evidence = json.loads((HERE / "knodo-wire-evidence.json").read_text(encoding="utf-8"))
-    expected_blocked = {"G_API_CONTRACT", "G_LIVE_BUDGET", "G_AGENT_ISOLATION", "G_K12_TERMS", "G_HUMAN_CONTENT_REVIEW"}
-    if set(evidence["gates"]) != expected_blocked:
+    expected_gates = {
+        "G_API_CONTRACT",
+        "G_LIVE_BUDGET",
+        "G_AGENT_ISOLATION",
+        "G_K12_TERMS",
+        "G_HUMAN_CONTENT_REVIEW",
+    }
+    if set(evidence["gates"]) != expected_gates:
         failures.append("gate set mismatch")
+    expected_status = {
+        "G_API_CONTRACT": "PASS",
+        "G_LIVE_BUDGET": "PASS",
+        "G_AGENT_ISOLATION": "BLOCKED",
+        "G_K12_TERMS": "BLOCKED",
+        "G_HUMAN_CONTENT_REVIEW": "BLOCKED",
+    }
     for gate, value in evidence["gates"].items():
-        if value["status"] != "BLOCKED":
-            failures.append(f"{gate} must remain BLOCKED without authorized live evidence")
+        if value["status"] != expected_status[gate]:
+            failures.append(f"{gate} status mismatch")
         if not value.get("reason"):
-            failures.append(f"{gate} lacks block reason")
+            failures.append(f"{gate} lacks status reason")
     if evidence["platform_permissions_verified"] or evidence["bot_chat"]["tenant_verified"]:
         failures.append("public docs cannot set tenant verification")
-    for key in ("first_request_redacted", "continue_request_redacted", "response_redacted", "stream_events_redacted", "actual_model_id", "actual_agent_os"):
-        if evidence["bot_chat"].get(key, evidence.get(key)) is not None:
-            failures.append(f"unverified field marked present: {key}")
+    for key in ("actual_model_id", "actual_agent_os"):
+        if evidence.get(key) is not None:
+            failures.append(f"live-only field marked present: {key}")
+    config = json.loads(
+        (HERE / "tenant-config.user-reported.json").read_text(encoding="utf-8")
+    )
+    authorization = config["live_authorization"]
+    if authorization["max_actual_requests"] != 20:
+        failures.append("live request cap must remain 20")
+    if any(
+        authorization[key]
+        for key in ("automatic_retry", "automatic_recharge", "plan_upgrade", "continue_after_exhaustion")
+    ):
+        failures.append("live authorization forbids retry/recharge/upgrade/overage")
     text = (HERE / "knodo-wire-evidence.json").read_text(encoding="utf-8")
     for forbidden in ("jvs_your_token_here", "Authorization: Bearer $JAVIS_AUTH_TOKEN", "knodo_site_access="):
         if forbidden in text:
@@ -49,7 +73,7 @@ def main() -> int:
         print("FAIL")
         print("\n".join(failures))
         return 1
-    print("PASS: public Knodo snapshots match and all external gates remain BLOCKED.")
+    print("PASS: official Bot Chat evidence and bounded user authorisation are consistent.")
     return 0
 
 

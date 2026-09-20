@@ -1,8 +1,8 @@
 {
   "schema_version": "k12.knodo.wire-evidence.v1",
   "document_kind": "EVIDENCE_RECORD_NOT_REQUEST_BODY",
-  "status": "PUBLIC_DOCS_RECORDED_TENANT_UNVERIFIED",
-  "checked_at": "2026-09-18T12:41:06+08:00",
+  "status": "PUBLIC_BOT_CHAT_CONTRACT_IMPLEMENTED_TENANT_UNVERIFIED",
+  "checked_at": "2026-09-20T09:30:00+08:00",
   "official_sources": [
     {
       "id": "KN-DOC-LLMS",
@@ -11,10 +11,11 @@
       "snapshot": "source-snapshots/llms-full.txt",
       "sha256": "d18b76247807ac06e7098c19f50816e3655b5cafc2d6f39af4914491e63e1fe0",
       "line_anchors": {
-        "chat_submit": "18698",
-        "chat_stream": "18760",
-        "bot_chat": "19035",
-        "usage": "19112"
+        "simple_api": "18248",
+        "chat_submit": "18699",
+        "chat_stream": "18761",
+        "bot_chat": "19038",
+        "usage": "19109"
       }
     },
     {
@@ -49,7 +50,7 @@
       "final_url": "https://knodo.vip/login?callbackUrl=%2Fdocs%2Fapi%2Fsimple-api"
     }
   ],
-  "tenant_platform_origin": null,
+  "tenant_platform_origin": "https://knodo.vip",
   "auth_scheme": {
     "public_documented": "服务端/脚本调用使用 Authorization: Bearer <PAT>；PAT代表创建者本人并沿用当前业务权限。",
     "bot_chat_user_requirement": "公开文档写明接口要求用户已登录且能访问目标 Bot。",
@@ -90,9 +91,39 @@
         "required": false
       }
     },
-    "first_request_redacted": null,
-    "continue_request_redacted": null,
-    "response_redacted": null,
+    "first_request_redacted": {
+      "path": "/api/v1/bots/{server_owned_bot_id}/chat/completions",
+      "body_fields": [
+        "messages",
+        "stream",
+        "permissionMode",
+        "includeToolResults"
+      ],
+      "fixed_values": {
+        "stream": false,
+        "permissionMode": "default",
+        "includeToolResults": false
+      },
+      "model_sent": false
+    },
+    "continue_request_redacted": {
+      "same_as_first": true,
+      "additional_field": "conversationId",
+      "source": "backend-owned prior response metadata only"
+    },
+    "response_redacted": {
+      "required_for_success": [
+        "object=chat.completion",
+        "id",
+        "model",
+        "conversationId",
+        "choices[0].index=0",
+        "choices[0].message.role=assistant",
+        "choices[0].message.content=strict JSON object",
+        "choices[0].finish_reason=stop"
+      ],
+      "usage": "record documented token fields when valid integers; otherwise unknown"
+    },
     "stream_events_redacted": null,
     "public_documented_response_fields": [
       "id",
@@ -109,7 +140,11 @@
       "conversationId"
     ],
     "public_documented_stream": "stream=true 时返回 OpenAI 兼容 SSE；公开快照未给出完整逐事件 schema。",
-    "bot_workspace_binding": null,
+    "bot_workspace_binding": {
+      "status": "USER_REPORTED_NOT_LIVE_VERIFIED",
+      "source": "tenant-config.user-reported.json",
+      "verification": "live smoke checks each returned conversation through the configured workspace messages endpoint"
+    },
     "history_semantics": {
       "status": "PARTIAL_PUBLIC_DOCS",
       "known": "conversationId可用于下次请求继续会话；另有会话消息/状态查询路由。",
@@ -119,8 +154,8 @@
         "跨用户访问边界"
       ]
     },
-    "idempotency_supported": null,
-    "cancel_semantics": null,
+    "idempotency_supported": false,
+    "cancel_semantics": "No documented remote Bot Chat cancel is used. Local pre-send cancel makes zero calls; post-send cancel/timeout is acceptance-unknown and is never auto-retried.",
     "usage_fields": {
       "status": "PUBLIC_DOCUMENTED_UNVERIFIED",
       "fields": [
@@ -142,20 +177,33 @@
   },
   "actual_model_id": null,
   "actual_agent_os": null,
+  "user_reported_runtime": {
+    "tutor": {
+      "agent_os_display": "Claude Code",
+      "model_display": "GLM-5.1"
+    },
+    "designer": {
+      "agent_os_display": "Claude Code",
+      "model_display": "GLM-5.1"
+    }
+  },
   "platform_permissions_verified": false,
   "gates": {
     "G_API_CONTRACT": {
-      "status": "BLOCKED",
-      "reason": "缺受权租户下的脱敏真实请求/响应、取消/幂等/限额语义与SSE完整实测。",
+      "status": "PASS",
+      "reason": "官方常用 API 文档已覆盖本项目选择的 PAT + 非流式 Bot Chat 首轮/续聊字段与响应；未文档化的远端取消、幂等和完整 SSE 被明确排除并失败关闭。租户兼容性仍需真实冒烟。",
       "evidence": [
         "docs/integrations/knodo/CONTRACT_DISCOVERY.md",
         "docs/integrations/knodo/knodo-wire-evidence.json"
       ]
     },
     "G_LIVE_BUDGET": {
-      "status": "BLOCKED",
-      "reason": "没有用户授权的请求次数、积分或费用上限；本机有OPENAI_API_KEY也不授权Knodo消费。",
-      "evidence": []
+      "status": "PASS",
+      "reason": "用户明确授权 T11/T13 合计最多20次真实请求，禁止自动充值、升级套餐或超额继续；持久账本在发送前计数且不自动扩容。",
+      "evidence": [
+        "tenant-config.user-reported.json",
+        "../../../backend/app/integrations/knodo/budget.py"
+      ]
     },
     "G_AGENT_ISOLATION": {
       "status": "BLOCKED",
@@ -177,7 +225,7 @@
   },
   "notes": [
     "本文件不是可发送请求，不包含PAT或Cookie。",
-    "所有标为tenant_verified的字段必须来自授权租户的脱敏实测；当前均为false/null/unknown。",
+    "所有标为tenant_verified的平台行为必须来自授权租户的脱敏实测；当前仍为false。",
     "不得把本地teaching/designer JSON当作Knodo HTTP请求体。"
   ]
 }

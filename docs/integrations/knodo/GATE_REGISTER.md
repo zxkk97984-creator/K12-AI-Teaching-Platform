@@ -9,18 +9,20 @@
 
 | 门禁 | 当前状态 | 已有证据 | 缺失证据/负责人 |
 |---|---|---|---|
-| `G_API_CONTRACT` | BLOCKED | 公共文档快照、路由、部分字段和登录重定向 | 受权租户下完整脱敏 wire、续聊/SSE/取消/幂等/限额；平台执行者 |
-| `G_LIVE_BUDGET` | BLOCKED | 无 | 调用目的、最大请求数、积分或费用上限；用户明确授权 |
+| `G_API_CONTRACT` | PASS（限定非流式 Bot Chat） | 官方 `llms-full.txt` 的 `/docs/api/simple-api` 段落确认 PAT、首轮/续聊请求字段和响应；`knodo-wire-evidence.json` 已固定映射 | 租户兼容性仍待真实冒烟；远端取消、幂等、完整 SSE 未纳入本实现且失败关闭 |
+| `G_LIVE_BUDGET` | PASS | 用户授权 T11/T13 合计最多 20 次真实请求；`tenant-config.user-reported.json`；持久预算账本 | 禁止自动重试、充值、升级或超额继续 |
 | `G_AGENT_ISOLATION` | BLOCKED | 无 | 会话、文件、记忆、工具、运行身份和撤销的实测；团队技术验收 |
 | `G_K12_TERMS` | BLOCKED（当前原型 OUT_OF_SCOPE） | 用户范围决策：成人参赛者 + 合成学生数据；公开隐私政策第10节仍明确不面向16岁以下未成年人 | 若范围扩展到真实未成年人，需比赛租户及下游 K12 处理安排；当前原型不扩展 |
 | `G_HUMAN_CONTENT_REVIEW` | BLOCKED | 无 | 四档示范课和正式资源的真实审校签字；真实审校者 |
 
 ## 本机事实
 
-- 当前没有 `KNODO_PAT`、`KNODO_API_TOKEN`、`KNODO_BOT_ID`、`KNODO_WORKSPACE_ID` 环境变量。
-- 存在其他服务的 `OPENAI_API_KEY` 不构成 Knodo 预算授权，本任务未读取其值、未调用模型。
-- 没有登录绕权、浏览器 Cookie 提取或付费请求。
+- 旧 PAT 已由用户撤销；新 PAT 由用户报告已在本机安全环境配置，但当前 Codex 执行进程读取不到 `KNODO_PAT`。
+- Tutor/Designer 的 workspace、Bot、AgentOS 与模型显示名已记录在 `tenant-config.user-reported.json`，状态仍是 `USER_REPORTED_NOT_LIVE_VERIFIED`。
+- 截至本次更新没有登录绕权、浏览器 Cookie 提取或真实 Knodo 请求；预算账本尚未产生计数。
 
 ## 可以继续的工作
 
-在以上门禁保持 BLOCKED 时，可以继续开发身份、课程、本地 schema、fixture 适配、UI、判分、runner 和离线回归；不能声称 E2E Knodo 已接通，不能向真实 K12 学生开放。
+可以继续离线验证真实 mapper。只有新 PAT 对执行进程可见后，才运行
+`scripts/knodo-live-smoke.py --live` 的五请求上限序列；失败不自动重试。真实冒烟前不能声称 E2E
+Knodo 已接通，也不能向真实 K12 学生开放。

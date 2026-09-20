@@ -33,10 +33,13 @@ from app.modules.teaching.router import router as teaching_router
 
 def _make_lifespan(settings: Settings):
     @asynccontextmanager
-    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    async def lifespan(application: FastAPI) -> AsyncIterator[None]:
         await recover_runs(settings)
         await recover_authoring_jobs(settings)
-        yield
+        try:
+            yield
+        finally:
+            await application.state.gateway.aclose()
 
     return lifespan
 

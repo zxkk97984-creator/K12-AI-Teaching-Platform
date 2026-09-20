@@ -1,0 +1,64 @@
+{
+  "schema_version": "k12.knodo.tenant-config.v1",
+  "status": "USER_REPORTED_NOT_LIVE_VERIFIED",
+  "recorded_at": "2026-09-20T00:00:00+08:00",
+  "platform_origin": "https://knodo.vip",
+  "release_scope": {
+    "participants": "ADULT_CONTESTANTS_ONLY",
+    "learner_data": "SYNTHETIC_ONLY",
+    "real_students": false,
+    "production_deployment": false
+  },
+  "targets": {
+    "tutor": {
+      "workspace_id": "cmu93gg8q00xia0ns0cm1ugq8",
+      "bot_id": "c15bd075-cf3b-422f-9655-b88a3c259769",
+      "agent_os_display": "Claude Code",
+      "model_display": "GLM-5.1",
+      "operations": [
+        "TEACH_TURN",
+        "CODE_FEEDBACK"
+      ],
+      "expected_skill": "k12-teaching-core",
+      "expected_bundle_release": "knodo-assets-1.0.0",
+      "platform_binding_verified": false
+    },
+    "designer": {
+      "workspace_id": "cmu93fuj000x5a0nsgzvf1iq7",
+      "bot_id": "23caf7d4-d416-45f8-b1d1-6086b59a1ae5",
+      "agent_os_display": "Claude Code",
+      "model_display": "GLM-5.1",
+      "operations": [
+        "QUIZ_DRAFT",
+        "LESSON_PACKAGE_DRAFT"
+      ],
+      "expected_skills": [
+        "k12-assessment-author",
+        "k12-content-author"
+      ],
+      "platform_binding_verified": false
+    }
+  },
+  "live_authorization": {
+    "tasks": [
+      "T11",
+      "T13"
+    ],
+    "max_actual_requests": 20,
+    "automatic_retry": false,
+    "automatic_recharge": false,
+    "plan_upgrade": false,
+    "continue_after_exhaustion": false
+  },
+  "credential": {
+    "kind": "PAT",
+    "storage": "SERVER_PROCESS_ENVIRONMENT_ONLY",
+    "environment_variable": "KNODO_PAT",
+    "value_recorded": false
+  },
+  "notes": [
+    "目标 ID、AgentOS 和模型显示名由用户提供；真实调用前不标记为平台实测。",
+    "expected_bundle_release 是仓库打包版本，不等于已经核实的平台挂载快照。",
+    "本文件不包含 PAT、Cookie、真实学生数据或答案正文。"
+  ]
+}

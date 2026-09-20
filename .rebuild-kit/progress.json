@@ -2,23 +2,27 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T33",
+  "current_task": "T11",
   "gates": {
     "G_API_CONTRACT": {
-      "status": "BLOCKED",
+      "status": "PASS",
       "owner": "团队/执行Agent依据官方证据",
       "evidence": [
         "docs/integrations/knodo/CONTRACT_DISCOVERY.md",
         "docs/integrations/knodo/knodo-wire-evidence.json",
         "docs/integrations/knodo/source-snapshots/manifest.json"
       ],
-      "note": "公开文档已确认部分路由和字段；仍缺受权租户的脱敏真实请求/响应、取消/幂等/限额与完整SSE证据。"
+      "note": "官方《常用 API》已覆盖本项目限定的 PAT + 非流式 Bot Chat 首轮/续聊字段与响应；未文档化的远端取消、幂等和完整 SSE 被明确排除并失败关闭。租户兼容性由 T11 真实冒烟另验。"
     },
     "G_LIVE_BUDGET": {
-      "status": "BLOCKED",
+      "status": "PASS",
       "owner": "用户授权",
-      "evidence": [],
-      "note": "需明确模型调用次数/费用或积分上限及授权用途，配置了Key不等于允许消费。"
+      "evidence": [
+        "docs/integrations/knodo/tenant-config.user-reported.json",
+        "backend/app/integrations/knodo/budget.py",
+        "docs/acceptance/T11.md"
+      ],
+      "note": "用户授权 T11/T13 合计最多20次真实请求，禁止自动重试、充值、升级套餐或超额继续；持久账本在发网前计数且不自动扩容。"
     },
     "G_AGENT_ISOLATION": {
       "status": "BLOCKED",
@@ -561,31 +565,37 @@
     "T11": {
       "status": "BLOCKED",
       "evidence": [
+        "docs/acceptance/T11.md",
         "docs/integrations/knodo/GATE_REGISTER.md",
         "docs/integrations/knodo/CONTRACT_DISCOVERY.md",
-        "contracts/knodo-wire-evidence.template.json"
+        "docs/integrations/knodo/knodo-wire-evidence.json",
+        "docs/integrations/knodo/tenant-config.user-reported.json",
+        "docs/integrations/knodo/SIMPLE_API_SUMMARY.md",
+        "backend/app/integrations/knodo/wire.py",
+        "backend/app/integrations/knodo/budget.py",
+        "scripts/knodo-live-smoke.py"
       ],
       "verification": [
         {
-          "type": "blocked",
-          "command": "gate check: G_API_CONTRACT",
-          "exit_code": null,
-          "note": "缺受权租户的脱敏真实请求/响应、取消/幂等/限额与完整 SSE 证据；公开文档不足以实现 wire mapper。"
-        },
-        {
-          "type": "blocked",
-          "command": "gate check: G_LIVE_BUDGET",
-          "exit_code": null,
-          "note": "无模型调用次数/费用(积分)上限与用途授权；配置 Key 不等于允许消费。"
-        },
-        {
           "type": "automated",
-          "command": "N/A (未派发实现)",
-          "exit_code": null,
-          "note": "按原卡要求：门禁未过必须 BLOCKED，不生成“可运行假 mapper”冒充真实接入。"
+          "command": "pytest T11 integration mapper/runtime + affected T10 gateway tests",
+          "exit_code": 0,
+          "note": "27 integration passed；116 affected gateway passed、1 DB-fixture endpoint deselected。"
+        },
+        {
+          "type": "contract",
+          "command": "python contracts/test_contracts.py -v; validate_evidence.py; source snapshot SHA256",
+          "exit_code": 0,
+          "note": "38 contract passed；官方快照 4/4 完整；限定 wire 与预算授权一致。"
+        },
+        {
+          "type": "blocked",
+          "command": "./scripts/knodo-live-smoke.py --live",
+          "exit_code": 2,
+          "note": "新 PAT 对当前执行进程不可见；发网前退出，真实请求 0/20，预算账本未创建。"
         }
       ],
-      "note": "A 于 2026-09-19T17:07:51+08:00 登记 BLOCKED：原卡硬门禁 G_API_CONTRACT 与 G_LIVE_BUDGET 仍缺外部证据/授权；T11 不派发、不实现假 mapper。解除条件：用户提供受权租户脱敏 wire 证据与明确预算上限。"
+      "note": "本地证据驱动 mapper、严格解析、持久预算、真实冒烟脚本和第二遍复核已完成；真实租户冒烟因当前进程不可见 KNODO_PAT 保持 BLOCKED。解除条件：同一进程安全注入新 PAT 后运行最多5次、不重试的合成冒烟并核验脱敏证据。"
     },
     "T12": {
       "status": "DONE",

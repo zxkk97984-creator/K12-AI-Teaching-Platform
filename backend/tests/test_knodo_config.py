@@ -79,29 +79,30 @@ def test_production_requires_https_and_token(monkeypatch: pytest.MonkeyPatch) ->
 
 
 @pytest.mark.asyncio
-async def test_knodo_mode_stays_unavailable_until_the_wire_mapper_exists(
+async def test_knodo_mode_uses_the_bounded_wire_mapper(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     monkeypatch.setenv("KNODO_PAT", "synthetic-pat-for-tests")
     settings = Settings(
-        **base_settings(gateway_mode="knodo", knodo_base_url="https://knodo.invalid")
+        **base_settings(
+            gateway_mode="knodo",
+            knodo_base_url="https://knodo.invalid",
+            knodo_tutor_bot_id="tutor-bot-synthetic",
+            knodo_tutor_workspace_id="tutor-workspace-synthetic",
+            knodo_designer_bot_id="designer-bot-synthetic",
+            knodo_designer_workspace_id="designer-workspace-synthetic",
+            knodo_max_requests=20,
+            knodo_budget_ledger_path=str(tmp_path / "budget.json"),
+        )
     )
     gateway = build_gateway(settings)
     status = gateway.status
-    assert status.available is False
-    assert status.reason_code == "WIRE_MAPPER_NOT_IMPLEMENTED_T11"
-    assert status.wire_mapper == "NOT_IMPLEMENTED_T11"
+    assert status.available is True
+    assert status.reason_code == "AVAILABLE"
+    assert status.wire_mapper == "KNODO_BOT_CHAT_V1"
     assert status.fixture is False
-
-    payload = json.loads((EXAMPLES / "teaching-request.json").read_text(encoding="utf-8"))
-    result = await gateway.invoke(Operation.TEACH_TURN.value, payload)
-    assert result.status is GatewayStatus.FAILED
-    assert result.error is not None and result.error.category.value == "CONFIG"
-    # Never silently fall back to the fixture, and never invent upstream traffic.
-    assert result.output is None
-    assert result.fixture is False
-    assert result.mode == "knodo"
-    assert result.usage.upstream_calls == 0
+    await gateway.aclose()
 
 
 @pytest.mark.asyncio

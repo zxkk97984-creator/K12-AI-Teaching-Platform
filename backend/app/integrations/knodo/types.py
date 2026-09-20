@@ -61,6 +61,7 @@ class GatewayResult(BaseModel):
     output: dict[str, Any] | None
     error: GatewayErrorInfo | None
     usage: GatewayUsage
+    remote_metadata: dict[str, Any] | None = None
     fixture: bool
     fixture_notice: str | None = None
 
@@ -74,3 +75,4 @@ class BackendOutcome:
     cancelled: bool = False
     insufficient_evidence: bool = False
     upstream_calls: int = 0
+    remote_metadata: dict[str, Any] | None = None
