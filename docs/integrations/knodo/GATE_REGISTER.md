@@ -17,12 +17,12 @@
 
 ## 本机事实
 
-- 旧 PAT 已由用户撤销；新 PAT 由用户报告已在本机安全环境配置，但当前 Codex 执行进程读取不到 `KNODO_PAT`。
+- 旧 PAT 已由用户撤销；新 PAT 由管理员账号创建并由用户报告已在本机安全环境配置，但当前 Codex 执行进程读取不到 `KNODO_PAT`。因无法邀请专用账号，管理员身份作为受控例外；只允许 AI / Chat 能力、短有效期并在 T11/T13 后撤销。
 - Tutor/Designer 的 workspace、Bot、AgentOS 与模型显示名已记录在 `tenant-config.user-reported.json`，状态仍是 `USER_REPORTED_NOT_LIVE_VERIFIED`。
 - 截至本次更新没有登录绕权、浏览器 Cookie 提取或真实 Knodo 请求；预算账本尚未产生计数。
 
 ## 可以继续的工作
 
 可以继续离线验证真实 mapper。只有新 PAT 对执行进程可见后，才运行
-`scripts/knodo-live-smoke.py --live` 的五请求上限序列；失败不自动重试。真实冒烟前不能声称 E2E
+`scripts/knodo-live-smoke.py --live` 的三请求上限序列；失败不自动重试。真实冒烟前不能声称 E2E
 Knodo 已接通，也不能向真实 K12 学生开放。

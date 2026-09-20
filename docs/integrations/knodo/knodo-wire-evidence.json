@@ -143,7 +143,7 @@
     "bot_workspace_binding": {
       "status": "USER_REPORTED_NOT_LIVE_VERIFIED",
       "source": "tenant-config.user-reported.json",
-      "verification": "live smoke checks each returned conversation through the configured workspace messages endpoint"
+      "verification": "Use the authenticated Edge UI to read Bot/workspace/Skill/bundle settings. The administrator PAT smoke does not request conversation-history capability."
     },
     "history_semantics": {
       "status": "PARTIAL_PUBLIC_DOCS",
@@ -199,7 +199,7 @@
     },
     "G_LIVE_BUDGET": {
       "status": "PASS",
-      "reason": "用户明确授权 T11/T13 合计最多20次真实请求，禁止自动充值、升级套餐或超额继续；持久账本在发送前计数且不自动扩容。",
+      "reason": "用户明确授权 T11/T13 合计最多20次真实请求，禁止自动充值、升级套餐或超额继续；持久账本在发送前计数且不自动扩容。管理员 PAT 只用于 AI / Chat 调用。",
       "evidence": [
         "tenant-config.user-reported.json",
         "../../../backend/app/integrations/knodo/budget.py"

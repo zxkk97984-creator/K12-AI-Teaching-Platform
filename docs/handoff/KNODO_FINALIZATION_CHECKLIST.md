@@ -12,6 +12,7 @@
 - 官方 Bot Chat 首轮/续聊契约已实现；PAT 只从后端环境变量读取。
 - T11/T13 合计真实请求上限 20；禁止自动重试、充值、升级或超额继续。
 - 旧 PAT 已撤销；新 PAT 已由用户报告存入本机安全环境。
+- PAT 由管理员账号创建，因为当前组织没有邀请专用测试账号的权限；这是受控例外，不代表最小业务权限。
 
 完整非秘密配置在：
 `/home/zxk/Projects/K12/docs/integrations/knodo/tenant-config.user-reported.json`。
@@ -34,8 +35,11 @@ cd /home/zxk/Projects/K12
 ./scripts/knodo-live-smoke.py --live
 ```
 
-脚本最多发 5 次请求，不重试：Tutor 首轮、Tutor 续聊、Tutor workspace 检查、Designer 首轮、Designer
-workspace 检查。它会核对严格业务 JSON、`conversationId`、workspace、`runtimeType` 和响应 `model`。
+脚本最多发 3 次请求，不重试：Tutor 首轮、Tutor 续聊、Designer 首轮。它会核对严格业务 JSON、
+`conversationId` 和响应 `model`。Workspace、AgentOS、Skill 与知识包继续通过已登录 Edge 的只读页面核验。
+
+管理员 PAT 只应勾选 `AI / Chat 调用`。不要为冒烟增加组织管理、知识库写入、插件写入、任务写入或
+会话历史与元数据管理能力；若当前密钥包含这些多余能力，应撤销并重新创建一个短有效期密钥。
 
 输出文件（无需自行寻找）：
 

@@ -1,9 +1,11 @@
 #!/home/zxk/Projects/K12/backend/.venv/bin/python
 """Run the bounded T11 synthetic Knodo smoke sequence.
 
-The command makes at most five requests (three Bot calls and two workspace
-binding checks), never retries, and records only redacted metadata. The PAT is
-read exclusively from ``KNODO_PAT`` and is never printed or written.
+The command makes at most three Bot Chat requests, never retries, and records
+only redacted metadata. The PAT is read exclusively from ``KNODO_PAT`` and is
+never printed or written. Workspace history is intentionally not queried:
+an administrator-created PAT should not receive that broader capability merely
+for smoke-test evidence.
 """
 
 from __future__ import annotations
@@ -18,9 +20,6 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
-
-import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
@@ -96,81 +95,6 @@ def _result_record(operation: Any, request: dict[str, Any], result: Any) -> dict
     }
 
 
-async def _verify_workspace_conversation(
-    config: dict[str, Any],
-    *,
-    role: str,
-    conversation_id: str,
-) -> tuple[bool, dict[str, Any]]:
-    from app.integrations.knodo.budget import FileRequestBudget
-
-    target = config["targets"][role]
-    ledger = os.environ.get("KNODO_BUDGET_LEDGER_PATH", str(DEFAULT_LEDGER))
-    budget = FileRequestBudget(
-        ledger,
-        max_requests=config["live_authorization"]["max_actual_requests"],
-    )
-    record: dict[str, Any] = {
-        "kind": "WORKSPACE_CONVERSATION_CHECK",
-        "role": role,
-        "workspace_id": target["workspace_id"],
-        "bot_id": target["bot_id"],
-        "conversation_id": conversation_id,
-        "upstream_calls": 0,
-        "status": "FAILED",
-        "reason_code": None,
-    }
-    if not await budget.reserve():
-        record["reason_code"] = "LIVE_REQUEST_BUDGET_EXHAUSTED"
-        return False, record
-
-    record["upstream_calls"] = 1
-    url = (
-        f"{config['platform_origin']}/api/v1/workspaces/{target['workspace_id']}"
-        f"/chat/conversations/{quote(conversation_id, safe='')}/messages?limit=20"
-    )
-    headers = {"Authorization": f"Bearer {os.environ['KNODO_PAT']}"}
-    try:
-        async with httpx.AsyncClient(follow_redirects=False, trust_env=False) as client:
-            response = await client.get(url, headers=headers, timeout=20)
-    except httpx.HTTPError:
-        record["reason_code"] = "WORKSPACE_CHECK_CONNECTION_FAILED"
-        return False, record
-    record["http_status"] = response.status_code
-    if not 200 <= response.status_code < 300:
-        record["reason_code"] = f"WORKSPACE_CHECK_HTTP_{response.status_code}"
-        return False, record
-    if len(response.content) > 262_144:
-        record["reason_code"] = "WORKSPACE_CHECK_OUTPUT_TOO_LARGE"
-        return False, record
-    try:
-        payload = response.json()
-    except (json.JSONDecodeError, UnicodeDecodeError):
-        record["reason_code"] = "WORKSPACE_CHECK_MALFORMED_JSON"
-        return False, record
-    messages = payload.get("messages") if isinstance(payload, dict) else None
-    runtime_type = payload.get("runtimeType") if isinstance(payload, dict) else None
-    if not isinstance(messages, list) or not isinstance(runtime_type, str):
-        record["reason_code"] = "WORKSPACE_CHECK_SHAPE_INVALID"
-        return False, record
-    record.update(
-        {
-            "status": "OK",
-            "reason_code": None,
-            "message_count": len(messages),
-            "runtime_type": runtime_type,
-            "conversation_status": payload.get("conversationStatus"),
-        }
-    )
-    runtime_matches = _matches_display(runtime_type, target["agent_os_display"])
-    record["expected_runtime_display"] = target["agent_os_display"]
-    record["runtime_matches_reported_configuration"] = runtime_matches
-    if not runtime_matches:
-        record["status"] = "FAILED"
-        record["reason_code"] = "WORKSPACE_RUNTIME_MISMATCH"
-    return runtime_matches, record
-
-
 async def _run_live(config: dict[str, Any]) -> int:
     from app.integrations.knodo import GatewayStatus, Operation, build_gateway
 
@@ -210,15 +134,6 @@ async def _run_live(config: dict[str, Any]) -> int:
         if continue_result.status is not GatewayStatus.OK:
             return _write_evidence(config, records, sequence_complete)
 
-        tutor_verified, tutor_check = await _verify_workspace_conversation(
-            config,
-            role="tutor",
-            conversation_id=conversation_id,
-        )
-        records.append(tutor_check)
-        if not tutor_verified:
-            return _write_evidence(config, records, sequence_complete)
-
         designer = _load_json(EXAMPLES / "designer-request.json")
         designer["request_id"] = "synthetic-t11-live-designer-first"
         designer_result = await gateway.invoke(Operation.QUIZ_DRAFT, designer)
@@ -234,16 +149,7 @@ async def _run_live(config: dict[str, Any]) -> int:
         ):
             records[-1]["configuration_mismatch"] = "MODEL"
             return _write_evidence(config, records, sequence_complete)
-        designer_conversation_id = designer_result.remote_metadata.get("conversation_id")
-        if not isinstance(designer_conversation_id, str) or not designer_conversation_id:
-            return _write_evidence(config, records, sequence_complete)
-        designer_verified, designer_check = await _verify_workspace_conversation(
-            config,
-            role="designer",
-            conversation_id=designer_conversation_id,
-        )
-        records.append(designer_check)
-        sequence_complete = designer_verified
+        sequence_complete = True
         return _write_evidence(config, records, sequence_complete)
     finally:
         await gateway.aclose()
@@ -285,7 +191,7 @@ def main() -> int:
     parser.add_argument(
         "--live",
         action="store_true",
-        help="send the five-request synthetic smoke sequence (never retries)",
+        help="send the three-request synthetic smoke sequence (never retries)",
     )
     args = parser.parse_args()
     config = _load_json(CONFIG_PATH)
@@ -296,7 +202,7 @@ def main() -> int:
                 {
                     "mode": "DRY_RUN",
                     "token_present": token_present,
-                    "planned_max_requests": 5,
+                    "planned_max_requests": 3,
                     "authorised_total_cap": config["live_authorization"]["max_actual_requests"],
                     "automatic_retries": 0,
                     "config": str(CONFIG_PATH),

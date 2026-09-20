@@ -52,13 +52,29 @@
   },
   "credential": {
     "kind": "PAT",
+    "creator_account_role": "ADMIN",
+    "creator_role_reason": "User cannot invite a dedicated account in the joined organization.",
     "storage": "SERVER_PROCESS_ENVIRONMENT_ONLY",
     "environment_variable": "KNODO_PAT",
-    "value_recorded": false
+    "value_recorded": false,
+    "resource_scope_enforced": false,
+    "required_capability_categories": [
+      "AI / Chat 调用"
+    ],
+    "forbidden_unneeded_capabilities": [
+      "组织管理",
+      "知识库写入",
+      "插件写入",
+      "任务写入",
+      "会话历史与元数据管理"
+    ],
+    "short_expiry_recommended": true,
+    "revoke_after_t11_t13": true
   },
   "notes": [
     "目标 ID、AgentOS 和模型显示名由用户提供；真实调用前不标记为平台实测。",
     "expected_bundle_release 是仓库打包版本，不等于已经核实的平台挂载快照。",
+    "管理员 PAT 继承管理员当前业务权限；能力分类只能限制 API 类别，不能形成 Workspace 资源隔离。",
     "本文件不包含 PAT、Cookie、真实学生数据或答案正文。"
   ]
 }
