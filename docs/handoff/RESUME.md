@@ -17,14 +17,12 @@
 - T32: DONE as the required draft deliverable; report, demo and integration docs are committed, with
   T31 live metrics explicitly marked pending.
 - T33: BLOCKED by T31 and G_HUMAN_CONTENT_REVIEW; T32 draft delivery is complete, and the local
-  doctor/bootstrap repeat check passed twice. Latest implementation checkpoint is 5821daa, and the
-  handoff state update is eab362a.
+  doctor/bootstrap repeat check passed twice. Latest T13 live implementation/evidence checkpoint is `5bb5653`.
 
 ## Recovery facts
 
 - Repository: `/home/zxk/Projects/K12`, branch `main`, no remote, and the handoff worktree is clean.
-- Implementation checkpoint: `5821daa`; T32/status handoff checkpoint: `eab362a`; pointer-only
-  documentation revisions follow them in local history.
+- Latest implementation/evidence checkpoint: `5bb5653`; earlier T32/status checkpoints remain in local history.
 - Load only the existing secure environment through the documented scripts (for example the local
   test harness); do not print or copy any values from it. No root `.env`, PAT, cookie, database dump,
   upload, or browser storage belongs in Git.

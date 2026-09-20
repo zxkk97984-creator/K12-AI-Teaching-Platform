@@ -7,7 +7,7 @@
 可执行的本地范围已经有真实证据：T29 bootstrap/Compose、T13 backend 371 passed + 真实 Knodo 浏览器竖切、T30 backend 333 passed、
 frontend 101 passed、既有 browser 21 passed + 1 explicit skip，以及本轮动画 fixture browser
 1 passed、T24 Docker 5 passed、T31 offline eval 16 cases。Git 未添加远端或 push；本轮变更已记录
-在本地提交 `5821daa`。
+在本地提交 `5bb5653`。
 
 ## Verification record
 
