@@ -11,7 +11,8 @@
 | CodeLab | T23–T26, T30 browser, T24 Docker live | READY in synthetic/local scope |
 | Animation controls | T21 backend boundaries; T30 synthetic fixture browser 1 passed with 390/1280 screenshots | READY in synthetic/local scope; formal senior content review still BLOCKED |
 | Voice | T27 honest unavailable/fallback boundary | NOT_PROVIDED |
-| Knodo live quality/cost | T31 offline rubric only | BLOCKED: API contract/budget |
+| Knodo live integration | T11 Tutor/Designer smoke；T13 browser/API/PG Tutor vertical | READY in synthetic competition scope；16/20 requests |
+| Knodo quality/cost | T31 offline rubric + T11/T13 reusable live evidence | BLOCKED: T31-specific authorization, human rubric, trustworthy usage/cost |
 | Formal four-stage content review | no real signatures | BLOCKED |
 | Real minor/student release | explicitly out of scope; synthetic students only | NOT_IN_SCOPE (would require G_K12_TERMS + isolation if reopened) |
 

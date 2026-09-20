@@ -4,7 +4,7 @@
 
 **本文件不是用户最终验收或正式发布证明。当前本地合成可执行范围已完成，仍有外部阻塞。**
 
-可执行的本地范围已经有真实证据：T29 bootstrap/Compose、T30 backend 333 passed、
+可执行的本地范围已经有真实证据：T29 bootstrap/Compose、T13 backend 371 passed + 真实 Knodo 浏览器竖切、T30 backend 333 passed、
 frontend 101 passed、既有 browser 21 passed + 1 explicit skip，以及本轮动画 fixture browser
 1 passed、T24 Docker 5 passed、T31 offline eval 16 cases。Git 未添加远端或 push；本轮变更已记录
 在本地提交 `5821daa`。
@@ -21,7 +21,7 @@ frontend 101 passed、既有 browser 21 passed + 1 explicit skip，以及本轮�
 | `playwright test src/e2e/animation.spec.ts --config frontend/playwright.config.ts --reporter=line` | 0 | 1 passed；真实 FastAPI、PostgreSQL、Chrome，截图已保存 |
 | `./scripts/runner-live-test.sh` | 0 | 真实 Docker runner 5 passed |
 | `python3 evals/run_offline.py --output docs/acceptance/T31-offline-report.json` | 0 | 16 个合成评测样例 |
-| `./scripts/verify-live.sh` | 3 | 按门禁 fail-closed；未读取 PAT/未发起网络调用 |
+| T13 live Chrome → API → Knodo → PostgreSQL → Chrome | 0 | A 两轮续聊、B 独立会话；3 个真实 run 成功；预算 16/20 |
 | `./scripts/check.sh` | 1 | 只读 CareerMate source-audit 检测外部 HEAD/tree/status/untracked 漂移后 fail-closed；未修改 K12 工作树 |
 | source-audit 之后的 K12 checks | 0 | public evidence、plan、contracts、OpenAPI、ruff 和生成类型全部通过 |
 
@@ -32,8 +32,7 @@ frontend 101 passed、既有 browser 21 passed + 1 explicit skip，以及本轮�
 
 - T30 动画控制器已在明确的合成 T06 fixture 上执行并通过，但这不是正式 senior 内容人审；
   正式内容仍需真实审校者签署和发布证据。
-- T31 真实 Knodo Bot/Skill/wire/usage/cost/人工教学质量未运行；
-  G_API_CONTRACT 和 G_LIVE_BUDGET BLOCKED。
+- G_API_CONTRACT 和 G_LIVE_BUDGET 已对 T11/T13 限定路径 PASS；T31 专用 16-case live 执行、可信 usage/cost 与人工教学质量仍未运行，现有授权不能挪用。
 - G_AGENT_ISOLATION、G_HUMAN_CONTENT_REVIEW 仍 BLOCKED；当前范围明确为成人参赛者 + 合成数据，
   因此 G_K12_TERMS 不阻塞本原型；任何真实未成年人发布必须重新取得条款证据。
 - 完整 `scripts/check.sh` 还保留 CareerMate 只读源审计的外部漂移失败；这不是 K12 源码修复项，

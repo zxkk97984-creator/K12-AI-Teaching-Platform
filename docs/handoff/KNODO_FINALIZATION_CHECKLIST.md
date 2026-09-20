@@ -8,7 +8,7 @@
 - Tutor Bot：`c15bd075-cf3b-422f-9655-b88a3c259769`
 - Designer Workspace：`cmu93fuj000x5a0nsgzvf1iq7`
 - Designer Bot：`23caf7d4-d416-45f8-b1d1-6086b59a1ae5`
-- 两个 Bot 的 AgentOS/模型显示配置：`Claude Code` / `GLM-5.1`（用户报告，待 API 实测返回核对）
+- 两个 Bot 的 AgentOS/模型显示配置：`Claude Code` / `GLM-5.1`；T11/T13 实际返回模型为 `knodo/GLM-5.1`，T11 runtime 为 `CLAUDE_CODE`。
 - 官方 Bot Chat 首轮/续聊契约已实现；PAT 只从后端环境变量读取。
 - T11/T13 合计真实请求上限 20；禁止自动重试、充值、升级或超额继续。
 - 旧 PAT 已撤销；新 PAT 已由用户报告存入本机安全环境。
@@ -31,16 +31,21 @@ T11 已 DONE：Tutor 首轮、同一会话续聊和 Designer 题稿均通过冻�
 - `/home/zxk/Projects/K12/storage/private/knodo-request-budget.json`（本机私有、Git 忽略）
 - `/home/zxk/Projects/K12/docs/acceptance/T11.md`
 
-持久预算账本当前 13/20，剩余 7 次。不要手工删除或修改预算账本来恢复次数。
+持久预算账本当前 16/20，剩余 4 次。不要手工删除或修改预算账本来恢复次数。
+
+## T13 真实竖切结果
+
+T13 已 DONE：真实 Chrome → 本地 API → Knodo Tutor → PostgreSQL → 浏览器链通过；A 两轮复用同一
+conversationId，B 使用不同 conversationId 并按学段进入不同章节；不存在的来源被明确拒绝。证据见
+`/home/zxk/Projects/K12/docs/acceptance/T13.md` 和
+`/home/zxk/Projects/K12/docs/acceptance/t13-evidence/`。
 
 ## 接下来依次做
 
-1. 审查 `live-smoke.redacted.json`，确认无 PAT、Cookie、完整私人正文或真实学生数据。
-2. 将租户实测的 Bot/workspace/runtime/model/续聊结果写回 T11 证据；不能只凭 HTTP 200。
-3. T13 用同一合成课程跑真实一课闭环，验证已实现的后端 `conversationId` 持久绑定；两个合成学生
-   必须保持隔离。
-4. T13 后运行相关真实回归，再执行 T31 固定四学段评测；所有真实调用继续使用同一个 20 次账本。
-5. 根据真实结果补 T32 参赛文档，最后做 T33 放行复核。
+1. 审查 T11/T13 脱敏证据，确认无 PAT、Cookie、私人正文或真实学生数据。
+2. 如需执行 T31，先取得独立的 T31 调用授权与明确上限；现有剩余 4 次仍属于 T11/T13 授权，不能擅自挪用。
+3. 由真实审校者执行 T31 rubric；Agent 不能代签科学性、适龄性或正式内容审核。
+4. 完成 T31 后同步 T32 指标，最后执行 T33 用户放行复核。
 
 ## 仍未解除的门禁
 
@@ -48,4 +53,4 @@ T11 已 DONE：Tutor 首轮、同一会话续聊和 Designer 题稿均通过冻�
 - `G_HUMAN_CONTENT_REVIEW`：正式公开课程仍需真实人员审校；Agent 不能代签。
 - `G_K12_TERMS`：当前成人参赛者 + 合成数据原型不受其阻塞；若扩展到真实未成年人，必须重新处理。
 
-在 T11/T13 真实证据完成前，项目仍是合成本地竞赛原型，不得宣称真实 Knodo 教学闭环已放行。
+T11/T13 的真实合成链路已经完成；项目仍是合成竞赛原型。T31、人审和完整平台隔离未完成前，不得宣称正式教学质量或真实学生发布已放行。

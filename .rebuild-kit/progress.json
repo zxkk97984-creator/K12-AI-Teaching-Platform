@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T13",
+  "current_task": "T31",
   "gates": {
     "G_API_CONTRACT": {
       "status": "PASS",
@@ -665,37 +665,57 @@
       "note": "A 独立复核 PASS（2026-09-19T17:58:16+08:00）：短事务/DB 幂等/租约守卫/owner 隔离/校验后落库/SSE 与取消均实测；存在外部 check.sh 阻塞（非本卡）与一次 ACK 缺失流程偏差（已记录）。"
     },
     "T13": {
-      "status": "BLOCKED",
+      "status": "DONE",
       "evidence": [
         "docs/acceptance/T13.md",
+        "docs/acceptance/t13-evidence/live-vertical.redacted.json",
+        "docs/acceptance/t13-evidence/student-a-live-redacted.png",
+        "docs/acceptance/t13-evidence/student-b-live-redacted.png",
         "docs/integrations/knodo/GATE_REGISTER.md",
         "docs/acceptance/T11.md",
         "docs/acceptance/T12.md",
         "backend/alembic/versions/0017_knodo_remote_bindings.py",
         "backend/tests/integrations/test_knodo_persistent_binding.py",
-        "backend/tests/integrations/test_knodo_binding_query.py"
+        "backend/tests/integrations/test_knodo_binding_query.py",
+        "frontend/src/e2e/t13-live.spec.ts"
       ],
       "verification": [
         {
           "type": "dependency",
           "command": "dependency check: T11",
           "exit_code": 0,
-          "note": "T11 已DONE；最终真实三段冒烟通过，预算剩余7次。"
+          "note": "T11 已DONE；最终真实三段冒烟通过；T13结束后同一账本剩余4次。"
         },
         {
-          "type": "automated",
-          "command": "T11 mapper/runtime tests + continuation binding query test + affected gateway regression",
+          "type": "postgresql_integration",
+          "command": "pytest -q backend/tests/integrations/test_knodo_persistent_binding.py (APP_ENV=test, 55434)",
           "exit_code": 0,
-          "note": "31 + 1 passed；合并相关无数据库回归121 passed；1个依赖DB fixture的状态端点 deselected。"
+          "tests_passed": 4,
+          "note": "首次3 failed/1 passed定位为测试替身返回未授权固定来源；未放宽生产校验，修复替身后4 passed。"
         },
         {
-          "type": "blocked",
-          "command": "test_knodo_persistent_binding.py + real browser/Knodo vertical slice",
-          "exit_code": null,
-          "note": "4项PostgreSQL测试已编写但专用55434测试库未运行；Edge扩展读取超时；真实竖切NOT_RUN。"
+          "type": "regression",
+          "command": "PYTHONPATH=. backend/.venv/bin/pytest backend/tests -q",
+          "exit_code": 0,
+          "tests_passed": 371,
+          "tests_skipped": 1,
+          "note": "唯一skip为未配置真实CodeLab runner；首次错误工作目录导致3个runner导入收集错误，按标准入口修正。"
+        },
+        {
+          "type": "live_browser",
+          "command": "T13_LIVE=1 Playwright Chrome -> local API -> Knodo -> PostgreSQL -> browser",
+          "exit_code": 0,
+          "tests_passed": 1,
+          "note": "A两轮同conversationId脱敏哈希，B使用不同哈希及ch02；三次run均SUCCEEDED；最终只读重开1 passed且预算不变。"
+        },
+        {
+          "type": "budget",
+          "command": "persistent Knodo request ledger",
+          "exit_code": 0,
+          "note": "T11/T13授权20次，最终reserved=16、remaining=4；无自动重试/充值/超额。"
         }
       ],
-      "note": "持久conversationId、owner/session/target scope隔离、失败审计与目标变化失效的本地前置已实现；T11已DONE。PostgreSQL集成测试和浏览器真平台竖切未完成，因此T13保持BLOCKED。"
+      "note": "成人参赛者+合成学生范围内真实一课竖切完成：持久conversationId、owner/session/target scope隔离、无来源拒答、A续聊、B分档章节与真实浏览器持久展示均有证据。平台文件/记忆/工具/执行身份隔离仍未全证实，G_AGENT_ISOLATION保持BLOCKED。"
     },
     "T14": {
       "status": "DONE",
@@ -1593,6 +1613,9 @@
       "evidence": [
         "docs/acceptance/T31.md",
         "docs/acceptance/T31-offline-report.json",
+        "docs/acceptance/T11.md",
+        "docs/acceptance/T13.md",
+        "docs/acceptance/t13-evidence/live-vertical.redacted.json",
         "evals/teaching_cases.jsonl",
         "evals/rubric.v1.json",
         "evals/run_offline.py",
@@ -1608,13 +1631,19 @@
           "note": "四学段/五类别覆盖；automated_only=true，human review NOT_RUN。"
         },
         {
-          "type": "gate",
-          "command": "./scripts/verify-live.sh",
-          "exit_code": 3,
-          "note": "Fail-closed because G_API_CONTRACT and G_LIVE_BUDGET remain BLOCKED; no PAT/network read or call."
+          "type": "live_evidence_reuse",
+          "command": "T11 real smoke + T13 live browser vertical evidence audit",
+          "exit_code": 0,
+          "note": "Tutor、Designer均有真实样例；T13三次Tutor run成功并记录时延、A/B conversation隔离和16/20预算。调用授权属于T11/T13，不冒充T31评测执行。"
+        },
+        {
+          "type": "blocked",
+          "command": "T31 versioned live eval + human rubric review",
+          "exit_code": null,
+          "note": "现有真实请求授权仅限T11/T13，剩余4次未授权转用于T31；16条真实执行和人工科学性/适龄性评分NOT_RUN。"
         }
       ],
-      "note": "离线评测框架已完成；真实 Knodo 质量、usage、成本和人工判断必须等待 G_API_CONTRACT/G_LIVE_BUDGET 及人审授权。"
+      "note": "G_API_CONTRACT与G_LIVE_BUDGET现已PASS，且T11/T13提供真实两类Bot与完整课堂证据；但T31专用真实调用未获授权，16条评测集和人工rubric未执行，usage/人民币成本不可得，因此保持BLOCKED。"
     },
     "T32": {
       "status": "DONE",

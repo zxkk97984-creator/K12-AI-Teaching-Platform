@@ -13,8 +13,8 @@
 
 ## Required before any real platform claim
 
-- [ ] G_API_CONTRACT: authorized Bot wire, continuation, SSE/cancel/idempotency/errors/usage.
-- [ ] G_LIVE_BUDGET: explicit purpose, max request count, cost/points source.
+- [x] G_API_CONTRACT: official PAT/non-streaming Bot Chat contract plus T11/T13 tenant evidence; undocumented remote cancel/idempotency remain out of scope.
+- [x] G_LIVE_BUDGET: T11/T13 only, maximum 20 requests; ledger is 16/20 and cannot be reset or reused for T31 without authorization.
 - [ ] G_AGENT_ISOLATION: session/file/memory/tool/runtime identity and revocation evidence.
 - [ ] G_K12_TERMS: competition tenant and under-16 processing arrangement.
 - [ ] G_HUMAN_CONTENT_REVIEW: four stage examples and formal resources signed by real reviewers.

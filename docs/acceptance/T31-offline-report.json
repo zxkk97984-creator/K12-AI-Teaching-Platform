@@ -25,6 +25,6 @@
   ],
   "automated_only": true,
   "human_review": "NOT_RUN",
-  "live_platform": "BLOCKED_G_API_CONTRACT_AND_G_LIVE_BUDGET",
+  "live_platform": "PARTIAL_T11_T13_EVIDENCE_NOT_A_T31_EVAL_RUN",
   "learning_effect_claim": "FORBIDDEN"
 }

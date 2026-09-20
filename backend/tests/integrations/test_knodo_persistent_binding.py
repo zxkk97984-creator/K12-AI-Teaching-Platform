@@ -40,6 +40,16 @@ class SyntheticKnodoGateway:
         session_id = request["lesson_session_id"]
         self.calls.append((session_id, remote_conversation_id))
         conversation_id = remote_conversation_id or f"conv-{session_id}"
+        payload = teaching_response_payload(Operation(operation), request)
+        source = request["knowledge_context"][0]
+        payload["source_refs"] = [
+            {
+                "source_id": source["source_id"],
+                "revision": source["revision"],
+                "locator": source["locator"],
+            }
+        ]
+        payload["action"] = None
         metadata = {
             "provider": "knodo",
             "role": "tutor",
@@ -59,7 +69,7 @@ class SyntheticKnodoGateway:
             operation=operation,
             mode="knodo",
             status=GatewayStatus.FAILED if should_fail else GatewayStatus.OK,
-            output=None if should_fail else teaching_response_payload(operation, request),
+            output=None if should_fail else payload,
             error=None,
             usage=GatewayUsage(
                 input_bytes=1,

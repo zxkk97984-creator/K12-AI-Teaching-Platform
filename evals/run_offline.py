@@ -21,11 +21,15 @@ REQUIRED_CATEGORIES = {
 
 
 def load_cases() -> list[dict]:
-    cases = [json.loads(line) for line in CASES.read_text(encoding="utf-8").splitlines() if line]
+    cases = [
+        json.loads(line)
+        for line in CASES.read_text(encoding="utf-8").splitlines()
+        if line
+    ]
     ids = [case.get("case_id") for case in cases]
     if len(ids) != len(set(ids)):
         raise ValueError("case_id must be unique")
-    if set(case.get("stage") for case in cases) != STAGES:
+    if {case.get("stage") for case in cases} != STAGES:
         raise ValueError("the set must cover all four stages")
     if not REQUIRED_CATEGORIES <= {case.get("category") for case in cases}:
         raise ValueError("the set misses a required evaluation category")
@@ -44,11 +48,13 @@ def build_report(cases: list[dict], rubric: dict) -> dict:
         "mode": "OFFLINE_SYNTHETIC_NOT_KNODO",
         "cases": len(cases),
         "by_stage": dict(sorted(Counter(case["stage"] for case in cases).items())),
-        "by_category": dict(sorted(Counter(case["category"] for case in cases).items())),
+        "by_category": dict(
+            sorted(Counter(case["category"] for case in cases).items())
+        ),
         "rubric_dimensions": [item["id"] for item in rubric["dimensions"]],
         "automated_only": True,
         "human_review": "NOT_RUN",
-        "live_platform": "BLOCKED_G_API_CONTRACT_AND_G_LIVE_BUDGET",
+        "live_platform": "PARTIAL_T11_T13_EVIDENCE_NOT_A_T31_EVAL_RUN",
         "learning_effect_claim": "FORBIDDEN",
     }
 
