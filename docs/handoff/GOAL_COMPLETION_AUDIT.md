@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | 固定目录 `/home/zxk/Projects/K12` | PASS | `AGENTS.md`、实际 `realpath` |
 | 单 Agent 写入，不启动 Herdr/A/B | PASS | `AGENTS.md`、历史锁为 `RELEASED`、无其他 K12 写入进程 |
-| 本地 Git，不添加远端、不 push、不改写历史 | PASS | `git remote -v` 为空；最新 T31 实现/证据提交 `2677b4a` |
+| 本地 Git，不添加远端、不 push、不改写历史 | PASS | `git remote -v` 为空；最新 T31 审核交接提交 `0a7c7ab` |
 | 不提交 PAT/Cookie/真实学生数据 | PASS（本轮 diff） | staged/diff 秘密扫描；T11/T13 脱敏证据；私有预算账本被 Git 忽略 |
 | 仅成人参赛者与合成学生数据 | PASS（声明范围） | `release_scope`、T11/T13 报告、`G_K12_TERMS.scope_note` |
 
