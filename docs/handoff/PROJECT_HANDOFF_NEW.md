@@ -4,7 +4,7 @@
 
 - 目标目录：/home/zxk/Projects/K12
 - 当前本地 Git 分支：main；无远端、无 push、无历史重写。
-- 最近实现/证据提交：`3eb14b5`（T31 16-case 真实评测）；此前 T13 竖切为 `5bb5653`、T11 冒烟为 `ad9a93b`。
+- 最近实现/证据提交：`2677b4a`（T31 真实评测与 conversation 隔离审计）；此前 T13 竖切为 `5bb5653`、T11 冒烟为 `ad9a93b`。
 - 本轮唯一源码/测试/进度/Git 写入者：当前单 Agent；旧 Herdr/A-B/旧仓库只读。
 - 发布范围：synthetic_competition_prototype_until_authorized。
 

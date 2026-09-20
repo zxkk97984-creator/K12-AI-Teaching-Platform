@@ -2,7 +2,7 @@
 
 | Area | Evidence | State |
 | --- | --- | --- |
-| Git/single-agent recovery | local history through 3eb14b5; clean status; no remote/push | READY |
+| Git/single-agent recovery | local history through 2677b4a; clean status; no remote/push | READY |
 | Bootstrap/content/CodeLab import | T29 bootstrap twice; legacy/fixture/task REUSE | READY |
 | API/worker/web/PG | T29 Compose build, health/live/ready, worker one-shot | READY |
 | Identity/CSRF/owner/privacy | T05/T28 and codelab privacy tests | READY |
