@@ -139,6 +139,13 @@ def main() -> int:
                 failures.append("T31 live summary does not match its source evidence")
             if t31_summary.get("human_review") != "NOT_RUN":
                 failures.append("T31 human review must remain NOT_RUN until a person signs it")
+            isolation = t31_summary.get("isolation_observations", {})
+            if isolation.get("remote_conversation_hashes_present") != 15:
+                failures.append("T31 isolation evidence must contain 15 returned conversation ids")
+            if isolation.get("remote_conversation_hashes_unique") != 15:
+                failures.append("T31 fresh cases reused a remote conversation id")
+            if isolation.get("cross_case_id_mentions"):
+                failures.append("T31 output contains an observed cross-case id")
     text = (HERE / "knodo-wire-evidence.json").read_text(encoding="utf-8")
     for forbidden in (
         "jvs_your_token_here",

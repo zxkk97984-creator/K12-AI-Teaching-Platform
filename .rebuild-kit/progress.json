@@ -30,9 +30,10 @@
       "owner": "团队技术验收",
       "evidence": [
         "docs/acceptance/T13.md",
-        "docs/acceptance/t13-evidence/live-vertical.redacted.json"
+        "docs/acceptance/t13-evidence/live-vertical.redacted.json",
+        "docs/acceptance/T31-live-summary.json"
       ],
-      "note": "T13已证明两个合成学生的本地owner/session与远端conversation隔离；平台文件、自动记忆、工具权限和执行身份仍未形成完整技术证据，因此保持BLOCKED。"
+      "note": "T13已证明两个合成学生的本地owner/session与远端conversation隔离；T31另外观察到15个返回conversationId的哈希全部唯一且无跨case ID。平台文件、自动记忆、工具权限和执行身份仍未形成完整技术证据，因此保持BLOCKED。"
     },
     "G_K12_TERMS": {
       "status": "BLOCKED",

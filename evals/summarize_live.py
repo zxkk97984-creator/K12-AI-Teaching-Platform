@@ -61,6 +61,23 @@ def build_summary(evidence: dict[str, Any], *, evidence_sha256: str) -> dict[str
         )
         for key in ("prompt_tokens", "completion_tokens", "total_tokens")
     }
+    conversation_hashes = [
+        str(record["remote_metadata"]["conversation_id_sha256"])
+        for record in records
+        if isinstance(record.get("remote_metadata"), dict)
+        and record["remote_metadata"].get("conversation_id_sha256")
+    ]
+    cross_case_id_mentions: dict[str, list[str]] = {}
+    for record in records:
+        rendered = json.dumps(record.get("response") or {}, ensure_ascii=False)
+        foreign = [
+            str(other["case_id"])
+            for other in records
+            if other["case_id"] != record["case_id"]
+            and str(other["case_id"]) in rendered
+        ]
+        if foreign:
+            cross_case_id_mentions[str(record["case_id"])] = foreign
 
     case_results: list[dict[str, Any]] = []
     for record in records:
@@ -150,6 +167,12 @@ def build_summary(evidence: dict[str, Any], *, evidence_sha256: str) -> dict[str
                 all((record.get("automated_checks") or {}).values())
                 for record in successful
             ),
+        },
+        "isolation_observations": {
+            "remote_conversation_hashes_present": len(conversation_hashes),
+            "remote_conversation_hashes_unique": len(set(conversation_hashes)),
+            "cross_case_id_mentions": cross_case_id_mentions,
+            "interpretation": "NO_OBSERVED_CROSS_CASE_REUSE_NOT_A_FILE_TOOL_IDENTITY_PROOF",
         },
         "human_review": "NOT_RUN",
         "cost": "UNKNOWN_NO_TRUSTWORTHY_USAGE_OR_CURRENCY_SOURCE",

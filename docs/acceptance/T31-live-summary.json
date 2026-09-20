@@ -66,6 +66,12 @@
     "successful_no_source_cases": 2,
     "successful_outputs_passing_all_automated_checks": 13
   },
+  "isolation_observations": {
+    "remote_conversation_hashes_present": 15,
+    "remote_conversation_hashes_unique": 15,
+    "cross_case_id_mentions": {},
+    "interpretation": "NO_OBSERVED_CROSS_CASE_REUSE_NOT_A_FILE_TOOL_IDENTITY_PROOF"
+  },
   "human_review": "NOT_RUN",
   "cost": "UNKNOWN_NO_TRUSTWORTHY_USAGE_OR_CURRENCY_SOURCE",
   "learning_effect_claim": "FORBIDDEN",
