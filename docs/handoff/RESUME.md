@@ -33,6 +33,8 @@
 - Human review starts from `docs/acceptance/T31-review-packet.local.md` and
   `docs/acceptance/T31-human-review.template.json`; validate a separately completed copy with
   `python evals/review_tools.py check-review --review <completed.json> --output docs/acceptance/T31-human-review.result.json`.
+- A completed reviewer file can be checked end-to-end with
+  `./scripts/verify-human-review.sh <completed-review.json>`; this script does not mutate progress or sign T33.
 - No K12 API, Vite, Playwright, runner, or migration process was active at handoff. The historical
   `.herdr-control/shared-test.lock` is retained as recovery evidence; do not delete or claim it was
   released by this session.

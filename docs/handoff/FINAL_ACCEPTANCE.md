@@ -32,6 +32,11 @@ marked synthetic fixture, and real Docker runner isolation.
 The full repeatable command list and current exit codes are in `LOCAL_BUILD_COMPLETE.md` and
 `docs/acceptance/T30.md`.
 
+After a real reviewer completes the T31 JSON copy, run
+`./scripts/verify-human-review.sh <completed-review.json>`. The script validates all 16 scores,
+reviewer identity fields, evidence hash, attestation, conclusion, live evidence, kit and contracts;
+it never changes progress or signs T33 on the user's behalf.
+
 ## Cannot be claimed
 
 It includes a live Knodo integration and a 16-case T31 synthetic evaluation, but it is not a verified paid-model cost result, not a human-approved

@@ -22,6 +22,7 @@
 - [x] T31 16-case live synthetic execution and automated summary.
 - [ ] T31 human rubric review.
   - Review packet and machine-validatable unsigned template are ready; a real reviewer must provide the completed copy and traceable signature.
+  - Run `./scripts/verify-human-review.sh <completed-review.json>`; only a `PASS` human conclusion can reach the final T33 sign-off step.
 - [ ] T33 repeat acceptance and user sign-off.
 
 No checkbox above may be checked from a fixture, a key merely existing, or a model response.
