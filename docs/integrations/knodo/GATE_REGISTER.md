@@ -18,11 +18,13 @@
 ## 本机事实
 
 - 旧 PAT 已由用户撤销；新 PAT 由管理员账号创建并由用户报告已在本机安全环境配置，但当前 Codex 执行进程读取不到 `KNODO_PAT`。因无法邀请专用账号，管理员身份作为受控例外；只允许 AI / Chat 能力、短有效期并在 T11/T13 后撤销。
-- Tutor/Designer 的 workspace、Bot、AgentOS 与模型显示名已记录在 `tenant-config.user-reported.json`，状态仍是 `USER_REPORTED_NOT_LIVE_VERIFIED`。
-- 截至本次更新没有登录绕权、浏览器 Cookie 提取或真实 Knodo 请求；预算账本尚未产生计数。
+- Tutor/Designer 的 workspace、Bot、AgentOS 与模型已由真实 Bot Chat 响应核对；最终 Tutor 首轮、续聊和
+  Designer 题稿均通过冻结 Schema，证据见 `live-smoke.redacted.json`。
+- 持久预算账本当前为 13/20：6 次模型 POST（含 3 次保留的失败样例）与 7 次只读对账 GET；无自动重试、
+  无登录绕权、无浏览器 Cookie 提取。
 
 ## 可以继续的工作
 
-可以继续离线验证真实 mapper。只有新 PAT 对执行进程可见后，才运行
-`scripts/knodo-live-smoke.py --live` 的三请求上限序列；失败不自动重试。真实冒烟前不能声称 E2E
-Knodo 已接通，也不能向真实 K12 学生开放。
+T11 的真实 mapper 冒烟已经完成。下一步是 T13：在专用测试 PostgreSQL 上运行持久绑定/双合成学生隔离
+测试，再从本地页面走真实一课竖切。`G_AGENT_ISOLATION` 和正式内容人审仍未解除，不能向真实 K12
+学生开放。

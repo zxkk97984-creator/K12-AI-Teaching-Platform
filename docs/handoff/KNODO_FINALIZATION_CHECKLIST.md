@@ -17,20 +17,10 @@
 完整非秘密配置在：
 `/home/zxk/Projects/K12/docs/integrations/knodo/tenant-config.user-reported.json`。
 
-## 现在只需完成 T11 真实冒烟
+## T11 真实冒烟结果
 
-当前 Codex 进程看不到 `KNODO_PAT`。不要把值发到聊天、命令参数、`.env`、截图或仓库。可以直接使用
-脚本的隐藏输入模式；值不回显、不进入命令历史，也不写入文件。
-
-直接运行：
-
-```bash
-cd /home/zxk/Projects/K12
-./scripts/knodo-live-smoke.py --live --prompt-pat
-```
-
-脚本最多发 3 次请求，不重试：Tutor 首轮、Tutor 续聊、Designer 首轮。它会核对严格业务 JSON、
-`conversationId` 和响应 `model`。Workspace、AgentOS、Skill 与知识包继续通过已登录 Edge 的只读页面核验。
+T11 已 DONE：Tutor 首轮、同一会话续聊和 Designer 题稿均通过冻结 Schema；实际模型
+`knodo/GLM-5.1`、运行时 `CLAUDE_CODE`。超时与字段错误均已保留并完成只读对账。
 
 管理员 PAT 只应勾选 `AI / Chat 调用`。不要为冒烟增加组织管理、知识库写入、插件写入、任务写入或
 会话历史与元数据管理能力；若当前密钥包含这些多余能力，应撤销并重新创建一个短有效期密钥。
@@ -41,9 +31,9 @@ cd /home/zxk/Projects/K12
 - `/home/zxk/Projects/K12/storage/private/knodo-request-budget.json`（本机私有、Git 忽略）
 - `/home/zxk/Projects/K12/docs/acceptance/T11.md`
 
-任一步失败都停止，不自动扩大预算。不要手工删除或修改预算账本来恢复次数。
+持久预算账本当前 13/20，剩余 7 次。不要手工删除或修改预算账本来恢复次数。
 
-## T11 成功后依次做
+## 接下来依次做
 
 1. 审查 `live-smoke.redacted.json`，确认无 PAT、Cookie、完整私人正文或真实学生数据。
 2. 将租户实测的 Bot/workspace/runtime/model/续聊结果写回 T11 证据；不能只凭 HTTP 200。

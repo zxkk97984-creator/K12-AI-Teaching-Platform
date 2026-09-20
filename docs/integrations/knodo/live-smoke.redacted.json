@@ -1,0 +1,258 @@
+{
+  "schema_version": "k12.knodo.live-smoke.redacted.v1",
+  "executed_at": "2026-09-20T04:18:28.482114+00:00",
+  "data_class": "SYNTHETIC_ONLY",
+  "automatic_retries": 0,
+  "approved_request_cap": 20,
+  "requests_reserved_this_run": 3,
+  "sequence_complete": true,
+  "records": [
+    {
+      "kind": "BOT_CHAT",
+      "operation": "TEACH_TURN",
+      "request_id": "synthetic-t11-live-tutor-first",
+      "request_schema_version": "k12.teaching.request.v1",
+      "request_top_level_fields": [
+        "allowed_actions",
+        "allowed_animation_ids",
+        "allowed_code_task_ids",
+        "allowed_phase_suggestions",
+        "allowed_resource_ids",
+        "base_revision",
+        "chapter",
+        "code_feedback_facts",
+        "current_phase",
+        "curriculum_revision",
+        "event",
+        "evidence",
+        "knowledge_context",
+        "learner",
+        "lesson_session_id",
+        "limits",
+        "operation",
+        "policy_revision",
+        "request_id",
+        "schema_version",
+        "student_input"
+      ],
+      "request_sha256": "2cd383b544c6217bd8035705128904b07d8e11fc8e26aa42df1e4fe0a29b4e1b",
+      "status": "OK",
+      "error": null,
+      "remote_metadata": {
+        "provider": "knodo",
+        "role": "tutor",
+        "bot_id": "c15bd075-cf3b-422f-9655-b88a3c259769",
+        "workspace_id": "cmu93gg8q00xia0ns0cm1ugq8",
+        "completion_id": "chatcmpl-bdddccce-5a68-4317-9e85-6bc6039590e8",
+        "conversation_id": "02e790d4-a13f-49e0-9bf3-88acdfbc9b9a",
+        "model": "knodo/GLM-5.1",
+        "finish_reason": "stop",
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "usage": {
+        "input_bytes": 1227,
+        "output_bytes": 1174,
+        "duration_ms": 79689,
+        "upstream_calls": 1
+      },
+      "output_sha256": "c8a833f7dcca9c2388426cee7bf1f220445f6303f4371bb9e195fe9a394794a2",
+      "upstream_calls": 1,
+      "model_match": "KNODO_PROVIDER_PREFIX_ACCEPTED"
+    },
+    {
+      "kind": "BOT_CHAT",
+      "operation": "TEACH_TURN",
+      "request_id": "synthetic-t11-live-tutor-continue",
+      "request_schema_version": "k12.teaching.request.v1",
+      "request_top_level_fields": [
+        "allowed_actions",
+        "allowed_animation_ids",
+        "allowed_code_task_ids",
+        "allowed_phase_suggestions",
+        "allowed_resource_ids",
+        "base_revision",
+        "chapter",
+        "code_feedback_facts",
+        "current_phase",
+        "curriculum_revision",
+        "event",
+        "evidence",
+        "knowledge_context",
+        "learner",
+        "lesson_session_id",
+        "limits",
+        "operation",
+        "policy_revision",
+        "request_id",
+        "schema_version",
+        "student_input"
+      ],
+      "request_sha256": "a11380a22ea20eeb898d77af0873a59d49b1ed74fd65a8550e77c3c3c02d1eaa",
+      "status": "OK",
+      "error": null,
+      "remote_metadata": {
+        "provider": "knodo",
+        "role": "tutor",
+        "bot_id": "c15bd075-cf3b-422f-9655-b88a3c259769",
+        "workspace_id": "cmu93gg8q00xia0ns0cm1ugq8",
+        "completion_id": "chatcmpl-affc0e2d-8aed-418f-a3ad-6e1a92359000",
+        "conversation_id": "02e790d4-a13f-49e0-9bf3-88acdfbc9b9a",
+        "model": "knodo/GLM-5.1",
+        "finish_reason": "stop",
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "usage": {
+        "input_bytes": 1310,
+        "output_bytes": 1176,
+        "duration_ms": 25385,
+        "upstream_calls": 1
+      },
+      "output_sha256": "0298775cf525ecebaffcbeb6eae87bd903c8de175dc946f121c5426d66e2a288",
+      "upstream_calls": 1
+    },
+    {
+      "kind": "BOT_CHAT",
+      "operation": "QUIZ_DRAFT",
+      "request_id": "synthetic-t11-live-designer-first",
+      "request_schema_version": "k12.designer.request.v1",
+      "request_top_level_fields": [
+        "allowed_resource_ids",
+        "chapter_id",
+        "curriculum_revision",
+        "knowledge_context",
+        "lesson_spec",
+        "objective_ids",
+        "operation",
+        "quiz_spec",
+        "request_id",
+        "schema_version",
+        "stage"
+      ],
+      "request_sha256": "8775d8248aa6c9a0d51f48d45b1de6b84a85ce036442a2b9a9f9760e7ee61762",
+      "status": "OK",
+      "error": null,
+      "remote_metadata": {
+        "provider": "knodo",
+        "role": "designer",
+        "bot_id": "23caf7d4-d416-45f8-b1d1-6086b59a1ae5",
+        "workspace_id": "cmu93fuj000x5a0nsgzvf1iq7",
+        "completion_id": "chatcmpl-6dfb9b54-e8a9-4ff6-9aa5-ee6a0273c2b6",
+        "conversation_id": "d7a5b958-d9e3-40c2-930d-1b8937234d99",
+        "model": "knodo/GLM-5.1",
+        "finish_reason": "stop",
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "usage": {
+        "input_bytes": 867,
+        "output_bytes": 1505,
+        "duration_ms": 72459,
+        "upstream_calls": 1
+      },
+      "output_sha256": "230106fa0c7d214f54030ed602c0e61ed6b5cda5c29bc539c1d8c4f574e16046",
+      "upstream_calls": 1
+    }
+  ],
+  "prior_failed_records": [
+    {
+      "kind": "BOT_CHAT",
+      "operation": "QUIZ_DRAFT",
+      "request_id": "synthetic-t11-live-designer-first",
+      "request_schema_version": "k12.designer.request.v1",
+      "request_top_level_fields": [
+        "allowed_resource_ids",
+        "chapter_id",
+        "curriculum_revision",
+        "knowledge_context",
+        "lesson_spec",
+        "objective_ids",
+        "operation",
+        "quiz_spec",
+        "request_id",
+        "schema_version",
+        "stage"
+      ],
+      "request_sha256": "8775d8248aa6c9a0d51f48d45b1de6b84a85ce036442a2b9a9f9760e7ee61762",
+      "status": "FAILED",
+      "error": {
+        "category": "VALIDATION",
+        "reason_code": "RESPONSE_SCHEMA_MISMATCH",
+        "upstream_status": null
+      },
+      "remote_metadata": {
+        "provider": "knodo",
+        "role": "designer",
+        "bot_id": "23caf7d4-d416-45f8-b1d1-6086b59a1ae5",
+        "workspace_id": "cmu93fuj000x5a0nsgzvf1iq7",
+        "completion_id": "chatcmpl-d4158bfa-c258-4cea-9420-4ff615555a82",
+        "conversation_id": "a88040cd-5bac-4dd6-89a2-63dd9e31cd66",
+        "model": "knodo/GLM-5.1",
+        "finish_reason": "stop",
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "usage": {
+        "input_bytes": 867,
+        "output_bytes": 0,
+        "duration_ms": 71061,
+        "upstream_calls": 1
+      },
+      "output_sha256": null,
+      "upstream_calls": 1
+    },
+    {
+      "kind": "BOT_CHAT",
+      "operation": "QUIZ_DRAFT",
+      "request_id": "synthetic-t11-live-designer-first",
+      "request_schema_version": "k12.designer.request.v1",
+      "request_top_level_fields": [
+        "allowed_resource_ids",
+        "chapter_id",
+        "curriculum_revision",
+        "knowledge_context",
+        "lesson_spec",
+        "objective_ids",
+        "operation",
+        "quiz_spec",
+        "request_id",
+        "schema_version",
+        "stage"
+      ],
+      "request_sha256": "8775d8248aa6c9a0d51f48d45b1de6b84a85ce036442a2b9a9f9760e7ee61762",
+      "status": "FAILED",
+      "error": {
+        "category": "VALIDATION",
+        "reason_code": "RESPONSE_SCHEMA_MISMATCH",
+        "upstream_status": null
+      },
+      "remote_metadata": {
+        "provider": "knodo",
+        "role": "designer",
+        "bot_id": "23caf7d4-d416-45f8-b1d1-6086b59a1ae5",
+        "workspace_id": "cmu93fuj000x5a0nsgzvf1iq7",
+        "completion_id": "chatcmpl-1c2bb80b-71c1-4926-999e-ee5d012f909a",
+        "conversation_id": "b940c12c-0d72-4337-9c33-5153a3443c17",
+        "model": "knodo/GLM-5.1",
+        "finish_reason": "stop",
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "usage": {
+        "input_bytes": 867,
+        "output_bytes": 0,
+        "duration_ms": 42511,
+        "upstream_calls": 1
+      },
+      "output_sha256": null,
+      "upstream_calls": 1
+    }
+  ],
+  "secrets_recorded": false
+}

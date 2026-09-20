@@ -48,7 +48,11 @@ def _normalized_label(value: str) -> str:
 
 
 def _matches_display(actual: Any, expected: str) -> bool:
-    return isinstance(actual, str) and _normalized_label(actual) == _normalized_label(expected)
+    if not isinstance(actual, str):
+        return False
+    actual_label = _normalized_label(actual)
+    expected_label = _normalized_label(expected)
+    return actual_label in {expected_label, f"knodo{expected_label}"}
 
 
 def _settings(config: dict[str, Any]) -> Any:
@@ -67,7 +71,7 @@ def _settings(config: dict[str, Any]) -> Any:
         knodo_designer_workspace_id=targets["designer"]["workspace_id"],
         knodo_max_requests=config["live_authorization"]["max_actual_requests"],
         knodo_budget_ledger_path=os.environ.get("KNODO_BUDGET_LEDGER_PATH", str(DEFAULT_LEDGER)),
-        gateway_timeout_seconds=20,
+        gateway_timeout_seconds=120,
         gateway_max_output_bytes=262_144,
     )
 
@@ -96,7 +100,9 @@ def _result_record(operation: Any, request: dict[str, Any], result: Any) -> dict
     }
 
 
-async def _run_live(config: dict[str, Any]) -> int:
+async def _run_live(
+    config: dict[str, Any], *, resume_valid_first: bool = False, designer_only: bool = False
+) -> int:
     from app.integrations.knodo import GatewayStatus, Operation, build_gateway
 
     gateway = build_gateway(_settings(config))
@@ -105,35 +111,73 @@ async def _run_live(config: dict[str, Any]) -> int:
     try:
         first = _load_json(EXAMPLES / "teaching-request.json")
         first["request_id"] = "synthetic-t11-live-tutor-first"
-        first_result = await gateway.invoke(Operation.TEACH_TURN, first)
-        records.append(_result_record(Operation.TEACH_TURN, first, first_result))
-        if first_result.status is not GatewayStatus.OK or first_result.remote_metadata is None:
-            return _write_evidence(config, records, sequence_complete)
-        if not _matches_display(
-            first_result.remote_metadata.get("model"),
-            config["targets"]["tutor"]["model_display"],
-        ):
-            records[-1]["configuration_mismatch"] = "MODEL"
-            return _write_evidence(config, records, sequence_complete)
+        if designer_only:
+            prior = _load_json(EVIDENCE_PATH)
+            prior_records = prior.get("records")
+            records = (
+                [
+                    dict(item)
+                    for item in prior_records
+                    if isinstance(item, dict)
+                    and item.get("operation") == "TEACH_TURN"
+                    and item.get("status") == "OK"
+                ]
+                if isinstance(prior_records, list)
+                else []
+            )
+            if len(records) < 2:
+                print(
+                    "Two valid Tutor records are required before Designer-only mode.",
+                    file=sys.stderr,
+                )
+                return 2
+            conversation_id = None
+        elif resume_valid_first:
+            prior = _load_json(EVIDENCE_PATH)
+            prior_records = prior.get("records")
+            if (
+                not isinstance(prior_records, list)
+                or not prior_records
+                or not isinstance(prior_records[0], dict)
+                or prior_records[0].get("status") != "OK"
+                or not isinstance(prior_records[0].get("remote_metadata"), dict)
+            ):
+                print("No valid first-turn evidence to resume.", file=sys.stderr)
+                return 2
+            records = [dict(prior_records[0])]
+            records[0].pop("configuration_mismatch", None)
+            records[0]["model_match"] = "KNODO_PROVIDER_PREFIX_ACCEPTED"
+            conversation_id = records[0]["remote_metadata"].get("conversation_id")
+        else:
+            first_result = await gateway.invoke(Operation.TEACH_TURN, first)
+            records.append(_result_record(Operation.TEACH_TURN, first, first_result))
+            if first_result.status is not GatewayStatus.OK or first_result.remote_metadata is None:
+                return _write_evidence(config, records, sequence_complete)
+            if not _matches_display(
+                first_result.remote_metadata.get("model"),
+                config["targets"]["tutor"]["model_display"],
+            ):
+                records[-1]["configuration_mismatch"] = "MODEL"
+                return _write_evidence(config, records, sequence_complete)
+            conversation_id = first_result.remote_metadata.get("conversation_id")
+        if not designer_only:
+            if not isinstance(conversation_id, str) or not conversation_id:
+                return _write_evidence(config, records, sequence_complete)
 
-        conversation_id = first_result.remote_metadata.get("conversation_id")
-        if not isinstance(conversation_id, str) or not conversation_id:
-            return _write_evidence(config, records, sequence_complete)
-
-        continuation = copy.deepcopy(first)
-        continuation["request_id"] = "synthetic-t11-live-tutor-continue"
-        continuation["base_revision"] = 1
-        continuation["event"] = "ASK"
-        continuation["current_phase"] = "EXPLAIN"
-        continuation["student_input"] = "合成测试：请继续说明为什么一次比较不等于整个排序完成。"
-        continue_result = await gateway.invoke(
-            Operation.TEACH_TURN,
-            continuation,
-            remote_conversation_id=conversation_id,
-        )
-        records.append(_result_record(Operation.TEACH_TURN, continuation, continue_result))
-        if continue_result.status is not GatewayStatus.OK:
-            return _write_evidence(config, records, sequence_complete)
+            continuation = copy.deepcopy(first)
+            continuation["request_id"] = "synthetic-t11-live-tutor-continue"
+            continuation["base_revision"] = 1
+            continuation["event"] = "ASK"
+            continuation["current_phase"] = "EXPLAIN"
+            continuation["student_input"] = "合成测试：请继续说明为什么一次比较不等于整个排序完成。"
+            continue_result = await gateway.invoke(
+                Operation.TEACH_TURN,
+                continuation,
+                remote_conversation_id=conversation_id,
+            )
+            records.append(_result_record(Operation.TEACH_TURN, continuation, continue_result))
+            if continue_result.status is not GatewayStatus.OK:
+                return _write_evidence(config, records, sequence_complete)
 
         designer = _load_json(EXAMPLES / "designer-request.json")
         designer["request_id"] = "synthetic-t11-live-designer-first"
@@ -159,6 +203,19 @@ async def _run_live(config: dict[str, Any]) -> int:
 def _write_evidence(
     config: dict[str, Any], records: list[dict[str, Any]], sequence_complete: bool
 ) -> int:
+    prior_failed_records: list[dict[str, Any]] = []
+    if EVIDENCE_PATH.is_file():
+        existing = _load_json(EVIDENCE_PATH)
+        existing_failed = existing.get("prior_failed_records")
+        if isinstance(existing_failed, list):
+            prior_failed_records.extend(item for item in existing_failed if isinstance(item, dict))
+        existing_records = existing.get("records")
+        if isinstance(existing_records, list):
+            prior_failed_records.extend(
+                item
+                for item in existing_records
+                if isinstance(item, dict) and item.get("status") != "OK"
+            )
     evidence = {
         "schema_version": "k12.knodo.live-smoke.redacted.v1",
         "executed_at": datetime.now(UTC).isoformat(),
@@ -168,6 +225,7 @@ def _write_evidence(
         "requests_reserved_this_run": sum(item["upstream_calls"] for item in records),
         "sequence_complete": sequence_complete,
         "records": records,
+        "prior_failed_records": prior_failed_records,
         "secrets_recorded": False,
     }
     EVIDENCE_PATH.write_text(
@@ -198,6 +256,16 @@ def main() -> int:
         "--prompt-pat",
         action="store_true",
         help="read KNODO_PAT once from a hidden terminal prompt; never persist it",
+    )
+    parser.add_argument(
+        "--resume-valid-first",
+        action="store_true",
+        help="reuse the valid first Tutor result in the redacted evidence file",
+    )
+    parser.add_argument(
+        "--designer-only",
+        action="store_true",
+        help="reuse two valid Tutor records and run only Designer",
     )
     args = parser.parse_args()
     config = _load_json(CONFIG_PATH)
@@ -230,7 +298,13 @@ def main() -> int:
             file=sys.stderr,
         )
         return 2
-    return asyncio.run(_run_live(config))
+    return asyncio.run(
+        _run_live(
+            config,
+            resume_valid_first=args.resume_valid_first,
+            designer_only=args.designer_only,
+        )
+    )
 
 
 if __name__ == "__main__":

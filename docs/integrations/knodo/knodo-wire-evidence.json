@@ -1,7 +1,7 @@
 {
   "schema_version": "k12.knodo.wire-evidence.v1",
   "document_kind": "EVIDENCE_RECORD_NOT_REQUEST_BODY",
-  "status": "PUBLIC_BOT_CHAT_CONTRACT_IMPLEMENTED_TENANT_UNVERIFIED",
+  "status": "LIVE_BOT_CHAT_VERIFIED_SYNTHETIC",
   "checked_at": "2026-09-20T09:30:00+08:00",
   "official_sources": [
     {
@@ -60,7 +60,7 @@
   "bot_chat": {
     "method": "POST",
     "path_from_public_docs": "/api/v1/bots/{botId}/chat/completions",
-    "tenant_verified": false,
+    "tenant_verified": true,
     "public_documented_request_fields": {
       "messages": {
         "type": "array",
@@ -146,10 +146,9 @@
       "verification": "Use the authenticated Edge UI to read Bot/workspace/Skill/bundle settings. The administrator PAT smoke does not request conversation-history capability."
     },
     "history_semantics": {
-      "status": "PARTIAL_PUBLIC_DOCS",
-      "known": "conversationId可用于下次请求继续会话；另有会话消息/状态查询路由。",
+      "status": "LIVE_VERIFIED_SINGLE_TUTOR_CONVERSATION",
+      "known": "同一个后端保存的conversationId已完成Tutor首轮与续聊，两个响应均通过冻结Schema。",
       "unknown": [
-        "Bot Chat continuation live behavior",
         "历史消息是否包含工具结果",
         "跨用户访问边界"
       ]
@@ -175,8 +174,8 @@
     "status": "GET /api/v1/workspaces/{workspaceId}/chat/conversations/{conversationId}/status",
     "note": "存在路径和部分字段不等于本项目已选择或已完成 tenant 联调。"
   },
-  "actual_model_id": null,
-  "actual_agent_os": null,
+  "actual_model_id": "knodo/GLM-5.1",
+  "actual_agent_os": "CLAUDE_CODE",
   "user_reported_runtime": {
     "tutor": {
       "agent_os_display": "Claude Code",

@@ -1,6 +1,6 @@
 {
   "schema_version": "k12.knodo.tenant-config.v1",
-  "status": "USER_REPORTED_NOT_LIVE_VERIFIED",
+  "status": "LIVE_BOT_CHAT_VERIFIED_SYNTHETIC",
   "recorded_at": "2026-09-20T00:00:00+08:00",
   "platform_origin": "https://knodo.vip",
   "release_scope": {
@@ -21,7 +21,7 @@
       ],
       "expected_skill": "k12-teaching-core",
       "expected_bundle_release": "knodo-assets-1.0.0",
-      "platform_binding_verified": false
+      "platform_binding_verified": true
     },
     "designer": {
       "workspace_id": "cmu93fuj000x5a0nsgzvf1iq7",
@@ -36,7 +36,7 @@
         "k12-assessment-author",
         "k12-content-author"
       ],
-      "platform_binding_verified": false
+      "platform_binding_verified": true
     }
   },
   "live_authorization": {

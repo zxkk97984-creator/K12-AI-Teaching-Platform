@@ -172,12 +172,13 @@ class KnodoWireMapper:
         target: KnodoTarget,
         remote_conversation_id: str | None,
     ) -> UpstreamRequest:
-        content = json.dumps(
+        request_json = json.dumps(
             request,
             ensure_ascii=False,
             sort_keys=True,
             separators=(",", ":"),
         )
+        content = f"{_protocol_instruction(operation)}\nREQUEST_JSON:\n{request_json}"
         payload: dict[str, Any] = {
             "messages": [{"role": "user", "content": content}],
             "stream": False,
@@ -311,6 +312,34 @@ def _local_request_id(operation: Operation, request: dict[str, Any]) -> str:
     if isinstance(value, str) and value:
         return value
     return operation.value
+
+
+def _protocol_instruction(operation: Operation) -> str:
+    common = (
+        "只输出一个完整JSON对象，不要Markdown围栏或前后说明；"
+        "不得调用工具、不得写文件、不得返回工具日志。"
+    )
+    if operation in (Operation.TEACH_TURN, Operation.CODE_FEEDBACK):
+        return (
+            f"{common} 顶层schema_version必须是k12.teaching.response.v1。"
+            "action为OPEN_ANIMATION或OPEN_RESOURCE时只能使用resource_id字段，"
+            "不得使用animation_id。所有字段必须严格符合已绑定的teaching-response.schema.json。"
+        )
+    if operation is Operation.QUIZ_DRAFT:
+        return (
+            f"{common} 顶层schema_version必须是k12.quiz.draft.v1；"
+            "顶层只能包含schema_version、request_id、chapter_id、curriculum_revision、stage、"
+            "difficulty、questions、warnings。每题使用question_key、objective_id、stem、"
+            "explanation、hints、source_refs、type以及对应题型字段；hints必须是字符串数组。"
+            'SINGLE_CHOICE的options必须是[{"key":"A","text":"..."}]对象数组，'
+            "correct_answer必须是选项key字符串。不得输出question_id、answer_key、"
+            "题内difficulty、misconception_focus、顶层objective_ids、quiz_spec或"
+            "suggested_resource_id。所有字段必须严格符合已绑定的quiz-draft.schema.json。"
+        )
+    return (
+        f"{common} 顶层schema_version必须是k12.lesson.package.draft.v1；"
+        "所有字段必须严格符合已绑定的lesson-package-draft.schema.json。"
+    )
 
 
 def _nonnegative_int(value: Any) -> int | None:

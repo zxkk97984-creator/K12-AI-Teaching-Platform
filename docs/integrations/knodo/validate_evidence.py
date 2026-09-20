@@ -53,11 +53,14 @@ def main() -> int:
             failures.append(f"{gate} status mismatch")
         if not value.get("reason"):
             failures.append(f"{gate} lacks status reason")
-    if evidence["platform_permissions_verified"] or evidence["bot_chat"]["tenant_verified"]:
-        failures.append("public docs cannot set tenant verification")
-    for key in ("actual_model_id", "actual_agent_os"):
-        if evidence.get(key) is not None:
-            failures.append(f"live-only field marked present: {key}")
+    if evidence["platform_permissions_verified"]:
+        failures.append("platform permission isolation is not fully verified")
+    if not evidence["bot_chat"]["tenant_verified"]:
+        failures.append("live Bot Chat verification is missing")
+    if evidence.get("actual_model_id") != "knodo/GLM-5.1":
+        failures.append("actual live model mismatch")
+    if evidence.get("actual_agent_os") != "CLAUDE_CODE":
+        failures.append("actual live AgentOS mismatch")
     config = json.loads((HERE / "tenant-config.user-reported.json").read_text(encoding="utf-8"))
     authorization = config["live_authorization"]
     if authorization["max_actual_requests"] != 20:
@@ -79,6 +82,19 @@ def main() -> int:
         failures.append("administrator PAT must require only AI / Chat capability")
     if not credential.get("revoke_after_t11_t13"):
         failures.append("administrator PAT must be revoked after T11/T13")
+    live = json.loads((HERE / "live-smoke.redacted.json").read_text(encoding="utf-8"))
+    if not live.get("sequence_complete") or live.get("secrets_recorded") is not False:
+        failures.append("live smoke is incomplete or secret handling is invalid")
+    records = live.get("records")
+    if not isinstance(records, list) or len(records) != 3:
+        failures.append("live smoke must contain exactly three successful records")
+    elif any(item.get("status") != "OK" for item in records if isinstance(item, dict)):
+        failures.append("live smoke contains a non-success final record")
+    ledger = HERE.parents[2] / "storage/private/knodo-request-budget.json"
+    if ledger.is_file():
+        budget = json.loads(ledger.read_text(encoding="utf-8"))
+        if budget.get("reserved_requests", 21) > 20:
+            failures.append("live request budget exceeded")
     text = (HERE / "knodo-wire-evidence.json").read_text(encoding="utf-8")
     for forbidden in (
         "jvs_your_token_here",

@@ -2,7 +2,7 @@
   "schema_version": "k12.rebuild.progress.v1",
   "target_root": "/home/zxk/Projects/K12",
   "release_scope": "synthetic_competition_prototype_until_authorized",
-  "current_task": "T11",
+  "current_task": "T13",
   "gates": {
     "G_API_CONTRACT": {
       "status": "PASS",
@@ -563,7 +563,7 @@
       "note": "A 独立复核 PASS（2026-09-19T17:07:42+08:00）：四 operation/fail-closed/无回退/usage 隔离/脱敏限额均实测；check.sh 因外部仓库变更在 source-audit 腿阻塞（非本卡缺陷，已上报）。"
     },
     "T11": {
-      "status": "BLOCKED",
+      "status": "DONE",
       "evidence": [
         "docs/acceptance/T11.md",
         "docs/integrations/knodo/GATE_REGISTER.md",
@@ -573,7 +573,10 @@
         "docs/integrations/knodo/SIMPLE_API_SUMMARY.md",
         "backend/app/integrations/knodo/wire.py",
         "backend/app/integrations/knodo/budget.py",
-        "scripts/knodo-live-smoke.py"
+        "scripts/knodo-live-smoke.py",
+        "docs/integrations/knodo/live-smoke.redacted.json",
+        "docs/integrations/knodo/live-smoke.attempt-1.redacted.json",
+        "docs/integrations/knodo/designer-inspection.redacted.json"
       ],
       "verification": [
         {
@@ -589,13 +592,13 @@
           "note": "38 contract passed；官方快照 4/4 完整；限定 wire 与预算授权一致。"
         },
         {
-          "type": "blocked",
-          "command": "./scripts/knodo-live-smoke.py --live",
-          "exit_code": 2,
-          "note": "新管理员 PAT 对当前执行进程不可见；发网前退出，真实请求 0/20，预算账本未创建。冒烟缩减为3次 Bot Chat，不授予会话历史等额外能力。"
+          "type": "live",
+          "command": "knodo-live-smoke.py + accepted-unknown reconciliation + targeted protocol fixes",
+          "exit_code": 0,
+          "note": "最终Tutor首轮/续聊/Designer三项均通过；模型knodo/GLM-5.1、运行时CLAUDE_CODE；同一Tutor conversationId；账本13/20，旧失败全部保留。"
         }
       ],
-      "note": "本地证据驱动 mapper、严格解析、持久预算、真实冒烟脚本和第二遍复核已完成；真实租户冒烟因当前进程不可见 KNODO_PAT 保持 BLOCKED。管理员 PAT 仅允许 AI/Chat 能力；解除条件：同一进程安全注入后运行最多3次、不重试的合成冒烟并核验脱敏证据。"
+      "note": "T11 DONE：真实Tutor首轮/续聊与Designer均通过冻结Schema；超时accepted-unknown已只读对账，字段失败与修复均保留；无自动重试、无秘密入库或Git。"
     },
     "T12": {
       "status": "DONE",
@@ -674,10 +677,10 @@
       ],
       "verification": [
         {
-          "type": "blocked",
+          "type": "dependency",
           "command": "dependency check: T11",
-          "exit_code": 2,
-          "note": "T11 mapper 已实现，但当前进程不可见 KNODO_PAT；真实请求0/20，真实冒烟未执行。"
+          "exit_code": 0,
+          "note": "T11 已DONE；最终真实三段冒烟通过，预算剩余7次。"
         },
         {
           "type": "automated",
@@ -692,7 +695,7 @@
           "note": "4项PostgreSQL测试已编写但专用55434测试库未运行；Edge扩展读取超时；真实竖切NOT_RUN。"
         }
       ],
-      "note": "持久conversationId、owner/session/target scope隔离、失败审计与目标变化失效的本地前置已实现；T11真实冒烟、PostgreSQL集成测试和浏览器真平台竖切未完成，因此保持BLOCKED。"
+      "note": "持久conversationId、owner/session/target scope隔离、失败审计与目标变化失效的本地前置已实现；T11已DONE。PostgreSQL集成测试和浏览器真平台竖切未完成，因此T13保持BLOCKED。"
     },
     "T14": {
       "status": "DONE",

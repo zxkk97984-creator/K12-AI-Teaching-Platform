@@ -1,0 +1,27 @@
+{
+  "schema_version": "k12.knodo.designer-inspection.redacted.v1",
+  "checked_at": "2026-09-20T04:16:37.150624+00:00",
+  "request_id": "synthetic-t11-live-designer-first",
+  "conversation_id": "b940c12c-0d72-4337-9c33-5153a3443c17",
+  "requests_reserved": 1,
+  "outcome": "INVALID",
+  "http_status": 200,
+  "message_count": 2,
+  "assistant_content_sha256": "b6b5f2a79793f41be591ca31f2744b311f92a2ef86bda78afa4ab0f53df20e94",
+  "schema_valid": false,
+  "schema_problems": [
+    "questions.0.quiz_draft_questions_item_v0.options.0: model_type",
+    "questions.0.quiz_draft_questions_item_v0.options.1: model_type",
+    "questions.0.quiz_draft_questions_item_v0.options.2: model_type",
+    "questions.0.quiz_draft_questions_item_v0.options.3: model_type",
+    "questions.0.quiz_draft_questions_item_v1.type: literal_error",
+    "questions.0.quiz_draft_questions_item_v1.correct_answer: bool_type",
+    "questions.0.quiz_draft_questions_item_v1.options: extra_forbidden",
+    "questions.0.quiz_draft_questions_item_v2.type: literal_error",
+    "questions.0.quiz_draft_questions_item_v2.items: missing",
+    "questions.0.quiz_draft_questions_item_v2.correct_order: missing",
+    "questions.0.quiz_draft_questions_item_v2.options: extra_forbidden",
+    "questions.0.quiz_draft_questions_item_v2.correct_answer: extra_forbidden"
+  ],
+  "reason_code": "RESPONSE_SCHEMA_MISMATCH"
+}

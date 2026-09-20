@@ -122,21 +122,22 @@ async def test_first_turn_maps_only_documented_fields_and_fixed_role_target(
     }
     assert timeout == 7
     assert sent.payload == {
-        "messages": [
-            {
-                "role": "user",
-                "content": json.dumps(
-                    local_request,
-                    ensure_ascii=False,
-                    sort_keys=True,
-                    separators=(",", ":"),
-                ),
-            }
-        ],
+        "messages": [{"role": "user", "content": sent.payload["messages"][0]["content"]}],
         "stream": False,
         "permissionMode": "default",
         "includeToolResults": False,
     }
+    wire_content = sent.payload["messages"][0]["content"]
+    assert "只输出一个完整JSON对象" in wire_content
+    assert "不得调用工具、不得写文件" in wire_content
+    assert "schema_version" in wire_content
+    assert json.loads(wire_content.split("REQUEST_JSON:\n", 1)[1]) == local_request
+    if operation is Operation.QUIZ_DRAFT:
+        assert "question_key" in wire_content
+        assert "correct_answer" in wire_content
+        assert "hints必须是字符串数组" in wire_content
+        assert 'options必须是[{"key":"A","text":"..."}]对象数组' in wire_content
+        assert "不得输出question_id" in wire_content
     assert "model" not in sent.payload
     assert "conversationId" not in sent.payload
 
@@ -165,7 +166,9 @@ async def test_continue_turn_uses_only_backend_supplied_conversation_id() -> Non
     assert outcome.error is None
     sent = transport.requests[0][0]
     assert sent.payload["conversationId"] == "conv_backend_owned_002"
-    encoded_local_request = json.loads(sent.payload["messages"][0]["content"])
+    encoded_local_request = json.loads(
+        sent.payload["messages"][0]["content"].split("REQUEST_JSON:\n", 1)[1]
+    )
     assert encoded_local_request["conversationId"] == "student-controlled-value-must-not-be-used"
 
 
