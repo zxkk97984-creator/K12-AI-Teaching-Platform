@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import copy
+import getpass
 import hashlib
 import json
 import os
@@ -193,6 +194,11 @@ def main() -> int:
         action="store_true",
         help="send the three-request synthetic smoke sequence (never retries)",
     )
+    parser.add_argument(
+        "--prompt-pat",
+        action="store_true",
+        help="read KNODO_PAT once from a hidden terminal prompt; never persist it",
+    )
     args = parser.parse_args()
     config = _load_json(CONFIG_PATH)
     token_present = bool(os.environ.get("KNODO_PAT"))
@@ -212,9 +218,15 @@ def main() -> int:
             )
         )
         return 0
+    if not token_present and args.prompt_pat:
+        token = getpass.getpass("Knodo PAT（隐藏输入，不会保存）: ")
+        if token:
+            os.environ["KNODO_PAT"] = token
+            token_present = True
+        token = ""
     if not token_present:
         print(
-            "KNODO_PAT is not visible to this process; no request was sent.",
+            "KNODO_PAT is not visible; use --prompt-pat or inject the variable. No request sent.",
             file=sys.stderr,
         )
         return 2

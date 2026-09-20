@@ -19,20 +19,14 @@
 
 ## 现在只需完成 T11 真实冒烟
 
-当前 Codex 进程看不到 `KNODO_PAT`。需要让启动 Codex/运行命令的**同一进程环境**继承它；不要把值发到聊天、
-命令参数、`.env`、截图或仓库。
+当前 Codex 进程看不到 `KNODO_PAT`。不要把值发到聊天、命令参数、`.env`、截图或仓库。可以直接使用
+脚本的隐藏输入模式；值不回显、不进入命令历史，也不写入文件。
 
-确认变量可见时只检查存在性，不打印值：
-
-```bash
-test -n "$KNODO_PAT" && echo KNODO_PAT_READY
-```
-
-随后运行：
+直接运行：
 
 ```bash
 cd /home/zxk/Projects/K12
-./scripts/knodo-live-smoke.py --live
+./scripts/knodo-live-smoke.py --live --prompt-pat
 ```
 
 脚本最多发 3 次请求，不重试：Tutor 首轮、Tutor 续聊、Designer 首轮。它会核对严格业务 JSON、
