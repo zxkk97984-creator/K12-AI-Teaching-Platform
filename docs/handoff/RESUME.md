@@ -17,16 +17,19 @@
 - T31: BLOCKED；16-case 真实执行已完成（13 OK、2 Schema失败、1超时），人工 rubric 未执行。
 - T32: DONE as the required draft deliverable; report, demo and integration docs are committed, with
   T31 live metrics已补入验收材料，真人判断仍明确 pending。
-- T33: BLOCKED by T31 and G_HUMAN_CONTENT_REVIEW; T32 draft delivery is complete, and the local
-  doctor/bootstrap repeat check passed twice. Latest T13 live implementation/evidence checkpoint is `5bb5653`.
+- T33: BLOCKED by T31 human review and G_HUMAN_CONTENT_REVIEW; T32 draft delivery is complete, and the local
+  doctor/bootstrap repeat check passed twice. Latest T31 live implementation/evidence checkpoint is `3eb14b5`.
 
 ## Recovery facts
 
 - Repository: `/home/zxk/Projects/K12`, branch `main`, no remote, and the handoff worktree is clean.
-- Latest implementation/evidence checkpoint: `5bb5653`; earlier T32/status checkpoints remain in local history.
+- Latest implementation/evidence checkpoint: `3eb14b5`; earlier T11/T13/T32 checkpoints remain in local history.
 - Load only the existing secure environment through the documented scripts (for example the local
   test harness); do not print or copy any values from it. No root `.env`, PAT, cookie, database dump,
   upload, or browser storage belongs in Git.
+- Full T31 synthetic model text and its exhausted private ledger remain local-only at
+  `docs/acceptance/T31-live-results.synthetic.json` and `storage/private/t31-request-budget.json`;
+  both are intentionally ignored. The committed summary is hash-bound to the local raw evidence.
 - No K12 API, Vite, Playwright, runner, or migration process was active at handoff. The historical
   `.herdr-control/shared-test.lock` is retained as recovery evidence; do not delete or claim it was
   released by this session.
