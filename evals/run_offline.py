@@ -54,7 +54,7 @@ def build_report(cases: list[dict], rubric: dict) -> dict:
         "rubric_dimensions": [item["id"] for item in rubric["dimensions"]],
         "automated_only": True,
         "human_review": "NOT_RUN",
-        "live_platform": "PARTIAL_T11_T13_EVIDENCE_NOT_A_T31_EVAL_RUN",
+        "live_platform": "LIVE_T31_COMPLETED_SEPARATE_EVIDENCE",
         "learning_effect_claim": "FORBIDDEN",
     }
 

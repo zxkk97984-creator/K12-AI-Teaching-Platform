@@ -50,6 +50,15 @@
     "plan_upgrade": false,
     "continue_after_exhaustion": false
   },
+  "t31_authorization": {
+    "recorded_at": "2026-09-20T13:45:00+08:00",
+    "user_stated_request_limit": "NO_LIMIT_STATED",
+    "operational_cap_for_t31_local_v1": 16,
+    "automatic_retry": false,
+    "automatic_recharge": false,
+    "plan_upgrade": false,
+    "separate_ledger": "storage/private/t31-request-budget.json"
+  },
   "credential": {
     "kind": "PAT",
     "creator_account_role": "ADMIN",
@@ -69,12 +78,13 @@
       "会话历史与元数据管理"
     ],
     "short_expiry_recommended": true,
-    "revoke_after_t11_t13": true
+    "revoke_after_live_evaluation": true
   },
   "notes": [
     "目标 ID、AgentOS 和模型显示名由用户提供；真实调用前不标记为平台实测。",
     "expected_bundle_release 是仓库打包版本，不等于已经核实的平台挂载快照。",
     "管理员 PAT 继承管理员当前业务权限；能力分类只能限制 API 类别，不能形成 Workspace 资源隔离。",
+    "用户后续解除 T31 调用额度限制；本项目仍为 t31-local-v1 设置 16 次单次运行上限、独立账本和零自动重试。",
     "本文件不包含 PAT、Cookie、真实学生数据或答案正文。"
   ]
 }

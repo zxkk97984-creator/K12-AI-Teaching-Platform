@@ -25,13 +25,13 @@ API。系统架构见 plans/02_架构与数据边界.md，证据见 T24/T29 报�
   deterministic score/status 与 AI feedback 状态分开。
 - fixture 仅在开发/测试 profile 使用，界面标明合成/未审校；production 拒绝 fixture gateway。
 
-真实 Knodo wire、Bot/Skill、usage 和成本尚未授权，不能写成“换 BaseURL 即可接通”。
+真实 Knodo 限定 Bot Chat wire 已通过 T11/T13/T31 合成验证；平台未返回可信 usage/成本及 Skill/bundle 挂载版本，不能写成正式教学质量或“换 BaseURL 即可接通”。
 
 ## 4. 多模态与五类 R1 功能
 
 | 能力 | 本地证据 | 当前宣称 |
 | --- | --- | --- |
-| 教学对话/主动课堂 | T14/T17/T30 lesson/conversation 浏览器与后端 | fixture 教学链路通过；真实 Knodo NOT_RUN |
+| 教学对话/主动课堂 | T13 真实浏览器竖切；T31 16-case live；T14/T17/T30 本地链 | 合成数据真实 Knodo 已验证；真人教学质量未审 |
 | Word/PPT/video 资源 | T20 真实合成文件上传、下载、播放、撤回；T30 截图 | 本地资源闭环通过；正式内容/人审未通过 |
 | 确定性动画 | T21 后端边界测试；T30 synthetic fixture browser 1 passed、390/1280 截图 | 注册/参数/安全边界和本地控制器通过；正式内容仍需人审 senior chapter |
 | 在线编程 | T23–T26、T30 CodeLab、T24 Docker 5 tests | 本地真实 Docker/可信判分通过；AI feedback 为 fixture |
@@ -52,9 +52,10 @@ API。系统架构见 plans/02_架构与数据边界.md，证据见 T24/T29 报�
 
 ## 6. 评测与未验证
 
-T31 已建立四档 16-case synthetic eval set 和人工 rubric，输出 T31-offline-report.json。真实平台
-QA35–37、usage、延迟、Bot/Skill/bundle 版本、人工科学性/适龄/引用判断因
-G_API_CONTRACT/G_LIVE_BUDGET BLOCKED。没有真实学生研究，不声称学习效率或成绩提升。
+T31 四档 16-case synthetic eval 已在真实 Knodo 执行：13 个有效冻结 Schema 响应、2 个
+`RESPONSE_SCHEMA_MISMATCH`、1 个超时；有效响应率 81.25%，median 88.134s，p95/max 120.104s。
+13 个成功输出全部通过来源/action/秘密自动边界；上游 token 均报告 0，按不可用处理，不估算费用。
+人工科学性、适龄、引用和教学可行动性 rubric 尚未填写。没有真实学生研究，不声称学习效率或成绩提升。
 
 ## 7. 证据索引
 
@@ -62,6 +63,7 @@ G_API_CONTRACT/G_LIVE_BUDGET BLOCKED。没有真实学生研究，不声称学�
 - T28 安全与隐私：docs/acceptance/T28.md
 - T29 干净部署：docs/acceptance/T29.md
 - T30 全链路回归：docs/acceptance/T30.md
+- T31 真实评测：docs/acceptance/T31.md、docs/acceptance/T31-live-summary.json
 - Knodo 门禁登记：docs/integrations/knodo/GATE_REGISTER.md
 
-报告可交付状态：本地离线/合成原型；等待平台契约、预算、隔离、K12 条款、真实人审和用户最终验收。
+报告可交付状态：本地 + 真实 Knodo 合成原型；等待平台完整隔离、真实人审和用户最终验收。

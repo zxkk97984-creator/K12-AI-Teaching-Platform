@@ -24,6 +24,7 @@ frontend/vite.config.d.ts
 # Local runtime data, uploads, databases, and generated evidence
 backend/storage/
 storage/
+docs/acceptance/T31-live-results.synthetic.json
 platform/knodo/bundles/authoring/
 **/uploads/
 *.db

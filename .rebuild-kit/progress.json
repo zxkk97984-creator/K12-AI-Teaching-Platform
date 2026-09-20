@@ -20,9 +20,10 @@
       "evidence": [
         "docs/integrations/knodo/tenant-config.user-reported.json",
         "backend/app/integrations/knodo/budget.py",
-        "docs/acceptance/T11.md"
+        "docs/acceptance/T11.md",
+        "docs/acceptance/T31-live-summary.json"
       ],
-      "note": "用户授权 T11/T13 合计最多20次真实请求，禁止自动重试、充值、升级套餐或超额继续；持久账本在发网前计数且不自动扩容。"
+      "note": "T11/T13 使用原20次账本；用户随后明确T31调用不设额度限制。项目仍为t31-local-v1设置独立16次账本、零自动重试、零自动充值和零套餐升级；两账本均在发网前计数且不自动扩容。"
     },
     "G_AGENT_ISOLATION": {
       "status": "BLOCKED",
@@ -1616,12 +1617,18 @@
       "evidence": [
         "docs/acceptance/T31.md",
         "docs/acceptance/T31-offline-report.json",
+        "docs/acceptance/T31-live-results.synthetic.json",
+        "docs/acceptance/T31-live-summary.json",
+        "docs/acceptance/T31-HUMAN-REVIEW.md",
         "docs/acceptance/T11.md",
         "docs/acceptance/T13.md",
         "docs/acceptance/t13-evidence/live-vertical.redacted.json",
         "evals/teaching_cases.jsonl",
         "evals/rubric.v1.json",
         "evals/run_offline.py",
+        "evals/run_live.py",
+        "evals/summarize_live.py",
+        "evals/test_run_live.py",
         "scripts/verify-live.sh",
         "docs/integrations/knodo/GATE_REGISTER.md"
       ],
@@ -1634,19 +1641,26 @@
           "note": "四学段/五类别覆盖；automated_only=true，human review NOT_RUN。"
         },
         {
-          "type": "live_evidence_reuse",
-          "command": "T11 real smoke + T13 live browser vertical evidence audit",
+          "type": "live_eval",
+          "command": "python evals/run_live.py --live --prompt-pat",
           "exit_code": 0,
-          "note": "Tutor、Designer均有真实样例；T13三次Tutor run成功并记录时延、A/B conversation隔离和16/20预算。调用授权属于T11/T13，不冒充T31评测执行。"
+          "cases": 16,
+          "note": "16/16真实调用已记录：13 OK，2 RESPONSE_SCHEMA_MISMATCH，1 UPSTREAM_TIMEOUT_ACCEPTANCE_UNKNOWN；无自动重试；独立账本16/16。"
+        },
+        {
+          "type": "automated_summary",
+          "command": "python evals/summarize_live.py",
+          "exit_code": 0,
+          "note": "四学段各4；有效响应率81.25%；median 88.134s，p95/max 120.104s；13个成功输出全部通过自动allowlist/秘密边界。"
         },
         {
           "type": "blocked",
-          "command": "T31 versioned live eval + human rubric review",
+          "command": "docs/acceptance/T31-HUMAN-REVIEW.md",
           "exit_code": null,
-          "note": "现有真实请求授权仅限T11/T13，剩余4次未授权转用于T31；16条真实执行和人工科学性/适龄性评分NOT_RUN。"
+          "note": "真实科学性、来源支持、适龄性和教学可行动性rubric仍需真实审校者填写；Agent不能代签。"
         }
       ],
-      "note": "G_API_CONTRACT与G_LIVE_BUDGET现已PASS，且T11/T13提供真实两类Bot与完整课堂证据；但T31专用真实调用未获授权，16条评测集和人工rubric未执行，usage/人民币成本不可得，因此保持BLOCKED。"
+      "note": "T31专用16-case真实执行和自动汇总已完成；13 OK、2 Schema失败、1超时，usage/人民币成本仍不可得。真人rubric尚未填写，因此保持BLOCKED。"
     },
     "T32": {
       "status": "DONE",

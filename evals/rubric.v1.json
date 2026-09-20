@@ -19,5 +19,12 @@
   ],
   "human_review_required": true,
   "learning_effect_claims_allowed": false,
-  "live_budget": {"status": "NOT_AUTHORIZED", "max_requests": null, "currency": null}
+  "live_budget": {
+    "status": "AUTHORIZED_BY_USER_NO_LIMIT_STATED",
+    "operational_cap_for_t31_local_v1": 16,
+    "automatic_retries": 0,
+    "automatic_recharge": false,
+    "plan_upgrade": false,
+    "currency": null
+  }
 }

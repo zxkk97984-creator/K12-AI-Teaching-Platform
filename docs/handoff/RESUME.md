@@ -14,9 +14,9 @@
   affected animation spec was rerun with explicit T06 fixtures and passed 1/1. Formal human-reviewed
   senior animation content remains an external requirement.
 - T11: DONE；T13: DONE。真实 Tutor/Designer 与浏览器课堂竖切证据已提交候选，预算账本 16/20。
-- T31: BLOCKED；API/预算门禁对 T11/T13 已 PASS，但 T31 专用调用未获授权，人工 rubric 未执行。
+- T31: BLOCKED；16-case 真实执行已完成（13 OK、2 Schema失败、1超时），人工 rubric 未执行。
 - T32: DONE as the required draft deliverable; report, demo and integration docs are committed, with
-  T31 live metrics explicitly marked pending.
+  T31 live metrics已补入验收材料，真人判断仍明确 pending。
 - T33: BLOCKED by T31 and G_HUMAN_CONTENT_REVIEW; T32 draft delivery is complete, and the local
   doctor/bootstrap repeat check passed twice. Latest T13 live implementation/evidence checkpoint is `5bb5653`.
 
@@ -33,7 +33,7 @@
 - The latest `./scripts/check.sh` exited 1 at the read-only CareerMate source audit because that
   external reference tree's HEAD/tree/status/untracked state drifted. Preserve the failure; do not
   reset, checkout, delete, or bypass the old reference tree. K12-specific evidence remains in T30/T31.
-- Continue from `.rebuild-kit/progress.json`, `docs/acceptance/T13.md`, `T31.md`, `T32.md`, `T33.md`, and the Knodo checklist. Do not spend the remaining four T11/T13-authorized requests on T31 without new authorization.
+- Continue from `.rebuild-kit/progress.json`, `docs/acceptance/T31.md`, `T31-live-summary.json`, `T31-HUMAN-REVIEW.md`, `T32.md`, `T33.md`, and the Knodo checklist. Do not rerun the exhausted 16-case T31 ledger.
 
 ## Safe local commands
 

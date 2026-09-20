@@ -1,4 +1,4 @@
-# 演示脚本（合成数据、无付费调用）
+# 演示脚本（合成数据；现场默认不新增付费调用）
 
 ## 开始前
 
@@ -29,9 +29,9 @@
 - 前端：npm test --prefix frontend && npm run typecheck --prefix frontend && npm run build --prefix frontend
 - 浏览器：scripts/verify.sh（需本机合成账号和 T22 revision）
 - 真实 sandbox：./scripts/runner-live-test.sh
-- 平台 live：当前必须停在门禁说明，scripts/verify-live.sh 会 fail-closed。
+- 平台 live：展示已保存的 T11/T13/T31 脱敏证据；现场默认不重跑已封顶的 T31 ledger。
 
 ## 不可宣称
 
-不能宣称已接入真实 Knodo、已验证真实成本/usage、已完成四档人工审校、已开放真实未成年人、
+可以宣称“成人参赛者 + 合成数据范围内完成真实 Knodo 技术验证”；不能宣称已验证真实成本/usage、已完成四档人工审校、已开放真实未成年人、
 已证明学习效果、已完成平台删除或绝对安全。

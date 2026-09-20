@@ -34,7 +34,7 @@ The full repeatable command list and current exit codes are in `LOCAL_BUILD_COMP
 
 ## Cannot be claimed
 
-It includes a live Knodo integration verified only with synthetic students/content, but it is not a verified T31 paid-model cost result, not a human-approved
+It includes a live Knodo integration and a 16-case T31 synthetic evaluation, but it is not a verified paid-model cost result, not a human-approved
 four-stage course release, not a real-under-16 student product, not proof of platform deletion or
 tenant isolation, and not evidence of learning-effect improvement. The animation fixture is not a
 human-approved senior chapter and cannot be used as formal content-release evidence.
@@ -43,5 +43,4 @@ human-approved senior chapter and cannot be used as formal content-release evide
 
 G_API_CONTRACT and G_LIVE_BUDGET are PASS for the bounded T11/T13 path. G_AGENT_ISOLATION and G_HUMAN_CONTENT_REVIEW remain BLOCKED.
 `G_K12_TERMS` is OUT_OF_SCOPE for the declared adult-contestant/synthetic-data prototype; any
-future real-under-16 or formal K12 release must reopen and pass that gate. T31 live evaluation and
-T33 formal release therefore remain blocked.
+future real-under-16 or formal K12 release must reopen and pass that gate. T31 human review and T33 formal release therefore remain blocked.

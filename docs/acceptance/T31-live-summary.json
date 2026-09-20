@@ -1,0 +1,312 @@
+{
+  "schema_version": "k12.t31.live-summary.v1",
+  "eval_set": "t31-local-v1",
+  "source_evidence_sha256": "d632b1353d4d95c42fd6919a253afcf9b34bafcf940f2f79817eb3796618b813",
+  "data_class": "SYNTHETIC_ONLY",
+  "sequence_complete": true,
+  "planned_cases": 16,
+  "recorded_cases": 16,
+  "status_counts": {
+    "FAILED": 3,
+    "OK": 13
+  },
+  "valid_response_rate": 0.8125,
+  "errors": [
+    {
+      "category": "TIMEOUT",
+      "reason_code": "UPSTREAM_TIMEOUT_ACCEPTANCE_UNKNOWN",
+      "count": 1
+    },
+    {
+      "category": "VALIDATION",
+      "reason_code": "RESPONSE_SCHEMA_MISMATCH",
+      "count": 2
+    }
+  ],
+  "coverage": {
+    "by_stage": {
+      "JUNIOR": 4,
+      "PRIMARY_LOWER": 4,
+      "PRIMARY_UPPER": 4,
+      "SENIOR": 4
+    },
+    "by_category": {
+      "active_opening": 4,
+      "code_guidance": 2,
+      "no_source_boundary": 2,
+      "source_supported_explanation": 4,
+      "wrong_answer_feedback": 4
+    },
+    "by_operation": {
+      "CODE_FEEDBACK": 2,
+      "TEACH_TURN": 14
+    }
+  },
+  "latency_ms": {
+    "min": 39708,
+    "median": 88134,
+    "p95_nearest_rank": 120104,
+    "max": 120104,
+    "total": 1358080
+  },
+  "upstream_calls": 16,
+  "models": [
+    "knodo/GLM-5.1"
+  ],
+  "upstream_reported_tokens": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "token_usage_interpretation": "UNAVAILABLE_OR_UNRELIABLE",
+  "automated_boundaries": {
+    "successful_published_cases_with_source_refs": 11,
+    "successful_published_cases": 11,
+    "successful_no_source_cases_with_zero_refs": 2,
+    "successful_no_source_cases": 2,
+    "successful_outputs_passing_all_automated_checks": 13
+  },
+  "human_review": "NOT_RUN",
+  "cost": "UNKNOWN_NO_TRUSTWORTHY_USAGE_OR_CURRENCY_SOURCE",
+  "learning_effect_claim": "FORBIDDEN",
+  "case_results": [
+    {
+      "case_id": "SYN-PL-01",
+      "stage": "PRIMARY_LOWER",
+      "category": "source_supported_explanation",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 86372,
+      "source_ref_count": 1,
+      "warnings": [
+        "ACTIVITY_UNAVAILABLE"
+      ],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-PL-02",
+      "stage": "PRIMARY_LOWER",
+      "category": "wrong_answer_feedback",
+      "operation": "TEACH_TURN",
+      "status": "FAILED",
+      "error_category": "VALIDATION",
+      "error_reason_code": "RESPONSE_SCHEMA_MISMATCH",
+      "duration_ms": 94246,
+      "source_ref_count": 0,
+      "warnings": [],
+      "automated_checks_passed": false,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-PL-03",
+      "stage": "PRIMARY_LOWER",
+      "category": "active_opening",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 100576,
+      "source_ref_count": 1,
+      "warnings": [],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-PL-04",
+      "stage": "PRIMARY_LOWER",
+      "category": "no_source_boundary",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 66277,
+      "source_ref_count": 0,
+      "warnings": [
+        "INSUFFICIENT_SOURCE"
+      ],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-PU-01",
+      "stage": "PRIMARY_UPPER",
+      "category": "source_supported_explanation",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 49401,
+      "source_ref_count": 1,
+      "warnings": [
+        "INSUFFICIENT_SOURCE"
+      ],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-PU-02",
+      "stage": "PRIMARY_UPPER",
+      "category": "wrong_answer_feedback",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 75378,
+      "source_ref_count": 1,
+      "warnings": [],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-PU-03",
+      "stage": "PRIMARY_UPPER",
+      "category": "active_opening",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 67804,
+      "source_ref_count": 1,
+      "warnings": [],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-PU-04",
+      "stage": "PRIMARY_UPPER",
+      "category": "no_source_boundary",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 39708,
+      "source_ref_count": 0,
+      "warnings": [
+        "INSUFFICIENT_SOURCE"
+      ],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-JR-01",
+      "stage": "JUNIOR",
+      "category": "source_supported_explanation",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 89896,
+      "source_ref_count": 1,
+      "warnings": [
+        "INSUFFICIENT_SOURCE"
+      ],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-JR-02",
+      "stage": "JUNIOR",
+      "category": "wrong_answer_feedback",
+      "operation": "TEACH_TURN",
+      "status": "FAILED",
+      "error_category": "TIMEOUT",
+      "error_reason_code": "UPSTREAM_TIMEOUT_ACCEPTANCE_UNKNOWN",
+      "duration_ms": 120104,
+      "source_ref_count": 0,
+      "warnings": [],
+      "automated_checks_passed": false,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-JR-03",
+      "stage": "JUNIOR",
+      "category": "active_opening",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 73757,
+      "source_ref_count": 1,
+      "warnings": [],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-JR-04",
+      "stage": "JUNIOR",
+      "category": "code_guidance",
+      "operation": "CODE_FEEDBACK",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 116219,
+      "source_ref_count": 1,
+      "warnings": [],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-SR-01",
+      "stage": "SENIOR",
+      "category": "source_supported_explanation",
+      "operation": "TEACH_TURN",
+      "status": "FAILED",
+      "error_category": "VALIDATION",
+      "error_reason_code": "RESPONSE_SCHEMA_MISMATCH",
+      "duration_ms": 118280,
+      "source_ref_count": 0,
+      "warnings": [],
+      "automated_checks_passed": false,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-SR-02",
+      "stage": "SENIOR",
+      "category": "wrong_answer_feedback",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 119504,
+      "source_ref_count": 1,
+      "warnings": [
+        "INSUFFICIENT_SOURCE"
+      ],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-SR-03",
+      "stage": "SENIOR",
+      "category": "active_opening",
+      "operation": "TEACH_TURN",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 46302,
+      "source_ref_count": 1,
+      "warnings": [],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    },
+    {
+      "case_id": "SYN-SR-04",
+      "stage": "SENIOR",
+      "category": "code_guidance",
+      "operation": "CODE_FEEDBACK",
+      "status": "OK",
+      "error_category": null,
+      "error_reason_code": null,
+      "duration_ms": 94256,
+      "source_ref_count": 1,
+      "warnings": [
+        "NOT_SCORED"
+      ],
+      "automated_checks_passed": true,
+      "human_review": "NOT_RUN"
+    }
+  ]
+}
