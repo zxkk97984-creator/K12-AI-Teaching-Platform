@@ -27,8 +27,11 @@
     "G_AGENT_ISOLATION": {
       "status": "BLOCKED",
       "owner": "团队技术验收",
-      "evidence": [],
-      "note": "真实会话/文件/记忆/工具/执行身份隔离尚未验证。"
+      "evidence": [
+        "docs/acceptance/T13.md",
+        "docs/acceptance/t13-evidence/live-vertical.redacted.json"
+      ],
+      "note": "T13已证明两个合成学生的本地owner/session与远端conversation隔离；平台文件、自动记忆、工具权限和执行身份仍未形成完整技术证据，因此保持BLOCKED。"
     },
     "G_K12_TERMS": {
       "status": "BLOCKED",
@@ -1676,6 +1679,7 @@
         "docs/handoff/FINAL_ACCEPTANCE.md",
         "docs/handoff/LOCAL_BUILD_COMPLETE.md",
         "docs/handoff/LOCAL_READINESS.md",
+        "docs/handoff/GOAL_COMPLETION_AUDIT.md",
         "docs/acceptance/T30.md",
         "docs/acceptance/T31.md",
         "docs/acceptance/T32.md"
@@ -1710,6 +1714,12 @@
           "command": "docs/acceptance/T33.md QA01/QA34/QA35/QA36/QA40 matrix",
           "exit_code": 0,
           "note": "逐项区分 local pass、fixture pass、live NOT_RUN、human NOT_VERIFIED 和 draft；未将外部门禁自动转 PASS。"
+        },
+        {
+          "type": "goal_completion_audit",
+          "command": "docs/handoff/GOAL_COMPLETION_AUDIT.md",
+          "exit_code": 0,
+          "note": "38个必需任务仅T31/T33未完成；逐项登记T11/T13证据、五门禁和外部必需条件，未缩小Goal完成定义。"
         }
       ],
       "note": "K12 本地最终重复验收已通过；另有 CareerMate 只读 source-audit 外部漂移失败需保留。T31、正式 animation human review 和 G_HUMAN_CONTENT_REVIEW 等外部阻塞未解除，不能正式放行。"

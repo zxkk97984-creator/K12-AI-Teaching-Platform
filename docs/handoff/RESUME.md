@@ -6,6 +6,7 @@
 2. read AGENTS.md and .rebuild-kit/progress.json
 3. run git status --short and confirm no other writer
 4. read docs/acceptance/T30.md, T31.md, T32.md, T33.md and this handoff
+5. read docs/handoff/GOAL_COMPLETION_AUDIT.md for the requirement-by-requirement stop state
 
 ## Current task state
 
