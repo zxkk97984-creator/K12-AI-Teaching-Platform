@@ -17,6 +17,7 @@ if [ "$gate_state" != "PASS PASS" ]; then
 fi
 
 python3 docs/integrations/knodo/validate_evidence.py
+backend/.venv/bin/python evals/review_tools.py check-template
 python3 - <<'PY'
 import json
 from pathlib import Path

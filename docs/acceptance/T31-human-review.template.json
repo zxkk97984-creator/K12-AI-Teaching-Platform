@@ -1,0 +1,231 @@
+{
+  "schema_version": "k12.t31.human-review.v1",
+  "eval_set": "t31-local-v1",
+  "source_evidence_sha256": "d632b1353d4d95c42fd6919a253afcf9b34bafcf940f2f79817eb3796618b813",
+  "review_status": "NOT_RUN",
+  "reviewer": {
+    "name": null,
+    "role_or_org": null
+  },
+  "reviewed_at": null,
+  "attestation": null,
+  "case_reviews": [
+    {
+      "case_id": "SYN-PL-01",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-PL-02",
+      "live_status": "FAILED",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-PL-03",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-PL-04",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-PU-01",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-PU-02",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-PU-03",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-PU-04",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-JR-01",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-JR-02",
+      "live_status": "FAILED",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-JR-03",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-JR-04",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-SR-01",
+      "live_status": "FAILED",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-SR-02",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-SR-03",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    },
+    {
+      "case_id": "SYN-SR-04",
+      "live_status": "OK",
+      "scores": {
+        "factuality": null,
+        "source_support": null,
+        "age_fit": null,
+        "pedagogical_actionability": null,
+        "safety_boundary": null
+      },
+      "disposition": null,
+      "rationale": ""
+    }
+  ],
+  "overall": {
+    "accept_failed_cases_for_demo": null,
+    "four_stage_age_fit": null,
+    "source_support_sufficient": null,
+    "code_feedback_boundary_preserved": null,
+    "conclusion": null,
+    "rationale": "",
+    "traceable_signature": null
+  }
+}

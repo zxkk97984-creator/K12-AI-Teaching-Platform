@@ -25,6 +25,7 @@ frontend/vite.config.d.ts
 backend/storage/
 storage/
 docs/acceptance/T31-live-results.synthetic.json
+docs/acceptance/T31-review-packet.local.md
 platform/knodo/bundles/authoring/
 **/uploads/
 *.db

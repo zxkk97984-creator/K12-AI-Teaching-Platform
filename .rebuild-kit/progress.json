@@ -1621,6 +1621,7 @@
         "docs/acceptance/T31-live-results.synthetic.json",
         "docs/acceptance/T31-live-summary.json",
         "docs/acceptance/T31-HUMAN-REVIEW.md",
+        "docs/acceptance/T31-human-review.template.json",
         "docs/acceptance/T11.md",
         "docs/acceptance/T13.md",
         "docs/acceptance/t13-evidence/live-vertical.redacted.json",
@@ -1630,6 +1631,8 @@
         "evals/run_live.py",
         "evals/summarize_live.py",
         "evals/test_run_live.py",
+        "evals/review_tools.py",
+        "evals/test_review_tools.py",
         "scripts/verify-live.sh",
         "docs/integrations/knodo/GATE_REGISTER.md"
       ],
@@ -1659,6 +1662,12 @@
           "command": "docs/acceptance/T31-HUMAN-REVIEW.md",
           "exit_code": null,
           "note": "真实科学性、来源支持、适龄性和教学可行动性rubric仍需真实审校者填写；Agent不能代签。"
+        },
+        {
+          "type": "human_review_handoff",
+          "command": "python evals/review_tools.py build; python evals/review_tools.py check-template",
+          "exit_code": 0,
+          "note": "16-case本机审核包、未签署机器模板与完成校验器已生成；3项测试证明未签署或缺评分不能通过。"
         }
       ],
       "note": "T31专用16-case真实执行和自动汇总已完成；13 OK、2 Schema失败、1超时，usage/人民币成本仍不可得。真人rubric尚未填写，因此保持BLOCKED。"

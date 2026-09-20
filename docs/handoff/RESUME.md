@@ -30,6 +30,9 @@
 - Full T31 synthetic model text and its exhausted private ledger remain local-only at
   `docs/acceptance/T31-live-results.synthetic.json` and `storage/private/t31-request-budget.json`;
   both are intentionally ignored. The committed summary is hash-bound to the local raw evidence.
+- Human review starts from `docs/acceptance/T31-review-packet.local.md` and
+  `docs/acceptance/T31-human-review.template.json`; validate a separately completed copy with
+  `python evals/review_tools.py check-review --review <completed.json> --output docs/acceptance/T31-human-review.result.json`.
 - No K12 API, Vite, Playwright, runner, or migration process was active at handoff. The historical
   `.herdr-control/shared-test.lock` is retained as recovery evidence; do not delete or claim it was
   released by this session.

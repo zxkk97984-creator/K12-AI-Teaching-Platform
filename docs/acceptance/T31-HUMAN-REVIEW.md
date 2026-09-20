@@ -7,6 +7,14 @@
 - 完整合成输出：`docs/acceptance/T31-live-results.synthetic.json`
 - 机器汇总：`docs/acceptance/T31-live-summary.json`
 - 评分规则：`evals/rubric.v1.json`
+- 机器模板：`docs/acceptance/T31-human-review.template.json`
+- 本机逐条审核包：`docs/acceptance/T31-review-packet.local.md`
+
+推荐使用机器模板填写 completed JSON，并运行：
+
+`python evals/review_tools.py check-review --review <completed.json> --output docs/acceptance/T31-human-review.result.json`
+
+模板和本表的空白状态不能解除门禁。
 
 每个维度填写 0、1 或 2，并在“依据/问题”中写出可定位理由。失败或超时 case 仍需判断其失败对课堂可用性的影响，不能从分母中删除。
 

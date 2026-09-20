@@ -21,6 +21,7 @@
 - [ ] Formal animation/content rerun with an approved senior chapter (synthetic fixture rerun is recorded separately above).
 - [x] T31 16-case live synthetic execution and automated summary.
 - [ ] T31 human rubric review.
+  - Review packet and machine-validatable unsigned template are ready; a real reviewer must provide the completed copy and traceable signature.
 - [ ] T33 repeat acceptance and user sign-off.
 
 No checkbox above may be checked from a fixture, a key merely existing, or a model response.
