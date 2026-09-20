@@ -14,14 +14,15 @@ Bot/Skill 已在线可用。真实创建、上传、读取验证必须在获得�
 | Skill 在线加载 | NOT_RUN | 同上 |
 | 教学效果 | NOT_RUN | 同上 |
 
-五个真实性门禁（`docs/integrations/knodo/GATE_REGISTER.md`）当前全部 BLOCKED：
-`G_API_CONTRACT`、`G_LIVE_BUDGET`、`G_AGENT_ISOLATION`、`G_K12_TERMS`、`G_HUMAN_CONTENT_REVIEW`。
-本指南**不会**因为"打包成功"而解锁它们。
+当前声明范围为成人参赛者 + 合成学生数据，不使用真实未成年人，因此 `G_K12_TERMS` 不阻塞
+这个合成竞赛原型；若范围扩展，必须重新取得该门禁证据。其余真实性门禁仍 BLOCKED：
+`G_API_CONTRACT`、`G_LIVE_BUDGET`、`G_AGENT_ISOLATION`、`G_HUMAN_CONTENT_REVIEW`。
+本指南**不会**因为“打包成功”而解锁任何真实性门禁。
 
 ## 1. 人工部署步骤（每个租户执行一次）
 
 1. **取得授权**：确认本次操作已获平台写入授权与预算授权；未获授权时到第 0 步为止。
-2. **核对租户条款**：确认租户允许 K12（含未成年人）教学用途；未确认前只允许合成学生/团队内部测试。
+2. **核对租户条款**：当前仅成人参赛者 + 合成学生数据，不进入真实未成年人场景；若未来改为真实 K12，必须先确认租户允许该用途。
 3. **创建 Tutor Bot**：在平台按官方菜单创建，绑定的系统提示词取自
    `platform/knodo/tutor/v1/system-prompt.md`（与 `bot-profile.json` 同版本）。
    仅使用 `TEACH_TURN`、`CODE_FEEDBACK` 两类操作，不依赖平台原生多 Agent 或工作流格式。

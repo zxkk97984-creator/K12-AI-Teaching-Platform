@@ -30,9 +30,12 @@
       "status": "BLOCKED",
       "owner": "用户/赛题组/平台",
       "evidence": [
-        "docs/integrations/knodo/source-snapshots/privacy.html"
+        "docs/integrations/knodo/source-snapshots/privacy.html",
+        "docs/acceptance/T33.md",
+        "docs/handoff/FINAL_ACCEPTANCE.md"
       ],
-      "note": "公开隐私政策明确服务不面向16岁以下未成年人；比赛租户及下游K12安排未确认。"
+      "scope_note": "OUT_OF_SCOPE_FOR_CURRENT_RELEASE",
+      "note": "用户已明确当前作品范围为成人参赛者+合成学生数据，不使用真实未成年人资料、不投入真实场景；因此该门禁不阻塞当前合成竞赛原型。正式真实未成年人发布仍保持 BLOCKED，不能把本范围决策当作平台/法律批准。"
     },
     "G_HUMAN_CONTENT_REVIEW": {
       "status": "BLOCKED",

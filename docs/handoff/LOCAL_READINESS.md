@@ -13,7 +13,7 @@
 | Voice | T27 honest unavailable/fallback boundary | NOT_PROVIDED |
 | Knodo live quality/cost | T31 offline rubric only | BLOCKED: API contract/budget |
 | Formal four-stage content review | no real signatures | BLOCKED |
-| Real minor/student release | terms/isolation not confirmed | BLOCKED |
+| Real minor/student release | explicitly out of scope; synthetic students only | NOT_IN_SCOPE (would require G_K12_TERMS + isolation if reopened) |
 
 “READY” means the local synthetic scope has inspectable evidence; it does not mean production,
 platform, legal, human-review, or learning-effect readiness.

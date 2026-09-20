@@ -34,7 +34,8 @@ frontend 101 passed、既有 browser 21 passed + 1 explicit skip，以及本轮�
   正式内容仍需真实审校者签署和发布证据。
 - T31 真实 Knodo Bot/Skill/wire/usage/cost/人工教学质量未运行；
   G_API_CONTRACT 和 G_LIVE_BUDGET BLOCKED。
-- G_AGENT_ISOLATION、G_K12_TERMS、G_HUMAN_CONTENT_REVIEW 仍 BLOCKED。
+- G_AGENT_ISOLATION、G_HUMAN_CONTENT_REVIEW 仍 BLOCKED；当前范围明确为成人参赛者 + 合成数据，
+  因此 G_K12_TERMS 不阻塞本原型；任何真实未成年人发布必须重新取得条款证据。
 - 完整 `scripts/check.sh` 还保留 CareerMate 只读源审计的外部漂移失败；这不是 K12 源码修复项，
   不能删除记录或用 `|| true` 绕过。
 

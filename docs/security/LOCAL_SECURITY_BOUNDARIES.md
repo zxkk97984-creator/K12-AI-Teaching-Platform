@@ -21,14 +21,15 @@
 
 The local tests do not prove Knodo workspace/session/file/memory/tool
 isolation, legal K12 suitability, remote deletion, or platform retention. The
-following gates remain `BLOCKED` in `.rebuild-kit/progress.json`:
+The following formal gates remain `BLOCKED` in `.rebuild-kit/progress.json`:
 
 - `G_AGENT_ISOLATION`: no authorized tenant evidence for cross-session files,
   memory, tools, execution identity, or revocation;
-- `G_K12_TERMS`: the applicable competition tenant and under-16 terms are not
-  confirmed;
 - `G_API_CONTRACT` and `G_LIVE_BUDGET`: no authorized live wire/usage evidence;
 - `G_HUMAN_CONTENT_REVIEW`: no human reviewer signature.
+
+`G_K12_TERMS` is out of scope for the declared adult-contestant/synthetic-data prototype; any real
+under-16 release must reopen this gate and obtain tenant terms evidence.
 
 ## T26 and local privacy boundary
 

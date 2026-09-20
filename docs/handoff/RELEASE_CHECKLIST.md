@@ -9,6 +9,7 @@
 - [x] Backend/frontend/contract/browser/real Docker evidence recorded.
 - [x] Deterministic animation controls rerun on explicitly marked synthetic fixtures; formal human review remains separate.
 - [x] Secrets, cookies, real student data and runtime uploads excluded from Git.
+- [x] Declared scope is adult contestants + synthetic student data only; no real minor/student release.
 
 ## Required before any real platform claim
 

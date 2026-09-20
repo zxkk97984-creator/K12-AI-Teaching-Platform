@@ -41,5 +41,7 @@ human-approved senior chapter and cannot be used as formal content-release evide
 
 ## Gate state
 
-G_API_CONTRACT, G_LIVE_BUDGET, G_AGENT_ISOLATION, G_K12_TERMS and G_HUMAN_CONTENT_REVIEW remain
-BLOCKED. T31 live evaluation and T33 formal release therefore remain blocked.
+G_API_CONTRACT, G_LIVE_BUDGET, G_AGENT_ISOLATION and G_HUMAN_CONTENT_REVIEW remain BLOCKED.
+`G_K12_TERMS` is OUT_OF_SCOPE for the declared adult-contestant/synthetic-data prototype; any
+future real-under-16 or formal K12 release must reopen and pass that gate. T31 live evaluation and
+T33 formal release therefore remain blocked.

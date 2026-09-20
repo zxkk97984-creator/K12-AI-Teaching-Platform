@@ -32,7 +32,7 @@ CodeLab 显示 UNAVAILABLE。真实 Knodo 不启动。
 
 1. T30 合成动画控制器已通过 targeted rerun；正式 senior 内容仍需真实 human-approved chapter，不能用 fixture 替代。
 2. T31 真实 Knodo wire、Bot/Skill/bundle、usage、预算、成本、人工教学评价均未运行；T32 草稿已交付但不能替代这些证据。
-3. G_API_CONTRACT、G_LIVE_BUDGET、G_AGENT_ISOLATION、G_K12_TERMS、G_HUMAN_CONTENT_REVIEW 均 BLOCKED。
+3. G_API_CONTRACT、G_LIVE_BUDGET、G_AGENT_ISOLATION、G_HUMAN_CONTENT_REVIEW 均 BLOCKED；G_K12_TERMS 对当前成人参赛者 + 合成数据范围 OUT_OF_SCOPE，真实未成年人发布时必须重新打开。
 4. T33 不能签署正式发布、真实 K12 开放或学习效果。
 
 ## 恢复顺序
