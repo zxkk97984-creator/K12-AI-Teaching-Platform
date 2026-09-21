@@ -156,6 +156,45 @@ describe("ConversationPage", () => {
     expect(screen.queryByTestId("cancel-run")).toBeNull();
   });
 
+  it("keeps the draft and explains the failure when a turn is rejected", async () => {
+    // R14: the draft is the student's work. Clearing it before the request is
+    // known to have succeeded would silently lose it.
+    vi.mocked(api.createTurn).mockRejectedValue(new Error("网络中断"));
+    window.history.replaceState({}, "", `/conversations?session=${summary.id}`);
+    render(<ConversationPage />);
+    await waitFor(() => expect(screen.getByTestId("assistant-card")).toBeTruthy());
+
+    const composer = screen.getByLabelText("想对老师说什么") as HTMLTextAreaElement;
+    fireEvent.change(composer, { target: { value: "别把我的草稿弄丢" } });
+    fireEvent.click(screen.getByTestId("send-turn"));
+
+    await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+    expect((screen.getByLabelText("想对老师说什么") as HTMLTextAreaElement).value).toBe(
+      "别把我的草稿弄丢",
+    );
+    // Still sendable once the failure has been acknowledged.
+    expect((screen.getByTestId("send-turn") as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("remeasures the composer when the draft is cleared from outside", async () => {
+    // R13: the height follows the value, so a programmatic clear (restoring a
+    // draft, switching sessions) must not leave a stale tall box behind.
+    vi.mocked(api.createTurn).mockResolvedValue({ run: runWith("QUEUED") });
+    window.history.replaceState({}, "", `/conversations?session=${summary.id}`);
+    render(<ConversationPage />);
+    await waitFor(() => expect(screen.getByTestId("assistant-card")).toBeTruthy());
+
+    const composer = screen.getByLabelText("想对老师说什么") as HTMLTextAreaElement;
+    Object.defineProperty(composer, "scrollHeight", { value: 900, configurable: true });
+    fireEvent.change(composer, { target: { value: "很长的草稿".repeat(40) } });
+    await waitFor(() => expect(composer.style.height).not.toBe(""));
+
+    // A successful send clears the draft; the box must shrink back.
+    fireEvent.click(screen.getByTestId("send-turn"));
+    await waitFor(() => expect(composer.value).toBe(""));
+    expect(Number.parseInt(composer.style.height, 10)).toBeLessThanOrEqual(180);
+  });
+
   it("cancels an in-flight run through the API", async () => {
     vi.mocked(api.createTurn).mockResolvedValue({ run: runWith("QUEUED") });
     vi.mocked(api.cancelRun).mockResolvedValue(runWith("CANCELLED"));

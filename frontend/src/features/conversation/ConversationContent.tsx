@@ -205,13 +205,16 @@ function ConversationThread({ detail, run, draft, inputId, inputRef, busy, sendi
   </div>;
 }
 
-function ConversationComposer({ inputId, inputRef, draft, busy, sending, contextLabel, onDraft, onVoice, onSend }: {
+const DEFAULT_MAX_LENGTH = 8000;
+
+function ConversationComposer({ inputId, inputRef, draft, busy, sending, contextLabel, maxLength = DEFAULT_MAX_LENGTH, onDraft, onVoice, onSend }: {
   inputId: string;
   inputRef: RefObject<HTMLTextAreaElement | null>;
   draft: string;
   busy: boolean;
   sending: boolean;
   contextLabel?: string;
+  maxLength?: number;
   onDraft: (value: string) => void;
   onVoice: (value: string) => void;
   onSend: () => void;
@@ -224,7 +227,7 @@ function ConversationComposer({ inputId, inputRef, draft, busy, sending, context
   }, [draft, inputRef]);
   return <form className="conv-composer" onSubmit={(event) => { event.preventDefault(); onSend(); }}>
     {contextLabel ? <div className="conv-composer-context"><span>{contextLabel}</span></div> : null}
-    <textarea ref={inputRef} id={inputId} maxLength={8000} value={draft} onChange={(event) => onDraft(event.target.value)}
+    <textarea ref={inputRef} id={inputId} maxLength={maxLength} value={draft} onChange={(event) => onDraft(event.target.value)}
       onKeyDown={(event) => {
         if (event.nativeEvent.isComposing || event.keyCode === 229) return;
         if (event.key === "Enter" && !event.shiftKey) {
@@ -238,15 +241,23 @@ function ConversationComposer({ inputId, inputRef, draft, busy, sending, context
 }
 
 function SessionActions({ sessionId, controller }: { sessionId: string; controller: ReturnType<typeof useConversation>["controller"] }) {
+  // R30: renaming and archiving are not idempotent from the UI's point of view,
+  // so a second click while one is in flight must be refused rather than
+  // firing a duplicate request.
+  const [busyAction, setBusyAction] = useState<string | null>(null);
   const run = async (action: () => Promise<void>) => {
-    try { await action(); } catch (error) { window.alert(error instanceof Error ? error.message : "操作失败，请重试"); }
+    if (busyAction) return;
+    setBusyAction("pending");
+    try { await action(); }
+    catch (error) { window.alert(error instanceof Error ? error.message : "操作失败，请重试"); }
+    finally { setBusyAction(null); }
   };
   return <span className="conv-session-actions" onClick={(event) => event.stopPropagation()}>
-    <button type="button" aria-label="重命名对话" title="重命名" onClick={() => {
+    <button type="button" aria-label="重命名对话" title="重命名" disabled={busyAction !== null} onClick={() => {
       const title = window.prompt("给这段对话取个名字");
       if (title?.trim()) void run(() => controller.rename(sessionId, title.trim()));
     }}>改名</button>
-    <button type="button" aria-label="归档对话" title="归档" onClick={() => void run(() => controller.archive(sessionId))}>归档</button>
+    <button type="button" aria-label="归档对话" title="归档" disabled={busyAction !== null} onClick={() => void run(() => controller.archive(sessionId))}>归档</button>
     <button type="button" aria-label="删除对话" title="删除" onClick={() => {
       if (window.confirm("确认删除这段对话？删除后不可恢复。")) void run(() => controller.remove(sessionId));
     }}>删除</button>

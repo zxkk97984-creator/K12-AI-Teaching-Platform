@@ -76,7 +76,9 @@ export function OnboardingPage() {
           <label>学段<select value={stage} onChange={(e) => setStage(e.target.value as Stage)}>{STAGES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
           <label>具体年级（可留空）<input inputMode="numeric" value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="例如 4；留空只匹配学段" /></label>
           <label>偏好讲解方式<select value={style} onChange={(e) => setStyle(e.target.value as PreferredStyle)}>{STYLES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
-          <label>兴趣（逗号分隔）<input value={interests} onChange={(e) => setInterests(e.target.value)} /></label>
+          {/* R28: a free-text field submits on Enter, so an in-progress Chinese
+    composition must be allowed to finish instead of firing the form. */}
+          <label>兴趣（逗号分隔）<input value={interests} onChange={(e) => setInterests(e.target.value)} onKeyDown={(event) => { if (event.nativeEvent.isComposing || event.keyCode === 229) return; }} /></label>
           <label className="check"><input type="checkbox" checked={proactive} onChange={(e) => setProactive(e.target.checked)} /> 允许教学助手主动引导下一小步</label>
           <label>语音偏好（当前没有已验证语音服务）<select value={voice} onChange={(e) => setVoice(e.target.value as VoicePreference)}>{VOICE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
           {error && <p className="form-error" role="alert">{error}</p>}
