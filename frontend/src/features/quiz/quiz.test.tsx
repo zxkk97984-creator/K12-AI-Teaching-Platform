@@ -14,6 +14,8 @@ vi.mock("./api", () => ({
   getQuizSession: vi.fn(),
   submitQuizAnswer: vi.fn(),
   requestQuizHint: vi.fn(),
+  saveQuizDraft: vi.fn().mockResolvedValue({ draft: { question_id: "q1", answer: "A", revision: 1, updated_at: "" }, last_submitted_answer: null }),
+  saveQuizPosition: vi.fn().mockResolvedValue({ position: 0 }),
   getQuizReview: vi.fn(),
 }));
 
@@ -351,6 +353,26 @@ describe("server-driven answers (T17 J2/J3/J6)", () => {
     fireEvent.click(screen.getByTestId("quiz-submit"));
     await waitFor(() => expect(api.submitQuizAnswer).toHaveBeenCalledTimes(2));
     expect(api.submitQuizAnswer).toHaveBeenLastCalledWith(QUIZ, Q3, ["A", "B", "C"], expect.any(String));
+  });
+
+  it("keeps the single-choice radios in one native group for arrow-key navigation", async () => {
+    // R29 does not apply here: the reference used radios without roving
+    // tabindex, but this app renders a native same-name group, so the browser
+    // supplies arrow-key movement and a single tab stop. Lock that down so a
+    // future refactor cannot silently drop it.
+    const first = question({});
+    vi.mocked(api.createQuizSession).mockResolvedValue(session({ questions: [first] }));
+    renderPractice(`?session=${LESSON}&chapter=${CHAPTER}&start=1`);
+    await screen.findByTestId("practice-session");
+
+    const radios = document.querySelectorAll<HTMLInputElement>("input[type=radio]");
+    expect(radios.length).toBeGreaterThan(1);
+    const names = new Set([...radios].map((radio) => radio.name));
+    // One shared name is what gives the group its native arrow-key behaviour.
+    expect(names.size).toBe(1);
+    expect([...names][0]).toBeTruthy();
+    // No explicit tabindex: the browser manages the single tab stop.
+    for (const radio of radios) expect(radio.getAttribute("tabindex")).toBeNull();
   });
 
   it("drives the hint button from the server counters and posts the next level", async () => {
