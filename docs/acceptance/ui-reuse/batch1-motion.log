@@ -1,0 +1,18 @@
+# Batch 1 — M01 motion-safe module (recorded 2026-09-21T17:35:02Z)
+# commands: npm run typecheck / npm test (--prefix frontend)
+
+$ npm run typecheck
+
+> shuangling-k12-frontend@0.1.0 typecheck
+> tsc -b --pretty false
+
+
+$ npm test
+ ✓ src/features/content/content.test.tsx (7 tests) 294ms
+ ✓ src/features/quiz/quiz.test.tsx (16 tests) 228ms
+
+ Test Files  16 passed (16)
+      Tests  114 passed (114)
+   Start at  01:35:05
+   Duration  1.19s (transform 1.59s, setup 0ms, collect 4.15s, tests 1.71s, environment 5.52s, prepare 1.04s)
+

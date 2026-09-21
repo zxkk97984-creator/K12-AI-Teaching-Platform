@@ -9,6 +9,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AnimationStep, SearchStep, SortStep } from "./types";
+import { useMotionSafe } from "../../shared/motion/motion-safe";
 
 const TICK_MS = 900;
 
@@ -18,19 +19,6 @@ function isSortStep(step: AnimationStep | undefined): step is SortStep {
 
 function isSearchStep(step: AnimationStep | undefined): step is SearchStep {
   return step !== undefined && "low" in step;
-}
-
-function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(query.matches);
-    const listener = (event: MediaQueryListEvent) => setReduced(event.matches);
-    query.addEventListener("change", listener);
-    return () => query.removeEventListener("change", listener);
-  }, []);
-  return reduced;
 }
 
 export function AnimationPlayer({
@@ -44,7 +32,9 @@ export function AnimationPlayer({
 }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const reducedMotion = usePrefersReducedMotion();
+  // M01 returns "animation allowed"; this view reports the inverse so the
+  // existing data-reduced-motion contract is unchanged.
+  const reducedMotion = !useMotionSafe();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const lastIndex = Math.max(steps.length - 1, 0);
