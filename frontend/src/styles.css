@@ -1,5 +1,11 @@
 :root {
-  /* Design tokens (T07). Values are taken from the existing styles below. */
+  /* Design tokens (T07).
+     NOTE: design-system.css is imported after this file and re-declares most
+     of these tokens on :root, so for anything both define the later block wins
+     (verified computed: --sl-primary resolves to #006bee, not #1e5fae here).
+     Only the tokens unique to this block — the ok/warn/danger semantic pairs
+     and the shadow/space scale — are still in effect. Add new tokens to
+     design-system.css, not here. */
   --sl-font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
   --sl-text-xs: 0.78rem;
   --sl-text-sm: 0.92rem;
