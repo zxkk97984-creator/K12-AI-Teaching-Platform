@@ -340,3 +340,31 @@ test("classroom and pet share a run and block duplicate asks", async ({
   ).toContainText("已取消");
   expect(asks).toBe(1);
 });
+
+test("calm background stays decorative and degrades to static", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await fixture(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  await page.goto("/login");
+  const background = page.locator(".sl-fluid-bg");
+  await expect(background).toHaveCount(1);
+  await expect(page.locator(".sl-fblob")).toHaveCount(5);
+  // The backdrop must never swallow input meant for the form.
+  await expect(background).toHaveCSS("pointer-events", "none");
+  await page.getByLabel("用户名").fill("背景不吃事件");
+  await expect(page.getByLabel("用户名")).toHaveValue("背景不吃事件");
+
+  // Reduced motion drops the canvas but keeps a visible static gradient.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.getByTestId("calm-constellation")).toHaveCount(0);
+  await expect(page.locator(".sl-fblob").first()).toHaveCSS("opacity", "1");
+  await expect(background).toHaveAttribute("data-paused", "true");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+
+  await page.goto("/conversations");
+  await expect(page.getByTestId("calm-constellation")).toHaveCount(1);
+  await page.screenshot({ path: `${evidence}/calm-welcome-1440.png` });
+  expect(errors).toEqual([]);
+});

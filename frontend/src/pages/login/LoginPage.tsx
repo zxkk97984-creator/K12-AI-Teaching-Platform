@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { login } from "../../features/identity/api";
 import { navigate } from "../../features/identity/session";
+import { CalmBackground } from "../../features/background/CalmBackground";
 
 export function LoginPage() {
   const [username, setUsername] = useState("");
@@ -14,8 +15,8 @@ export function LoginPage() {
     setError(null);
     try {
       const result = await login({ username, password });
-      if (result.user.role === "admin") navigate("/");
-      else navigate(result.profile?.onboarding_completed ? "/settings" : "/onboarding");
+      if (result.user.role === "admin") navigate("/admin/resources");
+      else navigate(result.profile?.onboarding_completed ? "/conversations" : "/onboarding");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "登录失败");
     } finally {
@@ -25,6 +26,8 @@ export function LoginPage() {
 
   return (
     <main className="auth-shell">
+      {/* The blobs are a welcome-surface treatment only; the workspace stays plain. */}
+      <CalmBackground />
       <section className="auth-card">
         <p className="eyebrow">霜铃 · 本地身份</p>
         <h1>回到你的学习空间</h1>
