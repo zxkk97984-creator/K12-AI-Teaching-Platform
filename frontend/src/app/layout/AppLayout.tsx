@@ -127,15 +127,21 @@ function AccountLayout({ me, children }: { me: MeResponse; children: ReactNode }
 function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode }) {
   const { pathname } = useLocation();
   const navigateTo = useNavigate();
-  const { controller } = useConversation();
+  const { controller, detail: activeConversation } = useConversation();
   const [logoutError, setLogoutError] = useState("");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const admin = me.user.role === "admin";
   const adminPage = pathname.startsWith("/admin");
   const stage = me.profile?.stage;
   const items = adminPage ? ADMIN_NAV : STUDENT_NAV;
-  const activeTitle = adminPage ? "教学管理" : items.find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`))?.label ?? (pathname.startsWith("/workbench") ? "学习工作台" : "学习平台");
+  const navTitle = adminPage ? "教学管理" : items.find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`))?.label ?? (pathname.startsWith("/workbench") ? "学习工作台" : "学习平台");
   const conversationPage = pathname.startsWith("/conversations");
+  // One topbar, not two: when a conversation is open its title replaces the
+  // generic nav label rather than sitting in a second header beneath it.
+  const activeTitle = conversationPage && activeConversation
+    ? activeConversation.title ?? activeConversation.chapter_title ?? "新对话"
+    : navTitle;
+  const activeChapter = conversationPage ? activeConversation?.chapter_title ?? null : null;
   const signOut = () => { void logout().then(() => navigate("/login")).catch(() => setLogoutError("退出失败，请重试")); };
   const closeMobile = () => setMobileNavOpen(false);
   const startConversation = () => { void controller.start().then((id) => { if (id) navigateTo(`/conversations?session=${id}`); }); };
@@ -156,7 +162,7 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
       {logoutError ? <p className="app-logout-error" role="alert">{logoutError}</p> : null}
     </aside>
     <div className={`app-main${conversationPage ? " app-main--conversation" : ""}`}>
-      <header className={`app-topbar${conversationPage ? " app-topbar--conversation" : ""}`}><div><p className="app-breadcrumb">{adminPage ? "管理端" : "我的学习"}</p><h1>{activeTitle}</h1></div><div className="app-topbar-account"><span className="app-topbar-dot" aria-hidden="true" />{me.user.username}</div></header>
+      <header className={`app-topbar${conversationPage ? " app-topbar--conversation" : ""}`}><div className="app-topbar-title"><p className="app-breadcrumb">{adminPage ? "管理端" : "我的学习"}</p><h1>{activeTitle}</h1></div>{activeChapter && activeChapter !== activeTitle ? <span className="conv-context-chip">当前参考：{activeChapter}</span> : null}<div className="app-topbar-account"><span className="app-topbar-dot" aria-hidden="true" />{me.user.username}</div></header>
       <div id="page-content" className={`app-content${conversationPage ? " app-content--conversation" : ""}`} tabIndex={-1}>{adminPage && !admin ? <main><h1>仅管理员可访问</h1><a href="/conversations">返回学习平台</a></main> : children}</div>
     </div>
     {!admin && stage && pathname !== "/onboarding" && !adminPage ? <Companion userId={me.user.id} /> : null}

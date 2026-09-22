@@ -727,7 +727,7 @@ label {
   background: rgba(255, 255, 255, 0.58);
 }
 .app-content--conversation .conv-welcome {
-  width: min(900px, calc(100% - 48px));
+  width: min(760px, calc(100% - 48px));
   max-width: 900px;
   min-height: 0;
   flex: 1;
@@ -804,7 +804,7 @@ label {
   font-size: 12px;
 }
 .app-content--conversation .conv-course-start {
-  width: min(900px, calc(100% - 48px));
+  width: min(760px, calc(100% - 48px));
   flex-shrink: 0;
   margin: 0 auto 12px;
   padding: 10px 14px;
@@ -864,7 +864,8 @@ label {
   margin-top: 10px;
 }
 .app-content--conversation .conv-composer {
-  width: min(900px, 100%);
+  /* Same reading column as the message list so the two line up. */
+  width: min(760px, 100%);
   flex-shrink: 0;
   margin: 0 auto;
   padding: 11px 13px 10px;
@@ -937,7 +938,7 @@ label {
   }
   .app-content--conversation .conv-welcome,
   .app-content--conversation .conv-course-start {
-    width: min(900px, calc(100% - 24px));
+    width: min(760px, calc(100% - 24px));
   }
   .app-content--conversation .conv-thread {
     padding-inline: 15px;

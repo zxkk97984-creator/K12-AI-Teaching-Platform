@@ -23,18 +23,21 @@
 }
 
 .conversation-content--full {
-  min-height: min(720px, calc(100vh - 230px));
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
 }
 
+/* A single full-height column. The global sidebar owns navigation and history,
+   so there is no second conversation list here and nothing to frame. */
 .conv-workspace {
-  min-height: min(720px, calc(100vh - 230px));
-  display: grid;
-  grid-template-columns: 264px minmax(0, 1fr);
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
   overflow: hidden;
-  border: var(--sl-border, 1px solid #e4e7ec);
-  border-radius: 18px;
-  background: var(--sl-surface, #fff);
-  box-shadow: var(--sl-shadow-soft, 0 4px 14px #17202f08);
+  background: transparent;
 }
 
 .conv-sidebar {
@@ -66,7 +69,7 @@
 .conv-history-meta { color: var(--sl-text-muted); font-size: 11px; }
 .conv-sidebar-foot { padding: 14px 5px 0; color: var(--sl-text-muted); font-size: 11px; line-height: 1.5; }
 
-.conv-main { display: flex; min-width: 0; flex-direction: column; background: white; }
+.conv-main { display: flex; min-height: 0; min-width: 0; flex: 1; flex-direction: column; background: transparent; }
 .conv-main-topbar { min-height: 72px; display: flex; align-items: center; gap: 12px; padding: 13px 24px; border-bottom: var(--sl-border, 1px solid #e4e7ec); }
 .conv-history-toggle { display: none; padding: 7px 10px; }
 .conv-main-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -76,7 +79,7 @@
 .conv-assistant-avatar { display: grid; flex-shrink: 0; width: 36px; height: 36px; place-items: center; border-radius: 12px; color: #fff; background: linear-gradient(135deg, #376db5, #80aee2); font-weight: 700; }
 .conv-context-chip { max-width: 42%; margin-left: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 5px 9px; border-radius: 999px; color: var(--sl-primary-ink, #316ac2); background: var(--sl-primary-soft, #edf3fb); font-size: 11px; }
 .conv-loading { padding: 0 24px; }
-.conv-thread { display: flex; min-height: 0; flex: 1; flex-direction: column; padding: 0 24px 20px; }
+.conv-thread { display: flex; min-height: 0; flex: 1; flex-direction: column; padding: 0; }
 .conv-thread .conv-messages { flex: 1; }
 .conv-welcome { display: grid; max-width: 620px; margin: auto; padding: 42px 24px 30px; text-align: center; justify-items: center; }
 .conv-welcome-mark { display: grid; width: 54px; height: 54px; place-items: center; margin-bottom: 16px; border-radius: 18px; color: #2a65ae; background: #edf4fc; font-size: 25px; }
@@ -92,7 +95,18 @@
 .conv-course-actions button { padding: 7px 10px; color: var(--sl-text); font-size: 12px; font-weight: 500; }
 .conv-sidebar-backdrop { display: none; }
 
-.conv-composer { flex-shrink: 0; gap: 9px; margin-top: auto; padding: 13px 15px 11px; border: var(--sl-border, 1px solid #e4e7ec); border-radius: 14px; background: #f8fafc; }
+.conv-composer {
+  display: grid;
+  flex-shrink: 0;
+  gap: 9px;
+  /* Match the message column so the input lines up with the conversation. */
+  width: min(760px, 100%);
+  margin: auto auto 0;
+  padding: 13px 15px 11px;
+  border: var(--sl-border, 1px solid #e4e7ec);
+  border-radius: 14px;
+  background: #f8fafc;
+}
 .conv-composer-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .conv-composer-label label { color: var(--sl-text); font-size: 13px; }
 .conv-composer-label span { color: var(--sl-text-muted); font-size: 11px; }
@@ -106,11 +120,27 @@
 .conv-voice-error { color: #9c332d; font-size: 11px; }
 
 .conv-error {
-  border: 1px solid #d64545;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  /* Match the reading column and never stretch with the flex parent. */
+  width: min(760px, 100%);
+  margin: 16px auto 0;
+  padding: 10px 14px;
+  border: 1px solid #f0c2c2;
+  border-radius: 12px;
   background: #fdf2f2;
   color: #8c1d1d;
-  padding: 8px 12px;
-  border-radius: 6px;
+  font-size: 13px;
+}
+
+.conv-run {
+  /* The run status belongs to the reading column, not the whole width. */
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding-inline: 24px;
 }
 
 .conv-history ul,
@@ -139,26 +169,52 @@
 
 .conv-messages {
   list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   /* A scrolling message area keeps the run status and composer from shifting
      while SSE updates append messages during a run. */
-  max-height: none;
-  min-height: 180px;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 26px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 22px 8px 18px 0;
+  /* Centre a comfortable reading column rather than stretching the full
+     width, so long answers stay legible on a wide screen. */
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 28px 24px 32px;
 }
 
+/* Consecutive turns get more air than lines inside one turn. */
+.conv-message { display: flex; flex-direction: column; }
+
+/* The user's own words sit in a quiet bubble on the right; the assistant
+   answers in open text on the left, without a card or a bubble of its own.
+   That asymmetry is what makes the two speakers readable at a glance. */
 .conv-message-user {
   align-self: flex-end;
-  background: #eef4ff;
-  border-radius: 8px;
-  padding: 8px 12px;
-  max-width: min(80%, 58ch);
+  max-width: min(78%, 62ch);
+  padding: 11px 16px;
+  border-radius: 18px 18px 4px 18px;
+  background: var(--sl-primary-soft, #edf3fb);
+  color: var(--sl-text, #14213d);
 }
+
+.conv-message-user p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.conv-message-assistant {
+  align-self: stretch;
+  color: var(--sl-text, #14213d);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.conv-message-assistant > *:first-child { margin-top: 0; }
+.conv-message-assistant > *:last-child { margin-bottom: 0; }
+/* Prose is selectable and wraps instead of forcing the column wider. */
+.conv-message-assistant p,
+.conv-message-assistant li { overflow-wrap: anywhere; }
+.conv-message-assistant pre { overflow-x: auto; }
 
 .conv-card {
   border: 1px solid #d7dce3;

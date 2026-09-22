@@ -152,10 +152,7 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
     </nav> : null}
     <div className="conv-workspace">
       <section className="conv-main" aria-label="霜铃对话">
-        {detail ? <div className="conv-main-topbar">
-          <div className="conv-main-title"><span className="conv-assistant-avatar" aria-hidden="true">霜</span><div><strong>{currentTitle}</strong><span>霜铃 · AI 学习助手</span></div></div>
-          {detail.chapter_id ? <span className="conv-context-chip">当前参考：{detail.chapter_title}</span> : null}
-        </div> : null}
+
         {selecting ? <p role="status" className="conv-loading">正在读取对话…</p> : null}
         {detail ? <ConversationThread detail={detail} run={run} draft={draft} inputId={inputId} inputRef={input} busy={busy} sending={sending}
           onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void controller.send()} onCancel={() => void controller.cancel()} /> :
