@@ -158,15 +158,14 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
           onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void controller.send()} onCancel={() => void controller.cancel()} /> :
           <>
             <section className="conv-welcome" data-testid="conversation-welcome">
-              <p className="eyebrow">霜铃 · 你的 AI 学习伙伴</p><h2>把问题聊清楚，把知识学明白。</h2>
-              <p>关于人工智能、编程和计算机知识，我们一起从好奇开始。</p>
+              <h2>今天想弄清楚什么？</h2>
               <div className="conv-quick-prompts" aria-label="推荐问题">
                 {[
                   { title: "认识人工智能", icon: "✦", value: "请用一个贴近生活的例子，解释什么是人工智能。" },
                   { title: "读懂一段代码", icon: "</>", value: "我想请你帮我读懂一段代码，我会把代码贴在下面：" },
                   { title: "梳理学习思路", icon: "☷", value: "请先问问我正在学习什么、哪里不太理解，再帮我梳理接下来的学习顺序。" },
                 ].map((prompt) => <button key={prompt.title} type="button" className="conv-prompt-card" onClick={() => applySuggestion(prompt.value)}>
-                  <span className="conv-prompt-icon" aria-hidden="true">{prompt.icon}</span><span>{prompt.title}</span><span className="conv-prompt-arrow" aria-hidden="true">↗</span>
+                  <span className="conv-prompt-icon" aria-hidden="true">{prompt.icon}</span><span>{prompt.title}</span>
                 </button>)}
               </div>
               {draftNotice ? <p className="conv-draft-notice" role="status">{draftNotice}</p> : null}

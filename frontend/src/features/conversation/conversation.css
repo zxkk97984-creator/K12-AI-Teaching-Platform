@@ -81,11 +81,26 @@
 .conv-loading { padding: 0 24px; }
 .conv-thread { display: flex; min-height: 0; flex: 1; flex-direction: column; padding: 0; }
 .conv-thread .conv-messages { flex: 1; }
-.conv-welcome { display: grid; max-width: 620px; margin: auto; padding: 42px 24px 30px; text-align: center; justify-items: center; }
+/* Empty state: a short greeting directly above the composer, rather than a
+   hero block floating in the middle of an empty pane. Sits at the bottom of
+   the column so it reads as a prompt for the input below it. */
+.conv-welcome {
+  display: flex;
+  width: min(760px, 100%);
+  margin: auto auto 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 24px 18px;
+  text-align: center;
+}
 .conv-welcome-mark { display: grid; width: 54px; height: 54px; place-items: center; margin-bottom: 16px; border-radius: 18px; color: #2a65ae; background: #edf4fc; font-size: 25px; }
-.conv-welcome h2 { margin: 2px 0 8px; font-size: clamp(24px, 4vw, 32px); }
+.conv-welcome h2 { margin: 0 0 16px; font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
 .conv-welcome > p:not(.eyebrow) { max-width: 44ch; margin: 0; color: var(--sl-text-muted); }
-.conv-quick-prompts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 22px; }
+/* A single centred row of prompt chips. Small enough to scan at a glance and
+   click without moving the pointer far. */
+.conv-quick-prompts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+/* The chip hugs its label instead of filling a grid cell. */
+.conv-quick-prompts button { flex: 0 0 auto; width: auto; }
 .conv-quick-prompts button { padding: 8px 11px; border-radius: 999px; color: var(--sl-text); font-size: 12px; font-weight: 500; }
 .conv-course-start { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin: 0 24px 14px; padding: 13px 15px; border: 1px solid #e4eaf2; border-radius: 12px; background: #fafcfe; }
 .conv-course-start > div:first-child { display: grid; gap: 2px; }
@@ -310,9 +325,11 @@
   .conv-header { padding-inline: 2px; }
   .conv-main-topbar { align-items: flex-start; flex-wrap: wrap; }
   .conv-context-chip { width: 100%; max-width: none; margin-left: 47px; }
-  .conv-welcome { padding: 32px 15px 22px; }
-  .conv-quick-prompts { display: grid; width: 100%; }
-  .conv-quick-prompts button { width: 100%; }
+  .conv-welcome { padding: 18px 15px 13px; }
+  /* Chips stay inline on a phone: a stack of full-width bars reads as a menu
+     rather than a set of suggestions. */
+  .conv-quick-prompts { display: flex; flex-wrap: wrap; justify-content: center; width: 100%; }
+  .conv-quick-prompts button { width: auto; }
   .conv-course-start { align-items: stretch; flex-direction: column; }
   .conv-course-actions { display: grid; }
   .conv-course-actions button { text-align: left; }

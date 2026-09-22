@@ -726,23 +726,25 @@ label {
   border-bottom-color: #e7eef8;
   background: rgba(255, 255, 255, 0.58);
 }
+/* The empty state sits directly above the composer rather than filling the
+   pane: a short greeting, then a row of prompts to click. It must not grow, or
+   the gap between the greeting and the input reads as missing content. */
 .app-content--conversation .conv-welcome {
+  display: flex;
   width: min(760px, calc(100% - 48px));
-  max-width: 900px;
-  min-height: 0;
-  flex: 1;
-  align-content: center;
-  justify-items: start;
-  margin: 0 auto;
-  padding: 34px 16px 24px;
-  text-align: left;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  margin: auto auto 0;
+  padding: 24px 16px 18px;
+  text-align: center;
 }
 .app-content--conversation .conv-welcome h2 {
-  margin: 8px 0 10px;
+  margin: 0 0 16px;
   color: #1f2937;
-  font-size: clamp(30px, 3.8vw, 42px);
-  line-height: 1.2;
-  letter-spacing: -0.035em;
+  font-size: 22px;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
 }
 .app-content--conversation .conv-welcome > p:not(.eyebrow):not(.conv-draft-notice) {
   max-width: 48ch;
@@ -750,27 +752,29 @@ label {
   font-size: 16px;
 }
 .app-content--conversation .conv-quick-prompts {
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 28px;
+  /* A wrapping row of chips, centred. Not a 3-up grid: these are prompts to
+     click, not features to browse. */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 0;
 }
+/* Prompt chips, not feature cards: one glanceable row that fills the input
+   rather than a grid that invites browsing. */
 .app-content--conversation .conv-prompt-card {
-  display: grid;
+  display: inline-flex;
   min-width: 0;
-  min-height: 80px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 11px;
-  padding: 14px 15px;
+  gap: 7px;
+  padding: 8px 13px 8px 10px;
   border: 1px solid #dce7f5;
-  border-radius: 14px;
+  border-radius: 999px;
   color: #334155;
-  background: rgba(255, 255, 255, 0.84);
-  text-align: left;
-  font-size: 14px;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 500;
+  transition: border-color 0.15s, background 0.15s;
 }
 .app-content--conversation .conv-quick-prompts,
 .app-content--conversation .conv-course-start,
@@ -784,13 +788,14 @@ label {
 }
 .conv-prompt-icon {
   display: grid;
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
   place-items: center;
-  border-radius: 9px;
+  border-radius: 6px;
   color: var(--sl-primary-ink);
   background: var(--sl-primary-soft);
-  font-size: 15px;
+  font-size: 11px;
   font-weight: 700;
 }
 .conv-prompt-arrow {
@@ -955,18 +960,21 @@ label {
   }
   .app-content--conversation .conv-welcome {
     width: 100%;
-    padding: 28px 18px 20px;
+    padding: 20px 16px 14px;
   }
   .app-content--conversation .conv-welcome h2 {
-    font-size: clamp(28px, 8vw, 36px);
+    font-size: 19px;
   }
   .app-content--conversation .conv-quick-prompts {
-    grid-template-columns: 1fr;
     gap: 8px;
-    margin-top: 20px;
+    margin-top: 0;
   }
+  /* On a narrow screen the chip keeps its own width and wraps, rather than
+     stretching into a full-width bar. */
   .app-content--conversation .conv-prompt-card {
-    min-height: 60px;
+    min-height: 40px;
+    width: auto;
+    flex: 0 0 auto;
   }
   .app-content--conversation .conv-course-start {
     width: calc(100% - 28px);
