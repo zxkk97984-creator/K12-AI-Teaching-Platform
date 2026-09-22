@@ -39,7 +39,7 @@ async function signIn(page: Page, account: { username: string; password: string 
   await page.getByLabel("密码").fill(account.password);
   await page.getByRole("button", { name: "登录" }).click();
   // T05 sends admins to the home shell and students into onboarding/settings.
-  await expect(page).toHaveURL(/\/(settings|onboarding|)$/);
+  await expect(page).toHaveURL(/\/(settings|onboarding|conversations)$/);
 }
 
 async function registerAndPublish(
