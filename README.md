@@ -1,7 +1,11 @@
-# 霜铃 K12 教学助手
+# K12人工智能教学平台
 
-面向比赛展示的 AI 教学作品，串联课程学习、霜铃自由对话、互动练习、动画演示、在线编程和学习记录。
+霜铃 K12：面向比赛展示的 AI 教学作品，串联课程学习、自由对话、互动练习、动画演示、在线编程和学习记录。
 采用 FastAPI + React/TypeScript/Vite + PostgreSQL，AI 通过 Knodo Tutor / Designer 接入。
+
+本项目为非开源比赛作品，代码保存在私有仓库
+[K12-AI-Teaching-Platform](https://github.com/zxkk97984-creator/K12-AI-Teaching-Platform)。
+`main` 保存阶段基线，`Xiaoxiao/next-phase` 用于下一阶段开发；仓库不包含本机密钥、数据库或上传文件。
 
 ## 启动
 

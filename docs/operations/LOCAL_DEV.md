@@ -1,5 +1,10 @@
 # 本地运行与开发
 
+当前项目的 GitHub 备份是私有仓库 `zxkk97984-creator/K12-AI-Teaching-Platform`，
+与旧 `K12-Learning-platform`、`k12-multimodal-learning-assistant` 仓库独立。
+`main` 保存阶段基线，`Xiaoxiao/next-phase` 为下一阶段工作分支。私有仓库只保存代码与必要资产，
+本机运行配置、数据库和上传内容仍需单独保管；不能通过将仓库改为公开来分享比赛材料。
+
 所有日常命令从项目根目录执行，入口是 `./k12`。运行配置保存在
 `~/.config/k12/runtime.env`（或 `K12_RUNTIME_ENV_FILE` 指定的绝对路径），
 模板是 `config/runtime.env.example`。`setup` 首次创建权限为 600 的配置，自动生成本机
