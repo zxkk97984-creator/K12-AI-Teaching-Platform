@@ -268,3 +268,115 @@ class Observation(Base):
         CheckConstraint("projection_revision >= 1", name="ck_learning_observations_revision"),
         CheckConstraint("jsonb_typeof(basis) = 'object'", name="ck_learning_observations_basis"),
     )
+
+
+class LearningBookmark(Base):
+    """An owner-scoped saved item in the student's bookshelf.
+
+    ``target_id`` is deliberately a string because courses and registered
+    resources use UUIDs while animation definitions use stable registry ids.
+    The snapshot fields let a student remove an item after its source is
+    withdrawn without exposing the withdrawn content.
+    """
+
+    __tablename__ = "learning_bookmarks"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("identity_users.id", ondelete="CASCADE"), nullable=False
+    )
+    target_kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    target_id: Mapped[str] = mapped_column(String(160), nullable=False)
+    target_title: Mapped[str] = mapped_column(String(200), nullable=False)
+    target_type: Mapped[str | None] = mapped_column(String(32))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "owner_user_id",
+            "target_kind",
+            "target_id",
+            name="uq_learning_bookmarks_owner_target",
+        ),
+        CheckConstraint(
+            "target_kind IN ('COURSE', 'RESOURCE', 'ANIMATION')",
+            name="ck_learning_bookmarks_target_kind",
+        ),
+        CheckConstraint(
+            "length(target_id) BETWEEN 1 AND 160", name="ck_learning_bookmarks_target_id"
+        ),
+        CheckConstraint(
+            "length(target_title) BETWEEN 1 AND 200", name="ck_learning_bookmarks_title"
+        ),
+    )
+
+
+class PicturebookProgress(Base):
+    """The last page a student explicitly viewed in a built-in picturebook."""
+
+    __tablename__ = "learning_picturebook_progress"
+
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("identity_users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    story_id: Mapped[str] = mapped_column(String(24), primary_key=True)
+    page_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        CheckConstraint("story_id IN ('crow', 'tortoise')", name="ck_picturebook_story_id"),
+        CheckConstraint("page_index BETWEEN 0 AND 2", name="ck_picturebook_page_index"),
+    )
+
+
+class LearningOpenEvent(Base):
+    """A factual, owner-scoped open action for a resource-like item.
+
+    Open events do not imply completion, mastery, or reading progress. They
+    only record that the student explicitly opened a visible item.
+    """
+
+    __tablename__ = "learning_open_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("identity_users.id", ondelete="CASCADE"), nullable=False
+    )
+    # A client generated id makes an explicit open action safe to retry after
+    # a network timeout. It is scoped to the owner.
+    client_event_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    target_kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    target_id: Mapped[str] = mapped_column(String(160), nullable=False)
+    target_title: Mapped[str] = mapped_column(String(200), nullable=False)
+    target_version: Mapped[str | None] = mapped_column(String(160))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "owner_user_id",
+            "client_event_id",
+            name="uq_learning_open_events_owner_client",
+        ),
+        CheckConstraint(
+            "client_event_id IS NULL OR client_event_id ~ '^[A-Za-z0-9._:-]{8,64}$'",
+            name="ck_learning_open_events_client_id",
+        ),
+        CheckConstraint(
+            "target_kind IN ('COURSE', 'RESOURCE', 'ANIMATION')",
+            name="ck_learning_open_events_target_kind",
+        ),
+        CheckConstraint(
+            "length(target_id) BETWEEN 1 AND 160", name="ck_learning_open_events_target_id"
+        ),
+        CheckConstraint(
+            "length(target_title) BETWEEN 1 AND 200", name="ck_learning_open_events_title"
+        ),
+    )

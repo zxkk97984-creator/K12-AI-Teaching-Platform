@@ -29,6 +29,7 @@ from app.modules.assessment.models import (
 )
 from app.modules.assessment.service import create_quiz_draft_job
 from app.modules.assessment.specs import load_chapter_material
+from app.modules.content.models import Chapter
 from app.modules.identity.models import UserRole
 from app.modules.learning.models import QuizEvidence
 from tests.content_helpers import revision_by_slug
@@ -208,6 +209,203 @@ async def _hint(client, session_id, question_id, level: int, key: str):
         json={"level": level, "idempotency_key": key},
         headers=await csrf_headers(client),
     )
+
+
+@pytest.mark.asyncio
+async def test_quiz_summary_is_recent_owner_scoped_and_answer_free(
+    content_session, test_settings: Settings
+):
+    settings = teaching_settings(test_settings)
+    await prepare_fixture_course(content_session)
+    revision = await revision_by_slug(content_session, "t06-fixture-course", "ch02", 1)
+    chapter = await content_session.get(Chapter, revision.chapter_id)
+    material = await load_chapter_material(content_session, chapter_id=revision.chapter_id)
+    await _auto_validated_draft(
+        content_session,
+        settings,
+        revision.chapter_id,
+        [
+            _single_choice(f"summary-q{index}", material.objectives[0], _source_refs(material))
+            for index in range(1, 4)
+        ],
+    )
+    await _junior(settings, "t16.summary.owner")
+    await _junior(settings, "t16.summary.other")
+    client = create_app_client(settings)
+    async with client:
+        assert (await login(client, "t16.summary.owner", PASSWORD)).status_code == 200
+        first = await _open_quiz(client, revision.chapter_id)
+        second = await _open_quiz(client, revision.chapter_id)
+        for index, question in enumerate(first["questions"], 1):
+            answered = await _answer(
+                client, first["id"], question["id"], "A", f"t16-summary-000{index}"
+            )
+            assert answered.status_code == 200, answered.text
+
+        response = await client.get("/api/v1/quiz-sessions?view=summary&limit=1")
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body["total"] == 2 and body["limit"] == 1 and body["offset"] == 0
+        assert body["items"][0]["id"] == first["id"]
+        assert body["items"][0]["title"] == f"{chapter.title} · 章节练习"
+        assert body["items"][0]["status"] == "COMPLETED"
+        assert body["items"][0]["progress"] == {"answered": 3, "correct": 3, "total": 3}
+        assert body["items"][0]["completed_at"]
+        assert "correct_answer" not in response.text
+        assert "questions" not in body["items"][0]
+        assert "explanation" not in response.text
+
+        next_page = await client.get("/api/v1/quiz-sessions?view=summary&limit=1&offset=1")
+        assert next_page.json()["items"][0]["id"] == second["id"]
+        full = await client.get("/api/v1/quiz-sessions")
+        assert full.status_code == 200 and len(full.json()["items"]) == 2
+        assert "questions" in full.json()["items"][0]
+        assert (await client.get("/api/v1/quiz-sessions?view=summary&limit=0")).status_code == 422
+
+        assert (await login(client, "t16.summary.other", PASSWORD)).status_code == 200
+        other = await client.get("/api/v1/quiz-sessions?view=summary")
+        assert other.json() == {"items": [], "total": 0, "limit": 100, "offset": 0}
+
+
+@pytest.mark.asyncio
+async def test_quiz_answer_draft_position_and_history_are_owner_scoped(
+    content_session, test_settings: Settings
+):
+    settings = teaching_settings(test_settings)
+    await prepare_fixture_course(content_session)
+    chapter = await revision_by_slug(content_session, "t06-fixture-course", "ch02", 1)
+    material = await load_chapter_material(content_session, chapter_id=chapter.chapter_id)
+    await _auto_validated_draft(
+        content_session,
+        settings,
+        chapter.chapter_id,
+        [
+            _single_choice("draft-q1", material.objectives[0], _source_refs(material)),
+            _single_choice("draft-q2", material.objectives[0], _source_refs(material)),
+            _single_choice("draft-q3", material.objectives[0], _source_refs(material)),
+        ],
+    )
+    await _junior(settings, "t16.draft.student")
+    client = create_app_client(settings)
+    async with client:
+        assert (await login(client, "t16.draft.student", PASSWORD)).status_code == 200
+        quiz = await _open_quiz(client, chapter.chapter_id)
+        question_id = quiz["questions"][0]["id"]
+        saved = await client.put(
+            f"/api/v1/quiz-sessions/{quiz['id']}/questions/{question_id}/draft",
+            json={"answer": "A", "base_revision": 0},
+            headers=await csrf_headers(client),
+        )
+        assert saved.status_code == 200, saved.text
+        assert saved.json()["draft"]["revision"] == 1
+        positioned = await client.patch(
+            f"/api/v1/quiz-sessions/{quiz['id']}/position",
+            json={"position": 0},
+            headers=await csrf_headers(client),
+        )
+        assert positioned.status_code == 200
+        restored = await client.get(f"/api/v1/quiz-sessions/{quiz['id']}")
+        assert restored.status_code == 200
+        assert restored.json()["drafts"][question_id]["answer"] == "A"
+        history = await client.get(f"/api/v1/quiz-sessions/{quiz['id']}/history")
+        assert history.status_code == 200
+        assert history.json()["attempts"] == []
+
+
+@pytest.mark.asyncio
+async def test_result_uses_server_attempts_and_is_owner_scoped(
+    content_session, test_settings: Settings
+):
+    settings = teaching_settings(test_settings)
+    await prepare_fixture_course(content_session)
+    chapter = await revision_by_slug(content_session, "t06-fixture-course", "ch02", 1)
+    material = await load_chapter_material(content_session, chapter_id=chapter.chapter_id)
+    await _auto_validated_draft(
+        content_session,
+        settings,
+        chapter.chapter_id,
+        [
+            _single_choice(f"result-q{index}", material.objectives[0], _source_refs(material))
+            for index in range(1, 4)
+        ],
+    )
+    await _junior(settings, "t16.result.owner")
+    await _junior(settings, "t16.result.other")
+    client = create_app_client(settings)
+    async with client:
+        assert (await login(client, "t16.result.owner", PASSWORD)).status_code == 200
+        quiz = await _open_quiz(client, chapter.chapter_id)
+        first, second, third = quiz["questions"]
+        url = f"/api/v1/quiz-sessions/{quiz['id']}/result"
+        assert (await client.get(url)).status_code == 409
+
+        fake_score = await client.post(
+            f"/api/v1/quiz-sessions/{quiz['id']}/questions/{first['id']}/answers",
+            json={"answer": "A", "score": 100, "idempotency_key": "result-fake-score"},
+            headers=await csrf_headers(client),
+        )
+        assert fake_score.status_code == 422
+        assert (
+            await _hint(client, quiz["id"], first["id"], 1, "result-hint-0001")
+        ).status_code == 200
+        assert (
+            await _answer(client, quiz["id"], first["id"], "B", "result-wrong-0001")
+        ).status_code == 200
+        assert (
+            await _answer(client, quiz["id"], first["id"], "A", "result-right-0001")
+        ).status_code == 200
+        assert (
+            await _answer(client, quiz["id"], second["id"], "A", "result-right-0002")
+        ).status_code == 200
+        assert (
+            await _answer(client, quiz["id"], third["id"], "A", "result-right-0003")
+        ).status_code == 200
+
+        response = await client.get(url)
+        assert response.status_code == 200, response.text
+        result = response.json()
+        assert (
+            result["correct"],
+            result["first_correct"],
+            result["total"],
+            result["score_percent"],
+        ) == (3, 2, 3, 100)
+        assert result["questions"][0]["first_answer"] == "B"
+        assert result["questions"][0]["last_answer"] == "A"
+        assert result["questions"][0]["attempts_used"] == 2
+        assert result["questions"][0]["hints_used"] == 1
+        assert result["questions"][0]["explanation"]
+
+        favorite_url = f"/api/v1/quiz-sessions/{quiz['id']}/favorite"
+        favorite = await client.put(favorite_url, headers=await csrf_headers(client))
+        assert favorite.status_code == 200 and favorite.json() == {"is_favorite": True}
+        assert (await client.put(favorite_url, headers=await csrf_headers(client))).json() == {
+            "is_favorite": True
+        }
+        favorites = await client.get("/api/v1/quiz-sessions?view=summary&favorite_only=true")
+        assert favorites.status_code == 200
+        assert [item["id"] for item in favorites.json()["items"]] == [quiz["id"]]
+        assert favorites.json()["items"][0]["is_favorite"] is True
+
+        repeated = await client.post(
+            f"/api/v1/quiz-sessions/{quiz['id']}/repeat",
+            json={},
+            headers=await csrf_headers(client),
+        )
+        assert repeated.status_code == 201, repeated.text
+        assert repeated.json()["questions"][0]["stem"] == first["stem"]
+        assert repeated.json()["progress"] == {"answered": 0, "correct": 0, "total": 3}
+        assert repeated.json()["is_favorite"] is False
+
+        unfavorite = await client.delete(favorite_url, headers=await csrf_headers(client))
+        assert unfavorite.status_code == 200 and unfavorite.json() == {"is_favorite": False}
+        assert (await client.get("/api/v1/quiz-sessions?favorite_only=true")).json()["items"] == []
+
+        assert (await login(client, "t16.result.other", PASSWORD)).status_code == 200
+        assert (await client.get(url)).status_code == 404
+        assert (
+            await client.put(favorite_url, headers=await csrf_headers(client))
+        ).status_code == 404
 
 
 @pytest.mark.asyncio
@@ -590,6 +788,11 @@ async def test_wrong_answer_creates_review_link_and_similar_source(
         # no second same-objective draft exists → honest "no similar source"
         assert body["items"][0]["similar_source"]["draft_id"] is None
         assert body["items"][0]["next_action"] == "REVIEW_SOURCE_MATERIAL"
+        wrong_list = await client.get("/api/v1/quiz-wrong-questions")
+        assert wrong_list.status_code == 200
+        assert wrong_list.json()["items"][0]["question_id"] == str(question.id)
+        assert wrong_list.json()["items"][0]["student_answer"] == "B"
+        assert wrong_list.json()["items"][0]["outcome"] == "INCORRECT"
 
     # a second validated draft with the same objective becomes the similar source
     await _auto_validated_draft(
@@ -614,6 +817,9 @@ async def test_wrong_answer_creates_review_link_and_similar_source(
         assert item["similar_source"]["draft_id"] is not None
         assert item["similar_source"]["label"]
         assert item["next_action"] == "REVIEW_SIMILAR_QUESTION"
+        own_wrong = (await client.get("/api/v1/quiz-wrong-questions")).json()["items"]
+        assert len(own_wrong) == 1
+        assert own_wrong[0]["question_id"] == str(question2.id)
 
     await content_session.commit()
     links = int(await content_session.scalar(select(func.count()).select_from(QuizReviewLink)) or 0)

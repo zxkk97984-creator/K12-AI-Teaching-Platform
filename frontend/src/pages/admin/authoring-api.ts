@@ -6,6 +6,7 @@
  */
 
 import { ApiError, ensureCsrfToken } from "../../features/identity/api";
+import type { components as AdminComponents } from "../../shared/types/generated/admin";
 
 const API_BASE = "/api/v1";
 
@@ -22,8 +23,15 @@ export type AuthoringJob = {
   error_code: string | null;
   gateway_mode: string;
   idempotency_key: string;
-  package_id: string | null;
+  package_id?: string | null;
 };
+
+export type AuthoringRevision = AdminComponents["schemas"]["AdminChapterRevisionDTO"];
+export type AuthoringJobSummary = AdminComponents["schemas"]["AdminAuthoringJobDTO"] & {
+  status: AuthoringJob["status"];
+};
+
+export type Paged<T> = { items: T[]; total: number; limit: number; offset: number };
 
 export type AuthoringArtifact = {
   kind: string;
@@ -109,8 +117,38 @@ export function createAuthoringJob(chapterRevisionId: string, idempotencyKey: st
   );
 }
 
+export function listAuthoringRevisions(options: {
+  q?: string;
+  courseId?: string;
+  chapterId?: string;
+  limit?: number;
+  offset?: number;
+} = {}): Promise<Paged<AuthoringRevision>> {
+  const params = new URLSearchParams();
+  if (options.q?.trim()) params.set("q", options.q.trim());
+  if (options.courseId) params.set("course_id", options.courseId);
+  if (options.chapterId) params.set("chapter_id", options.chapterId);
+  if (options.limit !== undefined) params.set("limit", String(options.limit));
+  if (options.offset !== undefined) params.set("offset", String(options.offset));
+  const query = params.toString();
+  return request<Paged<AuthoringRevision>>(`${API_BASE}/admin/content/revisions${query ? `?${query}` : ""}`);
+}
+
+export function listAuthoringJobs(options: {
+  status?: AuthoringJob["status"];
+  limit?: number;
+  offset?: number;
+} = {}): Promise<Paged<AuthoringJobSummary>> {
+  const params = new URLSearchParams();
+  if (options.status) params.set("status", options.status);
+  if (options.limit !== undefined) params.set("limit", String(options.limit));
+  if (options.offset !== undefined) params.set("offset", String(options.offset));
+  const query = params.toString();
+  return request<Paged<AuthoringJobSummary>>(`${API_BASE}/admin/authoring/jobs${query ? `?${query}` : ""}`);
+}
+
 export function getAuthoringJob(jobId: string): Promise<AuthoringJob> {
-  return request<AuthoringJob>(`${API_BASE}/admin/authoring/jobs/${jobId}`);
+  return request<AuthoringJob>(`${API_BASE}/admin/authoring/jobs/${encodeURIComponent(jobId)}`);
 }
 
 export function cancelAuthoringJob(jobId: string): Promise<AuthoringJob> {

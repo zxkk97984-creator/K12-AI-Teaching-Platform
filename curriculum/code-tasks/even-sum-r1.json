@@ -1,0 +1,140 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "even-sum",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": true,
+  "review_status": "UNREVIEWED",
+  "title": "偶数求和：把符合条件的数字加起来",
+  "description": "编写 sum_even(numbers)，返回列表中所有偶数的和。列表允许为空；输入元素均为 -1,000,000 到 1,000,000 的整数。",
+  "starter_code": "def sum_even(numbers):\n    \"\"\"偶数求和：把符合条件的数字加起来\"\"\"\n    # 在这里写下你的解题思路\n    pass\n",
+  "entrypoint": "sum_even",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "numbers"
+      ],
+      "properties": {
+        "numbers": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "type": "integer",
+            "minimum": -1000000,
+            "maximum": 1000000
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "integer"
+    },
+    "limits": {
+      "max_input_bytes": 65536,
+      "max_output_bytes": 16384,
+      "timeout_ms": 3000
+    },
+    "errors": [
+      "INVALID_JSON",
+      "INVALID_INPUT",
+      "STUDENT_EXCEPTION",
+      "TIMEOUT",
+      "OUTPUT_LIMIT",
+      "SYSTEM_ERROR"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "numbers": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "output": 6
+    },
+    {
+      "input": {
+        "numbers": []
+      },
+      "output": 0
+    },
+    {
+      "input": {
+        "numbers": [
+          -3,
+          -4,
+          6
+        ]
+      },
+      "output": 2
+    }
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {
+        "id": "F1",
+        "name": "常规用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "F2",
+        "name": "变化与组合用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "R1",
+        "name": "边界用例",
+        "dimension": "R",
+        "max_score": 10,
+        "case_count": 2
+      }
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "053645894a041381f1636d17a17915ad95325e40fbabb14be68c6f908f3922b1"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [
+      {
+        "id": "F",
+        "max_score": 60
+      },
+      {
+        "id": "R",
+        "max_score": 10
+      }
+    ],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "python-first-steps",
+    "chapter_slug": "ch05",
+    "revision": 1,
+    "stage": "JUNIOR",
+    "knowledge_point_slugs": [
+      "variable",
+      "condition-if",
+      "loop"
+    ]
+  },
+  "source": {
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "source_path": "curriculum/code-tasks/even-sum-r1.json",
+    "source_sha256": "16449008c79bc0033c5c3c991d1bd252c1b7e1032659a15fa41be58d3b8a2d7d",
+    "reference_solution_sha256": "69a2328f18440f35c20ca80274fe1607f4304d825dcc3ed48867626eb4a21a8c"
+  }
+}

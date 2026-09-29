@@ -57,7 +57,8 @@ async def clean_test_db(migrated_test_db: None, test_settings: Settings) -> Asyn
     async with engine.begin() as connection:
         await connection.execute(
             text(
-                "TRUNCATE privacy_deletion_requests, codelab_code_runs, codelab_code_drafts, "
+                "TRUNCATE privacy_deletion_requests, codelab_task_favorites, "
+                "codelab_task_catalog, codelab_code_runs, codelab_code_drafts, "
                 "codelab_task_revisions, "
                 "authoring_publications, authoring_reviews, "
                 "authoring_artifacts, "
@@ -66,10 +67,13 @@ async def clean_test_db(migrated_test_db: None, test_settings: Settings) -> Asyn
                 "resource_items, "
                 "recommendation_feedback_events, recommendation_feedback, "
                 "recommendation_snapshots, "
+                "learning_picturebook_progress, learning_open_events, learning_bookmarks, "
+                "memory_document_versions, memory_documents, memory_context_states, "
                 "memory_events, memory_candidates, learning_observations, "
                 "learning_evidence_items, "
                 "learning_quiz_evidence, assessment_quiz_review_links, "
                 "assessment_quiz_hint_events, assessment_quiz_attempts, "
+                "assessment_quiz_answer_drafts, "
                 "assessment_quiz_questions, assessment_quiz_sessions, "
                 "assessment_quiz_drafts, assessment_generation_jobs, "
                 "assessment_designer_sessions, "

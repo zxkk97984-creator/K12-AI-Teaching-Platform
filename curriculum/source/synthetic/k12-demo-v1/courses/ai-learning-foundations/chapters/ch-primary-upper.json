@@ -1,0 +1,39 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-primary-upper",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "数据小侦探：给机器贴标签"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "通过分类和标签理解数据如何帮助程序判断，能预测简单分类结果并修改一小段代码。"
+    },
+    {
+      "type": "SECTION",
+      "key": "labels",
+      "text": "标签让例子更容易被整理"
+    },
+    {
+      "type": "KNOWLEDGE_CARD",
+      "title": "数据和标签",
+      "text": "标签像给照片贴上的小纸条。程序可以根据很多带标签的例子，学习把新例子分到合适的类别。",
+      "example": {
+        "label": "预测一下",
+        "text": "如果训练例子里没有雨天的照片，程序遇到雨天会怎样？"
+      }
+    },
+    {
+      "type": "CALLOUT",
+      "title": "动手试试",
+      "text": "完成一次分类游戏，修改一行规则并比较结果。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "demo-data-labels",
+    "demo-ai-makes-mistakes",
+    "demo-condition-if"
+  ]
+}

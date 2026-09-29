@@ -4,15 +4,15 @@
   --sl-font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
-  --sl-bg: oklch(99% 0.002 240);
+  --sl-bg: #ffffff;
   --sl-surface: #fff;
-  --sl-text: oklch(18% 0.012 250);
-  --sl-text-muted: #637080;
-  --sl-primary: oklch(53% 0.18 255);
+  --sl-text: #202124;
+  --sl-text-muted: #5c6062;
+  --sl-primary: #25272a;
   --sl-primary-ink: var(--sl-primary);
-  --sl-border: 1px solid #e4e7ec;
-  --sl-primary-soft: #edf3fb;
-  --sl-neutral-soft: #f3f4f6;
+  --sl-border: 1px solid #e7e7e5;
+  --sl-primary-soft: #fff4d2;
+  --sl-neutral-soft: #e7e7e5;
   --sl-radius-sm: 10px;
   --sl-radius-md: 14px;
   --sl-radius-lg: 18px;
@@ -22,7 +22,7 @@
   --sl-space-5: 24px;
   --sl-space-6: 32px;
   --sl-text-2xl: clamp(26px, 3vw, 36px);
-  --sl-focus: #316ac2;
+  --sl-focus: #25272a;
   font-family: var(--sl-font-family);
   color: var(--sl-text);
   background: var(--sl-bg);
@@ -174,7 +174,7 @@ label {
 }
 .app-avatar {
   border: var(--sl-border);
-  background: #eff2f7;
+  background: #e7e7e5;
   width: 32px;
   height: 32px;
   display: grid;
@@ -318,7 +318,7 @@ label {
 .app-content .content-card {
   padding: 24px;
   border-radius: 12px;
-  border-top: 3px solid #dce6f3;
+  border-top: 3px solid #e7e7e5;
 }
 .app-content .content-card__title {
   font-size: 20px;
@@ -365,7 +365,7 @@ label {
   margin-top: 18px;
 }
 .conversation-content .conv-composer {
-  background: #f7f8fa;
+  background: #fafafa;
   border: var(--sl-border);
   border-radius: 12px;
   padding: 14px;
@@ -412,7 +412,7 @@ label {
   width: 100%;
 }
 .app-content :is(.admin-resource-table, .admin-authoring__table) th {
-  background: #f3f5f8;
+  background: #fafafa;
   color: var(--sl-text-muted);
   font-weight: 500;
 }
@@ -530,22 +530,22 @@ label {
 /* Unified K12 shell. Feature styles remain scoped below this frame so the
    same navigation and history are available on every student page. */
 :root {
-  --sl-bg: #f4f9ff;
+  --sl-bg: #ffffff;
   --sl-surface: #ffffff;
-  --sl-text: #14213d;
-  --sl-text-muted: #586988;
-  --sl-primary: #006bee;
-  --sl-primary-ink: #0056cc;
-  --sl-primary-soft: #eaf3ff;
-  --sl-border: 1px solid #dce7f5;
-  --sl-focus: #246fca;
+  --sl-text: #25272a;
+  --sl-text-muted: #5c6062;
+  --sl-primary: #25272a;
+  --sl-primary-ink: #25272a;
+  --sl-primary-soft: #fff4d2;
+  --sl-border: 1px solid #e7e7e5;
+  --sl-focus: #5c6062;
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .app-shell { min-height: 100dvh; display: flex; background: var(--sl-bg); color: var(--sl-text); }
 .app-sidebar { position: sticky; top: 0; z-index: 40; display: flex; width: 264px; min-width: 264px; height: 100dvh; flex-direction: column; padding: 24px 16px 16px; border-right: var(--sl-border); background: rgba(255, 255, 255, .94); backdrop-filter: blur(16px); }
 .app-brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 22px; color: var(--sl-text); text-decoration: none; }
-.app-brand-mark { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 13px; color: #fff; background: linear-gradient(145deg, #28a3ff, #1767df); font-size: 16px; font-weight: 800; }
+.app-brand-mark { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 13px; color: #fff; background: linear-gradient(145deg, #5c6062, #5c6062); font-size: 16px; font-weight: 800; }
 .app-brand-copy { display: grid; min-width: 0; gap: 1px; }
 .app-brand-copy strong { font-size: 18px; letter-spacing: -.02em; white-space: nowrap; }
 .app-brand-copy small { color: var(--sl-text-muted); font-size: 11px; white-space: nowrap; }
@@ -554,7 +554,7 @@ label {
 .app-new-conversation span { font-size: 20px; line-height: 1; font-weight: 400; }
 .app-sidebar-nav { display: grid; gap: 4px; }
 .app-sidebar-nav a { display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 8px 12px; border-radius: 9px; color: var(--sl-text); text-decoration: none; font-size: 14px; }
-.app-sidebar-nav a:hover { background: #f0f6ff; }
+.app-sidebar-nav a:hover { background: #f5f5f4; }
 .app-sidebar-nav a.active { color: var(--sl-primary-ink); background: var(--sl-primary-soft); font-weight: 650; }
 .app-sidebar-nav svg { flex: 0 0 auto; }
 .app-history { display: flex; min-height: 0; flex: 1; flex-direction: column; margin: 22px 4px 14px; padding-top: 17px; border-top: var(--sl-border); }
@@ -562,12 +562,12 @@ label {
 .app-history-heading h2 { margin: 0; color: var(--sl-text-muted); font-size: 12px; font-weight: 650; }
 .app-history-heading span { color: var(--sl-text-muted); font-size: 11px; }
 .app-history-search { display: block; padding: 0 6px 8px; }
-.app-history-search input { min-height: 32px; padding: 6px 9px; border-color: #e2ebf7; border-radius: 8px; background: #f8fbff; font-size: 12px; }
+.app-history-search input { min-height: 32px; padding: 6px 9px; border-color: #e7e7e5; border-radius: 8px; background: #f7f7f6; font-size: 12px; }
 .app-history-list { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; }
 .app-history-list ul { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
 .app-history-list li { position: relative; }
 .app-history-list li > button:first-child { display: flex; width: 100%; min-width: 0; align-items: center; gap: 8px; padding: 8px 7px; border: 1px solid transparent; border-radius: 8px; color: var(--sl-text); background: transparent; text-align: left; }
-.app-history-list li > button:first-child:hover, .app-history-list li > button:first-child.is-active { border-color: #cbe0fb; background: #f0f6ff; }
+.app-history-list li > button:first-child:hover, .app-history-list li > button:first-child.is-active { border-color: #d4d5d2; background: #eff0ee; }
 .app-history-icon { display: grid; flex: 0 0 auto; color: var(--sl-text-muted); }
 .app-history-copy { display: grid; min-width: 0; gap: 1px; }
 .app-history-title { display: block; min-width: 0; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
@@ -579,7 +579,7 @@ label {
 .app-history-all { display: none; margin-top: 8px; padding: 6px; border: 0; color: var(--sl-primary-ink); background: transparent; font-size: 12px; }
 .app-history-toggle { padding: 1px 3px; border: 0; color: var(--sl-primary-ink); background: transparent; font-size: 10px; font-weight: 500; }
 .app-sidebar-user { display: flex; min-width: 0; align-items: center; gap: 9px; padding: 12px 5px 0; border-top: var(--sl-border); }
-.app-avatar { display: grid; flex: 0 0 auto; width: 32px; height: 32px; place-items: center; border: 1px solid #cae0f9; border-radius: 50%; color: var(--sl-primary-ink); background: #eaf3ff; font-size: 12px; font-weight: 700; }
+.app-avatar { display: grid; flex: 0 0 auto; width: 32px; height: 32px; place-items: center; border: 1px solid #d7d8d5; border-radius: 50%; color: var(--sl-primary-ink); background: #fff4d2; font-size: 12px; font-weight: 700; }
 .app-user-copy { display: grid; min-width: 0; flex: 1; gap: 1px; }
 .app-user-copy strong { min-width: 0; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
 .app-user-copy small { color: var(--sl-text-muted); font-size: 10px; }
@@ -589,7 +589,7 @@ label {
 .app-main { display: flex; min-width: 0; flex: 1; flex-direction: column; }
 .app-topbar { display: flex; min-height: 76px; align-items: center; justify-content: space-between; gap: 16px; padding: 16px clamp(20px, 4vw, 56px); border-bottom: var(--sl-border); background: rgba(255, 255, 255, .72); backdrop-filter: blur(12px); }
 .app-breadcrumb { margin: 0; color: var(--sl-text-muted); font-size: 11px; }
-.app-topbar h1 { margin: 2px 0 0; color: var(--sl-text); font-size: 20px; letter-spacing: -.02em; }
+.app-topbar .app-topbar-page-title { margin: 2px 0 0; color: var(--sl-text); font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
 .app-topbar-account { display: flex; align-items: center; gap: 8px; color: var(--sl-text-muted); font-size: 12px; }
 .app-topbar-dot { width: 8px; height: 8px; border-radius: 50%; background: #36b37e; }
 .app-content { width: 100%; max-width: 1440px; flex: 1; margin: 0; padding: 0 clamp(20px, 4vw, 56px) 64px; }
@@ -605,7 +605,7 @@ label {
 @media (max-width: 820px) {
   .app-sidebar { position: fixed; inset: 0 auto 0 0; transform: translateX(-105%); transition: transform .2s ease; box-shadow: 16px 0 38px #12284420; }
   .app-sidebar.is-open { transform: translateX(0); }
-  .app-mobile-toggle { position: fixed; top: 15px; left: 14px; z-index: 50; display: grid; width: 38px; height: 38px; place-items: center; padding: 0; border: 1px solid #d4e2f3; border-radius: 10px; color: var(--sl-text); background: #fff; }
+  .app-mobile-toggle { position: fixed; top: 15px; left: 14px; z-index: 50; display: grid; width: 38px; height: 38px; place-items: center; padding: 0; border: 1px solid #e7e7e5; border-radius: 10px; color: var(--sl-text); background: #fff; }
   .app-sidebar-backdrop { position: fixed; inset: 0; z-index: 35; display: block; padding: 0; border: 0; border-radius: 0; background: #14213d4d; }
   .app-topbar { padding-left: 68px; }
   .app-topbar-account { display: none; }
@@ -613,27 +613,27 @@ label {
 }
 @media (max-width: 560px) {
   .app-topbar { min-height: 66px; padding-top: 12px; padding-bottom: 12px; }
-  .app-topbar h1 { font-size: 18px; }
+  .app-topbar .app-topbar-page-title { font-size: 18px; }
   .app-content { padding-right: 14px; padding-left: 14px; }
   .app-content .conv-page { padding-top: 14px; }
 }
 
 /* Feature-owned controls keep readable foregrounds after lazy CSS loads. */
 .app-content .codelab-editor {
-  background: #fbfcfe;
+  background: #fafafa;
   border: var(--sl-border);
 }
 .app-content .codelab-editor .cm-editor {
-  color: #202c3c;
-  background: #fbfcfe;
+  color: #25272a;
+  background: #fafafa;
 }
 .app-content .codelab-editor .cm-gutters {
-  color: #68768a;
-  background: #f0f3f7;
+  color: #5c6062;
+  background: #e7e7e5;
   border-right: var(--sl-border);
 }
 .app-content .codelab-editor .cm-cursor {
-  border-left-color: #202c3c;
+  border-left-color: #25272a;
 }
 .app-content .codelab-task-list button {
   color: var(--sl-text);
@@ -693,9 +693,7 @@ label {
   padding: 0;
   gap: 0;
   border-radius: 0;
-  background:
-    linear-gradient(180deg, rgba(244, 249, 255, 0.82), rgba(244, 249, 255, 0.96)),
-    url("/k12-learning-background.webp") center / cover no-repeat;
+  background: var(--sl-bg);
 }
 .app-content--conversation .conversation-content--full {
   display: flex;
@@ -723,7 +721,7 @@ label {
 .app-content--conversation .conv-main-topbar {
   min-height: 56px;
   padding: 9px 24px;
-  border-bottom-color: #e7eef8;
+  border-bottom-color: #e7e7e5;
   background: rgba(255, 255, 255, 0.58);
 }
 /* The empty state sits directly above the composer rather than filling the
@@ -741,14 +739,14 @@ label {
 }
 .app-content--conversation .conv-welcome h2 {
   margin: 0 0 16px;
-  color: #1f2937;
+  color: #25272a;
   font-size: 22px;
   line-height: 1.35;
   letter-spacing: -0.015em;
 }
 .app-content--conversation .conv-welcome > p:not(.eyebrow):not(.conv-draft-notice) {
   max-width: 48ch;
-  color: #64748b;
+  color: #5c6062;
   font-size: 16px;
 }
 .app-content--conversation .conv-quick-prompts {
@@ -768,9 +766,9 @@ label {
   align-items: center;
   gap: 7px;
   padding: 8px 13px 8px 10px;
-  border: 1px solid #dce7f5;
+  border: 1px solid #e7e7e5;
   border-radius: 999px;
-  color: #334155;
+  color: #25272a;
   background: rgba(255, 255, 255, 0.9);
   font-size: 13px;
   font-weight: 500;
@@ -783,7 +781,7 @@ label {
   z-index: 36;
 }
 .app-content--conversation .conv-prompt-card:hover {
-  border-color: #a8c8ef;
+  border-color: #d7d8d5;
   background: #fff;
 }
 .conv-prompt-icon {
@@ -799,13 +797,13 @@ label {
   font-weight: 700;
 }
 .conv-prompt-arrow {
-  color: #94a3b8;
+  color: #bfc1be;
   font-size: 18px;
   font-weight: 400;
 }
 .conv-draft-notice {
   margin: 12px 0 0;
-  color: #64748b;
+  color: #5c6062;
   font-size: 12px;
 }
 .app-content--conversation .conv-course-start {
@@ -813,7 +811,7 @@ label {
   flex-shrink: 0;
   margin: 0 auto 12px;
   padding: 10px 14px;
-  border: 1px solid #dce7f5;
+  border: 1px solid #e7e7e5;
   border-radius: 11px;
   background: rgba(255, 255, 255, 0.68);
 }
@@ -824,7 +822,7 @@ label {
   gap: 8px;
 }
 .app-content--conversation .conv-course-start strong {
-  color: #334155;
+  color: #25272a;
   font-size: 13px;
 }
 .app-content--conversation .conv-course-start span {
@@ -832,8 +830,8 @@ label {
 }
 .app-content--conversation .conv-course-actions button {
   padding: 6px 9px;
-  border: 1px solid #dce7f5;
-  background: #f8fbff;
+  border: 1px solid #e7e7e5;
+  background: #f7f7f6;
 }
 .app-content--conversation .conv-thread {
   width: min(900px, 100%);
@@ -848,16 +846,16 @@ label {
 }
 .app-content--conversation .conv-message-assistant {
   max-width: min(760px, 92%);
-  color: #334155;
+  color: #25272a;
   font-size: 16px;
   line-height: 1.7;
 }
 .app-content--conversation .conv-message-user {
   max-width: min(72%, 580px);
-  border: 1px solid #cfe2fb;
+  border: 1px solid #e7d493;
   border-radius: 14px 14px 4px 14px;
-  background: #eaf3ff;
-  color: #1f3f68;
+  background: #fff4d2;
+  color: #25272a;
   font-size: 15px;
 }
 .app-content--conversation .conv-card {
@@ -874,7 +872,7 @@ label {
   flex-shrink: 0;
   margin: 0 auto;
   padding: 11px 13px 10px;
-  border: 1px solid #d6e3f2;
+  border: 1px solid #e7e7e5;
   border-radius: 17px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 8px 22px rgba(50, 88, 130, 0.06);
@@ -887,8 +885,8 @@ label {
   padding: 3px 8px;
   overflow: hidden;
   border-radius: 7px;
-  color: #35689e;
-  background: #eef6ff;
+  color: #25272a;
+  background: #eff0ee;
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -912,7 +910,7 @@ label {
   gap: 8px;
 }
 .app-content--conversation .conv-composer-hint {
-  color: #8795a8;
+  color: #5c6062;
   font-size: 11px;
 }
 .app-content--conversation .conv-composer-actions > button {
@@ -930,9 +928,9 @@ label {
   box-shadow: none;
 }
 .app-content--conversation .conv-voice-button {
-  border: 1px solid #dce7f5;
-  background: #f7faff;
-  color: #3f5f82;
+  border: 1px solid #e7e7e5;
+  background: #f7f7f6;
+  color: #25272a;
 }
 @media (max-width: 820px) {
   .app-content--conversation {

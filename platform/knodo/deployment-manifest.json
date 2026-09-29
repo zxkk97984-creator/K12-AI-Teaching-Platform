@@ -15,7 +15,7 @@
       "skills": [
         "k12-teaching-core"
       ],
-      "packaged_config_hash": "e2f4012b3d4fd0fa8823f3de18cdc64f40c402203749cc8f6642ed5602a5f38f",
+      "packaged_config_hash": "dda40ce75a272a074ce5b88080076b9865dfc30ba94924a37e8b0768ef196ca2",
       "packaged_knowledge_bundle_hash": "ef42a2b5027392337566953f253611f44e416ee8b5b7cf3d3f9423146f068d3c",
       "deployed_config_hash": null,
       "deployment_verified": false
@@ -31,7 +31,7 @@
         "k12-assessment-author",
         "k12-content-author"
       ],
-      "packaged_config_hash": "f95fd0d712df8d3791c81f6b2957fa8d16707e07108f5d8f0765f8d7d1caca9f",
+      "packaged_config_hash": "8f551f5fea46fd71bdd584ebca36823946f53ac0d453e8db12d3e36035009179",
       "packaged_knowledge_bundle_hash": null,
       "deployed_config_hash": null,
       "deployment_verified": false

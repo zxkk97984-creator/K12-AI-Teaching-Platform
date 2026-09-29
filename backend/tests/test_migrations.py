@@ -7,11 +7,17 @@ from pathlib import Path
 
 import asyncpg
 import pytest
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 from sqlalchemy.engine import make_url
 
 from app.core.test_database import UnsafeTestDatabase, validate_test_database_url
 
 BACKEND = Path(__file__).resolve().parents[1]
+
+
+def _migration_head() -> str:
+    return ScriptDirectory.from_config(Config(str(BACKEND / "alembic.ini"))).get_current_head()
 
 
 def _run_upgrade(url: str) -> None:
@@ -50,10 +56,27 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
             "SELECT column_name FROM information_schema.columns "
             "WHERE table_schema = 'public' AND table_name = 'teaching_remote_bindings'"
         )
+        session_columns = await connection.fetch(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = 'public' AND table_name = 'teaching_lesson_sessions'"
+        )
+        run_columns = await connection.fetch(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = 'public' AND table_name = 'teaching_agent_runs'"
+        )
+        quiz_columns = await connection.fetch(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = 'public' AND table_name = 'assessment_quiz_sessions'"
+        )
     finally:
         await connection.close()
-    assert revision == "0017_knodo_remote_bindings"
+    assert revision == _migration_head()
     assert {"remote_scope", "remote_metadata"} <= {row["column_name"] for row in binding_columns}
+    assert {"conversation_type", "title", "archived_at"} <= {
+        row["column_name"] for row in session_columns
+    }
+    assert "scene_snapshot" in {row["column_name"] for row in run_columns}
+    assert "is_favorite" in {row["column_name"] for row in quiz_columns}
     assert {
         "identity_users",
         "auth_sessions",
@@ -103,6 +126,12 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "codelab_code_drafts",
         "codelab_code_runs",
         "privacy_deletion_requests",
+        "learning_bookmarks",
+        "learning_open_events",
+        "learning_picturebook_progress",
+        "memory_documents",
+        "memory_document_versions",
+        "memory_context_states",
     } <= {row["tablename"] for row in tables}
     constraint_names = {row["conname"] for row in constraints}
     assert {
@@ -116,6 +145,8 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "ck_teaching_sessions_stage",
         "ck_teaching_messages_role",
         "ck_teaching_bindings_kind",
+        "ck_teaching_sessions_conversation_type",
+        "ck_teaching_sessions_conversation_target",
         "ck_teaching_sessions_phase",
         "ck_teaching_sessions_lifecycle",
         "ck_assessment_job_status",
@@ -184,6 +215,29 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
         "ck_codelab_run_feedback_status",
         "ck_privacy_delete_status",
         "ck_privacy_delete_platform_status",
+        "ck_codelab_draft_revision",
+        "ck_codelab_draft_scope_key",
+        "ck_codelab_run_scope_key",
+        "ck_codelab_run_purpose",
+        "ck_memory_documents_category",
+        "ck_memory_documents_revision",
+        "ck_memory_documents_title",
+        "ck_memory_documents_content_length",
+        "ck_memory_document_versions_category",
+        "ck_memory_document_versions_action",
+        "ck_memory_document_versions_revision",
+        "ck_memory_document_versions_title",
+        "ck_memory_document_versions_content_length",
+        "ck_memory_context_states_revision",
+        "ck_teaching_runs_memory_revision",
+        "ck_learning_bookmarks_target_kind",
+        "ck_learning_bookmarks_target_id",
+        "ck_learning_bookmarks_title",
+        "ck_learning_open_events_target_kind",
+        "ck_learning_open_events_target_id",
+        "ck_learning_open_events_title",
+        "ck_picturebook_story_id",
+        "ck_picturebook_page_index",
     } <= constraint_names
 
 
@@ -208,7 +262,7 @@ async def test_clean_test_baseline_upgrade_is_idempotent(test_settings):
         )
     finally:
         await connection.close()
-    assert revision == "0017_knodo_remote_bindings"
+    assert revision == _migration_head()
     assert {
         "content_chapter_revisions_immutable",
         "content_review_state_guard",

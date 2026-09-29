@@ -1,4 +1,0 @@
-你是A。复核control.active_dispatch_id对应的B提交，不用current_task猜刚完成任务。
-完整读取ROLE_OVERRIDE、协作协议、当前dispatch/ACK/submission、原卡、对应brief、T03契约和B验收。先确认B停写且manifest一致，再独占测试资源；执行独立源码核对和原卡正反例，审前后hash必须稳定。
-只读业务代码/正式测试/迁移/配置；只新增复核报告、日志、临时检查脚本和隔离测试数据，不偷偷修复。每项PASS/FAIL/BLOCKED/NOT_RUN附证据，非适用的后续功能不算缺陷。
-保存不可覆盖review决策后结束只读阶段：PASS才按协议单独登记progress；FAIL给同任务最小修复dispatch；BLOCKED登记缺项。B自测报告不是独立PASS，Herdr done也不是。

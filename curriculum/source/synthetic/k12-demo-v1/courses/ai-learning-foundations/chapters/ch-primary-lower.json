@@ -1,0 +1,38 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-primary-lower",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "身边的 AI：会学习的电脑"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "用故事和生活例子认识 AI，知道 AI 会按数据和指令完成任务，也可能犯错。"
+    },
+    {
+      "type": "SECTION",
+      "key": "story",
+      "text": "先观察一个生活中的小问题"
+    },
+    {
+      "type": "KNOWLEDGE_CARD",
+      "title": "AI 是帮手",
+      "text": "把 AI 想成会按照例子做事的小帮手。它能帮忙，但遇到没见过的情况也可能答错。",
+      "example": {
+        "label": "想一想",
+        "text": "如果 AI 认错了图片，你会先检查什么？"
+      }
+    },
+    {
+      "type": "CALLOUT",
+      "title": "今天的任务",
+      "text": "完成一次AI 也会犯错，再告诉老师你发现了什么。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "demo-ai-as-helper",
+    "demo-ai-makes-mistakes"
+  ]
+}

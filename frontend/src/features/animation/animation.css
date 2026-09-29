@@ -10,7 +10,7 @@
   gap: 10px;
   margin: 16px 0;
   padding: 16px;
-  border: 1px solid #dfe3ea;
+  border: 1px solid #e7e7e5;
   border-radius: 12px;
   background: #fff;
 }
@@ -32,7 +32,7 @@
 .animation-summary,
 .animation-precondition {
   font-size: 0.9rem;
-  color: #4a5260;
+  color: #25272a;
 }
 
 .animation-notice {
@@ -54,7 +54,7 @@
 .animation-player {
   margin-top: 16px;
   padding: 16px;
-  border: 1px solid #dfe3ea;
+  border: 1px solid #e7e7e5;
   border-radius: 12px;
   background: #fff;
 }
@@ -72,8 +72,8 @@
   min-width: 48px;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #cfd6e2;
-  background: #f7f9fc;
+  border: 1px solid #d7d8d5;
+  background: #fafafa;
   text-align: center;
   font-variant-numeric: tabular-nums;
   transition:
@@ -106,7 +106,7 @@
 .animation-range,
 .animation-invariant {
   font-size: 0.88rem;
-  color: #4a5260;
+  color: #25272a;
 }
 
 .animation-narration {
@@ -118,7 +118,7 @@
 .animation-text-alternative {
   margin-top: 8px;
   font-size: 0.9rem;
-  color: #3c4350;
+  color: #25272a;
 }
 
 .animation-controls {
@@ -161,3 +161,22 @@
     flex: 1 1 40%;
   }
 }
+.guided-animation { display:grid; gap:18px; padding:24px; margin-bottom:28px; border:1px solid var(--student-line,#e2e2df); border-radius:12px; background:#fff; }
+.guided-animation-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.guided-animation-heading span,.guided-animation-copy>span { color:var(--student-muted,#575b60); font-size:14px; }
+.guided-animation-heading h2 { margin:6px 0 0; font-size:24px; }
+.guided-animation-body { display:grid; grid-template-columns:minmax(220px,1fr) minmax(0,1fr); gap:24px; align-items:stretch; }
+.guided-animation-visual { display:grid; place-items:center; min-height:200px; padding:20px; background:#faf8f1; border-radius:10px; }
+.guided-animation-visual svg { width:min(100%,320px); max-height:200px; }
+.guided-animation-copy { display:flex; flex-direction:column; justify-content:center; }
+.guided-animation-copy p { font-size:20px; line-height:1.7; }
+.guided-animation-controls { display:flex; flex-wrap:wrap; gap:8px; }
+.guided-animation details { line-height:1.8; }
+.guided-animation .animation-notice { margin:0; }
+.guided-fractions { display:grid; width:min(100%,320px); grid-template-columns:repeat(4,1fr); }
+.guided-fractions span { display:grid; place-items:center; height:80px; border:1px solid #a7a39a; font-size:22px; }
+.guided-fractions span.is-active,.guided-chain span.is-active { background:#ffe6a5; }
+.guided-chain { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.guided-chain span { display:flex; align-items:center; gap:8px; padding:12px; border-radius:8px; background:#eee; }
+.guided-chain b { font-weight:400; }
+@media(max-width:700px){.guided-animation{padding:18px}.guided-animation-heading,.guided-animation-body{display:flex;flex-direction:column}.guided-animation-visual{min-height:160px}.guided-animation-copy p{font-size:18px}}

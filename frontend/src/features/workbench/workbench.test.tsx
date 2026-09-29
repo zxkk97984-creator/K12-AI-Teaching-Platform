@@ -1,186 +1,118 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ApiError, getMe } from "../identity/api";
+import { getContinue, getHistory, getStudentContent, listCatalog } from "../study/api";
+import { listQuizSummaries } from "../quiz/api";
+import { listInteractive } from "../interactive/api";
+import { listCodeTasks } from "../codelab/api";
+import { WorkbenchShell } from "./WorkbenchShell";
+import { WorkbenchPage } from "../../pages/workbench/WorkbenchPage";
+import type { MeResponse, Stage } from "../identity/types";
 
 vi.mock("../identity/api", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../identity/api")>();
   return { ...actual, getMe: vi.fn(), logout: vi.fn() };
 });
+vi.mock("../study/api", () => ({
+  getContinue: vi.fn(), getHistory: vi.fn(), getStudentContent: vi.fn(), listCatalog: vi.fn(),
+}));
+vi.mock("../quiz/api", () => ({ listQuizSummaries: vi.fn() }));
+vi.mock("../interactive/api", () => ({ listInteractive: vi.fn() }));
+vi.mock("../codelab/api", () => ({ listCodeTasks: vi.fn() }));
 
-import { ApiError, getMe } from "../identity/api";
-import { WorkbenchShell } from "./WorkbenchShell";
-import { densityForStage } from "./density";
-import { WorkbenchPage } from "../../pages/workbench/WorkbenchPage";
-import type { MeResponse, Stage } from "../identity/types";
-
-const getMeMock = vi.mocked(getMe);
-
-function studentMe(
-  overrides: { stage?: Stage; grade?: number | null; onboarded?: boolean } = {},
-): MeResponse {
-  const { stage = "JUNIOR", grade = 8, onboarded = true } = overrides;
+function studentMe(stage: Stage | null = "JUNIOR"): MeResponse {
   return {
-    user: {
-      id: "00000000-0000-0000-0000-000000000001",
-      username: "synthetic.student",
-      role: "student",
-      is_active: true,
-    },
-    profile: {
-      stage: onboarded ? stage : null,
-      grade: onboarded ? grade : null,
-      revision: 3,
-      onboarding_completed: onboarded,
-    },
-    preferences: {
-      preferred_style: "VISUAL",
-      interests: ["算法"],
-      proactive_guidance_enabled: true,
-      voice_preference: "DISABLED",
-      profile_revision: 3,
-    },
+    user: { id: "00000000-0000-0000-0000-000000000001", username: "student", role: "student", is_active: true },
+    profile: { stage, grade: null, revision: 3, onboarding_completed: !!stage },
+    preferences: { preferred_style: "AUTO", teacher_style: "AUTO", companion_pet_id: "shuangling", interests: [], proactive_guidance_enabled: true, voice_preference: "DISABLED", profile_revision: 3 },
   };
 }
 
-const adminMe: MeResponse = {
-  user: {
-    id: "00000000-0000-0000-0000-0000000000aa",
-    username: "synthetic.admin",
-    role: "admin",
-    is_active: true,
-  },
-  profile: null,
-  preferences: null,
-};
+beforeEach(() => {
+  vi.mocked(getMe).mockReset();
+  vi.mocked(listCatalog).mockReset().mockResolvedValue({ items: [], total: 0, limit: 12, offset: 0 });
+  vi.mocked(getHistory).mockReset().mockResolvedValue({ items: [], total: 0 } as never);
+  vi.mocked(getContinue).mockReset().mockResolvedValue({ item: null });
+  vi.mocked(listQuizSummaries).mockReset().mockResolvedValue({ items: [], total: 0 });
+  vi.mocked(getStudentContent).mockReset().mockResolvedValue({ stage: "JUNIOR", picturebooks: [], guided_animation: null });
+  vi.mocked(listInteractive).mockReset().mockResolvedValue({ stage: "JUNIOR", items: [] });
+  vi.mocked(listCodeTasks).mockReset().mockResolvedValue({
+    items: [], total: 0, limit: 10, offset: 0, facets: { categories: [], difficulties: [] },
+  });
+});
+afterEach(() => { cleanup(); document.title = ""; });
 
-function text(node: HTMLElement | null): string {
-  return node?.textContent ?? "";
+function renderHome(me = studentMe()) {
+  return render(<MemoryRouter><WorkbenchShell me={me} /></MemoryRouter>);
 }
 
-beforeEach(() => {
-  getMeMock.mockReset();
-});
-
-afterEach(() => {
-  cleanup();
-  document.title = "";
-});
-
-describe("workbench shell honesty", () => {
-  it("shows the four regions with explicit not-connected states and no fake statistics", () => {
-    render(<WorkbenchShell me={studentMe()} />);
-
-    const shell = screen.getByTestId("workbench-shell");
-    expect(shell.getAttribute("data-density")).toBe("compact");
-    expect(text(screen.getByTestId("stage-summary"))).toContain("初中（7–9年级） · 8 年级");
-    expect(text(screen.getByTestId("chapter-navigation"))).toContain("归属任务：T08");
-    expect(text(screen.getByTestId("activity-slot"))).toContain("归属任务：T14");
-    expect(text(screen.getByTestId("lesson-canvas"))).toContain("归属任务：T08");
-
-    const body = text(shell);
-    for (const forbidden of ["学习天数", "正确率", "连续打卡", "示例回复", "正在生成"]) {
-      expect(body).not.toContain(forbidden);
-    }
-    expect(screen.queryByRole("link", { name: "课程" })).toBeNull();
-    expect(screen.getByText("课程").getAttribute("aria-disabled")).toBe("true");
+describe("new student home", () => {
+  it("uses its own layout and honest empty state", async () => {
+    renderHome();
+    expect(await screen.findByRole("heading", { name: "理解之后，再向前一步" })).toBeTruthy();
+    expect(screen.getByText(/从一次小尝试开始/)).toBeTruthy();
+    expect(screen.getByTestId("workbench-shell").classList.contains("study-page")).toBe(false);
+    expect(screen.queryByText("在线编程")).toBeNull();
   });
 
-  it("keeps the teacher area disabled without simulated replies", () => {
-    render(<WorkbenchShell me={studentMe()} />);
-    const teacherPanel = screen.getByRole("tabpanel", { name: "教师" });
-    const capabilityPanel = within(teacherPanel).getByTestId("teacher-capability");
-    expect(text(capabilityPanel)).toContain("教师未启用");
-    expect(capabilityPanel.getAttribute("data-state")).toBe("disabled");
-    // No simulated conversation surface: no message list, no fake speaker lines.
-    expect(within(teacherPanel).queryAllByRole("article")).toHaveLength(0);
-    expect(within(teacherPanel).queryAllByRole("log")).toHaveLength(0);
-    expect(text(teacherPanel)).not.toMatch(/老师：|Tutor：|正在生成…|生成中/);
-    expect(text(teacherPanel)).toContain("已记录偏好：图示讲解");
+  it("uses a server quiz summary as the continue target", async () => {
+    vi.mocked(listQuizSummaries).mockResolvedValue({ items: [{ id: "quiz-1", chapter_id: null, source_conversation_id: "conv-1", title: "食物链 · 趣味练习", status: "ACTIVE", progress: { answered: 1, correct: 0, total: 3 }, created_at: "2026-09-23T10:00:00Z", completed_at: null }], total: 1 });
+    renderHome();
+    expect((await screen.findAllByRole("link", { name: /继续练习/ }))[0]).toHaveProperty("href", expect.stringContaining("/practice/sessions/quiz-1"));
+    expect(screen.getAllByText(/已作答 1 \/ 3 题/).length).toBeGreaterThan(0);
   });
 
-  it("renders no fake chapters inside the chapter navigation", () => {
-    render(<WorkbenchShell me={studentMe()} />);
-    const nav = screen.getByRole("navigation", { name: "章节导航" });
-    expect(within(nav).queryAllByRole("listitem")).toHaveLength(0);
-    expect(text(within(nav).getByTestId("chapter-navigation"))).toContain("不展示任何占位课程");
+  it("renders stage-matched versioned picturebooks from the server", async () => {
+    vi.mocked(getStudentContent).mockResolvedValue({ stage: "PRIMARY_LOWER", picturebooks: [{ id: "crow", title: "乌鸦喝水", subtitle: "换个办法", image: "/picturebooks/crow-pitcher.jpg", topic: "观察", question: "水面为什么升高？", version: "v1", is_test_fixture: true, pages: [] }], guided_animation: null });
+    vi.mocked(listInteractive).mockResolvedValue({ stage: "PRIMARY_LOWER", items: [] });
+    renderHome(studentMe("PRIMARY_LOWER"));
+    expect(await screen.findByRole("heading", { name: "乌鸦喝水" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "开始阅读 →" }).getAttribute("href")).toBe("/picturebooks/crow");
   });
 
-  it("gives low grades a spacious density and fewer simultaneous panels", () => {
-    render(<WorkbenchShell me={studentMe({ stage: "PRIMARY_LOWER", grade: 2 })} />);
-    expect(screen.getByTestId("workbench-shell").getAttribute("data-density")).toBe("spacious");
-    expect(screen.queryByTestId("compact-panels")).toBeNull();
-    expect(text(screen.getByTestId("lesson-canvas"))).toContain("课程内容尚未接通");
+  it.each([
+    ["PRIMARY_UPPER", "知识点与练习"],
+    ["JUNIOR", "概念资料与专项练习"],
+    ["SENIOR", "专题资料与推理巩固"],
+  ] as const)("shows a distinct %s learning path", async (stage, heading) => {
+    vi.mocked(getStudentContent).mockResolvedValue({ stage, picturebooks: [], guided_animation: null });
+    vi.mocked(listInteractive).mockResolvedValue({ stage, items: [] });
+    renderHome(studentMe(stage));
+    expect(await screen.findByRole("region", { name: heading })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: heading })).toBeTruthy();
   });
 
-  it("keeps compact density panels for junior students", () => {
-    render(<WorkbenchShell me={studentMe()} />);
-    expect(screen.getByTestId("compact-panels")).not.toBeNull();
-  });
-
-  it("moves between workbench tabs with the keyboard", () => {
-    render(<WorkbenchShell me={studentMe()} />);
-    const canvasTab = screen.getByRole("tab", { name: "学习内容" });
-    const teacherTab = screen.getByRole("tab", { name: "教师" });
-    expect(canvasTab.getAttribute("aria-selected")).toBe("true");
-    canvasTab.focus();
-    fireEvent.keyDown(canvasTab, { key: "ArrowRight" });
-    expect(teacherTab.getAttribute("aria-selected")).toBe("true");
-    expect(document.activeElement).toBe(teacherTab);
-    fireEvent.keyDown(teacherTab, { key: "ArrowLeft" });
-    expect(canvasTab.getAttribute("aria-selected")).toBe("true");
+  it("reports an unavailable backend and retries", async () => {
+    vi.mocked(listCatalog).mockRejectedValueOnce(new Error("offline"));
+    renderHome();
+    expect((await screen.findByRole("alert")).textContent).toContain("offline");
+    fireEvent.click(screen.getByRole("button", { name: "重试" }));
+    await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
   });
 });
 
-describe("densityForStage", () => {
-  it("maps the four stages to two densities", () => {
-    expect(densityForStage("PRIMARY_LOWER")).toBe("spacious");
-    expect(densityForStage("PRIMARY_UPPER")).toBe("spacious");
-    expect(densityForStage("JUNIOR")).toBe("compact");
-    expect(densityForStage("SENIOR")).toBe("compact");
-    expect(densityForStage(null)).toBe("compact");
+describe("workbench page access", () => {
+  it("shows the real home to a student", async () => {
+    vi.mocked(getMe).mockResolvedValue(studentMe());
+    render(<MemoryRouter><WorkbenchPage /></MemoryRouter>);
+    expect(await screen.findByTestId("workbench-shell")).toBeTruthy();
   });
-});
-
-describe("workbench page states", () => {
-  it("renders the real shell for an authenticated student", async () => {
-    getMeMock.mockResolvedValue(studentMe());
-    render(<WorkbenchPage />);
-    expect(text(screen.getByRole("status"))).toContain("正在读取学习档案…");
-    const shell = await screen.findByTestId("workbench-shell");
-    expect(shell).not.toBeNull();
-    expect(text(screen.getByTestId("stage-summary"))).toContain("初中（7–9年级） · 8 年级");
-    expect(document.title).toBe("教学工作台 · 霜铃 K12");
-  });
-
-  it("shows a real 503 error state with request id and retries", async () => {
-    getMeMock.mockRejectedValueOnce(
-      new ApiError(503, "SERVICE_UNAVAILABLE", "数据库尚未就绪", "req-503"),
-    );
-    render(<WorkbenchPage />);
-    const alert = await screen.findByRole("alert");
-    expect(text(alert)).toContain("暂时无法打开工作台");
-    expect(text(alert)).toContain("数据库尚未就绪");
-    expect(text(alert)).toContain("req-503");
-
-    getMeMock.mockResolvedValueOnce(studentMe());
+  it("shows a real 503 error and retries", async () => {
+    vi.mocked(getMe).mockRejectedValueOnce(new ApiError(503, "SERVICE_UNAVAILABLE", "数据库尚未就绪", "req-503"));
+    render(<MemoryRouter><WorkbenchPage /></MemoryRouter>);
+    expect((await screen.findByRole("alert")).textContent).toContain("req-503");
+    vi.mocked(getMe).mockResolvedValueOnce(studentMe());
     fireEvent.click(screen.getByRole("button", { name: "重新加载" }));
-    expect(await screen.findByTestId("workbench-shell")).not.toBeNull();
-    expect(getMeMock).toHaveBeenCalledTimes(2);
+    expect(await screen.findByTestId("workbench-shell")).toBeTruthy();
   });
-
-  it("asks for onboarding instead of inventing a stage", async () => {
-    getMeMock.mockResolvedValue(studentMe({ onboarded: false }));
-    render(<WorkbenchPage />);
-    const note = await screen.findByTestId("needs-stage");
-    expect(text(note)).toContain("先完成学段选择");
-    const link = within(note).getByRole("link", { name: /去选择学段/ });
-    expect(link.getAttribute("href")).toBe("/onboarding");
-  });
-
-  it("keeps administrators out of the student workbench", async () => {
-    getMeMock.mockResolvedValue(adminMe);
-    render(<WorkbenchPage />);
-    const notice = await screen.findByTestId("admin-notice");
-    expect(text(notice)).toContain("管理端能力");
-    expect(screen.queryByTestId("workbench-shell")).toBeNull();
+  it("requires a stage and keeps administrators outside the student home", async () => {
+    vi.mocked(getMe).mockResolvedValueOnce(studentMe(null));
+    const first = render(<MemoryRouter><WorkbenchPage /></MemoryRouter>);
+    expect(await screen.findByTestId("needs-stage")).toBeTruthy();
+    first.unmount();
+    vi.mocked(getMe).mockResolvedValueOnce({ ...studentMe(), user: { ...studentMe().user, role: "admin" } });
+    render(<MemoryRouter><WorkbenchPage /></MemoryRouter>);
+    expect(await screen.findByTestId("admin-notice")).toBeTruthy();
   });
 });

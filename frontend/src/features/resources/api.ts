@@ -6,6 +6,7 @@
 
 import { ApiError, ensureCsrfToken } from "../identity/api";
 import type { ResourceKind, ResourceList, ResourceSummary, ResourceTicket } from "./types";
+import type { components as AdminComponents } from "../../shared/types/generated/admin";
 
 const API_BASE = "/api/v1";
 
@@ -54,7 +55,7 @@ export function listResources(options?: {
 }
 
 export function getResource(resourceId: string): Promise<ResourceSummary> {
-  return request<ResourceSummary>(`${API_BASE}/resources/${resourceId}`);
+  return request<ResourceSummary>(`${API_BASE}/resources/${encodeURIComponent(resourceId)}`);
 }
 
 /** Server-issued short-lived link; never stored as the resource identity. */
@@ -77,8 +78,27 @@ export function contentUrl(
   return `${API_BASE}/resources/${resourceId}/content?variant=${variant}&disposition=${disposition}`;
 }
 
-export function adminListResources(): Promise<ResourceList> {
-  return request<ResourceList>(`${API_BASE}/admin/resources`);
+export type AdminResourceFilters = {
+  q?: string;
+  kind?: ResourceKind;
+  stage?: string;
+  status?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export type AdminResourceList = AdminComponents["schemas"]["AdminResourceListDTO"];
+
+export function adminListResources(options: AdminResourceFilters = {}): Promise<AdminResourceList> {
+  const params = new URLSearchParams();
+  if (options.q?.trim()) params.set("q", options.q.trim());
+  if (options.kind) params.set("kind", options.kind);
+  if (options.stage) params.set("stage", options.stage);
+  if (options.status) params.set("status", options.status);
+  if (options.limit !== undefined) params.set("limit", String(options.limit));
+  if (options.offset !== undefined) params.set("offset", String(options.offset));
+  const query = params.toString();
+  return request<AdminResourceList>(`${API_BASE}/admin/resources${query ? `?${query}` : ""}`);
 }
 
 export function adminCreateResource(body: Record<string, unknown>): Promise<ResourceSummary> {

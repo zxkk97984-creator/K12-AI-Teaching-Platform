@@ -512,14 +512,35 @@ async def record_reading_event(
 
 
 async def latest_reading_state(
-    db: AsyncSession, *, viewer: ViewerScope, user_id: uuid.UUID, chapter_id: uuid.UUID
+    db: AsyncSession,
+    *,
+    viewer: ViewerScope,
+    user_id: uuid.UUID,
+    chapter_id: uuid.UUID,
+    revision: int | None = None,
 ) -> ReadingStateDTO | None:
-    current = await _visible_revision_row(db, chapter_id=chapter_id, viewer=viewer)
-    if current is None:
+    selected = await _visible_revision_row(
+        db, chapter_id=chapter_id, viewer=viewer, revision=revision
+    )
+    if selected is None:
         raise ContentNotVisible("chapter is not readable")
+    latest = (
+        selected
+        if revision is None
+        else await _visible_revision_row(db, chapter_id=chapter_id, viewer=viewer)
+    )
+    # ENTER and LEAVE events describe a visit but have no resume locator. They
+    # must not overwrite a previous BLOCK_VIEW/SECTION_VIEW/RESUME position
+    # when the reader opens the chapter again. If there is no locator-bearing
+    # event yet, there is no useful state to restore.
     event = await db.scalar(
         select(ReadingEvent)
-        .where(ReadingEvent.user_id == user_id, ReadingEvent.chapter_id == chapter_id)
+        .where(
+            ReadingEvent.user_id == user_id,
+            ReadingEvent.chapter_id == chapter_id,
+            or_(ReadingEvent.block_id.is_not(None), ReadingEvent.section_key.is_not(None)),
+            *([ReadingEvent.revision_id == selected.id] if revision is not None else []),
+        )
         .order_by(ReadingEvent.created_at.desc(), ReadingEvent.id.desc())
         .limit(1)
     )
@@ -538,7 +559,7 @@ async def latest_reading_state(
         section_key=event.section_key,
         block_id=event.block_id,
         created_at=event.created_at,
-        is_current_revision=recorded_revision.id == current.id,
+        is_current_revision=latest is not None and recorded_revision.id == latest.id,
     )
 
 

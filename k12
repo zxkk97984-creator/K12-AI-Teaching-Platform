@@ -1,0 +1,440 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT"
+
+usage() {
+  cat <<'EOF'
+霜铃 K12 本地入口
+
+用法：./k12 <命令> [选项]
+
+  setup [--config-only] [--with-runner]  配置、安装依赖、迁移并导入演示课程
+  dev [--with-runner]                  前台运行 API、Vite；可同时运行本机 runner
+  start [--build] [--with-runner]      启动应用；--with-runner 启动本机真实执行服务
+  stop                                 停止本项目应用，保留数据库、上传和数据卷
+  restart [--build] [--with-runner]    重启应用
+  status                               查看本项目服务
+  logs [Compose logs 选项或服务名]       查看本项目日志，默认最近 100 行
+  doctor                               检查开发工具、配置和端口
+  check                                在隔离测试库运行完整本地检查
+
+运行配置：~/.config/k12/runtime.env，可由 K12_RUNTIME_ENV_FILE 指定。
+EOF
+}
+
+config_path() {
+  local account_home
+  account_home="$(getent passwd "$(id -u)" | cut -d: -f6)"
+  : "${account_home:?Cannot find the current account home directory}"
+  printf '%s\n' "${K12_RUNTIME_ENV_FILE:-${XDG_CONFIG_HOME:-$account_home/.config}/k12/runtime.env}"
+}
+
+compose_container() {
+  local ids count
+  ids="$(docker ps -aq \
+    --filter 'label=com.docker.compose.project=k12r1' \
+    --filter "label=com.docker.compose.service=$1")"
+  count="$(printf '%s\n' "$ids" | sed '/^$/d' | wc -l)"
+  if [ "$count" -gt 1 ]; then
+    printf '找到多个 K12 %s 容器，无法安全推断凭据。\n' "$1" >&2
+    return 1
+  fi
+  printf '%s\n' "$ids"
+}
+
+container_env_value() {
+  local container="$1" name="$2"
+  [ -n "$container" ] || return 0
+  docker inspect "$container" --format '{{range .Config.Env}}{{println .}}{{end}}' \
+    | sed -n "s/^${name}=//p" | sed -n '1p'
+}
+
+random_secret() {
+  python3 -c 'import secrets; print(secrets.token_urlsafe(36))'
+}
+
+ensure_config() {
+  local target dir temp dev_container test_container api_container dev_password test_password session_secret line
+  target="$(config_path)"
+  case "$target" in
+    /*) ;;
+    *) printf 'K12_RUNTIME_ENV_FILE 必须是绝对路径：%s\n' "$target" >&2; return 2 ;;
+  esac
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    printf '保留现有运行配置：%s\n' "$target"
+    return 0
+  fi
+
+  # When an old Compose installation exists, reuse its database credentials.
+  # Creating different passwords against a populated volume would lock us out.
+  dev_container="$(compose_container postgres-dev)"
+  test_container="$(compose_container postgres-test)"
+  api_container="$(compose_container api)"
+  if { [ -z "$dev_container" ] && docker volume inspect k12r1-postgres-dev-data >/dev/null 2>&1; } \
+    || { [ -z "$test_container" ] && docker volume inspect k12r1-postgres-test-data >/dev/null 2>&1; }; then
+    printf '已有 K12 数据库卷但缺少对应容器，无法安全恢复密码；未写入配置。\n' >&2
+    return 1
+  fi
+  dev_password="$(container_env_value "$dev_container" POSTGRES_PASSWORD)"
+  test_password="$(container_env_value "$test_container" POSTGRES_PASSWORD)"
+  session_secret="$(container_env_value "$api_container" APP_SESSION_SECRET)"
+  if { [ -n "$dev_container" ] && [ -z "$dev_password" ]; } \
+    || { [ -n "$test_container" ] && [ -z "$test_password" ]; }; then
+    printf '已有 K12 数据库容器但无法读取其密码，未写入配置。\n' >&2
+    return 1
+  fi
+  dev_password="${dev_password:-$(random_secret)}"
+  test_password="${test_password:-$(random_secret)}"
+  session_secret="${session_secret:-$(random_secret)}"
+
+  dir="$(dirname "$target")"
+  install -d -m 700 "$dir"
+  temp="$(mktemp "$dir/.runtime.env.XXXXXX")"
+  chmod 600 "$temp"
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in
+      POSTGRES_DEV_PASSWORD=*) printf 'POSTGRES_DEV_PASSWORD=%s\n' "$dev_password" ;;
+      POSTGRES_TEST_PASSWORD=*) printf 'POSTGRES_TEST_PASSWORD=%s\n' "$test_password" ;;
+      APP_SESSION_SECRET=*) printf 'APP_SESSION_SECRET=%s\n' "$session_secret" ;;
+      GATEWAY_MODE=*) printf 'GATEWAY_MODE=fixture\n' ;;
+      KNODO_PAT=*) printf 'KNODO_PAT=\n' ;;
+      *) printf '%s\n' "$line" ;;
+    esac
+  done < "$ROOT/config/runtime.env.example" > "$temp"
+  if ln -- "$temp" "$target" 2>/dev/null; then
+    unlink "$temp"
+    printf '已创建运行配置：%s（权限 600，凭据未输出）\n' "$target"
+  elif [ -e "$target" ] || [ -L "$target" ]; then
+    unlink "$temp"
+    printf '并发创建了运行配置，保留现有文件：%s\n' "$target"
+  else
+    unlink "$temp"
+    printf '无法创建运行配置：%s\n' "$target" >&2
+    return 1
+  fi
+}
+
+load_config() {
+  . "$ROOT/scripts/load-runtime-env.sh"
+  : "${POSTGRES_DEV_PASSWORD:?POSTGRES_DEV_PASSWORD is required}"
+  : "${POSTGRES_TEST_PASSWORD:?POSTGRES_TEST_PASSWORD is required}"
+  : "${APP_SESSION_SECRET:?APP_SESSION_SECRET is required}"
+}
+
+validate_gateway() {
+  if [ "${GATEWAY_MODE:-}" = knodo ] && [ -z "${KNODO_PAT:-}" ]; then
+    printf 'GATEWAY_MODE=knodo 但本机配置缺少 KNODO_PAT；应用未重启。\n' >&2
+    return 1
+  fi
+}
+
+check_command() {
+  local label="$1"; shift
+  if "$@" >/dev/null 2>&1; then
+    printf 'OK   %s\n' "$label"
+  else
+    printf 'FAIL %s\n' "$label"
+    return 1
+  fi
+}
+
+run_doctor() {
+  local failed=0 path port
+  for path in python3.12 uv node npm docker setsid; do
+    check_command "$path" "$path" --version || failed=1
+  done
+  check_command 'Docker Compose' docker compose version || failed=1
+  check_command 'Docker daemon' docker info || failed=1
+  path="$(config_path)"
+  if [ -f "$path" ]; then
+    if ( . "$ROOT/scripts/load-runtime-env.sh" ); then
+      printf 'OK   本机运行配置（内容未输出）\n'
+    else
+      printf 'FAIL 本机运行配置\n'
+      failed=1
+    fi
+  else
+    printf 'INFO 运行配置尚未创建；执行 ./k12 setup\n'
+  fi
+  for port in 15173 18081 55433 55434 18090; do
+    if timeout 0.3 bash -c "</dev/tcp/127.0.0.1/$port" 2>/dev/null; then
+      printf 'INFO 端口 %s 已有监听；启动时只会管理 K12 自身服务\n' "$port"
+    else
+      printf 'OK   端口 %s 可用\n' "$port"
+    fi
+  done
+  return "$failed"
+}
+
+install_and_build() {
+  uv sync --project backend --locked
+  npm ci --prefix frontend
+  npm run build --prefix frontend
+}
+
+wait_for_database() {
+  local service="$1" container state
+  container="$("$ROOT/scripts/compose.sh" ps -q "$service")"
+  [ -n "$container" ] || { printf '数据库容器未创建：%s\n' "$service" >&2; return 1; }
+  for _ in $(seq 1 45); do
+    state="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container" 2>/dev/null || true)"
+    [ "$state" = healthy ] && return 0
+    sleep 1
+  done
+  printf '数据库未就绪：%s（%s）\n' "$service" "${state:-unknown}" >&2
+  return 1
+}
+
+run_setup() {
+  local config_only=0 with_runner=0
+  for arg in "$@"; do
+    case "$arg" in
+      --config-only) config_only=1 ;;
+      --with-runner) with_runner=1 ;;
+      -h|--help) printf '用法：./k12 setup [--config-only] [--with-runner]\n'; return 0 ;;
+      *) printf '未知参数：%s\n' "$arg" >&2; return 2 ;;
+    esac
+  done
+  ensure_config
+  load_config
+  [ "$config_only" -eq 0 ] || return 0
+  run_doctor
+  install_and_build
+  if [ "$with_runner" -eq 1 ]; then "$ROOT/scripts/build-runner.sh"; fi
+  "$ROOT/scripts/compose.sh" up -d postgres-dev postgres-test
+  wait_for_database postgres-dev
+  wait_for_database postgres-test
+  (
+    cd backend
+    uv run --locked alembic -c alembic.ini upgrade head
+    uv run --locked python -m app.scripts.import_content import \
+      --release-dir ../curriculum/source/legacy/k12-library-696364f --apply \
+      --mirror-dir ../curriculum/releases
+    if [ "${APP_ENV:-development}" != production ]; then
+      uv run --locked python -m app.scripts.import_content import \
+        --release-dir ../curriculum/source/synthetic/t06-fixtures-v1 --apply \
+        --mirror-dir ../curriculum/releases
+      uv run --locked python -m app.scripts.import_content import \
+        --release-dir ../curriculum/source/synthetic/k12-demo-v1 --apply \
+        --mirror-dir ../curriculum/releases
+    fi
+    uv run --locked python -m app.modules.codelab.importer --catalog-root ../curriculum/code-tasks
+    if [ "${APP_ENV:-development}" != production ] \
+      && [ -n "${T05_DEMO_STUDENT_A_USERNAME:-}" ] \
+      && [ -n "${T05_DEMO_STUDENT_A_PASSWORD:-}" ] \
+      && [ -n "${T05_DEMO_STUDENT_B_USERNAME:-}" ] \
+      && [ -n "${T05_DEMO_STUDENT_B_PASSWORD:-}" ] \
+      && [ -n "${T05_DEMO_ADMIN_USERNAME:-}" ] \
+      && [ -n "${T05_DEMO_ADMIN_PASSWORD:-}" ]; then
+      uv run --locked python -m app.modules.identity.demo
+    fi
+  )
+  printf '依赖、隔离数据库、迁移和课程已就绪；运行 ./k12 start --build 或 ./k12 dev。\n'
+}
+
+ensure_storage() {
+  . "$ROOT/scripts/runtime-storage.sh"
+  # The old Compose volume may hold files on first migration. The helper only
+  # copies an empty target; it refuses to overwrite a divergent ledger/upload.
+  "$ROOT/scripts/prepare-runtime-storage.sh"
+}
+
+wait_for_app() {
+  local api_ready=0 web_ready=0
+  for _ in $(seq 1 60); do
+    api_ready=0
+    web_ready=0
+    if curl -fsS --max-time 2 http://127.0.0.1:18081/health/ready >/dev/null 2>&1; then api_ready=1; fi
+    if curl -fsS --max-time 2 http://127.0.0.1:15173/ >/dev/null 2>&1; then web_ready=1; fi
+    if [ "$api_ready" -eq 1 ] && [ "$web_ready" -eq 1 ]; then return 0; fi
+    sleep 1
+  done
+  printf '应用未就绪（API=%s，前端=%s）；查看 ./k12 logs。\n' "$api_ready" "$web_ready" >&2
+  return 1
+}
+
+run_start() {
+  local build=0 with_runner=0 pid
+  for arg in "$@"; do
+    case "$arg" in
+      --build) build=1 ;;
+      --with-runner) with_runner=1 ;;
+      --no-browser) ;; # Legacy no-op: the unified CLI does not open a browser.
+      -h|--help) printf '用法：./k12 start [--build] [--with-runner]\n'; return 0 ;;
+      *) printf '未知参数：%s\n' "$arg" >&2; return 2 ;;
+    esac
+  done
+  load_config
+  validate_gateway
+  ensure_storage
+  if [ "$build" -eq 1 ]; then
+    install_and_build
+  fi
+  if [ "$with_runner" -eq 1 ]; then
+    if pid="$(verified_dev_pid)"; then
+      printf 'K12 本机应用已运行（PID %s）；如需重启，请执行 ./k12 restart --with-runner。\n' "$pid" >&2
+      return 1
+    fi
+    if [ "$build" -eq 1 ]; then "$ROOT/scripts/build-runner.sh"; fi
+    "$ROOT/scripts/compose.sh" up -d postgres-dev postgres-test
+    . "$ROOT/scripts/runtime-storage.sh"
+    mkdir -p "$K12_RUNTIME_STATE_DIR"
+    chmod 700 "$K12_RUNTIME_STATE_DIR"
+    setsid "$ROOT/scripts/dev.sh" --with-runner > "$K12_RUNTIME_STATE_DIR/host.log" 2>&1 < /dev/null &
+    for _ in $(seq 1 20); do
+      if verified_dev_pid >/dev/null 2>&1; then break; fi
+      sleep 0.2
+    done
+    verified_dev_pid >/dev/null || { tail -n 30 "$K12_RUNTIME_STATE_DIR/host.log" >&2; return 1; }
+    wait_for_app || { tail -n 30 "$K12_RUNTIME_STATE_DIR/host.log" >&2; return 1; }
+    if ! curl -fsS --max-time 2 "http://127.0.0.1:${RUNNER_PORT:-18090}/health" >/dev/null; then
+      printf 'API 与前端已启动，但 runner 未就绪；查看 %s\n' "$K12_RUNTIME_STATE_DIR/host.log" >&2
+      return 1
+    fi
+    printf '霜铃 K12 与真实 runner 已启动：前端 http://127.0.0.1:15173，API http://127.0.0.1:18081\n'
+    return 0
+  fi
+  "$ROOT/scripts/compose.sh" up -d postgres-dev
+  if [ "$build" -eq 1 ]; then
+    "$ROOT/scripts/compose.sh" up -d --build api worker web
+  else
+    "$ROOT/scripts/compose.sh" up -d api worker web
+  fi
+  wait_for_app
+  printf '霜铃 K12 已启动：前端 http://127.0.0.1:15173，API http://127.0.0.1:18081\n'
+}
+
+run_restart() {
+  local arg build=0 with_runner=0
+  for arg in "$@"; do
+    case "$arg" in
+      --build) build=1 ;;
+      --with-runner) with_runner=1 ;;
+      --no-browser) ;;
+      -h|--help) printf '用法：./k12 restart [--build] [--with-runner]\n'; return 0 ;;
+      *) printf '未知参数：%s\n' "$arg" >&2; return 2 ;;
+    esac
+  done
+  load_config
+  validate_gateway
+  ensure_storage
+  if [ "$build" -eq 1 ]; then
+    # Build first so a failed typecheck or image build leaves the existing app up.
+    install_and_build
+    if [ "$with_runner" -eq 0 ]; then
+      "$ROOT/scripts/compose.sh" build api worker web
+    else
+      "$ROOT/scripts/build-runner.sh"
+    fi
+  fi
+  run_stop
+  if [ "$with_runner" -eq 1 ]; then
+    run_start --with-runner
+  else
+    run_start
+  fi
+}
+
+verified_dev_pid() {
+  local pid_file pid cmdline
+  . "$ROOT/scripts/runtime-storage.sh"
+  pid_file="$K12_RUNTIME_STATE_DIR/dev.pid"
+  [ -f "$pid_file" ] || return 1
+  read -r pid < "$pid_file"
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 1
+  [ -r "/proc/$pid/cmdline" ] || return 1
+  cmdline="$(tr '\0' ' ' < "/proc/$pid/cmdline")"
+  [[ "$cmdline" == *"$ROOT/scripts/dev.sh"* ]] || return 1
+  printf '%s\n' "$pid"
+}
+
+run_stop() {
+  [ "$#" -eq 0 ] || { printf '用法：./k12 stop\n' >&2; return 2; }
+  local pid
+  load_config
+  if pid="$(verified_dev_pid)"; then
+    kill -TERM "$pid" 2>/dev/null || true
+    for _ in $(seq 1 20); do
+      if ! kill -0 "$pid" 2>/dev/null; then break; fi
+      sleep 0.5
+    done
+  fi
+  "$ROOT/scripts/compose.sh" stop api worker web
+  printf 'K12 应用已停止；数据库、上传文件、预算账本和数据卷仍保留。\n'
+}
+
+run_status() {
+  local pid
+  [ "$#" -eq 0 ] || { printf '用法：./k12 status\n' >&2; return 2; }
+  load_config
+  "$ROOT/scripts/compose.sh" ps
+  if pid="$(verified_dev_pid)"; then
+    printf '本机开发进程：运行中（PID %s）\n' "$pid"
+    if curl -fsS --max-time 2 "http://127.0.0.1:${RUNNER_PORT:-18090}/health" >/dev/null 2>&1; then
+      printf 'runner：健康（本机端口 %s）\n' "${RUNNER_PORT:-18090}"
+    else
+      printf 'runner：未就绪，编程运行不可用\n'
+    fi
+  else
+    printf '本机开发进程：未运行\n'
+  fi
+}
+
+run_logs() {
+  load_config
+  if [ "$#" -eq 0 ]; then
+    "$ROOT/scripts/compose.sh" logs --tail 100 api worker web
+  else
+    "$ROOT/scripts/compose.sh" logs "$@"
+  fi
+}
+
+run_check() {
+  [ "$#" -eq 0 ] || { printf '用法：./k12 check\n' >&2; return 2; }
+  if [ -f "$(config_path)" ]; then load_config; fi
+  export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
+  : "${TEST_DATABASE_URL:?TEST_DATABASE_URL is required; tests refuse non-isolated databases}"
+  : "${APP_SESSION_SECRET:?APP_SESSION_SECRET is required}"
+  export APP_ENV=test GATEWAY_MODE=fixture
+  uv run --project backend --locked python -c 'from app.core.test_database import validate_test_database_url; import os; validate_test_database_url(os.environ.get("TEST_DATABASE_URL"))'
+  (cd backend && uv run --locked alembic -c alembic.ini upgrade head)
+  python3 contracts/test_contracts.py -v
+
+  local spec module
+  K12_CHECK_TMP_DIR="$(mktemp -d)"
+  trap 'if [ -n "${K12_CHECK_TMP_DIR:-}" ]; then rm -r -- "$K12_CHECK_TMP_DIR"; fi' EXIT
+  for spec in identity content learning admin; do
+    module="$spec"
+    if [ "$spec" = admin ]; then module=authoring; fi
+    (cd backend && uv run --locked python -m "app.modules.$module.openapi" "$K12_CHECK_TMP_DIR/$spec.json")
+    diff -u "contracts/openapi.$spec.json" "$K12_CHECK_TMP_DIR/$spec.json"
+    npx --prefix frontend openapi-typescript "contracts/openapi.$spec.json" -o "$K12_CHECK_TMP_DIR/$spec.ts" >/dev/null
+    diff -u "frontend/src/shared/types/generated/$spec.ts" "$K12_CHECK_TMP_DIR/$spec.ts"
+  done
+  uv run --project backend --locked pytest backend/tests -q
+  uv run --project backend --locked ruff check backend
+  uv run --project backend --locked ruff format --check backend
+  npm test --prefix frontend
+  npm run typecheck --prefix frontend
+  npm run build --prefix frontend
+  python3 scripts/package-knodo.py verify
+  printf 'PASS: 协议、后端、前端、构建及 Knodo 资产检查完成。\n'
+}
+
+command="${1:-}"
+if [ -n "$command" ]; then shift; fi
+case "$command" in
+  setup) run_setup "$@" ;;
+  dev) exec "$ROOT/scripts/dev.sh" "$@" ;;
+  start) run_start "$@" ;;
+  stop) run_stop "$@" ;;
+  restart) run_restart "$@" ;;
+  status) run_status "$@" ;;
+  logs) run_logs "$@" ;;
+  doctor) [ "$#" -eq 0 ] || { usage >&2; exit 2; }; run_doctor ;;
+  check) run_check "$@" ;;
+  -h|--help|help|'') usage ;;
+  *) printf '未知命令：%s\n' "$command" >&2; usage >&2; exit 2 ;;
+esac

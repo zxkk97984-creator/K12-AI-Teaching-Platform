@@ -11,7 +11,7 @@ Fail-closed rules (QA38):
 * ``disabled`` never falls back to fixture or a direct LLM call;
 * ``fixture`` is rejected in production (settings + defence in depth here);
 * ``knodo`` requires a bare HTTPS origin, token, fixed Tutor/Designer targets,
-  a positive request cap and the frozen contract files; it never silently
+  an explicit unlimited or finite request policy and the frozen contract files; it never silently
   degrades to the fixture.
 """
 
@@ -21,12 +21,13 @@ import json
 import os
 import time
 import uuid
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any, Literal
 
 import httpx
 
-from app.integrations.knodo.budget import FileRequestBudget
+from app.integrations.knodo.budget import FileRequestBudget, UnlimitedRequestBudget
 from app.integrations.knodo.errors import (
     GatewayError,
     GatewayErrorCategory,
@@ -144,6 +145,7 @@ class AgentGateway:
         cancel: Any = None,
         delay_seconds: float | None = None,
         remote_conversation_id: str | None = None,
+        on_content: Callable[[str], Awaitable[None]] | None = None,
     ) -> GatewayResult:
         invocation_id = str(uuid.uuid4())
         started = time.perf_counter()
@@ -197,6 +199,7 @@ class AgentGateway:
             cancel=cancel,
             delay_seconds=delay_seconds,
             remote_conversation_id=remote_conversation_id,
+            on_content=on_content,
         )
         if outcome.cancelled:
             return self._result(
@@ -358,9 +361,14 @@ def build_gateway(settings: Any) -> AgentGateway:
                     workspace_id=settings.knodo_designer_workspace_id,
                 ),
             }
-            budget = FileRequestBudget(
-                settings.knodo_budget_ledger_path,
-                max_requests=int(settings.knodo_max_requests),
+            max_requests = int(settings.knodo_max_requests)
+            budget = (
+                UnlimitedRequestBudget()
+                if max_requests == 0
+                else FileRequestBudget(
+                    settings.knodo_budget_ledger_path,
+                    max_requests=max_requests,
+                )
             )
             # Redirects are intentionally disabled so credentials never follow
             # an upstream Location header to a different origin. Environment
@@ -372,6 +380,7 @@ def build_gateway(settings: Any) -> AgentGateway:
                 targets=targets,
                 transport=HttpTransport(client, max_output_bytes=max_output_bytes),
                 budget=budget,
+                stream_timeout_seconds=settings.knodo_stream_timeout_seconds,
             )
         except (AttributeError, TypeError, ValueError) as exc:
             raise GatewayConfigurationError("invalid Knodo target or budget configuration") from exc

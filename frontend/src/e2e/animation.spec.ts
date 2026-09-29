@@ -19,14 +19,14 @@ const junior = {
   password: process.env.E2E_T21_JUNIOR_PASSWORD ?? "",
 };
 
-const EVIDENCE = "docs/acceptance/t30-evidence";
+const EVIDENCE = "test-results/screenshots";
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");
   await page.getByLabel("用户名").fill(account.username);
   await page.getByLabel("密码").fill(account.password);
   await page.getByRole("button", { name: "登录" }).click();
-  await expect(page).toHaveURL(/\/(settings|onboarding|conversations)$/);
+  await expect(page).toHaveURL(/\/(settings|onboarding|conversations|admin\/resources)$/);
 }
 
 async function generate(page: Page) {

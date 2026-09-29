@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import copy
 import json
+from collections.abc import Awaitable, Callable
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
@@ -101,8 +102,9 @@ class FixtureGateway:
         cancel: asyncio.Event | None = None,
         delay_seconds: float | None = None,
         remote_conversation_id: str | None = None,
+        on_content: Callable[[str], Awaitable[None]] | None = None,
     ) -> BackendOutcome:
-        del remote_conversation_id
+        del remote_conversation_id, on_content
         timeout = timeout_seconds or self.default_timeout_seconds
 
         if scenario is FixtureScenario.SUCCESS:

@@ -34,6 +34,10 @@ async def test_export_and_local_delete_are_owner_scoped_and_platform_honest(
     await import_catalog(content_session)
     owner_csrf = await _login(client, test_settings, "privacy.owner")
     owner_headers = auth_headers(owner_csrf)
+    favorite = await client.put(
+        "/api/v1/code-tasks/odd-even/favorite", json={}, headers=owner_headers
+    )
+    assert favorite.status_code == 200
     saved = await client.put(
         "/api/v1/code-tasks/temperature-converter/draft",
         json={"task_revision": 1, "code": "def celsius_to_fahrenheit(celsius):\n    return 99\n"},
@@ -65,6 +69,7 @@ async def test_export_and_local_delete_are_owner_scoped_and_platform_honest(
         "OUTPUT_LIMIT",
         "SYSTEM_ERROR",
     }
+    assert exported["codelab"]["favorites"][0]["task_id"] == "odd-even"
     assert exported["scope"]["platform_status"] == "NOT_CONNECTED"
     assert not {
         "password_hash",
@@ -86,7 +91,7 @@ async def test_export_and_local_delete_are_owner_scoped_and_platform_honest(
     other_csrf = await _login(client, test_settings, "privacy.other")
     other_export = await client.get("/api/v1/me/data-export")
     assert other_export.status_code == 200
-    assert other_export.json()["codelab"] == {"drafts": [], "runs": []}
+    assert other_export.json()["codelab"] == {"drafts": [], "runs": [], "favorites": []}
     assert (await client.get(f"/api/v1/code-runs/{run_id}")).status_code == 404
     other_save = await client.put(
         "/api/v1/code-tasks/temperature-converter/draft",
@@ -108,10 +113,17 @@ async def test_export_and_local_delete_are_owner_scoped_and_platform_honest(
     assert deletion["idempotent_replay"] is False
     assert deletion["request"]["status"] == "LOCAL_COMPLETED"
     assert deletion["request"]["platform_status"] == "NOT_REQUESTED"
-    assert deletion["request"]["scope"]["requested_scope"] == "CODELAB_ONLY"
+    assert deletion["request"]["scope"]["requested_scope"] == "LOCAL_STUDENT_DATA"
     assert deletion["request"]["scope"]["local"] == {
         "codelab_code_drafts": 1,
         "codelab_code_runs": 1,
+        "codelab_task_favorites": 1,
+        "teaching_conversations": 0,
+        "learning_open_events": 0,
+        "learning_bookmarks": 0,
+        "memory_documents": 0,
+        "memory_context_states": 0,
+        "assessment_answer_drafts": 0,
     }
     replay = await client.post(
         "/api/v1/me/deletion-requests",
@@ -124,7 +136,9 @@ async def test_export_and_local_delete_are_owner_scoped_and_platform_honest(
     assert (await client.get("/api/v1/me/data-export")).json()["codelab"] == {
         "drafts": [],
         "runs": [],
+        "favorites": [],
     }
+    assert (await client.get("/api/v1/me/data-export")).json()["conversations"] == []
     starter = (
         await client.get("/api/v1/code-tasks/temperature-converter/draft?revision=1")
     ).json()["code"]

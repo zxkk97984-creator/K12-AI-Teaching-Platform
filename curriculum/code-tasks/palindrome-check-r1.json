@@ -1,0 +1,126 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "palindrome-check",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": true,
+  "review_status": "UNREVIEWED",
+  "title": "回文判断：从两边读都一样吗",
+  "description": "编写 is_palindrome(text)，按原字符顺序判断字符串是否为回文。区分大小写，不忽略空格和标点；空字符串视为回文。",
+  "starter_code": "def is_palindrome(text):\n    \"\"\"回文判断：从两边读都一样吗\"\"\"\n    # 在这里写下你的解题思路\n    pass\n",
+  "entrypoint": "is_palindrome",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      }
+    },
+    "output_schema": {
+      "type": "boolean"
+    },
+    "limits": {
+      "max_input_bytes": 65536,
+      "max_output_bytes": 16384,
+      "timeout_ms": 3000
+    },
+    "errors": [
+      "INVALID_JSON",
+      "INVALID_INPUT",
+      "STUDENT_EXCEPTION",
+      "TIMEOUT",
+      "OUTPUT_LIMIT",
+      "SYSTEM_ERROR"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "text": "level"
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "text": "Level"
+      },
+      "output": false
+    },
+    {
+      "input": {
+        "text": ""
+      },
+      "output": true
+    }
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {
+        "id": "F1",
+        "name": "常规用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "F2",
+        "name": "变化与组合用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "R1",
+        "name": "边界用例",
+        "dimension": "R",
+        "max_score": 10,
+        "case_count": 2
+      }
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "3f339e14628a9acc6d5e9c06b358ff0392e01e6f8a342b9ab6757d041423f738"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [
+      {
+        "id": "F",
+        "max_score": 60
+      },
+      {
+        "id": "R",
+        "max_score": 10
+      }
+    ],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "python-first-steps",
+    "chapter_slug": "ch05",
+    "revision": 1,
+    "stage": "JUNIOR",
+    "knowledge_point_slugs": [
+      "variable",
+      "condition-if",
+      "loop"
+    ]
+  },
+  "source": {
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "source_path": "curriculum/code-tasks/palindrome-check-r1.json",
+    "source_sha256": "0b416f6d3c2f19131e52064c0e7090f3b721fee0cc251614da24afeaffe3985b",
+    "reference_solution_sha256": "2bb5041c44001d45bb9651fd622761da006df407de25b3e3a88483e481b49363"
+  }
+}

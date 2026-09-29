@@ -2,8 +2,8 @@
 
 export const DOCK_WIDTH = 140;
 export const DOCK_HEIGHT = 168;
-export const PANEL_WIDTH = 392;
-export const PANEL_HEIGHT = 640;
+export const PANEL_WIDTH = 408;
+export const PANEL_HEIGHT = 560;
 export const PANEL_GAP = 16;
 export const PANEL_MOBILE_BREAKPOINT = 720;
 export const DOCK_DRAG_THRESHOLD = 5;
@@ -14,6 +14,11 @@ export const COMPANION_POSITION_KEY = "shuangling-companion-position";
 export interface Point {
   x: number;
   y: number;
+}
+
+export interface ViewportSize {
+  width: number;
+  height: number;
 }
 
 export interface PanelRect {
@@ -54,9 +59,23 @@ export function defaultDockPosition(): Point {
     x: Math.max(24, window.innerWidth - 168),
     y: Math.max(
       80,
-      window.innerHeight - DOCK_HEIGHT - (window.innerWidth <= 820 ? 88 : 28),
+      window.innerHeight - DOCK_HEIGHT - (window.innerWidth <= 820 ? 200 : 28),
     ),
   };
+}
+
+/** Keep a dock anchored to the right/bottom edge when switching screen sizes. */
+export function remapDockPosition(position: Point, previous: ViewportSize): Point {
+  if (!Number.isFinite(previous.width) || !Number.isFinite(previous.height)) {
+    return clampDock(position.x, position.y);
+  }
+  const rightGap = previous.width - position.x - DOCK_WIDTH;
+  const bottomGap = previous.height - position.y - DOCK_HEIGHT;
+  const fallback = defaultDockPosition();
+  return clampDock(
+    rightGap <= 48 ? fallback.x : position.x,
+    bottomGap <= (previous.width <= 820 ? 220 : 140) ? fallback.y : position.y,
+  );
 }
 
 /** 面板定位：右侧优先 → 溢出翻左侧 → 钳位；≤720px 底部抽屉（原型 placePanel） */

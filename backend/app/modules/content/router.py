@@ -103,13 +103,18 @@ async def get_chapter(
 async def get_reading_state(
     chapter_id: uuid.UUID,
     request: Request,
+    revision: int | None = Query(default=None, ge=1, le=10_000),
     context: SessionContext = Depends(require_student),
     db: AsyncSession = Depends(get_session),
 ) -> ReadingStateDTO | None:
     viewer = await _viewer(request, context, db)
     try:
         return await latest_reading_state(
-            db, viewer=viewer, user_id=context.user.id, chapter_id=chapter_id
+            db,
+            viewer=viewer,
+            user_id=context.user.id,
+            chapter_id=chapter_id,
+            revision=revision,
         )
     except ContentNotVisible:
         raise HTTPException(

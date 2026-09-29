@@ -13,8 +13,9 @@ import json
 import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from types import SimpleNamespace
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,6 +36,7 @@ from app.modules.assessment.scoring import (
     ScoringUnavailable,
     score_answer,
 )
+from app.modules.codelab.models import CodeRun, CodeTaskRevision
 from app.modules.content.models import (
     Chapter,
     ChapterReviewState,
@@ -44,7 +46,7 @@ from app.modules.content.models import (
     RevisionKnowledgePoint,
 )
 from app.modules.content.service import viewer_scope_from_profile, visible_chapter_detail
-from app.modules.identity.models import LearnerProfile, User
+from app.modules.identity.models import LearnerProfile, User, UserRole
 from app.modules.learning.models import QuizEvidence
 from app.modules.learning.policy import build_policy, evidence_level_from
 
@@ -117,14 +119,19 @@ async def quiz_evidence_level(db: AsyncSession, *, owner_user_id: uuid.UUID) -> 
     return evidence_level_from(real_activities=real, correct_activities=correct)
 
 
-async def _chapter_material(db: AsyncSession, *, chapter_id: uuid.UUID):
+async def _chapter_material(
+    db: AsyncSession, *, chapter_id: uuid.UUID, revision_id: uuid.UUID | None = None
+):
     row = (
         await db.execute(
             select(ChapterRevision, Chapter, Release, ChapterReviewState)
             .join(Chapter, Chapter.id == ChapterRevision.chapter_id)
             .join(Release, Release.id == ChapterRevision.release_id)
             .join(ChapterReviewState, ChapterReviewState.revision_id == ChapterRevision.id)
-            .where(ChapterRevision.chapter_id == chapter_id)
+            .where(
+                ChapterRevision.chapter_id == chapter_id,
+                *([ChapterRevision.id == revision_id] if revision_id is not None else []),
+            )
             .order_by(ChapterRevision.revision.desc())
             .limit(1)
         )
@@ -152,13 +159,18 @@ async def _chapter_material(db: AsyncSession, *, chapter_id: uuid.UUID):
     return revision, chapter, release, list(knowledge_points)
 
 
-async def _candidate_drafts(db: AsyncSession, *, chapter_id: uuid.UUID) -> list[QuizDraft]:
+async def _candidate_drafts(
+    db: AsyncSession, *, chapter_id: uuid.UUID, revision_id: uuid.UUID, owner_id: uuid.UUID
+) -> list[QuizDraft]:
     rows = await db.scalars(
         select(QuizDraft)
+        .join(User, User.id == QuizDraft.owner_user_id)
         .where(
             QuizDraft.chapter_id == chapter_id,
+            QuizDraft.revision_id == revision_id,
             QuizDraft.validation_passed.is_(True),
             QuizDraft.status.in_(("HUMAN_APPROVED", "AUTO_VALIDATED")),
+            or_(QuizDraft.owner_user_id == owner_id, User.role == UserRole.ADMIN.value),
         )
         .order_by(
             # human-reviewed sources first, then newest validated drafts
@@ -193,20 +205,34 @@ async def create_quiz_session(
     settings: Settings,
     requester: User,
     profile: LearnerProfile | None,
-    chapter_id: uuid.UUID,
+    chapter_id: uuid.UUID | None,
+    draft_id: uuid.UUID | None = None,
+    revision_id: uuid.UUID | None = None,
+    source_conversation_id: uuid.UUID | None = None,
+    source_message_id: uuid.UUID | None = None,
+    source_title: str = "",
+    code_task_ref: dict | None = None,
+    commit: bool = True,
 ) -> QuizSession:
     if profile is None or not profile.stage:
         raise QuizRequestRejected("请先完成学段设置再开始练习", code="STAGE_REQUIRED")
-    viewer = viewer_scope_from_profile(profile, settings)
-    detail = await visible_chapter_detail(db, chapter_id=chapter_id, viewer=viewer)
-    if detail is None:
-        raise QuizSourceUnavailable("章节对当前学段不可用", code="CHAPTER_NOT_VISIBLE")
-
-    revision, _chapter, _release, knowledge_points = await _chapter_material(
-        db, chapter_id=chapter_id
-    )
-    if revision.stage != profile.stage:
-        raise QuizSourceUnavailable("章节学段与学生档案不一致", code="STAGE_MISMATCH")
+    if source_conversation_id is not None:
+        if chapter_id is not None or revision_id is not None or draft_id is None:
+            raise QuizRequestRejected("会话练习来源无效")
+        revision = SimpleNamespace(id=None, stage=profile.stage)
+        knowledge_points: list[str] = []
+    else:
+        if chapter_id is None:
+            raise QuizRequestRejected("练习来源不能为空")
+        viewer = viewer_scope_from_profile(profile, settings)
+        detail = await visible_chapter_detail(db, chapter_id=chapter_id, viewer=viewer)
+        if detail is None:
+            raise QuizSourceUnavailable("章节对当前学段不可用", code="CHAPTER_NOT_VISIBLE")
+        revision, _chapter, _release, knowledge_points = await _chapter_material(
+            db, chapter_id=chapter_id, revision_id=revision_id
+        )
+        if revision.stage != profile.stage:
+            raise QuizSourceUnavailable("章节学段与学生档案不一致", code="STAGE_MISMATCH")
 
     level = await quiz_evidence_level(db, owner_user_id=requester.id)
     policy = build_policy(
@@ -219,7 +245,22 @@ async def create_quiz_session(
 
     chosen: tuple[QuizDraft, dict] | None = None
     rejections: list[str] = []
-    for draft in await _candidate_drafts(db, chapter_id=chapter_id):
+    if draft_id is not None:
+        selected = await db.scalar(
+            select(QuizDraft).where(
+                QuizDraft.id == draft_id,
+                QuizDraft.owner_user_id == requester.id,
+                QuizDraft.chapter_id == chapter_id,
+                QuizDraft.revision_id == revision.id,
+                QuizDraft.source_conversation_id == source_conversation_id,
+            )
+        )
+        candidates = [selected] if selected is not None else []
+    else:
+        candidates = await _candidate_drafts(
+            db, chapter_id=chapter_id, revision_id=revision.id, owner_id=requester.id
+        )
+    for draft in candidates:
         payload = draft.draft
         if not isinstance(payload, dict):
             rejections.append("DRAFT_PAYLOAD_MISSING")
@@ -238,12 +279,32 @@ async def create_quiz_session(
         raise QuizSourceUnavailable(detail_text)
 
     draft, payload = chosen
-    questions = payload["questions"]
+    questions = list(payload["questions"])
+    code_task = None
+    if code_task_ref is not None:
+        task_id = str(code_task_ref.get("task_id") or "")
+        task_revision = int(code_task_ref.get("revision") or 0)
+        code_task = await db.scalar(
+            select(CodeTaskRevision).where(
+                CodeTaskRevision.task_id == task_id,
+                CodeTaskRevision.revision == task_revision,
+                CodeTaskRevision.status.in_(("DRAFT", "PUBLISHED")),
+            )
+        )
+        binding = dict(code_task.chapter_binding or {}) if code_task else {}
+        if code_task is None or binding.get("stage") != revision.stage:
+            raise QuizSourceUnavailable("所选编程题当前学段不可用")
+        if len(questions) >= policy.max_quiz_questions:
+            questions = questions[: max(policy.max_quiz_questions - 1, 0)]
+        questions.append({"type": "CODE", "task": code_task})
     source_kind = "HUMAN_REVIEWED" if draft.status == "HUMAN_APPROVED" else "AI_DRAFT"
     session = QuizSession(
         owner_user_id=requester.id,
         chapter_id=chapter_id,
         revision_id=revision.id,
+        source_conversation_id=source_conversation_id,
+        source_message_id=source_message_id,
+        source_title=source_title[:200],
         draft_id=draft.id,
         curriculum_revision=draft.curriculum_revision,
         stage=revision.stage,
@@ -264,6 +325,38 @@ async def create_quiz_session(
 
     for position, question in enumerate(questions):
         qtype = question["type"]
+        if qtype == "CODE":
+            task = question["task"]
+            db.add(
+                QuizQuestion(
+                    session_id=session.id,
+                    position=position,
+                    question_key=f"code:{task.task_id}:r{task.revision}",
+                    objective_id=f"codelab:{task.task_id}",
+                    type="CODE",
+                    stem=task.description,
+                    options=None,
+                    items=None,
+                    correct_answer=None,
+                    explanation=None,
+                    hints=["先运行公开样例，再提交正式判题。"],
+                    source_refs=[],
+                    origin=draft.origin,
+                    source_draft_id=draft.id,
+                    code_task_revision_id=task.id,
+                    code_snapshot={
+                        "task_id": task.task_id,
+                        "task_revision": task.revision,
+                        "title": task.title,
+                        "description": task.description,
+                        "starter_code": task.starter_code,
+                        "entrypoint": task.entrypoint,
+                        "examples": task.examples,
+                    },
+                    is_demo=bool(task.is_test_fixture or task.status == "DRAFT"),
+                )
+            )
+            continue
         correct_answer = (
             question["correct_order"] if qtype == "ORDERING" else question["correct_answer"]
         )
@@ -290,8 +383,9 @@ async def create_quiz_session(
                 source_draft_id=draft.id,
             )
         )
-    await db.commit()
-    await db.refresh(session)
+    if commit:
+        await db.commit()
+        await db.refresh(session)
     return session
 
 
@@ -323,12 +417,16 @@ async def session_questions(db: AsyncSession, *, session_id: uuid.UUID) -> list[
 
 
 async def _attempts_by_question(
-    db: AsyncSession, *, session_id: uuid.UUID
+    db: AsyncSession, *, session_id: uuid.UUID, owner_user_id: uuid.UUID
 ) -> dict[uuid.UUID, list[QuizAttempt]]:
     rows = await db.scalars(
         select(QuizAttempt)
-        .where(QuizAttempt.session_id == session_id, QuizAttempt.attempt_no.is_not(None))
-        .order_by(QuizAttempt.created_at)
+        .where(
+            QuizAttempt.session_id == session_id,
+            QuizAttempt.owner_user_id == owner_user_id,
+            QuizAttempt.attempt_no.is_not(None),
+        )
+        .order_by(QuizAttempt.question_id, QuizAttempt.attempt_no)
     )
     grouped: dict[uuid.UUID, list[QuizAttempt]] = {}
     for row in rows:
@@ -336,10 +434,15 @@ async def _attempts_by_question(
     return grouped
 
 
-async def _hint_levels(db: AsyncSession, *, session_id: uuid.UUID) -> dict[uuid.UUID, int]:
+async def _hint_levels(
+    db: AsyncSession, *, session_id: uuid.UUID, owner_user_id: uuid.UUID
+) -> dict[uuid.UUID, int]:
     rows = await db.execute(
         select(QuizHintEvent.question_id, func.count())
-        .where(QuizHintEvent.session_id == session_id)
+        .where(
+            QuizHintEvent.session_id == session_id,
+            QuizHintEvent.owner_user_id == owner_user_id,
+        )
         .group_by(QuizHintEvent.question_id)
     )
     return {question_id: int(count) for question_id, count in rows.all()}
@@ -347,8 +450,10 @@ async def _hint_levels(db: AsyncSession, *, session_id: uuid.UUID) -> dict[uuid.
 
 async def session_snapshot(db: AsyncSession, *, session: QuizSession) -> dict:
     questions = await session_questions(db, session_id=session.id)
-    attempts = await _attempts_by_question(db, session_id=session.id)
-    hints = await _hint_levels(db, session_id=session.id)
+    attempts = await _attempts_by_question(
+        db, session_id=session.id, owner_user_id=session.owner_user_id
+    )
+    hints = await _hint_levels(db, session_id=session.id, owner_user_id=session.owner_user_id)
     return {"questions": questions, "attempts": attempts, "hints": hints}
 
 
@@ -385,7 +490,20 @@ async def _completed(db: AsyncSession, *, session: QuizSession) -> bool:
         )
         or 0
     )
-    return answered >= session.question_count
+    code_answered = int(
+        await db.scalar(
+            select(func.count(func.distinct(CodeRun.question_id))).where(
+                CodeRun.quiz_session_id == session.id,
+                CodeRun.purpose == "GRADE",
+                CodeRun.status.not_in(
+                    ("QUEUED", "RUNNING", "CANCELLED", "UNAVAILABLE", "SYSTEM_ERROR")
+                ),
+                CodeRun.correctness_status.in_(("PASSED", "PARTIAL", "FAILED")),
+            )
+        )
+        or 0
+    )
+    return answered + code_answered >= session.question_count
 
 
 async def submit_answer(
@@ -396,6 +514,8 @@ async def submit_answer(
     answer: object,
     idempotency_key: str,
 ) -> AttemptOutcome:
+    if question.type == "CODE":
+        raise QuizRequestRejected("编程题必须通过代码运行提交", code="INVALID_ANSWER")
     await db.refresh(session, with_for_update=True)
     # Scalars are captured before any rollback so a later read cannot become a
     # lazy refresh inside the event loop.
@@ -606,11 +726,17 @@ async def _link_review(db: AsyncSession, *, session: QuizSession, question: Quiz
 
     similar = await db.scalar(
         select(QuizDraft)
+        .join(User, User.id == QuizDraft.owner_user_id)
         .where(
             QuizDraft.chapter_id == session.chapter_id,
+            QuizDraft.source_conversation_id == session.source_conversation_id,
             QuizDraft.status.in_(("HUMAN_APPROVED", "AUTO_VALIDATED")),
             QuizDraft.validation_passed.is_(True),
             QuizDraft.id != session.draft_id,
+            or_(
+                QuizDraft.owner_user_id == session.owner_user_id,
+                User.role == UserRole.ADMIN.value,
+            ),
         )
         .order_by(QuizDraft.created_at.desc())
         .limit(1)

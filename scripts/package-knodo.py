@@ -34,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / "platform" / "knodo"
 CONTRACTS = ROOT / "contracts"
-KIT_PLATFORM = ROOT / ".rebuild-kit" / "platform"
+STAGE_POLICY = PACKAGE / "stage-policy.json"
 CURRICULUM_MIRROR = ROOT / "curriculum" / "releases"
 DEFAULT_RELEASE_ID = "knodo-assets-1.0.0"
 
@@ -554,8 +554,10 @@ def verify_skill_tree(skill_dir: Path, *, where: str) -> list[str]:
         elif local.read_bytes() != frozen.read_bytes():
             problems.append(f"{where}: schema differs from frozen contract: {schema}")
     stage_policy = skill_dir / "references" / "stage-policy.json"
-    source_policy = KIT_PLATFORM / "stage-policy.json"
-    if stage_policy.is_file() and source_policy.is_file():
+    source_policy = STAGE_POLICY
+    if not source_policy.is_file():
+        problems.append(f"{where}: canonical stage-policy.json missing")
+    elif stage_policy.is_file():
         if stage_policy.read_bytes() != source_policy.read_bytes():
             problems.append(f"{where}: stage-policy.json differs from source asset")
     return problems

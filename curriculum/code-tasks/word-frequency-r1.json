@@ -1,0 +1,150 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "word-frequency",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": true,
+  "review_status": "UNREVIEWED",
+  "title": "词频统计：找出词语出现了几次",
+  "description": "编写 word_frequency(words)，返回每个词出现次数的字典。输入最多 1000 个小写英文字词，每个词长 1 至 30；空列表返回空字典。",
+  "starter_code": "def word_frequency(words):\n    \"\"\"词频统计：找出词语出现了几次\"\"\"\n    # 在这里写下你的解题思路\n    pass\n",
+  "entrypoint": "word_frequency",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "words"
+      ],
+      "properties": {
+        "words": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
+            "pattern": "^[a-z]+$"
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "limits": {
+      "max_input_bytes": 65536,
+      "max_output_bytes": 16384,
+      "timeout_ms": 3000
+    },
+    "errors": [
+      "INVALID_JSON",
+      "INVALID_INPUT",
+      "STUDENT_EXCEPTION",
+      "TIMEOUT",
+      "OUTPUT_LIMIT",
+      "SYSTEM_ERROR"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "words": [
+          "ai",
+          "python",
+          "ai"
+        ]
+      },
+      "output": {
+        "ai": 2,
+        "python": 1
+      }
+    },
+    {
+      "input": {
+        "words": []
+      },
+      "output": {}
+    },
+    {
+      "input": {
+        "words": [
+          "a",
+          "a",
+          "b"
+        ]
+      },
+      "output": {
+        "a": 2,
+        "b": 1
+      }
+    }
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {
+        "id": "F1",
+        "name": "常规用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "F2",
+        "name": "变化与组合用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "R1",
+        "name": "边界用例",
+        "dimension": "R",
+        "max_score": 10,
+        "case_count": 2
+      }
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "67629c69825064fcad88ae8b655b9fa12010ae3849f4d8a7e06bf77325f887fb"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [
+      {
+        "id": "F",
+        "max_score": 60
+      },
+      {
+        "id": "R",
+        "max_score": 10
+      }
+    ],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "python-first-steps",
+    "chapter_slug": "ch05",
+    "revision": 1,
+    "stage": "JUNIOR",
+    "knowledge_point_slugs": [
+      "variable",
+      "condition-if",
+      "loop"
+    ]
+  },
+  "source": {
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "source_path": "curriculum/code-tasks/word-frequency-r1.json",
+    "source_sha256": "4115aac853d32ddcf5a8882ea8c9aa05f8af6fba17d6e7f697e426c770fe47c2",
+    "reference_solution_sha256": "7f862c32941f514037e0bb8690b413653944e3878cb524036d22290ef423149f"
+  }
+}

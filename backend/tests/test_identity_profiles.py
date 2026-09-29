@@ -66,6 +66,45 @@ async def test_stage_boundaries_and_nullable_grade(client, test_settings: Settin
 
 
 @pytest.mark.asyncio
+async def test_stage_only_switch_clears_old_grade_and_style_survives_reload(
+    client, test_settings: Settings
+):
+    await create_synthetic_user(
+        test_settings,
+        username="student.stage-switch",
+        password="Stage-Switch-Pass-123",
+        stage="PRIMARY_LOWER",
+        grade=2,
+    )
+    data = await _login_profile(client, "student.stage-switch", "Stage-Switch-Pass-123")
+    switched = await _patch(
+        client,
+        "/api/v1/me/profile",
+        {"base_revision": data["profile"]["revision"], "stage": "SENIOR"},
+        data["csrf_token"],
+    )
+    assert switched.status_code == 200, switched.text
+    assert switched.json()["profile"]["stage"] == "SENIOR"
+    assert switched.json()["profile"]["grade"] is None
+
+    styled = await _patch(
+        client,
+        "/api/v1/me/preferences",
+        {
+            "base_revision": switched.json()["profile"]["revision"],
+            "preferred_style": "STEP_BY_STEP",
+        },
+        data["csrf_token"],
+    )
+    assert styled.status_code == 200, styled.text
+    reloaded = await client.get("/api/v1/me")
+    assert reloaded.status_code == 200
+    assert reloaded.json()["profile"]["stage"] == "SENIOR"
+    assert reloaded.json()["profile"]["grade"] is None
+    assert reloaded.json()["preferences"]["preferred_style"] == "STEP_BY_STEP"
+
+
+@pytest.mark.asyncio
 async def test_invalid_or_conflicting_grade_is_rejected_without_side_effect(
     client, test_settings: Settings
 ):
@@ -209,3 +248,39 @@ async def test_preferences_partial_patch_revision_and_persistence(client, test_s
     restored = await client.get("/api/v1/me")
     assert restored.json()["preferences"]["preferred_style"] == "STEP_BY_STEP"
     assert restored.json()["preferences"]["interests"] == ["算法", "机器人"]
+
+
+@pytest.mark.asyncio
+async def test_teacher_style_and_pet_are_separate_account_preferences(
+    client, test_settings: Settings
+):
+    await create_synthetic_user(
+        test_settings,
+        username="student.teacher-style",
+        password="Preference-Pass-123",
+        stage="PRIMARY_UPPER",
+        grade=5,
+    )
+    data = await _login_profile(client, "student.teacher-style", "Preference-Pass-123")
+    changed = await _patch(
+        client,
+        "/api/v1/me/preferences",
+        {
+            "base_revision": data["profile"]["revision"],
+            "teacher_style": "SOCRATIC",
+            "companion_pet_id": "anya",
+        },
+        data["csrf_token"],
+    )
+    assert changed.status_code == 200, changed.text
+    reloaded = (await client.get("/api/v1/me")).json()
+    assert reloaded["preferences"]["teacher_style"] == "SOCRATIC"
+    assert reloaded["preferences"]["companion_pet_id"] == "anya"
+    assert reloaded["preferences"]["preferred_style"] == "AUTO"
+    rejected = await _patch(
+        client,
+        "/api/v1/me/preferences",
+        {"base_revision": reloaded["profile"]["revision"], "companion_pet_id": "foreign"},
+        data["csrf_token"],
+    )
+    assert rejected.status_code == 422

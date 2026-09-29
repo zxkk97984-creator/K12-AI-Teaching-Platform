@@ -79,6 +79,16 @@ def merge_learner_context(
     """
 
     merged: dict[str, dict[str, str]] = {}
+    # The account's current personal note must survive the request's evidence
+    # cap even when a lesson carries many quiz or activity observations.
+    for item in learner_context or []:
+        item_id = item.get("id")
+        if isinstance(item_id, str) and item_id.startswith("memory-document:"):
+            merged[item_id] = {
+                "id": item_id[:160],
+                "kind": str(item.get("kind") or "CONFIRMED_MEMORY"),
+                "summary": str(item.get("summary") or "")[:1200],
+            }
     for item in context.get("evidence") or []:
         if isinstance(item, dict) and isinstance(item.get("id"), str):
             merged.setdefault(item["id"], item)

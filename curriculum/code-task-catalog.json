@@ -1,0 +1,139 @@
+{
+  "schema_version": "k12.code-task-catalog.v1",
+  "items": [
+    {
+      "task_id": "temperature-converter",
+      "task_revision": 1,
+      "category": "PYTHON_BASICS",
+      "difficulty": "EASY",
+      "tags": [
+        "温度换算",
+        "函数"
+      ],
+      "sort_order": 0
+    },
+    {
+      "task_id": "odd-even",
+      "task_revision": 1,
+      "category": "PYTHON_BASICS",
+      "difficulty": "EASY",
+      "tags": [
+        "整数运算",
+        "条件判断"
+      ],
+      "sort_order": 1
+    },
+    {
+      "task_id": "even-sum",
+      "task_revision": 1,
+      "category": "PYTHON_BASICS",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "列表",
+        "循环",
+        "条件判断"
+      ],
+      "sort_order": 2
+    },
+    {
+      "task_id": "list-summary",
+      "task_revision": 1,
+      "category": "DATA_PROCESSING",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "列表",
+        "数据统计"
+      ],
+      "sort_order": 3
+    },
+    {
+      "task_id": "palindrome-check",
+      "task_revision": 1,
+      "category": "ALGORITHMS",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "字符串",
+        "双指针"
+      ],
+      "sort_order": 4
+    },
+    {
+      "task_id": "word-frequency",
+      "task_revision": 1,
+      "category": "DATA_PROCESSING",
+      "difficulty": "HARD",
+      "tags": [
+        "字典",
+        "数据统计"
+      ],
+      "sort_order": 5
+    },
+    {
+      "task_id": "prediction-accuracy",
+      "task_revision": 1,
+      "category": "DATA_PROCESSING",
+      "difficulty": "EASY",
+      "tags": [
+        "分类",
+        "模型评价"
+      ],
+      "sort_order": 0
+    },
+    {
+      "task_id": "binary-search",
+      "task_revision": 1,
+      "category": "ALGORITHMS",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "查找",
+        "二分算法"
+      ],
+      "sort_order": 1
+    },
+    {
+      "task_id": "sort-unique",
+      "task_revision": 1,
+      "category": "ALGORITHMS",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "排序",
+        "集合",
+        "去重"
+      ],
+      "sort_order": 2
+    },
+    {
+      "task_id": "balanced-brackets",
+      "task_revision": 1,
+      "category": "ALGORITHMS",
+      "difficulty": "HARD",
+      "tags": [
+        "栈",
+        "字符串"
+      ],
+      "sort_order": 3
+    },
+    {
+      "task_id": "range-sum",
+      "task_revision": 1,
+      "category": "ALGORITHMS",
+      "difficulty": "HARD",
+      "tags": [
+        "前缀和",
+        "区间查询"
+      ],
+      "sort_order": 4
+    },
+    {
+      "task_id": "climbing-stairs",
+      "task_revision": 1,
+      "category": "ALGORITHMS",
+      "difficulty": "HARD",
+      "tags": [
+        "动态规划",
+        "递推"
+      ],
+      "sort_order": 5
+    }
+  ]
+}

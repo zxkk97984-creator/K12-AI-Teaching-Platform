@@ -68,17 +68,23 @@ class LessonSession(Base):
         nullable=False,
         index=True,
     )
-    chapter_id: Mapped[uuid.UUID] = mapped_column(
+    chapter_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapters.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
-    revision_id: Mapped[uuid.UUID] = mapped_column(
+    revision_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapter_revisions.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
     )
+    conversation_type: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="LESSON", server_default="LESSON", index=True
+    )
+    title: Mapped[str | None] = mapped_column(String(200))
+    creation_key: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
     curriculum_revision: Mapped[str] = mapped_column(String(160), nullable=False)
     stage: Mapped[str] = mapped_column(String(16), nullable=False)
     grade: Mapped[int | None] = mapped_column(Integer)
@@ -97,11 +103,23 @@ class LessonSession(Base):
     )
 
     messages: Mapped[list[ConversationMessage]] = relationship(
-        back_populates="session", order_by="ConversationMessage.created_at"
+        back_populates="session",
+        order_by="ConversationMessage.created_at",
+        passive_deletes=True,
     )
 
     __table_args__ = (
         CheckConstraint("base_revision >= 0", name="ck_teaching_sessions_base_revision"),
+        CheckConstraint(
+            "conversation_type IN ('LESSON', 'FREE')",
+            name="ck_teaching_sessions_conversation_type",
+        ),
+        CheckConstraint(
+            "(conversation_type = 'FREE' AND chapter_id IS NULL AND revision_id IS NULL) "
+            "OR (conversation_type = 'LESSON' AND chapter_id IS NOT NULL "
+            "AND revision_id IS NOT NULL)",
+            name="ck_teaching_sessions_conversation_target",
+        ),
         CheckConstraint(
             "stage IN ('PRIMARY_LOWER', 'PRIMARY_UPPER', 'JUNIOR', 'SENIOR')",
             name="ck_teaching_sessions_stage",
@@ -115,6 +133,7 @@ class LessonSession(Base):
             name="ck_teaching_sessions_lifecycle",
         ),
         CheckConstraint("phase_revision >= 0", name="ck_teaching_sessions_phase_revision"),
+        UniqueConstraint("owner_user_id", "creation_key", name="uq_teaching_session_creation_key"),
     )
 
 
@@ -169,7 +188,11 @@ class AgentRun(Base):
     )
     operation: Mapped[str] = mapped_column(String(40), nullable=False)
     event: Mapped[str] = mapped_column(String(24), nullable=False, default="ASK")
+    scene_snapshot: Mapped[dict | None] = mapped_column(JSONB)
     policy_snapshot_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    # Revision of the owner-scoped personal memory visible when this turn was
+    # created; changed memory makes a late result stale.
+    memory_context_revision: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     idempotency_key: Mapped[str] = mapped_column(String(160), nullable=False)
     request_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     status: Mapped[str] = mapped_column(String(16), nullable=False, default=RunStatus.QUEUED.value)
@@ -180,6 +203,9 @@ class AgentRun(Base):
     gateway_invocation_id: Mapped[str | None] = mapped_column(String(64))
     error_category: Mapped[str | None] = mapped_column(String(40))
     stale_reason: Mapped[str | None] = mapped_column(String(80))
+    # A bounded provisional teaching reply for reconnectable SSE. It is never
+    # copied into conversation history and is cleared on every terminal state.
+    draft_markdown: Mapped[str | None] = mapped_column(Text)
     result_message_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("teaching_messages.id", ondelete="SET NULL")
     )
@@ -199,6 +225,7 @@ class AgentRun(Base):
             name="ck_teaching_runs_status",
         ),
         CheckConstraint("attempt >= 1", name="ck_teaching_runs_attempt"),
+        CheckConstraint("memory_context_revision >= 0", name="ck_teaching_runs_memory_revision"),
     )
 
 

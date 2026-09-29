@@ -3,12 +3,13 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_CATALOG_ROOT = REPO_ROOT / "curriculum" / "code-tasks"
+DEFAULT_CATALOG_METADATA_PATH = REPO_ROOT / "curriculum" / "code-task-catalog.json"
 TASK_SCHEMA_VERSION = "k12.code-task.v1"
 
 
@@ -104,12 +105,41 @@ class ChapterBinding(StrictModel):
 
 
 class Source(StrictModel):
-    source_kind: Literal["LEGACY_REUSED", "SYNTHETIC_FIXTURE"]
+    source_kind: Literal["LEGACY_REUSED"]
     source_commit: str = Field(pattern=r"^[0-9a-f]{40}$")
     source_path: str = Field(min_length=1)
     legacy_payload_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     reference_solution_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     legacy_test_groups_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class SyntheticSource(StrictModel):
+    source_kind: Literal["SYNTHETIC_FIXTURE"]
+    source_path: str = Field(min_length=1)
+    source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    reference_solution_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class CatalogMetadata(StrictModel):
+    task_id: str = Field(pattern=r"^[a-z][a-z0-9-]{2,63}$")
+    task_revision: int = Field(ge=1)
+    category: Literal["PYTHON_BASICS", "DATA_PROCESSING", "ALGORITHMS"]
+    difficulty: Literal["EASY", "MEDIUM", "HARD"]
+    tags: list[str] = Field(max_length=12)
+    sort_order: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def validate_tags(self) -> CatalogMetadata:
+        if any(not tag.strip() or len(tag) > 40 for tag in self.tags):
+            raise ValueError("catalog tags must contain 1 to 40 characters")
+        if len(set(self.tags)) != len(self.tags):
+            raise ValueError("catalog tags must be unique")
+        return self
+
+
+class CatalogMetadataDocument(StrictModel):
+    schema_version: Literal["k12.code-task-catalog.v1"]
+    items: list[CatalogMetadata]
 
 
 class TaskDefinition(StrictModel):
@@ -128,7 +158,7 @@ class TaskDefinition(StrictModel):
     test_manifest: TestManifest
     rubric: Rubric
     chapter_binding: ChapterBinding
-    source: Source
+    source: Annotated[Source | SyntheticSource, Field(discriminator="source_kind")]
 
     @model_validator(mode="after")
     def validate_boundaries(self) -> TaskDefinition:
@@ -168,6 +198,13 @@ def _reject_secret_fields(payload: Any, path: str = "task") -> None:
 
 def parse_task_document(payload: dict[str, Any]) -> TaskDefinition:
     _reject_secret_fields(payload)
+    source = payload.get("source")
+    if isinstance(source, dict) and source.get("source_kind") == "SYNTHETIC_FIXTURE":
+        source_hash = source.get("source_sha256")
+        unhashed = {key: value for key, value in payload.items() if key != "source"}
+        expected = hashlib.sha256(canonical_json(unhashed).encode("utf-8")).hexdigest()
+        if source_hash != expected:
+            raise ValueError("synthetic source_sha256 does not match the task document")
     return TaskDefinition.model_validate(payload)
 
 
@@ -187,6 +224,22 @@ def load_catalog(root: Path = DEFAULT_CATALOG_ROOT) -> list[tuple[Path, TaskDefi
     if not loaded:
         raise ValueError(f"code task catalog is empty: {root}")
     return loaded
+
+
+def load_catalog_metadata(
+    path: Path = DEFAULT_CATALOG_METADATA_PATH,
+) -> dict[tuple[str, int], CatalogMetadata]:
+    """Load the separately versioned, student-facing task catalogue metadata."""
+    if not path.is_file():
+        return {}
+    document = CatalogMetadataDocument.model_validate_json(path.read_text(encoding="utf-8"))
+    result: dict[tuple[str, int], CatalogMetadata] = {}
+    for item in document.items:
+        key = (item.task_id, item.task_revision)
+        if key in result:
+            raise ValueError(f"duplicate catalogue metadata: {item.task_id}@r{item.task_revision}")
+        result[key] = item
+    return result
 
 
 def public_task_view(task: TaskDefinition) -> dict[str, Any]:

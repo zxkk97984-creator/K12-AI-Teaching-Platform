@@ -1,17 +1,10 @@
-# platform/knodo —— Knodo 交付资产（PACKAGED，未部署）
+# platform/knodo —— Knodo 交付资产
 
 本目录是**本地打包资产**：Tutor/Designer 两类 Bot 的系统提示词、三份 Skill、受控课堂知识包、
 Designer 私有边界清单与部署登记。它**不是** Knodo 官方的一键 Bot 导入包，也不代表任何 Skill 已在线加载。
 
-## 状态区分（必须保持）
-
-| 事实 | 本仓现状 |
-|---|---|
-| 文件已打包（PACKAGED） | 是：`releases/<release_id>/` 内含 ZIP、逐条 SHA256 与 release manifest |
-| Bot/Skill 已部署（DEPLOYED） | **否**：`deployment-manifest.json` 中 `deployment_status=NOT_DEPLOYED`、`bot_id=null` |
-| 真实租户加载/教学效果 | **未验证**：没有平台执行证据，记为 NOT_RUN |
-
-平台操作步骤见 `docs/integrations/knodo/DEPLOYMENT_GUIDE.md`；Tutor/Designer 资料边界见
+运行目标由本机配置管理；本目录 manifest 记录本地包版本。
+操作步骤见 `docs/integrations/knodo/DEPLOYMENT_GUIDE.md`，资产说明见
 `docs/integrations/knodo/ASSET_BOUNDARIES.md`。
 
 ## 目录
@@ -19,7 +12,7 @@ Designer 私有边界清单与部署登记。它**不是** Knodo 官方的一键
 ```
 platform/knodo/
   VERSION.json                 包版本 + 契约版本
-  contracts/                   T03 冻结契约副本（只读，不改）
+  contracts/                   业务契约副本（与 contracts 同步）
   tutor/v1/                    Tutor 系统提示词、Bot profile 与配置说明
   designer/v1/                 Designer 系统提示词、Bot profile、题稿样例（样例只用于校验）
   skills/<name>/               SKILL.md + references/（schema 与冻结契约逐字节一致）

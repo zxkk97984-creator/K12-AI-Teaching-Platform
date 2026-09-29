@@ -15,18 +15,27 @@ const VIEWPORTS = [
   { name: "1280", width: 1280, height: 900 },
 ];
 
-async function signIn(page: Page, account: { username: string; password: string }) {
+async function signIn(
+  page: Page,
+  account: { username: string; password: string },
+) {
   await page.goto("/login");
   await page.getByLabel("用户名").fill(account.username);
   await page.getByLabel("密码").fill(account.password);
   await page.getByRole("button", { name: "登录" }).click();
-  await expect(page).toHaveURL(/\/(settings|onboarding)/);
+  await expect(page).toHaveURL(/\/(settings|onboarding|conversations)/);
 }
 
 /** Idempotently set the synthetic account's stage/grade through the real T05 flow. */
-async function setStage(page: Page, stage: "PRIMARY_LOWER" | "JUNIOR", grade: number) {
+async function setStage(
+  page: Page,
+  stage: "PRIMARY_LOWER" | "JUNIOR",
+  grade: number,
+) {
   await page.goto("/onboarding");
-  await expect(page.getByRole("heading", { name: "告诉我们从哪里开始" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "告诉我们从哪里开始" }),
+  ).toBeVisible();
   await page.getByLabel("学段").selectOption(stage);
   await page.getByLabel(/具体年级/).fill(String(grade));
   await page.getByRole("button", { name: /继续学习/ }).click();
@@ -59,8 +68,12 @@ test("reader chain: catalogue → chapter → figure → selection → chapter s
   // 2. Authoritative content, figure description and provenance are rendered.
   const reader = page.getByTestId("chapter-reader");
   await expect(reader).toBeVisible();
-  await expect(page.getByTestId("chapter-meta")).toContainText("测试内容，未作人工教学审校");
-  await expect(reader.getByRole("heading", { level: 2 }).first()).toContainText("合成样例");
+  await expect(page.getByTestId("chapter-meta")).toContainText(
+    "测试内容，未作人工教学审校",
+  );
+  await expect(reader.getByRole("heading", { level: 2 }).first()).toContainText(
+    "合成样例",
+  );
   await expect(reader.getByRole("img")).toContainText("两个方框");
   await expect(reader.getByText("测试知识卡")).toBeVisible();
   await expect(reader.getByText(/归属任务：T08/)).toHaveCount(0);
@@ -80,25 +93,33 @@ test("reader chain: catalogue → chapter → figure → selection → chapter s
   await expect(aside).toContainText("内容块");
   await expect(aside).toContainText("b3");
   await expect(aside).toContainText(/选中\s*\d+\s*字/);
-  await expect(aside.getByTestId("explain-slot")).toContainText("归属任务：T12");
+  await expect(aside.getByTestId("explain-slot")).toContainText("打开学习助手");
 
   // 4. Switch stage → different chapter becomes visible and old context is gone.
   await setStage(page, "JUNIOR", 8);
   await openFirstCourse(page);
   await page.getByTestId("chapter-link").first().click();
   await expect(page.getByTestId("chapter-meta")).toContainText("版本 r1");
-  await expect(page.getByTestId("chapter-reader")).toContainText("只确定学段时怎么匹配");
-  await expect(page.getByTestId("reader-aside")).toContainText("还没有选中文字");
+  await expect(page.getByTestId("chapter-reader")).toContainText(
+    "只确定学段时怎么匹配",
+  );
+  await expect(page.getByTestId("reader-aside")).toContainText(
+    "还没有选中文字",
+  );
   await expect(page.getByTestId("reader-aside")).not.toContainText("b3");
 
   // 5. Refresh keeps the same user on the same revision and restores the position.
   await page.reload();
   await expect(page.getByTestId("chapter-meta")).toContainText("版本 r1");
-  await expect(page.getByTestId("chapter-reader")).toContainText("只确定学段时怎么匹配");
+  await expect(page.getByTestId("chapter-reader")).toContainText(
+    "只确定学段时怎么匹配",
+  );
   await expect(page.getByTestId("resume-note")).toBeVisible();
 });
 
-test("old chapter link stops working after the student's stage changes (QA24)", async ({ page }) => {
+test("old chapter link stops working after the student's stage changes (QA24)", async ({
+  page,
+}) => {
   expect(studentA.username).not.toBe("");
   await signIn(page, studentA);
   await setStage(page, "JUNIOR", 8);
@@ -113,7 +134,9 @@ test("old chapter link stops working after the student's stage changes (QA24)", 
   await expect(page.getByTestId("chapter-reader")).toHaveCount(0);
 });
 
-test("reader adapts to 390/820/1280 without horizontal overflow", async ({ page }) => {
+test("reader adapts to 390/820/1280 without horizontal overflow", async ({
+  page,
+}) => {
   expect(studentA.username).not.toBe("");
   await signIn(page, studentA);
   await setStage(page, "PRIMARY_LOWER", 2);
@@ -122,31 +145,41 @@ test("reader adapts to 390/820/1280 without horizontal overflow", async ({ page 
   await expect(page.getByTestId("chapter-reader")).toBeVisible();
 
   await page.screenshot({
-    path: "docs/acceptance/t30-evidence/t08-course-list-1280.png",
+    path: "test-results/screenshots/t08-course-list-1280.png",
     fullPage: false,
   });
 
   for (const viewport of VIEWPORTS) {
-    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.setViewportSize({
+      width: viewport.width,
+      height: viewport.height,
+    });
     await page.waitForTimeout(120);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - window.innerWidth,
     );
-    expect(overflow, `viewport ${viewport.name}px must not overflow`).toBeLessThanOrEqual(1);
+    expect(
+      overflow,
+      `viewport ${viewport.name}px must not overflow`,
+    ).toBeLessThanOrEqual(1);
     await expect(page.getByTestId("chapter-reader")).toBeVisible();
     await page.screenshot({
-      path: `docs/acceptance/t30-evidence/t08-reader-${viewport.name}.png`,
+      path: `test-results/screenshots/t08-reader-${viewport.name}.png`,
       fullPage: true,
     });
   }
 });
 
-test("unauthenticated catalogue visit follows the login flow", async ({ browser }) => {
+test("unauthenticated catalogue visit follows the login flow", async ({
+  browser,
+}) => {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto("/courses");
   await expect(page).toHaveURL(/\/login/);
-  await expect(page.getByRole("heading", { name: "回到你的学习空间" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "回到你的学习空间" }),
+  ).toBeVisible();
   await context.close();
 });
 

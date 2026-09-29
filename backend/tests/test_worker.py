@@ -11,8 +11,14 @@ async def test_worker_one_shot_recovers_and_consumes_no_phantom_jobs(test_settin
     assert set(result) == {
         "recovered_teaching",
         "recovered_authoring",
+        "recovered_codelab",
+        "recovered_assessment",
         "teaching_processed",
         "authoring_processed",
+        "codelab_processed",
+        "assessment_processed",
     }
     assert result["teaching_processed"] == 0
     assert result["authoring_processed"] == 0
+    assert result["codelab_processed"] == 0
+    assert result["assessment_processed"] == 0

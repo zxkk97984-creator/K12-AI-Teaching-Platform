@@ -106,6 +106,147 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/learning/student-content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Student Content
+         * @description The packaged synthetic stories and guided animation for this account stage.
+         */
+        get: operations["read_student_content_api_v1_learning_student_content_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning/picturebooks/{story_id}/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Picturebook Progress */
+        get: operations["read_picturebook_progress_api_v1_learning_picturebooks__story_id__progress_get"];
+        /** Save Picturebook Progress */
+        put: operations["save_picturebook_progress_api_v1_learning_picturebooks__story_id__progress_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Catalog */
+        get: operations["learning_catalog_api_v1_learning_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning/bookshelf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Bookshelf */
+        get: operations["learning_bookshelf_api_v1_learning_bookshelf_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning/bookshelf/{target_kind}/{target_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Add Bookmark */
+        put: operations["add_bookmark_api_v1_learning_bookshelf__target_kind___target_id__put"];
+        post?: never;
+        /** Remove Bookmark */
+        delete: operations["remove_bookmark_api_v1_learning_bookshelf__target_kind___target_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning/open-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Open Event */
+        post: operations["record_open_event_api_v1_learning_open_events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning History */
+        get: operations["learning_history_api_v1_learning_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learning/continue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Continue Learning */
+        get: operations["continue_learning_api_v1_learning_continue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -115,6 +256,65 @@ export interface components {
          * @enum {string}
          */
         BlockType: "TITLE" | "SECTION" | "PARAGRAPH" | "KNOWLEDGE_CARD" | "CALLOUT" | "FIGURE";
+        /** BookmarkDTO */
+        BookmarkDTO: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "COURSE" | "RESOURCE" | "ANIMATION";
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Slug */
+            slug?: string | null;
+            /** Resource Type */
+            resource_type?: string | null;
+            /** Stage */
+            stage?: string | null;
+            /** Grade Min */
+            grade_min?: number | null;
+            /** Grade Max */
+            grade_max?: number | null;
+            /** Chapter Count */
+            chapter_count?: number | null;
+            /** Target Version */
+            target_version?: string | null;
+            /**
+             * Is Test Fixture
+             * @default false
+             */
+            is_test_fixture: boolean;
+            /** Content Notice */
+            content_notice?: string | null;
+            /**
+             * Available
+             * @default true
+             */
+            available: boolean;
+            /** Unavailable Reason */
+            unavailable_reason?: string | null;
+            /** Route */
+            route: string;
+            /** Created At */
+            created_at?: string | null;
+            /**
+             * Is Bookmarked
+             * @default false
+             */
+            is_bookmarked: boolean;
+            /**
+             * Bookmarked At
+             * Format: date-time
+             */
+            bookmarked_at: string;
+        };
         /** ChapterDetailDTO */
         ChapterDetailDTO: {
             /**
@@ -213,6 +413,49 @@ export interface components {
             /** Content Notice */
             content_notice: string | null;
         };
+        /** ContinueDTO */
+        ContinueDTO: {
+            item: components["schemas"]["ContinueItemDTO"] | null;
+        };
+        /** ContinueItemDTO */
+        ContinueItemDTO: {
+            /**
+             * Chapter Id
+             * Format: uuid
+             */
+            chapter_id: string;
+            /**
+             * Course Id
+             * Format: uuid
+             */
+            course_id: string;
+            /** Course Title */
+            course_title: string;
+            /** Chapter Title */
+            chapter_title: string;
+            /** Revision */
+            revision: number;
+            /**
+             * Revision Id
+             * Format: uuid
+             */
+            revision_id: string;
+            /** Event Kind */
+            event_kind: string;
+            /** Section Key */
+            section_key?: string | null;
+            /** Block Id */
+            block_id?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Is Current Revision */
+            is_current_revision: boolean;
+            /** Route */
+            route: string;
+        };
         /** CourseListDTO */
         CourseListDTO: {
             /** Items */
@@ -248,6 +491,60 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HistoryItemDTO */
+        HistoryItemDTO: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "READING" | "OPEN";
+            /**
+             * Target Kind
+             * @enum {string}
+             */
+            target_kind: "COURSE" | "RESOURCE" | "ANIMATION";
+            /** Target Id */
+            target_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Chapter Id */
+            chapter_id?: string | null;
+            /** Course Id */
+            course_id?: string | null;
+            /** Revision */
+            revision?: number | null;
+            /** Revision Id */
+            revision_id?: string | null;
+            /** Event Kind */
+            event_kind?: string | null;
+            /** Section Key */
+            section_key?: string | null;
+            /** Block Id */
+            block_id?: string | null;
+            /** Target Version */
+            target_version?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Is Current Revision */
+            is_current_revision?: boolean | null;
+            /**
+             * Available
+             * @default true
+             */
+            available: boolean;
+            /** Unavailable Reason */
+            unavailable_reason?: string | null;
+            /** Route */
+            route?: string | null;
+        };
         /** KnowledgePointDTO */
         KnowledgePointDTO: {
             /** Slug */
@@ -258,6 +555,60 @@ export interface components {
             topic: string;
             /** Description */
             description: string;
+        };
+        /** LearningItemDTO */
+        LearningItemDTO: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "COURSE" | "RESOURCE" | "ANIMATION";
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Slug */
+            slug?: string | null;
+            /** Resource Type */
+            resource_type?: string | null;
+            /** Stage */
+            stage?: string | null;
+            /** Grade Min */
+            grade_min?: number | null;
+            /** Grade Max */
+            grade_max?: number | null;
+            /** Chapter Count */
+            chapter_count?: number | null;
+            /** Target Version */
+            target_version?: string | null;
+            /**
+             * Is Test Fixture
+             * @default false
+             */
+            is_test_fixture: boolean;
+            /** Content Notice */
+            content_notice?: string | null;
+            /**
+             * Available
+             * @default true
+             */
+            available: boolean;
+            /** Unavailable Reason */
+            unavailable_reason?: string | null;
+            /** Route */
+            route: string;
+            /** Created At */
+            created_at?: string | null;
+            /**
+             * Is Bookmarked
+             * @default false
+             */
+            is_bookmarked: boolean;
         };
         /**
          * LicenseCode
@@ -277,6 +628,45 @@ export interface components {
             title: string;
             /** Revision */
             revision: number;
+        };
+        /** OpenEventReceipt */
+        OpenEventReceipt: {
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /**
+             * Target Kind
+             * @enum {string}
+             */
+            target_kind: "COURSE" | "RESOURCE" | "ANIMATION";
+            /** Target Id */
+            target_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /**
+             * Duplicate
+             * @default false
+             */
+            duplicate: boolean;
+        };
+        /** OpenEventRequest */
+        OpenEventRequest: {
+            /**
+             * Target Kind
+             * @enum {string}
+             */
+            target_kind: "COURSE" | "RESOURCE" | "ANIMATION";
+            /** Target Id */
+            target_id: string;
+            /** Client Event Id */
+            client_event_id?: string | null;
         };
         /**
          * PageContextDTO
@@ -321,6 +711,57 @@ export interface components {
             block_id?: string | null;
             /** Selected Text */
             selected_text?: string | null;
+        };
+        /** PaginatedBookmarksDTO */
+        PaginatedBookmarksDTO: {
+            /** Items */
+            items: components["schemas"]["BookmarkDTO"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Profile */
+            profile: string;
+        };
+        /** PaginatedHistoryDTO */
+        PaginatedHistoryDTO: {
+            /** Items */
+            items: components["schemas"]["HistoryItemDTO"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** PaginatedLearningItemsDTO */
+        PaginatedLearningItemsDTO: {
+            /** Items */
+            items: components["schemas"]["LearningItemDTO"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Profile */
+            profile: string;
+        };
+        /** PicturebookProgressDTO */
+        PicturebookProgressDTO: {
+            /** Story Id */
+            story_id: string;
+            /** Page Index */
+            page_index: number;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /** PicturebookProgressUpdate */
+        PicturebookProgressUpdate: {
+            /** Page Index */
+            page_index: number;
         };
         /**
          * PublicationStatus
@@ -596,7 +1037,9 @@ export interface operations {
     };
     get_reading_state_api_v1_chapters__chapter_id__reading_state_get: {
         parameters: {
-            query?: never;
+            query?: {
+                revision?: number | null;
+            };
             header?: never;
             path: {
                 chapter_id: string;
@@ -692,6 +1135,369 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReadingEventReceipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_student_content_api_v1_learning_student_content_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_picturebook_progress_api_v1_learning_picturebooks__story_id__progress_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PicturebookProgressDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_picturebook_progress_api_v1_learning_picturebooks__story_id__progress_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                story_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PicturebookProgressUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PicturebookProgressDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    learning_catalog_api_v1_learning_catalog_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                kind?: ("COURSE" | "RESOURCE" | "ANIMATION") | null;
+                resource_type?: string | null;
+                topic?: string | null;
+                stage?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedLearningItemsDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    learning_bookshelf_api_v1_learning_bookshelf_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedBookmarksDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_bookmark_api_v1_learning_bookshelf__target_kind___target_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                target_kind: "COURSE" | "RESOURCE" | "ANIMATION";
+                target_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookmarkDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_bookmark_api_v1_learning_bookshelf__target_kind___target_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                target_kind: "COURSE" | "RESOURCE" | "ANIMATION";
+                target_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: boolean;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_open_event_api_v1_learning_open_events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpenEventRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpenEventReceipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    learning_history_api_v1_learning_history_get: {
+        parameters: {
+            query?: {
+                kind?: ("READING" | "OPEN") | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedHistoryDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    continue_learning_api_v1_learning_continue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContinueDTO"];
                 };
             };
             /** @description Validation Error */

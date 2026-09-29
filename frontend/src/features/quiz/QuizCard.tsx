@@ -127,7 +127,7 @@ export function QuizCard({
           <ul className="quiz-card__sources" aria-label="题目来源">
             {question.source_refs.map((ref) => (
               <li key={`${ref.source_id}:${ref.locator}`}>
-                {ref.source_id} · {ref.locator}
+                {ref.source_id.startsWith("conversation:") ? "本段 AI 教师讲解" : ref.source_id.startsWith("chapter:") ? "课程章节内容" : "学习资料"}
               </li>
             ))}
           </ul>

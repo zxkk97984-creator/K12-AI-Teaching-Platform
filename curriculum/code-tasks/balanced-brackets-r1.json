@@ -1,0 +1,127 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "balanced-brackets",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": true,
+  "review_status": "UNREVIEWED",
+  "title": "括号匹配：检查嵌套顺序",
+  "description": "编写 balanced_brackets(text)，判断只含 ()、[]、{} 的字符串是否正确配对并嵌套。长度最多 1000；空字符串返回 True。",
+  "starter_code": "def balanced_brackets(text):\n    \"\"\"括号匹配：检查嵌套顺序\"\"\"\n    # 在这里写下你的解题思路\n    pass\n",
+  "entrypoint": "balanced_brackets",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 1000,
+          "pattern": "^[()\\[\\]{}]*$"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "boolean"
+    },
+    "limits": {
+      "max_input_bytes": 65536,
+      "max_output_bytes": 16384,
+      "timeout_ms": 3000
+    },
+    "errors": [
+      "INVALID_JSON",
+      "INVALID_INPUT",
+      "STUDENT_EXCEPTION",
+      "TIMEOUT",
+      "OUTPUT_LIMIT",
+      "SYSTEM_ERROR"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "text": "{[()]}"
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "text": "([)]"
+      },
+      "output": false
+    },
+    {
+      "input": {
+        "text": ""
+      },
+      "output": true
+    }
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {
+        "id": "F1",
+        "name": "常规用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "F2",
+        "name": "变化与组合用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "R1",
+        "name": "边界用例",
+        "dimension": "R",
+        "max_score": 10,
+        "case_count": 2
+      }
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "a4ddad0469724943605e33c654f4330559b2dcf8d4bde094b30ed39d0e46be7d"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [
+      {
+        "id": "F",
+        "max_score": 60
+      },
+      {
+        "id": "R",
+        "max_score": 10
+      }
+    ],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "algorithm-everyday",
+    "chapter_slug": "ch03",
+    "revision": 1,
+    "stage": "SENIOR",
+    "knowledge_point_slugs": [
+      "binary-search",
+      "time-complexity",
+      "sorting-algorithm"
+    ]
+  },
+  "source": {
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "source_path": "curriculum/code-tasks/balanced-brackets-r1.json",
+    "source_sha256": "af7db000627e651f2f7f23e4f62e63f90b857a2d0ac8248368d4ebb9fd1ab30b",
+    "reference_solution_sha256": "369323c854ef3b89de6716986560d30f989ce9a546b36ecff4db615ea9383c47"
+  }
+}

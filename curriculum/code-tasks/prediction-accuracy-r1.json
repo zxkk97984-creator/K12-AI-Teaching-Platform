@@ -1,0 +1,172 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "prediction-accuracy",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": true,
+  "review_status": "UNREVIEWED",
+  "title": "模型评价：计算预测准确率",
+  "description": "编写 accuracy(y_true, y_pred)，返回两个标签列表中预测正确的位置比例。两个列表等长、非空，长度不超过 1000，标签为 0 至 9 的整数。",
+  "starter_code": "def accuracy(y_true, y_pred):\n    \"\"\"模型评价：计算预测准确率\"\"\"\n    # 在这里写下你的解题思路\n    pass\n",
+  "entrypoint": "accuracy",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "y_true",
+        "y_pred"
+      ],
+      "properties": {
+        "y_true": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1000,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9
+          }
+        },
+        "y_pred": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1000,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "limits": {
+      "max_input_bytes": 65536,
+      "max_output_bytes": 16384,
+      "timeout_ms": 3000
+    },
+    "errors": [
+      "INVALID_JSON",
+      "INVALID_INPUT",
+      "STUDENT_EXCEPTION",
+      "TIMEOUT",
+      "OUTPUT_LIMIT",
+      "SYSTEM_ERROR"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "y_true": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "y_pred": [
+          1,
+          0,
+          0,
+          1
+        ]
+      },
+      "output": 0.75
+    },
+    {
+      "input": {
+        "y_true": [
+          1,
+          2,
+          3
+        ],
+        "y_pred": [
+          1,
+          2,
+          3
+        ]
+      },
+      "output": 1.0
+    },
+    {
+      "input": {
+        "y_true": [
+          0,
+          0
+        ],
+        "y_pred": [
+          1,
+          1
+        ]
+      },
+      "output": 0.0
+    }
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {
+        "id": "F1",
+        "name": "常规用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "F2",
+        "name": "变化与组合用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "R1",
+        "name": "边界用例",
+        "dimension": "R",
+        "max_score": 10,
+        "case_count": 2
+      }
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "4b23aa2410ca1052d83a5f0a63e789773036876320de32904aaa3cbccc4ea1c5"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [
+      {
+        "id": "F",
+        "max_score": 60
+      },
+      {
+        "id": "R",
+        "max_score": 10
+      }
+    ],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "synthetic-k12-demo-v1",
+    "course_slug": "ai-learning-foundations",
+    "chapter_slug": "ch-senior",
+    "revision": 1,
+    "stage": "SENIOR",
+    "knowledge_point_slugs": [
+      "demo-train-test-split",
+      "demo-overfitting",
+      "demo-ai-makes-mistakes"
+    ]
+  },
+  "source": {
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "source_path": "curriculum/code-tasks/prediction-accuracy-r1.json",
+    "source_sha256": "7ec9836abb180dda3a07d91cefbe3f62c1c99f2465f08cb9750d0850e7d6f03a",
+    "reference_solution_sha256": "a3b8309dd134e45d2f0e364aa84e5f062250c74958384c05627af808d68809f0"
+  }
+}

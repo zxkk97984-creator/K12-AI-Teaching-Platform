@@ -244,12 +244,18 @@ async def update_profile(
         raise RevisionConflict("profile revision mismatch")
     values = patch.model_dump(exclude={"base_revision"}, exclude_unset=True)
     next_stage = values.get("stage", profile.stage)
-    next_grade = values.get("grade", profile.grade)
+    stage_changed = "stage" in values and next_stage != profile.stage
+    # A stage selector does not always collect an exact grade. A grade from the
+    # previous stage must not prevent that student from changing stages, or be
+    # retained as a contradictory profile value after the switch.
+    next_grade = values.get("grade", None if stage_changed else profile.grade)
     _validate_stage_grade(next_stage, next_grade)
     if "stage" in values:
         profile.stage = next_stage.value if next_stage is not None else None
-    if "grade" in values:
+    if "grade" in values or stage_changed:
         profile.grade = next_grade
+    if "nickname" in values:
+        profile.nickname = values["nickname"]
     profile.revision += 1
     profile.updated_at = _now()
     await db.commit()
@@ -269,8 +275,11 @@ async def update_preferences(
         raise RevisionConflict("profile revision mismatch")
     values = patch.model_dump(exclude={"base_revision"}, exclude_unset=True)
     for key, value in values.items():
-        if key == "preferred_style" and value is not None:
-            profile.preferred_style = value.value
+        if key in {"preferred_style", "teacher_style"} and value is not None:
+            if key == "teacher_style":
+                profile.teacher_style = value.value
+            else:
+                profile.preferred_style = value.value
         elif key == "voice_preference" and value is not None:
             profile.voice_preference = value.value
         else:

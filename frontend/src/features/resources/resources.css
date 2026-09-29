@@ -17,7 +17,7 @@
 }
 
 .resource-card {
-  border: 1px solid #dfe3ea;
+  border: 1px solid #e7e7e5;
   border-radius: 12px;
   padding: 16px;
   background: #fff;
@@ -33,7 +33,7 @@
 
 .resource-kind,
 .resource-meta dt {
-  color: #5b6472;
+  color: #25272a;
   font-size: 0.85rem;
   margin: 2px 0;
 }
@@ -105,7 +105,7 @@
 
 .resource-player figcaption {
   font-size: 0.85rem;
-  color: #5b6472;
+  color: #25272a;
   margin-top: 6px;
 }
 

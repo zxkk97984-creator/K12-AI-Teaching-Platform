@@ -1,4 +1,11 @@
-import { act, cleanup, render, renderHook, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./api", async (importOriginal) => {
@@ -38,7 +45,12 @@ const chapter: ChapterDetailDTO = {
   content_notice: "测试内容，未作人工教学审校",
   objectives: ["确认合成内容带有测试标识"],
   knowledge_points: [
-    { slug: "fixture-notice", name: "测试内容标识", topic: "合成测试", description: "夹具标识" },
+    {
+      slug: "fixture-notice",
+      name: "测试内容标识",
+      topic: "合成测试",
+      description: "夹具标识",
+    },
   ],
   license_code: "SYNTHETIC-FIXTURE",
   source: {
@@ -71,7 +83,12 @@ const chapter: ChapterDetailDTO = {
       text: "合成内容必须一直标明测试标识。",
       example: { label: "试一试", text: "刷新页面检查提示文字。" },
     },
-    { block_id: "b6", type: "CALLOUT", title: "提醒", text: "看到这段话说明当前是测试环境。" },
+    {
+      block_id: "b6",
+      type: "CALLOUT",
+      title: "提醒",
+      text: "看到这段话说明当前是测试环境。",
+    },
   ],
 };
 
@@ -95,8 +112,12 @@ afterEach(() => {
 describe("ChapterReader", () => {
   it("renders every supported block type with its authoritative text", () => {
     render(<ChapterReader chapter={chapter} />);
-    expect(screen.getByRole("heading", { level: 1, name: chapter.title })).toBeTruthy();
-    expect(screen.getByRole("heading", { level: 2, name: chapter.title })).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { level: 1, name: chapter.title }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { level: 2, name: chapter.title }),
+    ).toBeTruthy();
     expect(screen.getByText("看图想一想")).toBeTruthy();
     expect(screen.getByText("合成测试课文").tagName).toBe("MARK");
     expect(screen.getByRole("img", { name: /两个方框/ })).toBeTruthy();
@@ -113,7 +134,11 @@ describe("ChapterReader", () => {
       ...chapter,
       blocks: [
         ...chapter.blocks,
-        { block_id: "b7", type: "UNSUPPORTED", reason: "内容块未通过服务端校验。" },
+        {
+          block_id: "b7",
+          type: "UNSUPPORTED",
+          reason: "内容块未通过服务端校验。",
+        },
         {
           block_id: "b8",
           type: "PARAGRAPH",
@@ -143,7 +168,7 @@ describe("ChapterReader", () => {
     };
     const { container } = render(<ChapterReader chapter={withAsset} />);
     expect(container.querySelector("img")).toBeNull();
-    expect(screen.getByText(/将在 T20 资源任务接通后显示/)).toBeTruthy();
+    expect(screen.getByText(/暂不可显示/)).toBeTruthy();
   });
 });
 
@@ -154,7 +179,11 @@ describe("useReader", () => {
     const { result } = renderHook(() => useReader(chapter.chapter_id));
     await waitFor(() => expect(result.current.state.kind).toBe("ready"));
     expect(api.postReadingEvent).toHaveBeenCalledWith(
-      expect.objectContaining({ event_kind: "ENTER", chapter_id: chapter.chapter_id, revision: 1 }),
+      expect.objectContaining({
+        event_kind: "ENTER",
+        chapter_id: chapter.chapter_id,
+        revision: 1,
+      }),
     );
   });
 
@@ -209,10 +238,15 @@ describe("useReader", () => {
   });
 
   it("surfaces a real error state when the chapter is unavailable", async () => {
-    vi.mocked(api.getChapter).mockRejectedValue(new ApiError(404, "NOT_FOUND", "章节不可用", "req-404"));
+    vi.mocked(api.getChapter).mockRejectedValue(
+      new ApiError(404, "NOT_FOUND", "章节不可用", "req-404"),
+    );
     vi.mocked(api.getReadingState).mockResolvedValue(null);
     const { result } = renderHook(() => useReader(chapter.chapter_id));
     await waitFor(() => expect(result.current.state.kind).toBe("error"));
-    expect(result.current.state).toMatchObject({ status: 404, message: "章节不可用" });
+    expect(result.current.state).toMatchObject({
+      status: 404,
+      message: "章节不可用",
+    });
   });
 });

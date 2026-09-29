@@ -1,9 +1,20 @@
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter, useNavigate } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clampDock, placePanel } from "./lib/geometry";
+
+vi.mock("../conversation/ConversationProvider", () => ({ useConversation: vi.fn() }));
+
+import { useConversation } from "../conversation/ConversationProvider";
+import { clampDock, defaultDockPosition, placePanel, remapDockPosition } from "./lib/geometry";
 import { COMPANION_PETS, getSpriteStyle } from "./lib/sprite";
 import { spriteFrames } from "./types";
 import { CompanionSprite } from "./components/CompanionSprite";
+import { Companion } from "./components/Companion";
+
+function LeaveChat() {
+  const navigate = useNavigate();
+  return <button type="button" onClick={() => navigate("/workbench")}>离开聊天</button>;
+}
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
@@ -50,6 +61,65 @@ describe("reused companion assets and bounds", () => {
     } as DOMRect);
     expect(panel.left + panel.width).toBeLessThanOrEqual(390);
     expect(panel.top + panel.height).toBeLessThanOrEqual(844 - 76);
+  });
+  it("keeps the companion near the right edge after a phone-to-desktop resize", () => {
+    vi.stubGlobal("innerWidth", 375);
+    vi.stubGlobal("innerHeight", 812);
+    const phone = defaultDockPosition();
+    vi.stubGlobal("innerWidth", 1440);
+    vi.stubGlobal("innerHeight", 900);
+    const desktop = remapDockPosition(phone, { width: 375, height: 812 });
+    expect(desktop.x).toBeGreaterThan(1200);
+    expect(desktop.y).toBeGreaterThan(600);
+  });
+  it("keeps all quick prompts clear and opens history, courses, and roles from the mobile panel menu", async () => {
+    vi.stubGlobal("innerWidth", 390);
+    vi.stubGlobal("innerHeight", 844);
+    const controller = {
+      initialize: vi.fn().mockResolvedValue(undefined),
+      select: vi.fn().mockResolvedValue(undefined),
+      start: vi.fn().mockResolvedValue("new-session"),
+      getSnapshot: () => ({ detail: null }),
+      setDraft: vi.fn(),
+      setPageContext: vi.fn(),
+    };
+    vi.mocked(useConversation).mockReturnValue({
+      controller,
+      sessions: [{ id: "saved-session", title: "之前的问题", message_count: 1 }],
+      chapters: [{ chapter_id: "allowed-chapter", title: "有权访问的章节" }],
+      detail: null,
+      draft: "",
+      run: null,
+      error: null,
+      loading: false,
+      selecting: false,
+      sending: false,
+    } as never);
+
+    render(<MemoryRouter initialEntries={["/conversations"]}><Companion userId="panel-options-test" /><LeaveChat /></MemoryRouter>);
+    const dock = screen.getByTestId("companion-dock");
+    await waitFor(() => expect(dock.getAttribute("data-minimized")).toBe("true"));
+    fireEvent.click(screen.getByRole("button", { name: /打开.*学习助手/ }));
+    await screen.findByRole("dialog", { name: /对话面板/ });
+    for (const label of ["讲清概念", "读懂代码", "梳理思路"])
+      expect(screen.getByRole("button", { name: new RegExp(label) })).toBeTruthy();
+    expect(screen.queryByText("选择学习伙伴")).toBeNull();
+    expect(screen.queryByTestId("history-item")).toBeNull();
+
+    const more = screen.getByRole("button", { name: "更多选项" });
+    fireEvent.click(more);
+    expect(more.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByLabelText("选择学习伙伴")).toBeTruthy();
+    expect(screen.getByTestId("history-item")).toBeTruthy();
+    expect(screen.getByTestId("start-session").textContent).toContain("有权访问的章节");
+    fireEvent.click(screen.getByTestId("history-item"));
+    expect(controller.select).toHaveBeenCalledWith("saved-session");
+    expect(more.getAttribute("aria-expanded")).toBe("false");
+
+    fireEvent.click(screen.getByRole("button", { name: "收起对话" }));
+    await waitFor(() => expect(dock.getAttribute("data-minimized")).toBe("true"));
+    fireEvent.click(screen.getByRole("button", { name: "离开聊天" }));
+    await waitFor(() => expect(dock.getAttribute("data-minimized")).toBe("true"));
   });
   it("stops frame timers when reduced motion is requested", () => {
     vi.useFakeTimers();

@@ -1,0 +1,215 @@
+.admin-resources,
+.admin-authoring {
+  --admin-ink: #22262b;
+  --admin-muted: #66707b;
+  --admin-line: #e5e7ea;
+  --admin-surface: #fff;
+  --admin-soft: #f6f7f8;
+  color: var(--admin-ink);
+  width: min(100%, 1260px);
+  margin: 0 auto;
+  padding: 32px clamp(16px, 3vw, 40px) 72px;
+  min-width: 0;
+}
+
+.admin-resources *,
+.admin-authoring * {
+  min-width: 0;
+}
+
+.admin-resources button,
+.admin-authoring button {
+  min-height: 42px;
+  color: #fff;
+  background: var(--admin-ink);
+  border: 1px solid var(--admin-ink);
+  border-radius: 9px;
+  padding: 8px 15px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-resources button:disabled,
+.admin-authoring button:disabled {
+  opacity: .48;
+}
+
+.admin-resources .admin-button-quiet,
+.admin-authoring .admin-button-quiet {
+  color: var(--admin-ink);
+  background: #fff;
+  border-color: var(--admin-line);
+}
+
+.admin-page-header,
+.admin-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.admin-page-header {
+  padding: 0 0 24px;
+  border-bottom: 1px solid var(--admin-line);
+  margin-bottom: 24px;
+}
+
+.admin-page-header h1,
+.admin-section-heading h2 {
+  color: var(--admin-ink);
+  margin: 4px 0 6px;
+  letter-spacing: -.03em;
+}
+
+.admin-page-header h1 {
+  font-size: clamp(28px, 3.5vw, 38px);
+}
+
+.admin-section-heading h2 {
+  font-size: 21px;
+}
+
+.admin-page-header p,
+.admin-section-heading p,
+.admin-muted {
+  color: var(--admin-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.admin-eyebrow {
+  margin: 0;
+  color: var(--admin-muted);
+  letter-spacing: .04em;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-page-count {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  background: var(--admin-soft);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+  color: var(--admin-muted);
+}
+
+.admin-panel,
+.admin-resource-detail,
+.admin-authoring__card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+  border-radius: 14px;
+  padding: clamp(18px, 2.5vw, 28px);
+  margin: 20px 0;
+  box-shadow: none;
+}
+
+.admin-resources label,
+.admin-authoring label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--admin-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-resources input,
+.admin-resources textarea,
+.admin-resources select,
+.admin-authoring input,
+.admin-authoring textarea,
+.admin-authoring select {
+  width: 100%;
+  max-width: 100%;
+  min-height: 42px;
+  border: 1px solid #d9dde2;
+  border-radius: 8px;
+  padding: 8px 11px;
+  background: white;
+  color: var(--admin-ink);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.admin-resources textarea,
+.admin-authoring textarea {
+  resize: vertical;
+}
+
+.admin-resources input[type="file"] {
+  padding: 7px 8px;
+}
+
+.admin-resources input:focus-visible,
+.admin-resources select:focus-visible,
+.admin-resources textarea:focus-visible,
+.admin-resources button:focus-visible,
+.admin-authoring input:focus-visible,
+.admin-authoring select:focus-visible,
+.admin-authoring textarea:focus-visible,
+.admin-authoring button:focus-visible {
+  outline: 2px solid #5d728b;
+  outline-offset: 2px;
+}
+
+.admin-notice,
+.admin-authoring__status {
+  border: 1px solid #b9d6c4;
+  color: #245c3b;
+  background: #f1f8f3;
+  border-radius: 9px;
+  padding: 11px 14px;
+  margin: 16px 0;
+}
+
+.admin-error,
+.admin-authoring__error {
+  border: 1px solid #ebc6c3;
+  color: #912e29;
+  background: #fff6f5;
+  border-radius: 9px;
+  padding: 11px 14px;
+  margin: 16px 0;
+}
+
+.admin-error .admin-button-quiet {
+  margin-left: 10px;
+  min-height: 32px;
+}
+
+.admin-empty {
+  padding: 28px;
+  border-radius: 10px;
+  background: var(--admin-soft);
+  color: var(--admin-muted);
+}
+
+.admin-technical {
+  margin-top: 24px;
+  border-top: 1px solid var(--admin-line);
+  padding-top: 16px;
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+.admin-technical summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .admin-resources,
+  .admin-authoring {
+    padding: 20px 16px 84px;
+  }
+  .admin-page-header,
+  .admin-section-heading {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

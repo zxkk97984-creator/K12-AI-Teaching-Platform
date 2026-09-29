@@ -1,0 +1,38 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-junior",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "从数据到判断：让程序做选择"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "理解数据、条件和输出之间的关系，使用 Python 条件与统计任务验证判断。"
+    },
+    {
+      "type": "SECTION",
+      "key": "pipeline",
+      "text": "输入、规则和输出"
+    },
+    {
+      "type": "KNOWLEDGE_CARD",
+      "title": "条件与数据",
+      "text": "程序先接收输入，再根据条件选择路径，最后产生输出。看到错误时，要把代码、输入和真实运行结果放在一起检查。",
+      "example": {
+        "label": "调试问题",
+        "text": "如果条件写反了，输出会怎样变化？"
+      }
+    },
+    {
+      "type": "CALLOUT",
+      "title": "编程实践",
+      "text": "进入在线编程完成Python 小实验，记录一次错误和修正后的结果。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "demo-data-labels",
+    "demo-condition-if"
+  ]
+}

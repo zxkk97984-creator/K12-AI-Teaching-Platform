@@ -1,0 +1,32 @@
+.grade-picker { min-width: 0; margin: 0; padding: 0; border: 0; }
+.grade-picker > legend { margin-bottom: 15px; font-size: 15px; font-weight: 700; color: #24282b; }
+.grade-picker-groups { display: grid; gap: 16px; }
+.grade-picker-group { min-width: 0; }
+.grade-picker-group-title { display: flex; align-items: baseline; gap: 10px; margin-bottom: 9px; }
+.grade-picker-group-title strong { color: #343a3e; font-size: 14px; }
+.grade-picker-group-title small { color: #7b7f80; font-size: 12px; }
+.grade-picker-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.grade-picker-options label {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px;
+  border: 1px solid #dfe1de;
+  border-radius: 8px;
+  background: #fff;
+  color: #34383b;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color .15s, background-color .15s;
+}
+.grade-picker-options label:hover { border-color: #b39953; background: #fffdf5; }
+.grade-picker-options label.is-selected { border-color: #ad8529; background: #fff3ca; color: #654b0a; }
+.grade-picker-options input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.grade-picker-options label:has(input:focus-visible) { outline: 3px solid #725300; outline-offset: 2px; }
+@media (max-width: 420px) {
+  .grade-picker-options { gap: 7px; }
+  .grade-picker-options label { font-size: 13px; }
+}

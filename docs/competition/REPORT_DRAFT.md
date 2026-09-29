@@ -1,69 +1,57 @@
-# 霜铃 K12 × Knodo 参赛报告草稿（证据绑定版）
+# 霜铃 K12 × Knodo 参赛报告草稿
 
-状态：草稿 / 合成数据参赛原型；不是已依托 Knodo 上线的真实 K12 产品。
+## 项目定位
 
-## 1. 项目定位
+霜铃把“目标—讲解—操作与练习—反馈—下一步”组织成可恢复的学习流程，面向比赛展示
+AI 辅助教学的完整体验。演示使用示例账号和课程，支持真实 Knodo 接入和离线模拟两种模式。
 
-霜铃把“目标—讲解—操作/练习—反馈—下一步”组织成一节可恢复的学习流程。FastAPI
-保存本地权威身份、课程 revision、学习事件、确定性判分和 CodeLab run；Tutor/Designer
-只负责经过契约校验的教学建议或结构化草稿。学生浏览器不持有平台 PAT，不决定 owner、
-章节 revision、远端会话或成绩。
+## 系统架构
 
-## 2. 架构与安全边界
+React / TypeScript / Vite 提供学习界面，FastAPI 处理教学业务与后台任务，PostgreSQL
+保存课程版本、学习活动和练习结果。Knodo Tutor 负责教学互动和编程反馈，Designer
+负责题目与课程草稿。CodeLab 通过独立 Docker runner 执行代码。
 
-React/TypeScript/Vite → FastAPI → PostgreSQL；资源文件进入路径受限的本地存储；后台
-worker 通过租约消费教学/教研任务；CodeLab 由独立 loopback runner 启动 digest 固定、
-无网络、非 root、只读、限 CPU/内存/PID/时间/输出的 Docker 容器。Docker socket 不挂给
-API。系统架构见 plans/02_架构与数据边界.md，证据见 T24/T29 报告。
+协议、来源和允许动作由服务端校验；练习与编程成绩根据实际作答和执行结果计算。
+平台凭据留在后端，课堂资料与答案分开管理。
 
-## 3. AI 策略与本地业务事实
+## 当前功能（2026-09-29）
 
-- Tutor 操作：TEACH_TURN、CODE_FEEDBACK；Designer 操作：QUIZ_DRAFT、LESSON_PACKAGE_DRAFT。
-- 本地先构建最小章节/学段/证据快照，再校验返回 schema、source refs、action allowlist 和
-  owner/revision；没有来源时明确不足，不伪造引用。
-- Quiz/CodeLab 的确定性结果不由模型改写。CodeLab AI feedback 不能添加分数；
-  deterministic score/status 与 AI feedback 状态分开。
-- fixture 仅在开发/测试 profile 使用，界面标明合成/未审校；production 拒绝 fixture gateway。
+| 功能 | 展示内容 |
+| --- | --- |
+| 学段与账号 | 一年级至高三映射到四学段首页和导航；昵称、头像、教师风格、六套桌宠按账号保存 |
+| 教学对话与课堂 | 独立自由对话、页面上下文提问、桌宠问答、按章节教学、暂停恢复与会话历史 |
+| 资源与阅读 | 学段筛选、收藏与书架、阅读历史、资料预览／下载、三本内置教材及绘本续读 |
+| 互动内容 | 管理端导入 HTML／ZIP、校验预览、版本发布；学生端场景切换、活动保存、恢复与重试 |
+| 在线编程 | 初中／高中各 6 道题，筛选收藏、草稿、公开示例、可信判题、历史回看与独立 AI 建议 |
+| 学科练习 | 按章节或教师回复生成、作答与提示、答案草稿、结果回顾、收藏与错题入口 |
+| 个人记忆 | 用户手动维护 Markdown 主文档，保存版本、预览和恢复；当前版本作为 Tutor 参考 |
+| 教师端 | 题目与课程草稿生成、资源管理、互动内容管理 |
 
-真实 Knodo 限定 Bot Chat wire 已通过 T11/T13/T31 合成验证；平台未返回可信 usage/成本及 Skill/bundle 挂载版本，不能写成正式教学质量或“换 BaseURL 即可接通”。
+四档学段为小学低段、小学高段、初中和高中。演示前按当前数据库的课程发布状态选择样章。
+对话语音输入使用浏览器 SpeechRecognition，回复及互动讲解可使用浏览器语音合成或内容包音频；
+受浏览器、权限和语音资源影响，不能保证所有设备可用。独立服务端 ASR/TTS 尚未接入。
 
-## 4. 多模态与五类 R1 功能
+个人记忆没有自动从聊天中提炼内容，也没有语义检索：文档最多保存 20,000 字符，
+本轮注入每份文档最多 1,200 字符（含说明）。后台保留规则候选记忆与学习证据，
+当前界面没有候选确认入口。课程推荐不直接读取个人 Markdown 正文。
 
-| 能力 | 本地证据 | 当前宣称 |
-| --- | --- | --- |
-| 教学对话/主动课堂 | T13 真实浏览器竖切；T31 16-case live；T14/T17/T30 本地链 | 合成数据真实 Knodo 已验证；真人教学质量未审 |
-| Word/PPT/video 资源 | T20 真实合成文件上传、下载、播放、撤回；T30 截图 | 本地资源闭环通过；正式内容/人审未通过 |
-| 确定性动画 | T21 后端边界测试；T30 synthetic fixture browser 1 passed、390/1280 截图 | 注册/参数/安全边界和本地控制器通过；正式内容仍需人审 senior chapter |
-| 在线编程 | T23–T26、T30 CodeLab、T24 Docker 5 tests | 本地真实 Docker/可信判分通过；AI feedback 为 fixture |
-| 趣味练习 | T15–T18、T30 practice browser | 本地题目快照/提示/判分/证据通过；教学效果未验证 |
+互动 HTML 通过受限 iframe 和消息桥接入，支持进度保存不等于可信判分；题目答案与 CodeLab
+隐藏用例留在服务端。当前阶段完成 UI 和主要功能接入，完整演示仍需对应发布内容、Knodo 和 runner 配置。
 
-图文绘本 O01 未纳入 R1 完成宣称。
+## 历史技术评测
 
-## 5. 四档样板与来源
+四档共 16 个合成案例在真实 Knodo 上执行：13 个有效 Schema 响应、2 个
+`RESPONSE_SCHEMA_MISMATCH`、1 个超时；有效响应率 81.25%，median 88.134s，
+p95/max 120.104s。13 个成功输出通过来源、允许动作和秘密泄露自动检查。
+上游 token 均报告 0，按不可用处理，不据此估算费用。
 
-四档策略已冻结，但四档正式示范课没有全部完成人工审校：
+结果见 `docs/acceptance/T31-live-summary.json`。这些数字描述该次技术测试，
+不代表学习成绩提升；当前版本的现场表现应单独说明。
 
-- PRIMARY_LOWER：开发合成 fixture 可演示结构；正式低龄样章待真实内容审校。
-- PRIMARY_UPPER：规划中“比较与排序”方向；正式内容待生产/审校。
-- JUNIOR：legacy python-first-steps/ch05 revision 1 已按来源导入，发布/人审状态仍按数据库事实。
-- SENIOR：legacy algorithm-everyday/ch03 revision 1 已按来源导入；正式动画内容仍待人审；T30 控制器使用 T06 合成 fixture 完成本地复核。
+## 复现
 
-不把 stage label、fixture 通过或模型输出当成人工审校/适龄证明。
-
-## 6. 评测与未验证
-
-T31 四档 16-case synthetic eval 已在真实 Knodo 执行：13 个有效冻结 Schema 响应、2 个
-`RESPONSE_SCHEMA_MISMATCH`、1 个超时；有效响应率 81.25%，median 88.134s，p95/max 120.104s。
-13 个成功输出全部通过来源/action/秘密自动边界；上游 token 均报告 0，按不可用处理，不估算费用。
-人工科学性、适龄、引用和教学可行动性 rubric 尚未填写。没有真实学生研究，不声称学习效率或成绩提升。
-
-## 7. 证据索引
-
-- T26 CodeLab：docs/acceptance/T26.md
-- T28 安全与隐私：docs/acceptance/T28.md
-- T29 干净部署：docs/acceptance/T29.md
-- T30 全链路回归：docs/acceptance/T30.md
-- T31 真实评测：docs/acceptance/T31.md、docs/acceptance/T31-live-summary.json
-- Knodo 门禁登记：docs/integrations/knodo/GATE_REGISTER.md
-
-报告可交付状态：本地 + 真实 Knodo 合成原型；等待平台完整隔离、真实人审和用户最终验收。
+- 启动：`./k12 setup`、`./k12 start --build`。
+- 本地检查：`./k12 check`。
+- 编程执行测试：`./scripts/runner-live-test.sh`。
+- Knodo 资产校验：`python3 scripts/package-knodo.py verify`。
+- [演示顺序](DEMO_SCRIPT.md)、[本地配置](../operations/LOCAL_DEV.md)、[Knodo 接入](../integrations/knodo/DEPLOYMENT_GUIDE.md)。

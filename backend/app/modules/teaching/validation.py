@@ -1,4 +1,4 @@
-"""Validate model output before anything is saved or shown (QA12/QA13).
+"""Validate complete model output before storing a final teaching card (QA12/QA13).
 
 Rules, in order:
 
@@ -7,6 +7,9 @@ Rules, in order:
 3. sources, evidence, actions and resource ids must be inside the session's
    allowed sets — a model cannot mint a source or a clickable resource;
 4. the raw payload is never persisted: only the extracted card is stored.
+
+``safe_partial_markdown`` separately gates a provisional stream snapshot. That
+snapshot is cleared on terminal status and never enters conversation history.
 """
 
 from __future__ import annotations
@@ -26,6 +29,22 @@ FORBIDDEN_MARKERS = (
 CONTROL_CHARS = (
     {chr(code) for code in range(0, 9)} | {chr(11), chr(12)} | {chr(code) for code in range(14, 32)}
 )
+
+
+def safe_partial_markdown(text: str, *, max_chars: int) -> str | None:
+    """Return a cautious visible prefix, or None if the draft is unsafe.
+
+    Hold back enough trailing characters to catch a forbidden marker split
+    across multiple upstream chunks before any part of that marker is shown.
+    The complete response still needs full schema and teaching validation.
+    """
+
+    if len(text) > max_chars or any(char in CONTROL_CHARS for char in text):
+        return None
+    if any(marker.lower() in text.lower() for marker in FORBIDDEN_MARKERS):
+        return None
+    holdback = max(map(len, FORBIDDEN_MARKERS)) - 1
+    return text[: max(0, len(text) - holdback)]
 
 
 def _allowed(context: dict[str, Any], allowance: dict[str, Any] | None, key: str) -> set[str]:

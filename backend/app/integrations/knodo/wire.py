@@ -1,8 +1,8 @@
 """Evidence-backed Knodo Bot Chat mapper.
 
-Official source: ``/docs/api/simple-api`` in the checked-in Knodo docs snapshot.
+Official source: the Bot Chat section of ``https://knodo.vip/llms-full.txt``.
 Only fields documented there are emitted. The mapper uses the Bot's configured
-model, disables streaming/tool-result emission, and requests the least
+model, disables tool-result emission, and requests the least
 privileged documented permission mode. It never reads a remote conversation ID
 from the local semantic payload; continuation IDs must be supplied separately
 by trusted backend state.
@@ -13,12 +13,14 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any, Literal, Protocol
 from urllib.parse import urlsplit
 
 from app.integrations.knodo.errors import GatewayError, GatewayErrorCategory
 from app.integrations.knodo.operations import OPERATION_SPECS, Operation, Role
+from app.integrations.knodo.partial import partial_top_level_string
 from app.integrations.knodo.transport import Transport, UpstreamRequest
 from app.integrations.knodo.types import BackendOutcome
 
@@ -47,8 +49,9 @@ class RequestBudget(Protocol):
 class InMemoryRequestBudget:
     """Concurrency-safe request cap used by tests and injectable runtimes.
 
-    Production assembly uses the durable file-backed budget in ``budget.py``;
-    this implementation remains useful for dependency-injected unit tests.
+    Production assembly uses the optional durable file-backed budget or the
+    unlimited policy in ``budget.py``; this implementation remains useful for
+    dependency-injected unit tests.
     """
 
     def __init__(self, max_requests: int):
@@ -79,6 +82,7 @@ class KnodoWireMapper:
         targets: dict[Role, KnodoTarget],
         transport: Transport,
         budget: RequestBudget,
+        stream_timeout_seconds: float = 300.0,
     ):
         self.base_url = _validate_origin(base_url)
         if not token:
@@ -89,6 +93,7 @@ class KnodoWireMapper:
         self._targets = dict(targets)
         self._transport = transport
         self._budget = budget
+        self._stream_timeout_seconds = stream_timeout_seconds
 
     async def aclose(self) -> None:
         closer = getattr(self._transport, "aclose", None)
@@ -122,15 +127,23 @@ class KnodoWireMapper:
         cancel: asyncio.Event | None = None,
         delay_seconds: float | None = None,
         remote_conversation_id: str | None = None,
+        on_content: Callable[[str], Awaitable[None]] | None = None,
     ) -> BackendOutcome:
         del scenario, delay_seconds  # fixture-only controls are never sent upstream
         target = self._targets[OPERATION_SPECS[operation].role]
+        send_stream = getattr(self._transport, "send_stream", None)
+        streaming = (
+            on_content is not None
+            and callable(send_stream)
+            and operation in (Operation.TEACH_TURN, Operation.CODE_FEEDBACK)
+        )
         try:
             mapped = self._map_request(
                 operation,
                 request,
                 target=target,
                 remote_conversation_id=remote_conversation_id,
+                streaming=streaming,
             )
         except (TypeError, ValueError):
             return BackendOutcome(
@@ -150,11 +163,28 @@ class KnodoWireMapper:
                 )
             )
 
-        outcome = await self._transport.send(
-            mapped,
-            timeout_seconds=timeout_seconds or 20.0,
-            cancel=cancel,
-        )
+        if streaming:
+            last_visible: str | None = None
+
+            async def forward_wire_content(content: str) -> None:
+                nonlocal last_visible
+                visible = partial_top_level_string(content, "message_markdown")
+                if visible is not None and visible != last_visible:
+                    last_visible = visible
+                    await on_content(visible)  # type: ignore[misc]
+
+            outcome = await send_stream(
+                mapped,
+                timeout_seconds=self._stream_timeout_seconds,
+                cancel=cancel,
+                on_content=forward_wire_content,
+            )
+        else:
+            outcome = await self._transport.send(
+                mapped,
+                timeout_seconds=timeout_seconds or 20.0,
+                cancel=cancel,
+            )
         if outcome.error is not None or outcome.cancelled:
             return outcome
         return self._parse_response(
@@ -162,6 +192,7 @@ class KnodoWireMapper:
             target,
             outcome,
             expected_conversation_id=remote_conversation_id,
+            streaming=streaming,
         )
 
     def _map_request(
@@ -171,6 +202,7 @@ class KnodoWireMapper:
         *,
         target: KnodoTarget,
         remote_conversation_id: str | None,
+        streaming: bool = False,
     ) -> UpstreamRequest:
         request_json = json.dumps(
             request,
@@ -181,7 +213,10 @@ class KnodoWireMapper:
         content = f"{_protocol_instruction(operation)}\nREQUEST_JSON:\n{request_json}"
         payload: dict[str, Any] = {
             "messages": [{"role": "user", "content": content}],
-            "stream": False,
+            "stream": streaming,
+            # Select the server-bound workspace even when the Bot has another
+            # source workspace. See https://knodo.vip/llms-full.txt (Bot Chat).
+            "workspaceId": target.workspace_id,
             # Bot Chat defaults to bypassPermissions. Use the documented safer
             # mode explicitly so tool/file access is never silently elevated.
             "permissionMode": "default",
@@ -193,7 +228,10 @@ class KnodoWireMapper:
             payload["conversationId"] = remote_conversation_id
 
         return UpstreamRequest(
-            url=f"{self.base_url}/api/v1/bots/{target.bot_id}/chat/completions",
+            url=(
+                f"{self.base_url}/api/v1/bots/{target.bot_id}/chat/completions"
+                f"{'/stream' if streaming else ''}"
+            ),
             payload=payload,
             headers={
                 "Authorization": f"Bearer {self._token}",
@@ -209,6 +247,7 @@ class KnodoWireMapper:
         outcome: BackendOutcome,
         *,
         expected_conversation_id: str | None,
+        streaming: bool = False,
     ) -> BackendOutcome:
         wire = outcome.payload
         if not isinstance(wire, dict):
@@ -216,13 +255,19 @@ class KnodoWireMapper:
         choices = wire.get("choices")
         completion_id = wire.get("id")
         conversation_id = wire.get("conversationId")
+        if streaming and conversation_id is None:
+            # The public Knodo docs promise OpenAI-compatible SSE, but do not
+            # promise the vendor conversation ID in every chunk. A known,
+            # backend-owned continuation ID remains valid; a new conversation
+            # without one simply cannot be reused on the next turn.
+            conversation_id = expected_conversation_id
         model = wire.get("model")
         if (
             wire.get("object") != "chat.completion"
             or not isinstance(completion_id, str)
             or not completion_id
-            or not isinstance(conversation_id, str)
-            or not _valid_conversation_id(conversation_id)
+            or (conversation_id is None and not streaming)
+            or (conversation_id is not None and not _valid_conversation_id(conversation_id))
             or not isinstance(model, str)
             or not model
             or not isinstance(choices, list)
@@ -354,7 +399,7 @@ def _remote_metadata(
     target: KnodoTarget,
     wire: dict[str, Any],
     completion_id: str,
-    conversation_id: str,
+    conversation_id: str | None,
     model: str,
     finish_reason: str,
 ) -> dict[str, Any]:

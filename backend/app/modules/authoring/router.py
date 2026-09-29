@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import asyncio
 import uuid
-from typing import Any
+from datetime import datetime
+from typing import Any, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
@@ -35,6 +36,7 @@ from app.modules.authoring.service import (
     reject_package,
     retry_job,
 )
+from app.modules.content.models import Chapter, ChapterReviewState, ChapterRevision, Course
 from app.modules.identity.dependencies import SessionContext, csrf_dependency, require_admin
 
 router = APIRouter(tags=["authoring-admin"])
@@ -60,6 +62,56 @@ class PublishRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     idempotency_key: str = Field(min_length=3, max_length=120)
+
+
+class AdminChapterRevisionDTO(BaseModel):
+    id: uuid.UUID
+    revision: int
+    chapter_id: uuid.UUID
+    chapter_title: str
+    course_id: uuid.UUID
+    course_title: str
+    stage: str
+    review_status: str
+    publication_status: str
+    created_at: datetime
+    updated_at: datetime | None
+
+
+class AdminChapterRevisionListDTO(BaseModel):
+    items: list[AdminChapterRevisionDTO]
+    total: int
+    limit: int
+    offset: int
+
+
+class AdminAuthoringJobDTO(BaseModel):
+    id: uuid.UUID
+    chapter_revision_id: uuid.UUID
+    revision: int
+    chapter_id: uuid.UUID
+    chapter_title: str
+    course_id: uuid.UUID
+    course_title: str
+    operation: str
+    status: str
+    attempt: int
+    max_attempts: int
+    run_ref: str | None
+    error_code: str | None
+    gateway_mode: str
+    package_id: uuid.UUID | None
+    package_title: str | None
+    package_status: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class AdminAuthoringJobListDTO(BaseModel):
+    items: list[AdminAuthoringJobDTO]
+    total: int
+    limit: int
+    offset: int
 
 
 def _settings(request: Request) -> Settings:
@@ -167,6 +219,78 @@ async def _package_dto(db: AsyncSession, package: AuthoringPackage) -> dict[str,
     }
 
 
+@router.get("/admin/content/revisions", response_model=AdminChapterRevisionListDTO)
+async def list_admin_chapter_revisions(
+    q: str | None = Query(default=None, max_length=100),
+    course_id: uuid.UUID | None = None,
+    chapter_id: uuid.UUID | None = None,
+    stage: Literal["PRIMARY_LOWER", "PRIMARY_UPPER", "JUNIOR", "SENIOR"] | None = None,
+    publication_status: Literal["DRAFT", "PUBLISHED", "WITHDRAWN"] | None = None,
+    limit: int = Query(default=100, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+    context: SessionContext = Depends(require_admin),
+    db: AsyncSession = Depends(get_session),
+) -> AdminChapterRevisionListDTO:
+    """Admin-only curriculum selector, including unpublished revisions."""
+    conditions = []
+    if course_id:
+        conditions.append(Course.id == course_id)
+    if chapter_id:
+        conditions.append(Chapter.id == chapter_id)
+    if stage:
+        conditions.append(ChapterRevision.stage == stage)
+    if publication_status:
+        conditions.append(
+            func.coalesce(ChapterReviewState.publication_status, "DRAFT") == publication_status
+        )
+    if q:
+        escaped = q.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        if escaped:
+            pattern = f"%{escaped}%"
+            conditions.append(
+                or_(
+                    Course.title.ilike(pattern, escape="\\"),
+                    Chapter.title.ilike(pattern, escape="\\"),
+                )
+            )
+    base = (
+        select(ChapterRevision, Chapter, Course, ChapterReviewState)
+        .join(Chapter, Chapter.id == ChapterRevision.chapter_id)
+        .join(Course, Course.id == Chapter.course_id)
+        .outerjoin(ChapterReviewState, ChapterReviewState.revision_id == ChapterRevision.id)
+        .where(*conditions)
+    )
+    total = int(await db.scalar(select(func.count()).select_from(base.subquery())) or 0)
+    rows = (
+        await db.execute(
+            base.order_by(Course.title, Chapter.order_index, ChapterRevision.revision.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+    ).all()
+    return AdminChapterRevisionListDTO(
+        items=[
+            AdminChapterRevisionDTO(
+                id=revision.id,
+                revision=revision.revision,
+                chapter_id=chapter.id,
+                chapter_title=chapter.title,
+                course_id=course.id,
+                course_title=course.title,
+                stage=revision.stage,
+                review_status=review.review_status if review else "UNREVIEWED",
+                publication_status=review.publication_status if review else "DRAFT",
+                created_at=revision.created_at,
+                updated_at=review.updated_at if review else None,
+            )
+            for revision, chapter, course, review in rows
+        ],
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+
+
 @router.post(
     "/admin/authoring/jobs",
     status_code=status.HTTP_201_CREATED,
@@ -194,6 +318,70 @@ async def create_authoring_job(
     if job.status == "QUEUED" and settings.authoring_autorun:
         _schedule(settings, job.id)
     return _job_dto(job)
+
+
+@router.get("/admin/authoring/jobs", response_model=AdminAuthoringJobListDTO)
+async def list_authoring_jobs(
+    status: Literal["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"] | None = None,
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+    context: SessionContext = Depends(require_admin),
+    db: AsyncSession = Depends(get_session),
+) -> AdminAuthoringJobListDTO:
+    conditions = [AuthoringJob.status == status] if status else []
+    total = int(
+        await db.scalar(select(func.count()).select_from(AuthoringJob).where(*conditions)) or 0
+    )
+    rows = (
+        await db.execute(
+            select(AuthoringJob, ChapterRevision, Chapter, Course)
+            .join(ChapterRevision, ChapterRevision.id == AuthoringJob.chapter_revision_id)
+            .join(Chapter, Chapter.id == ChapterRevision.chapter_id)
+            .join(Course, Course.id == Chapter.course_id)
+            .where(*conditions)
+            .order_by(AuthoringJob.created_at.desc(), AuthoringJob.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+    ).all()
+    packages: dict[uuid.UUID, AuthoringPackage] = {}
+    if rows:
+        package_rows = await db.scalars(
+            select(AuthoringPackage)
+            .where(AuthoringPackage.job_id.in_([job.id for job, _, _, _ in rows]))
+            .order_by(AuthoringPackage.created_at.desc(), AuthoringPackage.id.desc())
+        )
+        for package in package_rows:
+            packages.setdefault(package.job_id, package)
+    return AdminAuthoringJobListDTO(
+        items=[
+            AdminAuthoringJobDTO(
+                id=job.id,
+                chapter_revision_id=revision.id,
+                revision=revision.revision,
+                chapter_id=chapter.id,
+                chapter_title=chapter.title,
+                course_id=course.id,
+                course_title=course.title,
+                operation=job.operation,
+                status=job.status,
+                attempt=job.attempt,
+                max_attempts=job.max_attempts,
+                run_ref=job.run_ref,
+                error_code=job.error_code,
+                gateway_mode=job.gateway_mode,
+                package_id=packages[job.id].id if job.id in packages else None,
+                package_title=packages[job.id].title if job.id in packages else None,
+                package_status=packages[job.id].status if job.id in packages else None,
+                created_at=job.created_at,
+                updated_at=job.updated_at,
+            )
+            for job, revision, chapter, course in rows
+        ],
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.get("/admin/authoring/jobs/{job_id}")

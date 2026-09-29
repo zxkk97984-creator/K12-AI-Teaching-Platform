@@ -72,9 +72,13 @@ export async function getChapter(
   );
 }
 
-export async function getReadingState(chapterId: string): Promise<ReadingStateDTO | null> {
+export async function getReadingState(
+  chapterId: string,
+  revision?: number,
+): Promise<ReadingStateDTO | null> {
+  const suffix = revision ? `?revision=${revision}` : "";
   return request<ReadingStateDTO | null>(
-    `${API_BASE}/chapters/${encodeURIComponent(chapterId)}/reading-state`,
+    `${API_BASE}/chapters/${encodeURIComponent(chapterId)}/reading-state${suffix}`,
   );
 }
 

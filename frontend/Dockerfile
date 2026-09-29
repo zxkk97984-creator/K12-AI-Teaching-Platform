@@ -1,5 +1,5 @@
-# T29 static web image. The unique bootstrap builds frontend/dist; this image
-# only serves that immutable output and proxies same-origin API requests.
+# ./k12 start --build generates frontend/dist from current source before this
+# image is built. Nginx serves the result and proxies same-origin API requests.
 FROM nginx:alpine
 
 COPY frontend/dist /usr/share/nginx/html

@@ -1,0 +1,128 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "climbing-stairs",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": true,
+  "review_status": "UNREVIEWED",
+  "title": "爬楼梯：数一数不同走法",
+  "description": "编写 climb_stairs(n)，每次可以走 1 阶或 2 阶，返回走到第 n 阶的不同走法数量。0 <= n <= 30；n 为 0 时按 1 种空走法计算。",
+  "starter_code": "def climb_stairs(n):\n    \"\"\"爬楼梯：数一数不同走法\"\"\"\n    # 在这里写下你的解题思路\n    pass\n",
+  "entrypoint": "climb_stairs",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "n"
+      ],
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30
+        }
+      }
+    },
+    "output_schema": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "limits": {
+      "max_input_bytes": 65536,
+      "max_output_bytes": 16384,
+      "timeout_ms": 3000
+    },
+    "errors": [
+      "INVALID_JSON",
+      "INVALID_INPUT",
+      "STUDENT_EXCEPTION",
+      "TIMEOUT",
+      "OUTPUT_LIMIT",
+      "SYSTEM_ERROR"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "n": 0
+      },
+      "output": 1
+    },
+    {
+      "input": {
+        "n": 1
+      },
+      "output": 1
+    },
+    {
+      "input": {
+        "n": 5
+      },
+      "output": 8
+    }
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {
+        "id": "F1",
+        "name": "常规用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "F2",
+        "name": "变化与组合用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "R1",
+        "name": "边界用例",
+        "dimension": "R",
+        "max_score": 10,
+        "case_count": 2
+      }
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "a567be7eaab1e44ad631f64e1365a58ef3271164e82d379b58da610e610a1fdc"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [
+      {
+        "id": "F",
+        "max_score": 60
+      },
+      {
+        "id": "R",
+        "max_score": 10
+      }
+    ],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "algorithm-everyday",
+    "chapter_slug": "ch03",
+    "revision": 1,
+    "stage": "SENIOR",
+    "knowledge_point_slugs": [
+      "binary-search",
+      "time-complexity",
+      "sorting-algorithm"
+    ]
+  },
+  "source": {
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "source_path": "curriculum/code-tasks/climbing-stairs-r1.json",
+    "source_sha256": "916193c9e6e73b6441136423fc2e78e3ac71ae8eff2a26c661113138540d7388",
+    "reference_solution_sha256": "8a33082c9cc54cb08f95882e973a967e03e22c7bdbee723b27d99a4cf81c5020"
+  }
+}

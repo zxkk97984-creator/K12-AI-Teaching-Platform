@@ -12,7 +12,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-ResourceKindLiteral = Literal["WORD", "SLIDES", "VIDEO", "PDF", "IMAGE"]
+ResourceKindLiteral = Literal["WORD", "SLIDES", "VIDEO", "PDF", "IMAGE", "INTERACTIVE"]
 VariantLiteral = Literal["SOURCE", "PREVIEW"]
 
 
@@ -35,6 +35,9 @@ class ResourceSummaryDTO(BaseModel):
     title: str
     description: str
     kind: ResourceKindLiteral
+    interactive_purpose: Literal["LESSON", "GAME", "EXPERIMENT"] | None = None
+    interactive_subject: str | None = None
+    active_interactive_revision_id: uuid.UUID | None = None
     stage: str
     grade_min: int | None
     grade_max: int | None
@@ -56,6 +59,12 @@ class ResourceListDTO(BaseModel):
     profile: str
 
 
+class AdminResourceListDTO(ResourceListDTO):
+    total: int
+    limit: int
+    offset: int
+
+
 class ResourceTicketDTO(BaseModel):
     """A short-lived, server-signed link. It is not a material identifier."""
 
@@ -72,6 +81,8 @@ class ResourceCreateRequest(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     description: str = Field(default="", max_length=4000)
     kind: ResourceKindLiteral
+    interactive_purpose: Literal["LESSON", "GAME", "EXPERIMENT"] | None = None
+    interactive_subject: str | None = Field(default=None, max_length=80)
     stage: Literal["PRIMARY_LOWER", "PRIMARY_UPPER", "JUNIOR", "SENIOR"]
     grade_min: int | None = Field(default=None, ge=1, le=12)
     grade_max: int | None = Field(default=None, ge=1, le=12)
@@ -116,6 +127,7 @@ class ResourceUploadReceipt(BaseModel):
 
 
 __all__ = [
+    "AdminResourceListDTO",
     "ResourceCreateRequest",
     "ResourceListDTO",
     "ResourcePatchRequest",

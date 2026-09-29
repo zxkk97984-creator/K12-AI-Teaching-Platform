@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f3eb">
+  <title>星际知识闯关 · 趣味答题小游戏</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f3eb;
+      --ink: #18364b;
+      --muted: #5f707a;
+      --navy: #17384f;
+      --navy-deep: #102d43;
+      --mint: #bce6cf;
+      --yellow: #ffce62;
+      --coral: #f28a70;
+      --blue: #77c9e8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 15%, rgba(255, 206, 98, .2) 0 2px, transparent 3px),
+        radial-gradient(circle at 88% 25%, rgba(119, 201, 232, .25) 0 3px, transparent 4px),
+        var(--paper);
+      color: var(--ink);
+      font-family: "Nunito", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    }
+
+    main {
+      width: min(100%, 1240px);
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 12px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .game-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      touch-action: manipulation;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .choice { cursor: pointer; outline: none; }
+    .choice .choice-bg { transition: fill .16s ease, stroke .16s ease, transform .16s ease; }
+    .choice:hover .choice-bg { fill: #fff7df; stroke: #efbd4e; }
+    .choice:focus-visible .choice-bg { stroke: #247596; stroke-width: 3; }
+    .choice[aria-disabled="true"] { cursor: default; }
+    .choice[aria-disabled="true"]:hover .choice-bg { fill: #fff; stroke: #e8e4d8; }
+
+    .action { cursor: pointer; outline: none; }
+    .action:focus-visible .action-bg { stroke: #fff; stroke-width: 4; }
+    .action:hover .action-bg { filter: brightness(1.06); }
+
+    .float { animation: float 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .twinkle { animation: twinkle 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: .45; transform: scale(.84); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 680px) {
+      main { min-height: 0; display: block; padding: 0 0 16px; }
+      .game-svg { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 class="sr-only">星际知识闯关</h1>
+    <svg id="game" class="game-svg" xmlns="http://www.w3.org/2000/svg" role="group" aria-labelledby="svg-title svg-desc"></svg>
+    <p id="live" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        category: "自然观察",
+        prompt: ["水受热后变成水蒸气，", "这个过程叫什么？"],
+        options: ["凝固", "蒸发", "融化", "结冰"],
+        answer: 1,
+        hint: "想想晾在太阳下的衣服，水去了哪里？",
+        explain: "水受热变成水蒸气，这个过程叫蒸发。"
+      },
+      {
+        category: "植物朋友",
+        prompt: ["植物利用阳光、水和二氧化碳", "制造养分的过程叫什么？"],
+        options: ["光合作用", "呼吸作用", "蒸腾作用", "发芽"],
+        answer: 0,
+        hint: "答案里有“光”字，植物像小小的营养制造师。",
+        explain: "植物通过光合作用制造养分，也会释放氧气。"
+      },
+      {
+        category: "动物伙伴",
+        prompt: ["下面哪一种动物", "属于哺乳动物？"],
+        options: ["海豚", "金鱼", "海龟", "章鱼"],
+        answer: 0,
+        hint: "它用肺呼吸，还会给宝宝喂奶。",
+        explain: "海豚用肺呼吸，幼崽由母体哺乳，所以它是哺乳动物。"
+      },
+      {
+        category: "数学补给",
+        prompt: ["100 厘米", "等于多少米？"],
+        options: ["10 米", "1 米", "1000 米", "半米"],
+        answer: 1,
+        hint: "一米尺上有 100 个一厘米。",
+        explain: "100 厘米就是 1 米，记住这个常用的长度单位换算。"
+      },
+      {
+        category: "地球旅行",
+        prompt: ["每天早晨，太阳从", "哪个方向升起？"],
+        options: ["北方", "西方", "东方", "南方"],
+        answer: 2,
+        hint: "清晨的阳光，会从地图右边的方向照来。",
+        explain: "地球自西向东自转，所以我们看到太阳从东方升起。"
+      }
+    ];
+
+    const state = { index: 0, score: 0, answered: false, selected: -1, hintUsed: false, finished: false };
+    const svg = document.getElementById("game");
+    const live = document.getElementById("live");
+    let isMobile = false;
+
+    const esc = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+    }[char]));
+
+    function text(x, y, content, size, fill, weight = 500, anchor = "start", extra = "") {
+      return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" font-weight="${weight}" fill="${fill}" ${extra}>${esc(content)}</text>`;
+    }
+
+    function star(x, y, size, fill = "#ffce62", delay = "0s") {
+      return `<path class="twinkle" style="animation-delay:${delay}" d="M${x} ${y-size} L${x+size*.24} ${y-size*.24} L${x+size} ${y} L${x+size*.24} ${y+size*.24} L${x} ${y+size} L${x-size*.24} ${y+size*.24} L${x-size} ${y} L${x-size*.24} ${y-size*.24} Z" fill="${fill}"/>`;
+    }
+
+    function rocket(x, y, scale = 1, rotate = -28) {
+      return `<g transform="translate(${x} ${y}) rotate(${rotate}) scale(${scale})" aria-hidden="true"><g class="float">
+        <path d="M0 -34 C16 -21 20 0 0 18 C-20 0 -16 -21 0 -34Z" fill="#f5f4e9" stroke="#8bcbe0" stroke-width="3"/>
+        <path d="M-10 4 L-22 18 L-6 16 M10 4 L22 18 L6 16" fill="#f28a70" stroke="#f28a70" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="0" cy="-9" r="6.5" fill="#67bddc" stroke="#17384f" stroke-width="2"/>
+        <path d="M-6 20 Q0 31 6 20" fill="none" stroke="#ffce62" stroke-width="5" stroke-linecap="round"/>
+      </g></g>`;
+    }
+
+    function header(width, mobile) {
+      const x = mobile ? 22 : 46;
+      const titleY = mobile ? 57 : 61;
+      const titleSize = mobile ? 25 : 29;
+      const iconX = mobile ? 28 : 55;
+      const titleX = mobile ? 54 : 83;
+      const rightX = mobile ? width - 22 : width - 52;
+      const total = questions.length;
+      const completed = Math.min(total, state.index + Number(state.answered || state.finished));
+      const progress = completed / total;
+      const progressLabel = state.finished ? "旅程完成" : state.answered ? `已完成 ${completed} / ${total} 站` : `第 ${state.index + 1} / ${total} 站`;
+      return `
+        <g aria-hidden="true">
+          <circle cx="${iconX}" cy="${titleY-9}" r="19" fill="#17384f"/>
+          <path d="M${iconX} ${titleY-22} l3.5 9 9.5 3.5-9.5 3.5-3.5 9-3.5-9-9.5-3.5 9.5-3.5z" fill="#ffce62"/>
+          ${text(titleX, titleY, "星际知识闯关", titleSize, "#18364b", 800)}
+          ${mobile ? "" : text(titleX, titleY+23, "边探索，边把知识变成星星", 14, "#5f707a", 500)}
+          <rect x="${mobile ? 266 : 922}" y="${mobile ? 27 : 29}" width="${mobile ? 102 : 226}" height="38" rx="19" fill="#fff" stroke="#e5e2d7"/>
+          <circle cx="${mobile ? 284 : 945}" cy="${mobile ? 46 : 48}" r="5" fill="#52a987"/>
+          ${text(mobile ? 298 : 959, mobile ? 51 : 53, mobile ? "轻松学知识" : "科学 × 数学 × 探索", mobile ? 12 : 14, "#38586c", 700)}
+          <rect x="${x}" y="${mobile ? 94 : 112}" width="${width - x*2}" height="8" rx="4" fill="#e5e2d7"/>
+          <rect x="${x}" y="${mobile ? 94 : 112}" width="${Math.max(mobile ? 12 : 20, (width - x*2) * progress)}" height="8" rx="4" fill="#52a987"/>
+          ${text(rightX, mobile ? 91 : 105, progressLabel, mobile ? 12 : 14, "#5f707a", 700, "end")}
+        </g>`;
+    }
+
+    function mapScene(mobile) {
+      const completed = state.finished ? questions.length : state.index + Number(state.answered);
+      if (mobile) {
+        return `
+          <g aria-label="星际旅程进度">
+            <text x="28" y="184" font-size="12" font-weight="700" fill="#bce6cf" letter-spacing="1.4">探索路线</text>
+            <text x="28" y="213" font-size="20" font-weight="800" fill="#fff">收集知识星星</text>
+            <g transform="translate(319 203)">
+              <circle r="31" fill="#244c63"/>
+              <circle r="22" fill="#77c9e8"/>
+              <path d="M-20 8 Q0 -6 20 3 Q10 23 -9 19Z" fill="#52a987"/>
+              <ellipse cx="-4" cy="-7" rx="8" ry="4" fill="#d9f4f3" opacity=".75"/>
+            </g>
+            <path d="M38 247 H352" stroke="#486c7d" stroke-width="3" stroke-dasharray="4 8"/>
+            ${questions.map((_, i) => {
+              const cx = 40 + i * 77;
+              const done = i < completed;
+              const active = !state.finished && !state.answered && i === state.index;
+              return `<g><circle cx="${cx}" cy="247" r="${active ? 11 : 8}" fill="${done ? "#ffce62" : active ? "#bce6cf" : "#315a70"}" stroke="${active ? "#fff" : "none"}" stroke-width="2"/>
+                ${done ? `<path d="M${cx-3} 247 l2 2 4-5" fill="none" stroke="#17384f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>` : ""}</g>`;
+            }).join("")}
+            ${rocket(363, 224, .48, 18)}
+          </g>`;
+      }
+
+      const nodeXs = [117, 182, 253, 322, 365];
+      return `
+        <g aria-label="星际旅程进度">
+          ${text(83, 225, "探索路线", 14, "#bce6cf", 700, "start", `letter-spacing="1.5"`)}
+          ${text(83, 257, "收集知识星星", 22, "#fff", 800)}
+          <circle cx="245" cy="405" r="96" fill="#244c63"/>
+          <ellipse cx="245" cy="405" rx="126" ry="31" fill="none" stroke="#77c9e8" stroke-width="9" transform="rotate(-20 245 405)" opacity=".78"/>
+          <circle cx="245" cy="405" r="73" fill="#77c9e8"/>
+          <path d="M174 416 Q212 389 248 404 Q283 421 316 401 Q305 459 256 474 Q204 481 174 416Z" fill="#52a987"/>
+          <path d="M211 355 Q245 333 273 355 Q244 377 212 367Z" fill="#d9f4f3" opacity=".8"/>
+          <circle cx="222" cy="405" r="4" fill="#17384f"/><circle cx="265" cy="405" r="4" fill="#17384f"/>
+          <path d="M228 425 Q244 438 259 425" fill="none" stroke="#17384f" stroke-width="4" stroke-linecap="round"/>
+          ${star(101, 323, 7, "#ffce62", ".2s")}${star(363, 335, 6, "#bce6cf", ".7s")}${star(116, 484, 5, "#f28a70", "1.1s")}
+          <path d="M95 563 C157 524 229 590 292 551 S370 581 386 575" fill="none" stroke="#486c7d" stroke-width="3" stroke-dasharray="4 9"/>
+          ${questions.map((_, i) => {
+            const cx = nodeXs[i];
+            const done = i < completed;
+            const active = !state.finished && !state.answered && i === state.index;
+            return `<g>
+              <circle cx="${cx}" cy="${i % 2 === 0 ? 557 : 578}" r="${active ? 14 : 10}" fill="${done ? "#ffce62" : active ? "#bce6cf" : "#315a70"}" stroke="${active ? "#fff" : "none"}" stroke-width="3"/>
+              ${done ? `<path d="M${cx-4} ${i%2===0?557:578} l3 3 6-7" fill="none" stroke="#17384f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : ""}
+            </g>`;
+          }).join("")}
+          ${rocket(nodeXs[Math.min(state.index + Number(state.answered), 4)], (state.index + Number(state.answered)) % 2 === 0 ? 523 : 544, .55, -25)}
+          <rect x="83" y="615" width="303" height="54" rx="18" fill="#244c63" stroke="#3b6176"/>
+          <circle cx="112" cy="642" r="13" fill="#ffce62"/>
+          <path d="M112 632 L115 639 L123 640 L117 645 L119 653 L112 649 L105 653 L107 645 L101 640 L109 639Z" fill="#fff6d8"/>
+          ${text(137, 648, `${state.score} 星星`, 17, "#fff", 800)}
+          ${text(364, 648, `${completed} / ${questions.length}`, 14, "#bce6cf", 700, "end")}
+          ${rocket(362, 290, .42, 20)}
+        </g>`;
+    }
+
+    function choiceRow(index, option, x, y, width, height, mobile) {
+      const selected = state.selected === index;
+      const correct = state.answered && index === questions[state.index].answer;
+      const wrong = state.answered && selected && !correct;
+      const disabled = state.answered;
+      let fill = "#fff";
+      let stroke = "#e8e4d8";
+      let letterFill = "#e9f4ed";
+      let letterColor = "#3d8e70";
+      if (correct) { fill = "#e5f5ec"; stroke = "#72b993"; letterFill = "#52a987"; letterColor = "#fff"; }
+      if (wrong) { fill = "#fff0ea"; stroke = "#e9987d"; letterFill = "#f28a70"; letterColor = "#fff"; }
+      if (selected && !state.answered) { fill = "#fff7df"; stroke = "#efbd4e"; }
+      const letters = ["A", "B", "C", "D"];
+      return `<g class="choice" data-action="answer" data-index="${index}" role="button" tabindex="${disabled ? "-1" : "0"}" aria-label="${letters[index]}，${esc(option)}" aria-pressed="${selected}" aria-disabled="${disabled}">
+        <rect class="choice-bg" x="${x}" y="${y}" width="${width}" height="${height}" rx="${mobile ? 14 : 15}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        <circle cx="${x + (mobile ? 25 : 27)}" cy="${y + height/2}" r="${mobile ? 14 : 15}" fill="${letterFill}"/>
+        ${text(x + (mobile ? 25 : 27), y + height/2 + (mobile ? 5 : 5), letters[index], mobile ? 12 : 13, letterColor, 800, "middle")}
+        ${text(x + (mobile ? 51 : 58), y + height/2 + (mobile ? 5 : 6), option, mobile ? 15 : 17, "#25465b", 700)}
+        ${correct ? `<path d="M${x+width-34} ${y+height/2} l6 6 12-14" fill="none" stroke="#398c66" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>` : ""}
+        ${wrong ? `<path d="M${x+width-34} ${y+height/2-6} l12 12 M${x+width-22} ${y+height/2-6} l-12 12" fill="none" stroke="#dc7258" stroke-width="3" stroke-linecap="round"/>` : ""}
+      </g>`;
+    }
+
+    function controls(mobile, panel) {
+      const q = questions[state.index];
+      const hint = state.hintUsed ? q.hint : "还没头绪？点亮提示，继续挑战！";
+      const hintY = mobile ? panel.y + panel.h - 54 : panel.y + panel.h - 50;
+      const right = panel.x + panel.w - (mobile ? 20 : 25);
+      const left = panel.x + (mobile ? 18 : 25);
+      if (state.answered) {
+        const correct = state.selected === q.answer;
+        const msg = correct ? `答对啦！${q.explain}` : `差一点点，答案是「${q.options[q.answer]}」。${q.explain}`;
+        const maxChars = mobile ? 23 : 47;
+        const lines = Array.from({ length: Math.ceil(msg.length / maxChars) }, (_, i) => msg.slice(i * maxChars, (i + 1) * maxChars));
+        const buttonW = mobile ? 134 : 154;
+        const buttonX = right - buttonW;
+        const buttonY = mobile ? panel.y + panel.h - 60 : panel.y + panel.h - 58;
+        return `<g role="status" aria-live="polite">
+          <circle cx="${left+9}" cy="${mobile ? panel.y+panel.h-138 : panel.y+panel.h-88}" r="8" fill="${correct ? "#52a987" : "#f28a70"}"/>
+          ${text(left+9, mobile ? panel.y+panel.h-134 : panel.y+panel.h-84, correct ? "✓" : "i", 11, "#fff", 900, "middle")}
+          ${lines.map((line, i) => text(left+25, (mobile ? panel.y+panel.h-134 : panel.y+panel.h-84) + i*(mobile?18:17), line, mobile ? 11.5 : 13, correct ? "#337a5b" : "#a85a47", 700)).join("")}
+        </g>
+        <g class="action" data-action="next" role="button" tabindex="0" aria-label="${state.index === questions.length-1 ? "查看闯关结果" : "进入下一题"}">
+          <rect class="action-bg" x="${buttonX}" y="${buttonY}" width="${buttonW}" height="${mobile ? 40 : 42}" rx="${mobile ? 14 : 15}" fill="#17384f"/>
+          ${text(buttonX+buttonW/2, buttonY+(mobile?26:28), state.index === questions.length-1 ? "看闯关结果" : "继续出发", mobile ? 14 : 15, "#fff", 800, "middle")}
+          <path d="M${buttonX+buttonW-25} ${buttonY+(mobile?17:18)} l6 5-6 5" fill="none" stroke="#bce6cf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>`;
+      }
+
+      const hintButtonX = mobile ? panel.x + panel.w - 94 : panel.x + panel.w - 130;
+      const hintButtonY = mobile ? panel.y + 12 : panel.y + 15;
+      const hintW = mobile ? 78 : 108;
+      return `<g class="action" data-action="hint" role="button" tabindex="0" aria-label="${state.hintUsed ? "隐藏提示" : "查看提示"}" aria-pressed="${state.hintUsed}">
+          <rect class="action-bg" x="${hintButtonX}" y="${hintButtonY}" width="${hintW}" height="${mobile ? 30 : 32}" rx="16" fill="${state.hintUsed ? "#fff0ce" : "#f3f0e6"}" stroke="#e4dfd1"/>
+          <circle cx="${hintButtonX+17}" cy="${hintButtonY+(mobile?15:16)}" r="8" fill="#ffce62"/>
+          ${text(hintButtonX+17, hintButtonY+(mobile?19:20), "?", 11, "#614d24", 900, "middle")}
+          ${text(hintButtonX+32, hintButtonY+(mobile?20:21), state.hintUsed ? "隐藏提示" : "给我提示", mobile ? 11 : 13, "#38586c", 700)}
+        </g>
+        <rect x="${left}" y="${hintY-24}" width="${panel.w-(mobile?36:50)}" height="34" rx="11" fill="${state.hintUsed ? "#fff4d6" : "#f7f5ed"}"/>
+        ${text(left+12, hintY-2, hint, mobile ? 11.5 : 13, state.hintUsed ? "#7e6530" : "#667680", state.hintUsed ? 700 : 500)}`;
+    }
+
+    function quizPanel(mobile) {
+      const q = questions[state.index];
+      const p = mobile
+        ? { x: 20, y: 276, w: 350, h: 548, q1: 356, q2: 383, optionY: 419, rowH: 49, gap: 10 }
+        : { x: 434, y: 190, w: 700, h: 505, q1: 289, q2: 326, optionY: 359, rowH: 49, gap: 10 };
+      const pad = mobile ? 18 : 25;
+      const optionX = p.x + pad;
+      const optionW = p.w - pad*2;
+      const options = q.options.map((option, i) => choiceRow(i, option, optionX, p.optionY + i*(p.rowH+p.gap), optionW, p.rowH, mobile)).join("");
+      const promptSize = mobile ? 19 : 26;
+      const labelX = p.x + pad;
+      return `<g aria-label="答题卡">
+        <rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="${mobile ? 23 : 26}" fill="#fdfcf7"/>
+        ${text(labelX, mobile ? p.y+31 : p.y+35, `第 ${state.index+1} 题 · ${q.category}`, mobile ? 12 : 14, "#57866e", 800)}
+        ${q.prompt.map((line, i) => text(labelX, (i===0?p.q1:p.q2), line, promptSize, "#18364b", 800)).join("")}
+        ${options}
+        ${controls(mobile, p)}
+      </g>`;
+    }
+
+    function resultsPanel(mobile) {
+      const x = mobile ? 20 : 434;
+      const y = mobile ? 276 : 190;
+      const w = mobile ? 350 : 700;
+      const h = mobile ? 548 : 505;
+      const cx = x + w/2;
+      const correctCount = state.score / 10;
+      const headline = correctCount === questions.length ? "满载而归！" : correctCount >= 3 ? "太空探险家！" : "继续加油！";
+      const note = correctCount === questions.length ? "你把所有知识星星都收集齐了。" : `你答对了 ${correctCount} 题，新的发现正在等着你。`;
+      return `<g aria-label="闯关结果">
+        <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${mobile?23:26}" fill="#fdfcf7"/>
+        <circle cx="${cx}" cy="${y+130}" r="75" fill="#fff2c9"/>
+        <circle cx="${cx}" cy="${y+130}" r="57" fill="#ffce62"/>
+        <path d="M${cx} ${y+89} L${cx+12} ${y+119} L${cx+44} ${y+123} L${cx+20} ${y+144} L${cx+27} ${y+176} L${cx} ${y+159} L${cx-27} ${y+176} L${cx-20} ${y+144} L${cx-44} ${y+123} L${cx-12} ${y+119}Z" fill="#fff9e8"/>
+        ${star(cx-96, y+84, 9, "#f28a70")}${star(cx+95, y+167, 7, "#77c9e8")}${rocket(cx+126, y+93, .63, 28)}
+        ${text(cx, y+250, headline, mobile ? 27 : 32, "#18364b", 900, "middle")}
+        ${text(cx, y+282, note, mobile ? 14 : 16, "#5f707a", 600, "middle")}
+        <rect x="${cx-(mobile?111:128)}" y="${y+316}" width="${mobile?222:256}" height="62" rx="18" fill="#eaf5ee"/>
+        ${text(cx, y+343, "本次收获", 12, "#58836b", 700, "middle")}
+        ${text(cx, y+367, `${state.score} 颗知识星星`, 20, "#265c48", 900, "middle")}
+        <g class="action" data-action="restart" role="button" tabindex="0" aria-label="再玩一次">
+          <rect class="action-bg" x="${cx-95}" y="${y+408}" width="190" height="48" rx="17" fill="#17384f"/>
+          ${text(cx, y+438, "再玩一次", 16, "#fff", 800, "middle")}
+          <path d="M${cx+51} ${y+424} a10 10 0 1 1-3 15 M${cx+46} ${y+421} l7 2-5 5" fill="none" stroke="#bce6cf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </g>`;
+    }
+
+    function render(preferredFocus = "") {
+      isMobile = window.matchMedia("(max-width: 680px)").matches;
+      const width = isMobile ? 390 : 1200;
+      const height = isMobile ? 870 : 760;
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.setAttribute("aria-label", "星际知识闯关互动游戏");
+      const board = isMobile ? { x: 12, y: 145, w: 366, h: 706 } : { x: 42, y: 153, w: 1116, h: 575 };
+      const decor = isMobile
+        ? `${star(34, 152, 4, "#ffce62")}${star(362, 163, 5, "#bce6cf", ".6s")}${star(345, 270, 4, "#77c9e8", "1s")}`
+        : `${star(28, 210, 5, "#ffce62")}${star(1172, 287, 6, "#bce6cf", ".5s")}${star(1084, 739, 5, "#f28a70", "1s")}${star(246, 736, 4, "#77c9e8", "1.4s")}`;
+      const content = state.finished
+        ? resultsPanel(isMobile)
+        : `${mapScene(isMobile)}${quizPanel(isMobile)}`;
+      svg.innerHTML = `
+        <title id="svg-title">星际知识闯关</title>
+        <desc id="svg-desc">一款适合学生的五题趣味问答小游戏。选择答案、查看提示并收集知识星星。</desc>
+        <rect x="0" y="0" width="${width}" height="${height}" rx="${isMobile?0:30}" fill="#f4f3eb"/>
+        ${decor}
+        ${header(width, isMobile)}
+        <rect x="${board.x}" y="${board.y}" width="${board.w}" height="${board.h}" rx="${isMobile?25:32}" fill="#17384f"/>
+        <path d="M${board.x+20} ${board.y+23} Q${board.x+board.w*.42} ${board.y+5} ${board.x+board.w*.64} ${board.y+22}" fill="none" stroke="#31566d" stroke-width="2" opacity=".8"/>
+        ${isMobile ? "" : `${star(407, 183, 4, "#77c9e8", ".3s")}${star(1087, 177, 5, "#ffce62", ".9s")}${star(417, 698, 4, "#bce6cf", "1.1s")}`}
+        ${content}
+        ${isMobile ? "" : text(600, 750, "每一次认真思考，都是一次新的发现。", 13, "#5f707a", 600, "middle")}`;
+      if (preferredFocus) {
+        const target = preferredFocus === "answer" ? svg.querySelector(`[data-action="answer"][data-index="${state.selected}"]`) : svg.querySelector(`[data-action="${preferredFocus}"]`);
+        target?.focus();
+      }
+    }
+
+    function answer(index) {
+      if (state.answered || state.finished) return;
+      state.selected = index;
+      state.answered = true;
+      if (index === questions[state.index].answer) state.score += 10;
+      const correct = index === questions[state.index].answer;
+      live.textContent = correct ? `答对啦！${questions[state.index].explain}` : `差一点点，正确答案是${questions[state.index].options[questions[state.index].answer]}。${questions[state.index].explain}`;
+      render("next");
+    }
+
+    function next() {
+      if (!state.answered || state.finished) return;
+      if (state.index === questions.length - 1) {
+        state.finished = true;
+        live.textContent = `闯关完成，获得 ${state.score} 颗知识星星。`;
+      } else {
+        state.index += 1;
+        state.answered = false;
+        state.selected = -1;
+        state.hintUsed = false;
+        live.textContent = `第 ${state.index+1} 题，${questions[state.index].category}。`;
+      }
+      render(state.finished ? "restart" : "hint");
+    }
+
+    function activate(target) {
+      if (!target) return;
+      const action = target.dataset.action;
+      if (action === "answer") answer(Number(target.dataset.index));
+      if (action === "hint" && !state.answered && !state.finished) {
+        state.hintUsed = !state.hintUsed;
+        live.textContent = state.hintUsed ? questions[state.index].hint : "提示已收起。";
+        render("hint");
+      }
+      if (action === "next") next();
+      if (action === "restart") {
+        Object.assign(state, { index: 0, score: 0, answered: false, selected: -1, hintUsed: false, finished: false });
+        live.textContent = "新的星际旅程开始了。第一题：" + questions[0].prompt.join("");
+        render("hint");
+      }
+    }
+
+    svg.addEventListener("click", (event) => activate(event.target.closest("[data-action]")));
+    svg.addEventListener("keydown", (event) => {
+      if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-action]")) {
+        event.preventDefault();
+        activate(event.target);
+      }
+    });
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => render(), 100);
+    });
+    render();
+  </script>
+</body>
+</html>

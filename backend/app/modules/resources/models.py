@@ -48,6 +48,7 @@ class ResourceKind(enum.StrEnum):
     VIDEO = "VIDEO"
     PDF = "PDF"
     IMAGE = "IMAGE"
+    INTERACTIVE = "INTERACTIVE"
 
 
 class ResourceVariantKind(enum.StrEnum):
@@ -57,7 +58,7 @@ class ResourceVariantKind(enum.StrEnum):
     PREVIEW = "PREVIEW"
 
 
-_KIND_SQL = "('WORD', 'SLIDES', 'VIDEO', 'PDF', 'IMAGE')"
+_KIND_SQL = "('WORD', 'SLIDES', 'VIDEO', 'PDF', 'IMAGE', 'INTERACTIVE')"
 _VARIANT_SQL = "('SOURCE', 'PREVIEW')"
 _SOURCE_SQL = "('LEGACY_REUSED', 'NEW_SOURCE', 'SYNTHETIC_FIXTURE')"
 _LICENSE_SQL = "('CC-BY', 'CC-BY-SA', 'CC0', 'PROJECT-ORIGINAL', 'SYNTHETIC-FIXTURE', 'UNKNOWN')"
@@ -74,6 +75,11 @@ class Resource(Base):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False, default="")
     kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    interactive_purpose: Mapped[str | None] = mapped_column(String(16))
+    interactive_subject: Mapped[str | None] = mapped_column(String(80))
+    active_interactive_revision_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("resource_interactive_revisions.id", ondelete="SET NULL")
+    )
     stage: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
     grade_min: Mapped[int | None] = mapped_column(Integer)
     grade_max: Mapped[int | None] = mapped_column(Integer)
@@ -113,6 +119,14 @@ class Resource(Base):
 
     __table_args__ = (
         CheckConstraint(f"kind IN {_KIND_SQL}", name="ck_resource_items_kind"),
+        CheckConstraint(
+            "(kind = 'INTERACTIVE' AND interactive_purpose IN ('LESSON','GAME','EXPERIMENT') "
+            "AND interactive_subject IS NOT NULL) OR "
+            "(kind <> 'INTERACTIVE' AND interactive_purpose IS NULL "
+            "AND interactive_subject IS NULL "
+            "AND active_interactive_revision_id IS NULL)",
+            name="ck_resource_items_interactive_fields",
+        ),
         CheckConstraint(f"stage IN {_STAGE_SQL}", name="ck_resource_items_stage"),
         CheckConstraint(
             "(grade_min IS NULL AND grade_max IS NULL) OR "

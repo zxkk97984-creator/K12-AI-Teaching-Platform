@@ -1,22 +1,24 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const navigate = vi.fn();
-
-vi.mock("../identity/session", () => ({ navigate: (path: string) => navigate(path) }));
 vi.mock("./api", async () => {
   const actual = await vi.importActual<typeof import("./api")>("./api");
-  return {
-    ...actual,
-    listResources: vi.fn(),
-    createTicket: vi.fn(),
-  };
+  return { ...actual, getResource: vi.fn(), createTicket: vi.fn() };
+});
+vi.mock("../study/api", async () => {
+  const actual = await vi.importActual<typeof import("../study/api")>("../study/api");
+  return { ...actual, recordOpen: vi.fn(), newOpenEventId: vi.fn(() => "open-resource-test") };
 });
 
 import { ApiError } from "../identity/api";
+import { recordOpen } from "../study/api";
 import * as api from "./api";
-import { ResourceLibraryPage } from "./ResourceLibraryPage";
-import type { ResourceList, ResourceSummary, ResourceVariant } from "./types";
+import { ResourceCard } from "./ResourceCard";
+import { ResourceDetailPage } from "./ResourceDetailPage";
+import type { ResourceSummary, ResourceVariant } from "./types";
+
+const resourceId = "11111111-1111-1111-1111-111111111111";
 
 function variant(overrides: Partial<ResourceVariant> = {}): ResourceVariant {
   return {
@@ -34,7 +36,7 @@ function variant(overrides: Partial<ResourceVariant> = {}): ResourceVariant {
 
 function resource(overrides: Partial<ResourceSummary> = {}): ResourceSummary {
   return {
-    id: "11111111-1111-1111-1111-111111111111",
+    id: resourceId,
     slug: "t20-lesson",
     title: "合成测试资源",
     description: "用于测试",
@@ -57,56 +59,71 @@ function resource(overrides: Partial<ResourceSummary> = {}): ResourceSummary {
   };
 }
 
-function listOf(items: ResourceSummary[]): ResourceList {
-  return { items, profile: "development" };
+function LocationProbe() {
+  const location = useLocation();
+  return <span data-testid="location">{location.pathname}</span>;
+}
+
+function renderDetail() {
+  return render(
+    <MemoryRouter initialEntries={[`/resources/${resourceId}`]}>
+      <Routes>
+        <Route path="/resources/:resourceId" element={<ResourceDetailPage />} />
+        <Route path="/resources" element={<p>学习书库</p>} />
+      </Routes>
+      <LocationProbe />
+    </MemoryRouter>,
+  );
 }
 
 beforeEach(() => {
-  navigate.mockReset();
-  vi.mocked(api.listResources).mockReset();
+  vi.mocked(api.getResource).mockReset();
   vi.mocked(api.createTicket).mockReset();
+  vi.mocked(recordOpen).mockReset().mockResolvedValue({});
 });
-
 afterEach(cleanup);
 
-describe("ResourceLibraryPage", () => {
-  it("shows a real empty state instead of placeholder cards", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(listOf([]));
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-empty")).toBeTruthy());
-    expect(screen.queryByTestId("resource-grid")).toBeNull();
-  });
-
-  it("renders only server-provided resources, with kind and variants", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(listOf([resource()]));
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-grid")).toBeTruthy());
+describe("resource detail and card used by the student route", () => {
+  it("opens the server resource and records an explicit, idempotent open fact", async () => {
+    vi.mocked(api.getResource).mockResolvedValue(resource());
+    renderDetail();
+    expect(await screen.findByTestId(`resource-card-${resourceId}`)).toBeTruthy();
+    expect(api.getResource).toHaveBeenCalledWith(resourceId);
+    await waitFor(() => expect(recordOpen).toHaveBeenCalledWith("RESOURCE", resourceId, "open-resource-test"));
     expect(screen.getByTestId("resource-kind").textContent).toContain("Word 文档");
     expect(screen.getByTestId("variant-SOURCE").textContent).toContain("源文件");
-    expect(screen.getByTestId("download-SOURCE").getAttribute("href")).toContain(
-      "/api/v1/resources/11111111-1111-1111-1111-111111111111/content",
+    expect(screen.getByTestId("download-SOURCE").getAttribute("href")).toBe(
+      `/api/v1/resources/${resourceId}/content?variant=SOURCE&disposition=attachment`,
     );
+    fireEvent.click(screen.getByRole("button", { name: /返回资源中心/ }));
+    expect(screen.getByTestId("location").textContent).toBe("/resources");
   });
 
-  it("never fabricates a file URL from a resource title or a model string", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(
-      listOf([
-        resource({
-          title: "https://evil.example/payload.mp4",
-          kind: "VIDEO",
-          variants: [variant({ mime: "video/mp4", inline_ok: true })],
-        }),
-      ]),
-    );
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-player")).toBeTruthy());
-    const video = screen.getByTestId(
-      "resource-video-11111111-1111-1111-1111-111111111111",
-    ) as HTMLVideoElement;
+  it("shows server failure without inventing a resource card", async () => {
+    vi.mocked(api.getResource).mockRejectedValue(new ApiError(503, "SERVICE_UNAVAILABLE", "资源服务暂不可用", null));
+    renderDetail();
+    expect((await screen.findByRole("alert")).textContent).toContain("资源服务暂不可用");
+    expect(screen.queryByTestId(`resource-card-${resourceId}`)).toBeNull();
+    expect(recordOpen).not.toHaveBeenCalled();
+  });
+
+  it("still shows an authorized resource when history recording fails", async () => {
+    vi.mocked(api.getResource).mockResolvedValue(resource());
+    vi.mocked(recordOpen).mockRejectedValue(new Error("history unavailable"));
+    renderDetail();
+    expect(await screen.findByTestId(`resource-card-${resourceId}`)).toBeTruthy();
+  });
+
+  it("never derives a playable or download URL from an untrusted title", () => {
+    render(<ResourceCard resource={resource({
+      title: "https://evil.example/payload.mp4",
+      kind: "VIDEO",
+      variants: [variant({ mime: "video/mp4", inline_ok: true })],
+    })} />);
+    const video = screen.getByTestId(`resource-video-${resourceId}`) as HTMLVideoElement;
     expect(video.getAttribute("src")).toBe(
-      "/api/v1/resources/11111111-1111-1111-1111-111111111111/content?variant=SOURCE&disposition=inline",
+      `/api/v1/resources/${resourceId}/content?variant=SOURCE&disposition=inline`,
     );
-    // No URL-bearing attribute may be derived from the (untrusted) title text.
     const urls = Array.from(document.querySelectorAll("[href], [src]")).map(
       (node) => node.getAttribute("href") ?? node.getAttribute("src") ?? "",
     );
@@ -117,112 +134,45 @@ describe("ResourceLibraryPage", () => {
     }
   });
 
-  it("reports a readable failure and caches no fake suggestion", async () => {
-    vi.mocked(api.listResources).mockRejectedValue(
-      new ApiError(503, "SERVICE_UNAVAILABLE", "资源服务暂不可用", null),
-    );
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-error")).toBeTruthy());
-    expect(screen.getByTestId("resource-error").textContent).toContain("资源服务暂不可用");
-    expect(screen.queryByTestId("resource-grid")).toBeNull();
-  });
-
-  it("redirects to login when the session is gone", async () => {
-    vi.mocked(api.listResources).mockRejectedValue(
-      new ApiError(401, "UNAUTHORIZED", "登录已失效", null),
-    );
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith("/login"));
-  });
-
-  it("marks a resource whose file is missing as unavailable, not ready", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(
-      listOf([
-        resource({
-          variants: [
-            variant({ available: false, unavailable_reason: "RESOURCE_FILE_MISSING" }),
-          ],
-        }),
-      ]),
-    );
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-unavailable")).toBeTruthy());
+  it("marks a missing file unavailable and preserves the fixture notice", () => {
+    render(<ResourceCard resource={resource({
+      is_test_fixture: true,
+      content_notice: "测试内容，未作人工教学审校",
+      variants: [variant({ available: false, unavailable_reason: "RESOURCE_FILE_MISSING" })],
+    })} />);
+    expect(screen.getByTestId("resource-unavailable").textContent).toContain("文件当前缺失");
     expect(screen.queryByTestId("download-SOURCE")).toBeNull();
+    expect(screen.getByTestId("resource-ticket").hasAttribute("disabled")).toBe(true);
     expect(screen.getByTestId("variant-SOURCE").textContent).toContain("RESOURCE_FILE_MISSING");
+    expect(screen.getByTestId("resource-notice").textContent).toContain("未作人工教学审校");
   });
 
-  it("asks the server for a short-lived ticket and surfaces the notice", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(listOf([resource()]));
-    vi.mocked(api.createTicket).mockResolvedValue({
+  it("uses a server-issued temporary ticket and reports refusal", async () => {
+    vi.mocked(api.createTicket).mockResolvedValueOnce({
       url: "/api/v1/resources/content/abc.def",
       expires_at: "2026-09-19T13:00:00Z",
       variant: "SOURCE",
       notice: "临时链接：仅本人当次会话可用，不是教材资源 ID",
-    });
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-ticket")).toBeTruthy());
+    }).mockRejectedValueOnce(new ApiError(404, "NOT_FOUND", "RESOURCE_NOT_VISIBLE: 资源不可用", null));
+    render(<ResourceCard resource={resource()} />);
     fireEvent.click(screen.getByTestId("resource-ticket"));
-    await waitFor(() => expect(screen.getByTestId("resource-ticket-result")).toBeTruthy());
-    expect(screen.getByTestId("resource-ticket-result").textContent).toContain("不是教材资源 ID");
-  });
-
-  it("shows a readable error when the ticket request is refused", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(listOf([resource()]));
-    vi.mocked(api.createTicket).mockRejectedValue(
-      new ApiError(404, "NOT_FOUND", "RESOURCE_NOT_VISIBLE: 资源不可用", null),
-    );
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-ticket")).toBeTruthy());
+    expect((await screen.findByTestId("resource-ticket-result")).textContent).toContain("不是教材资源 ID");
+    expect(api.createTicket).toHaveBeenCalledWith(resourceId, "SOURCE");
     fireEvent.click(screen.getByTestId("resource-ticket"));
-    await waitFor(() =>
-      expect(screen.getByTestId("resource-ticket-error").textContent).toContain("资源不可用"),
-    );
+    await waitFor(() => expect(screen.getByTestId("resource-ticket-error").textContent).toContain("资源不可用"));
   });
 
-  it("shows the fixture notice when the server marks test content", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(
-      listOf([
-        resource({
-          is_test_fixture: true,
-          content_notice: "测试内容，未作人工教学审校",
-        }),
-      ]),
-    );
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-notice")).toBeTruthy());
-    expect(screen.getByTestId("resource-notice").textContent).toContain("未作人工教学审校");
-  });
-
-  it("handles video load and error events truthfully", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(
-      listOf([
-        resource({
-          kind: "VIDEO",
-          variants: [variant({ mime: "video/mp4", inline_ok: true, filename: "clip.mp4" })],
-        }),
-      ]),
-    );
-    render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-player")).toBeTruthy());
-    const video = screen.getByTestId("resource-video-11111111-1111-1111-1111-111111111111");
-
+  it("shows video loading, completion and failure honestly", () => {
+    render(<ResourceCard resource={resource({
+      kind: "VIDEO",
+      variants: [variant({ mime: "video/mp4", inline_ok: true, filename: "clip.mp4" })],
+    })} />);
+    const video = screen.getByTestId(`resource-video-${resourceId}`);
     fireEvent.loadedData(video);
     expect(screen.getByTestId("resource-player-state").textContent).toContain("正在播放");
-
     fireEvent.ended(video);
     expect(screen.getByTestId("resource-player-state").textContent).toContain("已播放完");
-
     fireEvent.error(video);
     expect(screen.getByTestId("resource-player-state").textContent).toContain("视频无法播放");
-  });
-
-  it("does not claim mastery, ranking or percentages anywhere", async () => {
-    vi.mocked(api.listResources).mockResolvedValue(listOf([resource()]));
-    const { container } = render(<ResourceLibraryPage />);
-    await waitFor(() => expect(screen.getByTestId("resource-grid")).toBeTruthy());
-    const text = container.textContent ?? "";
-    for (const word of ["掌握度", "排名", "排行榜", "%", "正确率"]) {
-      expect(text).not.toContain(word);
-    }
   });
 });

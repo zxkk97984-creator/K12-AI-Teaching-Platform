@@ -1,4 +1,4 @@
-"""Durable, fail-closed request counter for authorised live Knodo calls."""
+"""Optional durable request cap for live Knodo calls."""
 
 from __future__ import annotations
 
@@ -12,6 +12,13 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA_VERSION = "k12.knodo.request-budget.v1"
+
+
+class UnlimitedRequestBudget:
+    """Allow explicitly uncapped calls without reading or changing an old ledger."""
+
+    async def reserve(self) -> bool:
+        return True
 
 
 class FileRequestBudget:
@@ -121,4 +128,4 @@ class FileRequestBudget:
             raise
 
 
-__all__ = ["FileRequestBudget", "SCHEMA_VERSION"]
+__all__ = ["FileRequestBudget", "UnlimitedRequestBudget", "SCHEMA_VERSION"]

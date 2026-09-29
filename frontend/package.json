@@ -10,14 +10,19 @@
     "test": "vitest run",
     "preview": "vite preview --config vite.config.ts --host 127.0.0.1 --port 15173",
     "generate:identity": "openapi-typescript ../contracts/openapi.identity.json -o src/shared/types/generated/identity.ts",
-    "test:e2e:identity": "playwright test --config playwright.config.ts"
+    "test:e2e:identity": "playwright test --config playwright.config.ts",
+    "test:e2e:ui": "playwright test --config playwright.ui.config.ts"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.11.1",
     "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/language": "^6.12.4",
     "@codemirror/state": "^6.7.5",
     "@codemirror/view": "^6.43.12",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "7.18.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

@@ -1,0 +1,153 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "sort-unique",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": true,
+  "review_status": "UNREVIEWED",
+  "title": "排序去重：整理一组数字",
+  "description": "编写 sort_unique(numbers)，返回包含所有不同数字的升序新列表。输入最多 1000 个整数，每个值在 -1,000,000 到 1,000,000 之间；空列表返回空列表。",
+  "starter_code": "def sort_unique(numbers):\n    \"\"\"排序去重：整理一组数字\"\"\"\n    # 在这里写下你的解题思路\n    pass\n",
+  "entrypoint": "sort_unique",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "numbers"
+      ],
+      "properties": {
+        "numbers": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "type": "integer",
+            "minimum": -1000000,
+            "maximum": 1000000
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": -1000000,
+        "maximum": 1000000
+      }
+    },
+    "limits": {
+      "max_input_bytes": 65536,
+      "max_output_bytes": 16384,
+      "timeout_ms": 3000
+    },
+    "errors": [
+      "INVALID_JSON",
+      "INVALID_INPUT",
+      "STUDENT_EXCEPTION",
+      "TIMEOUT",
+      "OUTPUT_LIMIT",
+      "SYSTEM_ERROR"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "numbers": [
+          3,
+          1,
+          3,
+          2
+        ]
+      },
+      "output": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "input": {
+        "numbers": [
+          5,
+          4,
+          3
+        ]
+      },
+      "output": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "input": {
+        "numbers": []
+      },
+      "output": []
+    }
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {
+        "id": "F1",
+        "name": "常规用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "F2",
+        "name": "变化与组合用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "R1",
+        "name": "边界用例",
+        "dimension": "R",
+        "max_score": 10,
+        "case_count": 2
+      }
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "7388cb582aff514b3e8276978e29299ff2535f3a6754ea4277f48772459400e1"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [
+      {
+        "id": "F",
+        "max_score": 60
+      },
+      {
+        "id": "R",
+        "max_score": 10
+      }
+    ],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "algorithm-everyday",
+    "chapter_slug": "ch03",
+    "revision": 1,
+    "stage": "SENIOR",
+    "knowledge_point_slugs": [
+      "binary-search",
+      "time-complexity",
+      "sorting-algorithm"
+    ]
+  },
+  "source": {
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "source_path": "curriculum/code-tasks/sort-unique-r1.json",
+    "source_sha256": "fd3f5eae4d3de8ee7663714bd47b04eed5d0248cddc7839db45c2a2ae665d8bd",
+    "reference_solution_sha256": "ff71b51950073de64dd9df151dfc2ce03779ac69bff81f2e60b7ca481edc530c"
+  }
+}

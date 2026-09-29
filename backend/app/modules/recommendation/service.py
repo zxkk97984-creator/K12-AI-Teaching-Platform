@@ -191,6 +191,7 @@ async def assemble_inputs(
             select(LessonSession.chapter_id).where(
                 LessonSession.owner_user_id == owner_user_id,
                 LessonSession.lifecycle == "COMPLETED",
+                LessonSession.chapter_id.is_not(None),
             )
         )
     ).all()

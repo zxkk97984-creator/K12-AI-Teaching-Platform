@@ -1,18 +1,43 @@
-# K12 项目本地执行规则
+# K12 比赛作品开发指引
 
-本文件只补充项目级约束；任务目标、依赖、门禁和验收以
-`.rebuild-kit/` 中的原任务与当前 `.rebuild-kit/progress.json` 为准。
+## 目标
 
-- 工作目录固定为 `/home/zxk/Projects/K12`；旧 K12、CareerMate、旧数据库和旧服务只读。
-- 保持 FastAPI/Python 3.12、React/TypeScript/Vite、PostgreSQL、Knodo Tutor/Designer 与受限 runner 边界。
-- 复用现有会话、CSRF、四档学段、课程版本、题目快照和 OpenAPI 生成链；不新增直连大模型兜底。
-- 不打印、提交或上传密钥、Cookie、真实学生数据、数据库数据和运行时上传文件。
-- 真实 Knodo、付费调用、人工审校、真实未成年人数据和公网部署仍须各自门禁与授权；fixture 不等同真实验收。
-- Git 仅使用本地历史；不添加远端、不 push、不 force-push，不重写既有历史。
-- Git 筛选、基线和本轮授权的详细规则见 `docs/operations/GOAL_GIT_POLICY.md`。
+这是霜铃 K12 教学助手的比赛作品。优先做好可运行的功能、完整的演示流程、界面体验和答辩材料。
+以用户当前需求、现有代码和实际运行结果为准，不套用正式上线的审批流程。
 
-## 本轮单 Agent 接管
+## 项目与实现
 
-- 本轮由当前会话作为唯一源码、测试、进度和本地 Git 写入者；旧 Herdr、A/B 角色、派工和 ACK 仅作历史资料，不启动、不等待、不依赖。
-- 旧 `.herdr-control/` 记录保留为恢复证据；发现陈旧共享锁时只按其 release rule 做可追溯状态转移，不删除、抢占或伪造释放。
-- 普通任务完成后连续推进；每项仍须真实测试、同一 Agent 第二遍复核、失败修复和如实登记。第二遍复核不得描述为独立 Agent 审核。
+- 工作目录：`/home/zxk/Projects/K12`。旧 K12、CareerMate 及其服务和数据库只作参考。
+- 后端：`backend/app`，FastAPI / Python 3.12 / PostgreSQL；前端：`frontend/src`，React / TypeScript / Vite。
+- AI 接入复用 Knodo Tutor / Designer；提示词、Skill 和打包资产在 `platform/knodo`，业务协议在 `contracts`。
+- 课程与示例在 `curriculum`，代码执行在 `runner`，运行脚本在 `scripts`。
+- 复用已有会话、四档学段、课程版本、题目快照和 OpenAPI 类型生成链，避免另建重复实现。
+
+## 工作方式
+
+- 默认单 Agent 直接完成修改、相关测试和第二遍复核。普通修复、重构、界面优化和文档维护连续推进。
+- 不要求逐任务计划、进度 JSON、验收报告、角色 ACK 或审批单；复杂任务在对话里简述步骤即可。
+- 历史 `.herdr-control` 仅为恢复记录，不加载其派工规则、不启动旧角色、不操作历史共享锁。
+- 按实际改动选择测试；涉及行为变化时验证对应流程，涉及界面时检查浏览器效果。
+- 完成后简要说明改动、验证结果和仍存在的问题；没有执行的测试不写成通过。
+- 文档只维护使用者需要的说明。优先更新已有入口，不为每次工作新增计划、交接或总结文件。
+- 当前功能入口以 `frontend/src/main.tsx`、`backend/app/main.py` 和 README 为准；旧静态页面、历史截图和验收批次不是实现依据。
+- 浏览器截图和报告写入 `frontend/test-results/`；删除未跟踪的旧素材前先在仓库外保留可恢复副本，不把备份或一次性文件清单重新放入项目。
+
+## 比赛范围与必要保护
+
+- 演示可使用合成账号、示例课程和 fixture；展示时如实区分模拟结果与真实 Knodo 返回即可。
+- 正式上线评审、真实未成年人准入、四档人工教学审校不作为本地比赛开发和演示的前置条件。
+- 保留现有登录、CSRF、数据归属、答案隔离与 runner 沙箱保护；不为方便演示绕过它们。
+- 密钥只放本机运行配置，不打印或提交；测试使用隔离测试库，不清空开发库、上传文件或旧项目数据。
+- 已接入 Knodo 的本地调用次数不设项目上限，排查和验证可按需直接调用，无需按次数重新询问；新增购买额度、购买服务或公网发布需明确授权，不重复询问已授权事项。
+- Git 使用本地历史，保留用户未提交改动；不添加远端、不 push、不重写已有历史。
+
+## 常用入口
+
+- 启动与配置：`README.md`、`docs/operations/LOCAL_DEV.md`。
+- 首次配置与初始化：`./k12 setup`；按当前源码构建并启动：`./k12 start --build`。
+- 日常开发：`./k12 dev`；查看状态：`./k12 status`；完整本地检查：`./k12 check`。
+- 前端：`npm test --prefix frontend`、`npm run typecheck --prefix frontend`、`npm run build --prefix frontend`。
+- 协议：`python3 contracts/test_contracts.py -v`；Knodo 资产：`python3 scripts/package-knodo.py verify`。
+- 比赛演示与报告：`docs/competition/`；Knodo 配置：`docs/integrations/knodo/DEPLOYMENT_GUIDE.md`。

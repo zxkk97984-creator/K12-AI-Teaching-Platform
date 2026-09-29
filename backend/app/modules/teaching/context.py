@@ -145,6 +145,40 @@ def build_session_context(
     }
 
 
+def build_free_session_context(*, stage: str) -> dict[str, Any]:
+    """Build a safe, source-free context for an unconstrained student chat.
+
+    Free conversations deliberately have no chapter knowledge or clickable
+    resources. The Tutor still receives the same contract shape and can answer
+    general AI/programming questions using its configured Knodo knowledge.
+    """
+
+    return {
+        "chapter": {
+            "id": "free-conversation",
+            "title": "自由对话",
+            "objective_ids": ["free-conversation"],
+        },
+        "curriculum_revision": "free-conversation:v1",
+        "policy_revision": POLICY_REVISION,
+        "knowledge_context": [],
+        "allowed_actions": ["OFFER_QUIZ"],
+        "allowed_resource_ids": [],
+        "allowed_animation_ids": [],
+        "allowed_code_task_ids": [],
+        "allowed_phase_suggestions": ["ORIENT", "EXPLAIN", "CHECK", "PRACTICE", "REFLECT"],
+        "limits": {
+            "max_quiz_questions": 3,
+            "allowed_difficulties": ["EASY", "MEDIUM"],
+            "max_reply_chars": 1200,
+        },
+        "allowed_source_ids": [],
+        "allowed_evidence_ids": [],
+        "fixture_notice": FIXTURE_NOTICE,
+        "learner_stage": stage,
+    }
+
+
 def load_fixture_allowance() -> dict[str, Any]:
     """Dev/test allowance taken from the frozen synthetic example (T10 fixture)."""
 

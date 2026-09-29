@@ -221,6 +221,44 @@ async def make_published(rctx, token: str, *, slug: str, kind: str, revision_id,
     return resource_id
 
 
+# --------------------------------------------------------------------------- admin catalogue
+@pytest.mark.asyncio
+async def test_admin_resource_list_filters_and_paginates_without_storage_keys(rctx) -> None:
+    assert (await rctx.client.get("/api/v1/admin/resources")).status_code == 401
+    token = await as_admin(rctx)
+    first = await register(rctx, token, slug="catalog-alpha", kind="WORD", stage="JUNIOR")
+    second = await register(rctx, token, slug="catalog-beta", kind="PDF", stage="SENIOR")
+    assert first.status_code == second.status_code == 201
+    changed = await rctx.client.patch(
+        f"/api/v1/admin/resources/{second.json()['id']}",
+        json={"review_status": "HUMAN_APPROVED"},
+        headers=auth_headers(token),
+    )
+    assert changed.status_code == 200, changed.text
+
+    all_rows = await rctx.client.get("/api/v1/admin/resources")
+    assert all_rows.status_code == 200
+    assert all_rows.json()["total"] == 2
+    assert [item["slug"] for item in all_rows.json()["items"]] == ["catalog-alpha", "catalog-beta"]
+    assert "storage_key" not in all_rows.text
+    first_page = await rctx.client.get("/api/v1/admin/resources?limit=1&offset=1")
+    assert first_page.json()["total"] == 2
+    assert first_page.json()["items"][0]["slug"] == "catalog-beta"
+    for query, expected in (
+        ("q=alpha", "catalog-alpha"),
+        ("kind=PDF", "catalog-beta"),
+        ("stage=JUNIOR", "catalog-alpha"),
+        ("status=UNREVIEWED", "catalog-alpha"),
+        ("status=HUMAN_APPROVED", "catalog-beta"),
+    ):
+        response = await rctx.client.get(f"/api/v1/admin/resources?{query}")
+        assert response.status_code == 200, response.text
+        assert response.json()["total"] == 1
+        assert response.json()["items"][0]["slug"] == expected
+    assert (await rctx.client.get("/api/v1/admin/resources?limit=0")).status_code == 422
+    assert (await rctx.client.get("/api/v1/admin/resources?status=INVALID")).status_code == 422
+
+
 # --------------------------------------------------------------------------- R1
 @pytest.mark.asyncio
 async def test_r1_metadata_links_are_complete_and_keys_stay_internal(rctx, content_session) -> None:

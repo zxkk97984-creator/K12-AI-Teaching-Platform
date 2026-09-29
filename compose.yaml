@@ -39,6 +39,9 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+    env_file:
+      - path: ${K12_RUNTIME_ENV_FILE:?Run ./k12 setup first}
+        required: true
     environment:
       APP_ENV: ${APP_ENV:-development}
       DATABASE_URL: postgresql+asyncpg://k12r1_app:${POSTGRES_DEV_PASSWORD}@postgres-dev:5432/k12r1_dev
@@ -46,18 +49,18 @@ services:
       APP_SESSION_SECRET: ${APP_SESSION_SECRET:?APP_SESSION_SECRET is required}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://127.0.0.1:15173}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
-      GATEWAY_MODE: ${GATEWAY_MODE:-disabled}
-      TEACHING_AUTORUN: ${TEACHING_AUTORUN:-false}
-      AUTHORING_AUTORUN: ${AUTHORING_AUTORUN:-false}
       CODELAB_RUNNER_URL: ${CODELAB_RUNNER_URL:-}
       CODELAB_RUNNER_TOKEN: ${CODELAB_RUNNER_TOKEN:-}
+      KNODO_BUDGET_LEDGER_PATH: /app/backend/storage/private/knodo-runtime-budget.json
       RESOURCE_STORAGE_ROOT: /app/backend/storage/resources
       AUTHORING_ARTIFACT_ROOT: /app/backend/storage/authoring
       AUTHORING_BUNDLE_ROOT: /app/backend/storage/authoring-bundles
     ports:
       - "127.0.0.1:18081:18081"
     volumes:
-      - k12r1-app-storage:/app/backend/storage
+      - type: bind
+        source: ${K12_RUNTIME_STORAGE_ROOT:?K12_RUNTIME_STORAGE_ROOT is required}
+        target: /app/backend/storage
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -74,23 +77,28 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     command: ["python", "-m", "app.jobs.worker"]
+    env_file:
+      - path: ${K12_RUNTIME_ENV_FILE:?Run ./k12 setup first}
+        required: true
     environment:
       APP_ENV: ${APP_ENV:-development}
       DATABASE_URL: postgresql+asyncpg://k12r1_app:${POSTGRES_DEV_PASSWORD}@postgres-dev:5432/k12r1_dev
       TEST_DATABASE_URL: postgresql+asyncpg://k12r1_test:${POSTGRES_TEST_PASSWORD}@postgres-test:5432/k12r1_test
       APP_SESSION_SECRET: ${APP_SESSION_SECRET:?APP_SESSION_SECRET is required}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://127.0.0.1:15173}
-      GATEWAY_MODE: ${GATEWAY_MODE:-disabled}
       TEACHING_AUTORUN: "false"
       AUTHORING_AUTORUN: "false"
       CODELAB_RUNNER_URL: ${CODELAB_RUNNER_URL:-}
       CODELAB_RUNNER_TOKEN: ${CODELAB_RUNNER_TOKEN:-}
+      KNODO_BUDGET_LEDGER_PATH: /app/backend/storage/private/knodo-runtime-budget.json
       RESOURCE_STORAGE_ROOT: /app/backend/storage/resources
       AUTHORING_ARTIFACT_ROOT: /app/backend/storage/authoring
       AUTHORING_BUNDLE_ROOT: /app/backend/storage/authoring-bundles
       WORKER_POLL_SECONDS: ${WORKER_POLL_SECONDS:-1}
     volumes:
-      - k12r1-app-storage:/app/backend/storage
+      - type: bind
+        source: ${K12_RUNTIME_STORAGE_ROOT:?K12_RUNTIME_STORAGE_ROOT is required}
+        target: /app/backend/storage
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -114,5 +122,3 @@ volumes:
     name: k12r1-postgres-dev-data
   k12r1-postgres-test-data:
     name: k12r1-postgres-test-data
-  k12r1-app-storage:
-    name: k12r1-app-storage

@@ -31,7 +31,16 @@ lease cleanup. Test containers use synthetic code and labels only. The test
 cleanup removes only the exact containers it creates; it never invokes
 `docker prune`.
 
-The local controls are necessary constraints, not an absolute security
-certification. Do not expose this launcher as a public arbitrary-code API
-until T28 and deployment review verify the remaining identity, storage,
-resource, and operational boundaries.
+For the competition demo, build the pinned image and start the loopback control
+plane in a separate terminal:
+
+```text
+./scripts/build-runner.sh
+RUNNER_CONTROL_TOKEN=<local-random-token> ./scripts/codelab-runner-server.sh
+```
+
+Configure the API with `CODELAB_RUNNER_URL=http://127.0.0.1:18090` and the same
+value as `CODELAB_RUNNER_TOKEN`. The API never receives Docker access. If the
+runner is not configured, CodeLab keeps the draft and reports
+`RUNNER_UNAVAILABLE`; that state is a platform failure and is not counted as a
+student mistake.

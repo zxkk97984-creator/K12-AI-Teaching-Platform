@@ -1,2 +1,0 @@
-PASS: 38任务，DAG无环，任务/规格引用存在，JSON/Python语法与Skill契约一致。
-这不是未来K12应用测试，也没有调用Knodo、运行Docker或写入目标电脑。

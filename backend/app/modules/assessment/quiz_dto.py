@@ -46,6 +46,12 @@ def question_public(
         payload["options"] = list(question.options or [])
     elif question.type == "TRUE_FALSE":
         payload["options"] = list(TRUE_FALSE_OPTIONS)
+    elif question.type == "CODE":
+        payload["code_task_revision_id"] = (
+            str(question.code_task_revision_id) if question.code_task_revision_id else None
+        )
+        payload["code_snapshot"] = dict(question.code_snapshot or {})
+        payload["is_demo"] = question.is_demo
     else:
         payload["items"] = list(question.items or [])
 
@@ -86,8 +92,13 @@ def session_public(
     )
     return {
         "id": str(session.id),
-        "chapter_id": str(session.chapter_id),
-        "revision_id": str(session.revision_id),
+        "chapter_id": str(session.chapter_id) if session.chapter_id else None,
+        "revision_id": str(session.revision_id) if session.revision_id else None,
+        "source_conversation_id": str(session.source_conversation_id)
+        if session.source_conversation_id
+        else None,
+        "source_message_id": str(session.source_message_id) if session.source_message_id else None,
+        "source_title": session.source_title,
         "curriculum_revision": session.curriculum_revision,
         "stage": session.stage,
         "status": session.status,
@@ -100,6 +111,7 @@ def session_public(
         "scoring_version": session.scoring_version,
         "thresholds_version": session.thresholds_version,
         "base_revision": session.base_revision,
+        "is_favorite": session.is_favorite,
         "created_at": session.created_at.isoformat(),
         "completed_at": session.completed_at.isoformat() if session.completed_at else None,
         "progress": {

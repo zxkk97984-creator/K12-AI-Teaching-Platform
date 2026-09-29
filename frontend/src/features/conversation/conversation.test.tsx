@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const navigate = vi.fn();
@@ -11,6 +11,7 @@ vi.mock("./api", () => ({
   createSession: vi.fn(),
   createTurn: vi.fn(),
   cancelRun: vi.fn(),
+  getRun: vi.fn(),
   subscribeRun: vi.fn(),
 }));
 
@@ -81,6 +82,16 @@ function runWith(status: RunDTO["status"], runCard: CardDTO | null = null): RunD
   };
 }
 
+const detailWithUnansweredQuestion: SessionDetail = {
+  ...detail,
+  messages: [...detail.messages, {
+    id: "77777777-7777-7777-7777-777777777777",
+    run_id: "55555555-5555-5555-5555-555555555555",
+    role: "USER", content_markdown: "刚才没有回答的问题", card: null,
+    created_at: "2026-09-19T00:00:02Z",
+  }],
+};
+
 beforeEach(() => {
   vi.mocked(contentApi.listCourses).mockResolvedValue({
     items: [
@@ -117,6 +128,105 @@ afterEach(() => {
 });
 
 describe("ConversationPage", () => {
+  it.each([
+    ["VALIDATION", "回复格式未通过检查，请重新提问。"],
+    ["UNKNOWN", "老师服务暂时出错，请稍后再试。"],
+    ["TIMEOUT", "回复超时，请重新提问。"],
+  ])("explains a failed %s run without exposing its error category", async (category, message) => {
+    vi.mocked(api.getSession).mockResolvedValueOnce(detail).mockResolvedValue(detailWithUnansweredQuestion);
+    vi.mocked(api.createTurn).mockResolvedValue({ run: runWith("QUEUED") });
+    render(<ConversationPage search={`?session=${summary.id}`} />);
+
+    const composer = await screen.findByLabelText("想对老师说什么");
+    fireEvent.change(composer, { target: { value: "刚才没有回答的问题" } });
+    fireEvent.click(screen.getByTestId("send-turn"));
+    await waitFor(() => expect(api.subscribeRun).toHaveBeenCalledOnce());
+    act(() => vi.mocked(api.subscribeRun).mock.calls[0][1].onUpdate({ ...runWith("FAILED"), error_category: category }));
+
+    await waitFor(() => expect(screen.getByTestId("run-status").textContent).toContain(message));
+    expect(screen.getByTestId("run-status").textContent).not.toContain(category);
+  });
+
+  it("restores a failed question into an empty composer only on click, without resending it", async () => {
+    vi.mocked(api.getSession).mockResolvedValueOnce(detail).mockResolvedValue(detailWithUnansweredQuestion);
+    vi.mocked(api.createTurn).mockResolvedValue({ run: runWith("QUEUED") });
+    render(<ConversationPage search={`?session=${summary.id}`} />);
+
+    const composer = await screen.findByLabelText("想对老师说什么") as HTMLTextAreaElement;
+    fireEvent.change(composer, { target: { value: "刚才没有回答的问题" } });
+    fireEvent.click(screen.getByTestId("send-turn"));
+    await waitFor(() => expect(api.subscribeRun).toHaveBeenCalledOnce());
+    act(() => vi.mocked(api.subscribeRun).mock.calls[0][1].onUpdate({ ...runWith("FAILED"), error_category: "VALIDATION" }));
+
+    const restore = await screen.findByRole("button", { name: "放回输入框" }) as HTMLButtonElement;
+    expect(composer.value).toBe("");
+    expect(api.createTurn).toHaveBeenCalledOnce();
+
+    fireEvent.change(composer, { target: { value: "我正在写的新问题" } });
+    expect(restore.disabled).toBe(true);
+    expect(composer.value).toBe("我正在写的新问题");
+    fireEvent.change(composer, { target: { value: "" } });
+    fireEvent.click(restore);
+    expect(composer.value).toBe("刚才没有回答的问题");
+    expect(document.activeElement).toBe(composer);
+    expect(api.createTurn).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("button", { name: "放回输入框" })).toBeNull();
+    expect(screen.queryByText(/输入框中有草稿/)).toBeNull();
+
+    fireEvent.click(screen.getByTestId("send-turn"));
+    await waitFor(() => expect(api.createTurn).toHaveBeenCalledTimes(2));
+  });
+
+  it("does not offer to restore a newer question from another run", async () => {
+    vi.mocked(api.getSession).mockResolvedValueOnce(detail).mockResolvedValue({
+      ...detailWithUnansweredQuestion,
+      messages: [...detailWithUnansweredQuestion.messages.slice(0, -1), {
+        ...detailWithUnansweredQuestion.messages.at(-1)!,
+        run_id: "88888888-8888-8888-8888-888888888888",
+      }],
+    });
+    vi.mocked(api.createTurn).mockResolvedValue({ run: runWith("QUEUED") });
+    render(<ConversationPage search={`?session=${summary.id}`} />);
+
+    const composer = await screen.findByLabelText("想对老师说什么");
+    fireEvent.change(composer, { target: { value: "原来的问题" } });
+    fireEvent.click(screen.getByTestId("send-turn"));
+    await waitFor(() => expect(api.subscribeRun).toHaveBeenCalledOnce());
+    act(() => vi.mocked(api.subscribeRun).mock.calls[0][1].onUpdate({ ...runWith("FAILED"), error_category: "UNKNOWN" }));
+
+    await waitFor(() => expect(screen.getByTestId("run-status").textContent).toContain("老师服务暂时出错"));
+    expect(screen.queryByRole("button", { name: "放回输入框" })).toBeNull();
+  });
+
+  it("waits for a linked session before accepting a draft", async () => {
+    let finishSelection: ((value: SessionDetail) => void) | undefined;
+    vi.mocked(api.getSession).mockReturnValue(new Promise((resolve) => { finishSelection = resolve; }));
+    render(<ConversationPage search={`?session=${summary.id}`} />);
+
+    await waitFor(() => expect(api.getSession).toHaveBeenCalledWith(summary.id));
+    expect(screen.queryByLabelText("想对老师说什么")).toBeNull();
+    expect(screen.getByText("正在打开对话…")).toBeTruthy();
+
+    await act(async () => { finishSelection?.(detail); });
+    const composer = await screen.findByLabelText("想对老师说什么") as HTMLTextAreaElement;
+    fireEvent.change(composer, { target: { value: "这是什么？" } });
+    expect(composer.value).toBe("这是什么？");
+    expect((screen.getByTestId("send-turn") as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("keeps a failed linked session closed until retry succeeds", async () => {
+    vi.mocked(api.getSession)
+      .mockRejectedValueOnce(new Error("暂时无法读取对话"))
+      .mockResolvedValueOnce(detail);
+    render(<ConversationPage search={`?session=${summary.id}`} />);
+
+    await waitFor(() => expect(screen.getByTestId("conversation-error").textContent).toContain("暂时无法读取对话"));
+    expect(screen.queryByLabelText("想对老师说什么")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "重新读取状态" }));
+    await screen.findByLabelText("想对老师说什么");
+    expect(api.getSession).toHaveBeenCalledTimes(2);
+  });
+
   it("shows real history and the stored validated card", async () => {
     window.history.replaceState({}, "", `/conversations?session=${summary.id}`);
     render(<ConversationPage />);
@@ -146,14 +256,45 @@ describe("ConversationPage", () => {
     await waitFor(() => expect(api.createTurn).toHaveBeenCalled());
 
     const handlers = vi.mocked(api.subscribeRun).mock.calls.at(-1)?.[1];
-    handlers?.onUpdate(runWith("RUNNING"));
+    handlers?.onUpdate({ ...runWith("RUNNING"), draft_markdown: "未验证的课程答案" });
     await waitFor(() => expect(screen.getByTestId("run-status").textContent).toContain("正在生成"));
+    expect(screen.queryByTestId("streaming-message")).toBeNull();
     handlers?.onUpdate(runWith("SUCCEEDED", card));
     await waitFor(() =>
       expect(vi.mocked(api.getSession).mock.calls.length).toBeGreaterThanOrEqual(2),
     );
     await waitFor(() => expect(screen.getByTestId("run-status").textContent).toContain("已完成"));
     expect(screen.queryByTestId("cancel-run")).toBeNull();
+  });
+
+  it("hands off a streamed answer to the final card without a blank or duplicate", async () => {
+    vi.mocked(api.createTurn).mockResolvedValue({ run: runWith("QUEUED") });
+    const freeDetail: SessionDetail = { ...detail, chapter_id: null, chapter_title: null, conversation_type: "FREE" };
+    vi.mocked(api.getSession).mockResolvedValue(freeDetail);
+    window.history.replaceState({}, "", `/conversations?session=${summary.id}`);
+    render(<ConversationPage />);
+    await screen.findByLabelText("想对老师说什么");
+
+    fireEvent.change(screen.getByLabelText("想对老师说什么"), { target: { value: "请解释条件语句" } });
+    fireEvent.click(screen.getByTestId("send-turn"));
+    await waitFor(() => expect(api.subscribeRun).toHaveBeenCalledOnce());
+    const handlers = vi.mocked(api.subscribeRun).mock.calls[0][1];
+    act(() => handlers.onUpdate({ ...runWith("RUNNING"), draft_markdown: "如果条件成立，就执行这一步。" }));
+
+    expect(screen.getByTestId("streaming-message").textContent).toContain("如果条件成立");
+    expect(screen.getByTestId("streaming-message").textContent).toContain("正在回复");
+    await waitFor(() => expect(api.getSession).toHaveBeenCalledTimes(2));
+    let finishRefresh!: (value: SessionDetail) => void;
+    const refreshed = new Promise<SessionDetail>((resolve) => { finishRefresh = resolve; });
+    vi.mocked(api.getSession).mockReturnValueOnce(refreshed);
+    act(() => handlers.onUpdate({ ...runWith("SUCCEEDED", card), result_message_id: "final-message" }));
+    await waitFor(() => expect(screen.queryByTestId("streaming-message")).toBeNull());
+    expect(screen.getAllByTestId("assistant-card")).toHaveLength(2);
+    await act(async () => finishRefresh({ ...freeDetail, messages: [...freeDetail.messages, {
+      id: "final-message", role: "ASSISTANT", content_markdown: card.message_markdown,
+      card, created_at: "2026-09-19T00:00:02Z",
+    }] }));
+    expect(screen.getAllByTestId("assistant-card")).toHaveLength(2);
   });
 
   it("keeps the draft and explains the failure when a turn is rejected", async () => {

@@ -14,7 +14,7 @@
  * a verdict: `feedback` only exists once the server has scored an attempt.
  */
 
-export type QuestionType = "SINGLE_CHOICE" | "TRUE_FALSE" | "ORDERING";
+export type QuestionType = "SINGLE_CHOICE" | "TRUE_FALSE" | "ORDERING" | "CODE";
 
 export type QuizStatus = "ACTIVE" | "COMPLETED";
 
@@ -50,6 +50,16 @@ export type QuizQuestionDTO = {
   max_attempts: number;
   options?: ChoiceOption[];
   items?: OrderingItem[];
+  code_task_revision_id?: string | null;
+  code_snapshot?: {
+    task_id?: string;
+    task_revision?: number;
+    title?: string;
+    description?: string;
+    starter_code?: string;
+    examples?: Array<Record<string, unknown>>;
+  };
+  is_demo?: boolean;
   /** Present only after the server scored at least one attempt. */
   feedback?: QuestionFeedback;
 };
@@ -58,8 +68,11 @@ export type QuizProgress = { answered: number; correct: number; total: number };
 
 export type QuizSessionDTO = {
   id: string;
-  chapter_id: string;
-  revision_id: string;
+  chapter_id: string | null;
+  revision_id: string | null;
+  source_conversation_id?: string | null;
+  source_message_id?: string | null;
+  source_title?: string;
   curriculum_revision: string;
   stage: string;
   status: QuizStatus;
@@ -72,12 +85,35 @@ export type QuizSessionDTO = {
   scoring_version: string;
   thresholds_version: string;
   base_revision: number;
+  current_position?: number;
+  drafts?: Record<string, { answer: QuizAnswer; revision: number; updated_at: string }>;
+  last_submitted_answers?: Record<string, QuizAnswer>;
   created_at: string;
   completed_at: string | null;
   progress: QuizProgress;
   questions: QuizQuestionDTO[];
   notices: string[];
+  title?: string;
+  has_code?: boolean;
+  is_favorite?: boolean;
 };
+
+export type QuizSessionListDTO = { items: QuizSessionDTO[]; total: number };
+
+/** Answer-free projection for the home page's recent practice list. */
+export type QuizSessionSummaryDTO = {
+  id: string;
+  chapter_id: string | null;
+  source_conversation_id?: string | null;
+  title: string;
+  status: QuizStatus;
+  progress: QuizProgress;
+  created_at: string;
+  completed_at: string | null;
+  is_favorite?: boolean;
+};
+
+export type QuizSessionSummaryListDTO = { items: QuizSessionSummaryDTO[]; total: number };
 
 export type AnswerResultDTO = {
   outcome: string;
@@ -117,6 +153,35 @@ export type QuizReviewDTO = {
   notice: string;
 };
 
+/** Completed-session result calculated and returned by the server. */
+export type QuizResultDTO = {
+  source_conversation_id?: string | null;
+  session_id: string;
+  status: "COMPLETED";
+  scoring_version: string;
+  correct: number;
+  first_correct: number;
+  total: number;
+  score_percent: number;
+  completed_at: string | null;
+  questions: Array<{
+    id: string;
+    position: number;
+    type: QuestionType;
+    stem: string;
+    first_answer: QuizAnswer | null;
+    last_answer: QuizAnswer | null;
+    first_correct: boolean | null;
+    is_correct: boolean | null;
+    attempts_used: number;
+    hints_used: number;
+    correct_answer: unknown;
+    explanation: string;
+    source_refs: SourceRef[];
+    code_result: unknown;
+  }>;
+};
+
 /** The three accepted JSON shapes for `answer` (T16 scoring contract). */
 export type QuizAnswer = string | boolean | string[];
 
@@ -124,6 +189,7 @@ export const QUESTION_TYPE_LABEL: Record<QuestionType, string> = {
   SINGLE_CHOICE: "单选",
   TRUE_FALSE: "判断",
   ORDERING: "排序",
+  CODE: "编程",
 };
 
 export const DIFFICULTY_LABEL: Record<string, string> = {

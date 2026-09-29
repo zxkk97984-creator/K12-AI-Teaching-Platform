@@ -1,4 +1,6 @@
+import { useEffect, useRef } from "react";
 import type { ChapterDetailDTO, RenderedBlock, UnknownBlockDTO } from "./types";
+import type { ReadingStateDTO } from "./types";
 import { isUnsupportedBlock } from "./types";
 import "./content.css";
 
@@ -16,8 +18,14 @@ function MarkedText({ text, mark }: { text: string; mark?: string | null }) {
 
 function UnsupportedBlock({ block }: { block: UnknownBlockDTO }) {
   return (
-    <div className="content-block__unsupported" role="note" data-testid="unsupported-block">
-      <p className="content-block__unsupported-title">内容块未支持（{block.block_id}）</p>
+    <div
+      className="content-block__unsupported"
+      role="note"
+      data-testid="unsupported-block"
+    >
+      <p className="content-block__unsupported-title">
+        内容块未支持（{block.block_id}）
+      </p>
       <p className="content-note">{block.reason}</p>
     </div>
   );
@@ -26,14 +34,18 @@ function UnsupportedBlock({ block }: { block: UnknownBlockDTO }) {
 function FigureBlock({ block }: { block: RenderedBlock }) {
   return (
     <figure className="content-figure">
-      <div className="content-figure__placeholder" role="img" aria-label={block.alt ?? "图解"}>
+      <div
+        className="content-figure__placeholder"
+        role="img"
+        aria-label={block.alt ?? "图解"}
+      >
         <p className="content-figure__alt">{block.alt}</p>
       </div>
       <figcaption className="content-figure__caption">
         {block.caption}
         {block.src ? (
           <span className="content-figure__pending">
-            （图片资源 {block.src} 将在 T20 资源任务接通后显示；当前只渲染无障碍描述）
+            （图片资源 {block.src} 暂不可显示，以下为图片描述）
           </span>
         ) : null}
       </figcaption>
@@ -68,7 +80,9 @@ function BlockBody({ block }: { block: RenderedBlock }) {
           <p className="content-kc__text">{block.text}</p>
           {block.example ? (
             <p className="content-kc__example">
-              <span className="content-kc__example-label">{block.example.label}：</span>
+              <span className="content-kc__example-label">
+                {block.example.label}：
+              </span>
               {block.example.text}
             </p>
           ) : null}
@@ -85,9 +99,17 @@ function BlockBody({ block }: { block: RenderedBlock }) {
       return <FigureBlock block={block} />;
     default:
       return (
-        <div className="content-block__unsupported" role="note" data-testid="unsupported-block">
-          <p className="content-block__unsupported-title">未知内容块（{block.block_id}）</p>
-          <p className="content-note">该类型不在当前阅读器支持范围内，已保留位置但不渲染原始内容。</p>
+        <div
+          className="content-block__unsupported"
+          role="note"
+          data-testid="unsupported-block"
+        >
+          <p className="content-block__unsupported-title">
+            未知内容块（{block.block_id}）
+          </p>
+          <p className="content-note">
+            该类型不在当前阅读器支持范围内，已保留位置但不渲染原始内容。
+          </p>
         </div>
       );
   }
@@ -95,11 +117,57 @@ function BlockBody({ block }: { block: RenderedBlock }) {
 
 export function ChapterReader({
   chapter,
+  resume,
+  onReadPosition,
   onSelect,
+  locationHash,
 }: {
   chapter: ChapterDetailDTO;
+  resume?: ReadingStateDTO | null;
+  onReadPosition?: (blockId: string | null) => void;
   onSelect?: (blockId: string | null, selectedText: string) => void;
+  locationHash?: string;
 }) {
+  const readerRef = useRef<HTMLElement | null>(null);
+  const restoringRef = useRef(false);
+  useEffect(() => {
+    let hash = (locationHash ?? window.location.hash).replace(/^#/, "");
+    try {
+      hash = decodeURIComponent(hash);
+    } catch {
+      // An invalid hash is ignored; the server-provided resume remains usable.
+    }
+    const requestedBlock = hash || (resume?.is_current_revision ? resume.block_id : null);
+    if (!requestedBlock) return;
+    restoringRef.current = true;
+    const frame = requestAnimationFrame(() => {
+      const target = Array.from(
+        readerRef.current?.querySelectorAll<HTMLElement>("[data-block-id]") ?? [],
+      ).find((node) => node.dataset.blockId === requestedBlock);
+      target?.scrollIntoView({ block: "center", behavior: "auto" });
+      restoringRef.current = false;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [chapter.revision_id, resume, locationHash]);
+
+  useEffect(() => {
+    if (!onReadPosition || typeof IntersectionObserver === "undefined") return;
+    const nodes = Array.from(
+      readerRef.current?.querySelectorAll<HTMLElement>("[data-block-id]") ?? [],
+    );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (restoringRef.current) return;
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0];
+        if (visible) onReadPosition(visible.target.getAttribute("data-block-id"));
+      },
+      { root: null, rootMargin: "-18% 0px -62% 0px", threshold: 0 },
+    );
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, [chapter.revision_id, onReadPosition]);
   function handleSelection() {
     if (!onSelect) return;
     const selection = window.getSelection();
@@ -117,6 +185,7 @@ export function ChapterReader({
 
   return (
     <article
+      ref={readerRef}
       className="content-reader"
       data-testid="chapter-reader"
       data-revision={chapter.revision}
@@ -128,7 +197,9 @@ export function ChapterReader({
         <h1 className="content-reader__title">{chapter.title}</h1>
         <p className="content-reader__meta" data-testid="chapter-meta">
           版本 r{chapter.revision} ·{" "}
-          {chapter.is_test_fixture ? "测试内容，未作人工教学审校" : "正式发布内容"}
+          {chapter.is_test_fixture
+            ? "测试内容，未作人工教学审校"
+            : "正式发布内容"}
         </p>
       </header>
 
@@ -143,17 +214,29 @@ export function ChapterReader({
 
       <div className="content-reader__blocks">
         {chapter.blocks.map((block) => (
-          <div className="content-block" data-block-id={block.block_id} key={block.block_id}>
-            {isUnsupportedBlock(block) ? <UnsupportedBlock block={block} /> : <BlockBody block={block} />}
+          <div
+            className="content-block"
+            id={block.block_id}
+            data-block-id={block.block_id}
+            key={block.block_id}
+          >
+            {isUnsupportedBlock(block) ? (
+              <UnsupportedBlock block={block} />
+            ) : (
+              <BlockBody block={block} />
+            )}
           </div>
         ))}
       </div>
 
       <footer className="content-reader__source">
         <p className="eyebrow">来源</p>
-        <p className="content-note">许可：{chapter.license_code} · 版本号：r{chapter.revision}</p>
         <p className="content-note">
-          来源：{sourcePath ?? "未登记路径"} · {sourceCommit ? sourceCommit.slice(0, 12) : "未登记 commit"}
+          许可：{chapter.license_code} · 版本号：r{chapter.revision}
+        </p>
+        <p className="content-note">
+          来源：{sourcePath ?? "未登记路径"} ·{" "}
+          {sourceCommit ? sourceCommit.slice(0, 12) : "未登记 commit"}
         </p>
         <p className="content-note">
           知识点：

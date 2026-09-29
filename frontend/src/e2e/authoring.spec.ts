@@ -19,14 +19,14 @@ const student = {
   password: process.env.E2E_T22_STUDENT_PASSWORD ?? "",
 };
 const revisionId = process.env.E2E_T22_REVISION ?? "";
-const EVIDENCE = "docs/acceptance/t30-evidence";
+const EVIDENCE = "test-results/screenshots";
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");
   await page.getByLabel("用户名").fill(account.username);
   await page.getByLabel("密码").fill(account.password);
   await page.getByRole("button", { name: "登录" }).click();
-  await expect(page).toHaveURL(/\/(settings|onboarding|conversations)$/);
+  await expect(page).toHaveURL(/\/(settings|onboarding|conversations|admin\/resources)$/);
 }
 
 test("designer draft → human approval → publish, and a student is locked out", async ({

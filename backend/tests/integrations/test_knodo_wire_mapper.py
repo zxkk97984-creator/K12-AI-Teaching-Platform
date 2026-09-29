@@ -124,6 +124,11 @@ async def test_first_turn_maps_only_documented_fields_and_fixed_role_target(
     assert sent.payload == {
         "messages": [{"role": "user", "content": sent.payload["messages"][0]["content"]}],
         "stream": False,
+        "workspaceId": (
+            "tutor-workspace-synthetic"
+            if operation is Operation.TEACH_TURN
+            else "designer-workspace-synthetic"
+        ),
         "permissionMode": "default",
         "includeToolResults": False,
     }
@@ -166,6 +171,7 @@ async def test_continue_turn_uses_only_backend_supplied_conversation_id() -> Non
     assert outcome.error is None
     sent = transport.requests[0][0]
     assert sent.payload["conversationId"] == "conv_backend_owned_002"
+    assert sent.payload["workspaceId"] == "tutor-workspace-synthetic"
     encoded_local_request = json.loads(
         sent.payload["messages"][0]["content"].split("REQUEST_JSON:\n", 1)[1]
     )

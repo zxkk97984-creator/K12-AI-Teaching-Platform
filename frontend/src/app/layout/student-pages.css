@@ -1,0 +1,911 @@
+/* Student pages — shared by the standalone prototype and React source.
+   Keep the existing conversation and companion layouts in their own styles. */
+:root {
+  --student-ink: #202124;
+  --student-muted: #575b60;
+  --student-line: #e2e2df;
+  --student-soft: #f7f7f6;
+  --student-selected: #eff0ee;
+  --student-radius: 12px;
+  --student-reading: 780px;
+}
+
+body .prototype-app .home-reason {
+  margin: 12px 0 0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--student-line);
+  color: var(--student-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+body .prototype-app .settings-link.active {
+  background: var(--student-selected);
+  color: var(--student-ink);
+  font-weight: 650;
+}
+
+/* Page rhythm and headings */
+body .prototype-app .prototype-content:not(.chat-content) {
+  max-width: 1220px;
+  padding-top: 48px;
+  padding-bottom: 88px;
+}
+body .prototype-app .page-heading,
+body .app-shell:not(.prototype-app) :is(.study-heading,.practice-header,.growth-header,.lesson-header,.resource-library-header,.animation-header,.codelab-header) {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--student-line);
+}
+body .prototype-app .page-heading h2,
+body .app-shell:not(.prototype-app) :is(.study-heading,.practice-header,.growth-header,.lesson-header,.resource-library-header,.animation-header,.codelab-header) h1 {
+  margin: 8px 0;
+  font-size: clamp(28px, 2.7vw, 36px);
+  line-height: 1.35;
+  letter-spacing: -.025em;
+}
+body .prototype-app .page-description,
+body .app-shell:not(.prototype-app) :is(.study-heading,.practice-header,.growth-header,.lesson-header,.resource-library-header,.animation-header,.codelab-header) > p,
+body .app-shell:not(.prototype-app) .study-heading > div > p:last-child {
+  max-width: 64ch;
+  color: var(--student-muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+body .prototype-app .page-heading .eyebrow,
+body .app-shell:not(.prototype-app) :is(.study-heading,.practice-header,.growth-header) .eyebrow {
+  color: var(--student-muted);
+  font-size: 13px;
+  letter-spacing: .08em;
+}
+
+/* Learning hub: one clear next step, then a quiet library. */
+body .prototype-app .continue-panel,
+body .app-shell:not(.prototype-app) .study-continue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  min-height: 208px;
+  padding: 32px 40px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: var(--student-soft);
+  box-shadow: none;
+}
+body .prototype-app .continue-panel h3,
+body .app-shell:not(.prototype-app) .study-continue h2 {
+  max-width: 35ch;
+  margin: 8px 0 12px;
+  font-size: clamp(24px, 2.4vw, 30px);
+  line-height: 1.4;
+}
+body .prototype-app .continue-panel p,
+body .app-shell:not(.prototype-app) .study-continue p:last-child {
+  margin-bottom: 0;
+  color: var(--student-muted);
+  font-size: 16px;
+}
+body .prototype-app .section-heading,
+body .app-shell:not(.prototype-app) .study-section-heading {
+  align-items: baseline;
+  margin-bottom: 20px;
+}
+body .prototype-app .section-heading h3,
+body .app-shell:not(.prototype-app) .study-section-heading h2 {
+  font-size: 22px;
+  line-height: 1.4;
+}
+body .prototype-app .section-heading p,
+body .app-shell:not(.prototype-app) .k12-subtle {
+  color: var(--student-muted);
+  font-size: 14px;
+}
+body .app-shell:not(.prototype-app) .study-page {
+  width: min(1200px, 100%);
+  gap: 32px;
+  padding: 48px 0 80px;
+}
+body .app-shell:not(.prototype-app) .study-section {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body .prototype-app .resource-grid,
+body .app-shell:not(.prototype-app) .study-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+body .prototype-app .learning-card,
+body .app-shell:not(.prototype-app) .study-card {
+  display: flex;
+  min-width: 0;
+  min-height: 248px;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: #fff;
+  box-shadow: none;
+}
+body .prototype-app .card-body,
+body .app-shell:not(.prototype-app) .study-card-body {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+}
+body .prototype-app .card-body h3,
+body .app-shell:not(.prototype-app) .study-card h3 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+body .prototype-app .card-body p,
+body .app-shell:not(.prototype-app) .study-card-body > p:not(.study-card-kind) {
+  min-height: 0;
+  color: var(--student-muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+body .prototype-app .card-link,
+body .app-shell:not(.prototype-app) .study-card-actions {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--student-line);
+}
+body .app-shell:not(.prototype-app) .study-card-actions {
+  gap: 12px;
+}
+body .app-shell:not(.prototype-app) .study-open-link {
+  padding: 8px 0;
+  background: transparent;
+  color: var(--student-ink);
+  text-align: left;
+  font-size: 16px;
+}
+body .prototype-app .list-surface,
+body .app-shell:not(.prototype-app) .study-inline-list,
+body .app-shell:not(.prototype-app) .study-history {
+  border-top: 1px solid var(--student-line);
+  border-bottom: 1px solid var(--student-line);
+  border-radius: 0;
+  background: transparent;
+}
+body .app-shell:not(.prototype-app) .study-inline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: visible;
+}
+body .app-shell:not(.prototype-app) .study-bookmark-link {
+  width: 100%;
+  min-width: 0;
+  padding: 16px 8px;
+  border: 0;
+  border-bottom: 1px solid var(--student-line);
+  border-radius: 0;
+  background: transparent;
+}
+body .app-shell:not(.prototype-app) .study-bookmark-link:last-child {
+  border-bottom: 0;
+}
+body .prototype-app .library-row strong,
+body .app-shell:not(.prototype-app) .study-bookmark-link strong,
+body .app-shell:not(.prototype-app) .study-history-link {
+  font-size: 16px;
+  line-height: 1.5;
+}
+body .prototype-app .library-row .od-field > span,
+body .app-shell:not(.prototype-app) .study-bookmark-link .od-field > span,
+body .app-shell:not(.prototype-app) .study-history li > span {
+  color: var(--student-muted);
+  font-size: 14px;
+}
+
+/* One full-width bookshelf for saved and recently opened content. */
+body .prototype-app .shelf-section,
+body .app-shell:not(.prototype-app) .shelf-section {
+  width: 100%;
+  min-width: 0;
+}
+body .prototype-app .shelf-list,
+body .app-shell:not(.prototype-app) .shelf-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  border-block: 1px solid var(--student-line);
+}
+body .prototype-app .shelf-row,
+body .app-shell:not(.prototype-app) .shelf-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 80px;
+  padding: 16px 8px;
+  border: 0;
+  border-bottom: 1px solid var(--student-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--student-ink);
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+body .prototype-app .shelf-row:last-child,
+body .app-shell:not(.prototype-app) .shelf-row:last-child { border-bottom: 0; }
+body .prototype-app .shelf-row .od-field,
+body .app-shell:not(.prototype-app) .shelf-row .od-field { display: grid; gap: 4px; min-width: 0; }
+body .prototype-app .shelf-row strong,
+body .app-shell:not(.prototype-app) .shelf-row strong { display: block; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+body .prototype-app .shelf-row .od-field > span,
+body .app-shell:not(.prototype-app) .shelf-row .od-field > span { display: block; color: var(--student-muted); font-size: 14px; line-height: 1.5; }
+body .prototype-app .shelf-row-icon,
+body .app-shell:not(.prototype-app) .shelf-row-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 8px; background: var(--student-selected); color: var(--student-ink); }
+body .prototype-app .shelf-row-status,
+body .app-shell:not(.prototype-app) .shelf-row-status { display: block; color: var(--student-muted); font-size: 14px; white-space: nowrap; }
+body .app-shell:not(.prototype-app) .shelf-row:disabled { cursor: not-allowed; opacity: .65; }
+@media (hover: hover) {
+  body .prototype-app .shelf-row:hover,
+  body .app-shell:not(.prototype-app) .shelf-row:not(:disabled):hover { background: var(--student-selected); color: var(--student-ink); }
+}
+body .prototype-app .shelf-empty,
+body .app-shell:not(.prototype-app) .shelf-empty { display: grid; gap: 8px; min-height: 160px; align-content: center; padding: 24px; border: 1px dashed var(--student-line); border-radius: var(--student-radius); background: #fff; }
+body .prototype-app .shelf-empty strong,
+body .app-shell:not(.prototype-app) .shelf-empty strong { font-size: 18px; }
+body .prototype-app .shelf-empty p,
+body .app-shell:not(.prototype-app) .shelf-empty p { margin: 0; color: var(--student-muted); font-size: 16px; line-height: 1.6; }
+body .prototype-app .shelf-empty a,
+body .app-shell:not(.prototype-app) .shelf-empty a { width: fit-content; min-height: 44px; display: inline-flex; align-items: center; color: var(--student-ink); font-size: 16px; text-decoration: underline; }
+@media (max-width: 480px) {
+  body .prototype-app .shelf-row,
+  body .app-shell:not(.prototype-app) .shelf-row { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px 12px; }
+  body .prototype-app .shelf-row-icon,
+  body .app-shell:not(.prototype-app) .shelf-row-icon { grid-row: 1 / span 2; }
+  body .prototype-app .shelf-row-status,
+  body .app-shell:not(.prototype-app) .shelf-row-status { grid-column: 2; font-size: 12px; }
+}
+body .prototype-app .empty-state,
+body .app-shell:not(.prototype-app) .study-empty {
+  padding: 32px;
+  border: 1px dashed var(--student-line);
+  border-radius: var(--student-radius);
+  background: var(--student-soft);
+}
+
+/* Resource discovery and detail */
+body .prototype-app .resource-controls,
+body .app-shell:not(.prototype-app) .study-page[data-testid="resource-center"] .k12-catalog-tools {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: var(--student-soft);
+}
+body .prototype-app .search-form,
+body .app-shell:not(.prototype-app) .study-search {
+  width: 100%;
+  max-width: 720px;
+}
+body .prototype-app .search-input,
+body .app-shell:not(.prototype-app) .study-search input {
+  min-height: 48px;
+  border: 1px solid var(--student-line);
+  background: #fff;
+}
+body .prototype-app .filters-line {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+body .prototype-app .filter-button,
+body .app-shell:not(.prototype-app) .k12-filters button {
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid var(--student-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--student-ink);
+}
+body .prototype-app .filter-button.selected,
+body .app-shell:not(.prototype-app) .k12-filters button[aria-pressed="true"] {
+  border-color: #d0d2cf;
+  background: var(--student-selected);
+  color: var(--student-ink);
+  font-weight: 700;
+}
+body .prototype-app .result-summary,
+body .app-shell:not(.prototype-app) .study-page[data-testid="resource-center"] .k12-subtle {
+  color: var(--student-muted);
+  font-size: 16px;
+}
+body .prototype-app .resource-grid.list-view {
+  grid-template-columns: 1fr;
+}
+body .prototype-app .list-view .learning-card {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+  grid-template-rows: auto;
+  align-items: center;
+}
+body .app-shell:not(.prototype-app) .resource-library {
+  max-width: 1040px;
+  padding: 48px 0 80px;
+}
+body .app-shell:not(.prototype-app) .resource-card {
+  padding: 32px;
+  gap: 20px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  box-shadow: none;
+}
+body .app-shell:not(.prototype-app) .resource-card h3 {
+  font-size: 24px;
+  line-height: 1.4;
+}
+body .app-shell:not(.prototype-app) .resource-desc {
+  color: var(--student-muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+body .app-shell:not(.prototype-app) .resource-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 20px 0;
+  border-block: 1px solid var(--student-line);
+}
+body .app-shell:not(.prototype-app) .resource-meta > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+body .app-shell:not(.prototype-app) .resource-meta dd,
+body .app-shell:not(.prototype-app) .resource-variants li {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+body .app-shell:not(.prototype-app) .resource-variants li {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--student-line);
+}
+body .app-shell:not(.prototype-app) .resource-player video {
+  width: 100%;
+  max-height: none;
+  height: auto;
+}
+
+/* Practice: progress, one question, then an explicit result. */
+body .prototype-app .tab-row,
+body .app-shell:not(.prototype-app) .practice-tabs {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 4px;
+  max-width: 100%;
+  margin: 0 0 24px;
+  padding: 4px;
+  border: 1px solid var(--student-line);
+  border-radius: 10px;
+  background: var(--student-soft);
+}
+body .prototype-app .tab-row .tab-button,
+body .app-shell:not(.prototype-app) .practice-tabs button {
+  min-height: 44px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--student-muted);
+  font-size: 16px;
+}
+body .prototype-app .tab-row .tab-button.selected,
+body .app-shell:not(.prototype-app) .practice-tabs button[data-active="true"] {
+  background: var(--student-selected);
+  color: var(--student-ink);
+  font-weight: 700;
+}
+body .prototype-app .practice-intro,
+body .app-shell:not(.prototype-app) .practice-starter {
+  width: 100%;
+  max-width: none;
+  padding: 36px 40px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: var(--student-soft);
+  box-shadow: none;
+}
+body .prototype-app .practice-guide {
+  margin-top: 48px;
+}
+body .prototype-app .quiz-layout {
+  grid-template-columns: 216px minmax(0, 1fr);
+  gap: 24px;
+}
+body .prototype-app .question-navigator {
+  position: sticky;
+  top: 24px;
+  padding: 24px;
+  border: 1px solid var(--student-line);
+  background: var(--student-soft);
+}
+body .prototype-app .question-panel,
+body .app-shell:not(.prototype-app) .quiz-card {
+  min-width: 0;
+  padding: 32px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: #fff;
+}
+body .prototype-app .question-panel h3,
+body .app-shell:not(.prototype-app) .quiz-card__stem {
+  font-size: clamp(20px, 2vw, 24px);
+  line-height: 1.55;
+}
+body .prototype-app .answer-option,
+body .app-shell:not(.prototype-app) .quiz-choice {
+  min-height: 56px;
+  padding: 14px 16px;
+  border: 1px solid var(--student-line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--student-ink);
+  font-size: 16px;
+}
+body .prototype-app .answer-option.chosen,
+body .app-shell:not(.prototype-app) .quiz-choice:has(input:checked) {
+  border-color: #8a8e90;
+  background: var(--student-selected);
+}
+body .prototype-app .question-dots button.selected,
+body .app-shell:not(.prototype-app) .practice-step--current {
+  border: 1px solid #8a8e90;
+  background: var(--student-selected);
+  color: var(--student-ink);
+}
+body .app-shell:not(.prototype-app) .practice-page {
+  width: min(920px, 100%);
+  gap: 24px;
+  padding: 48px 0 80px;
+}
+body .app-shell:not(.prototype-app) .practice-session,
+body .app-shell:not(.prototype-app) .practice-history,
+body .app-shell:not(.prototype-app) .practice-result,
+body .app-shell:not(.prototype-app) .practice-review {
+  padding: 28px 32px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: #fff;
+  box-shadow: none;
+}
+body .app-shell:not(.prototype-app) .practice-steps {
+  padding: 16px 0;
+  border-block: 1px solid var(--student-line);
+}
+body .app-shell:not(.prototype-app) .practice-progress {
+  color: var(--student-ink);
+  font-size: 16px;
+}
+body .app-shell:not(.prototype-app) .quiz-card__meta,
+body .app-shell:not(.prototype-app) .quiz-card__note,
+body .app-shell:not(.prototype-app) .quiz-card__instruction {
+  color: var(--student-muted);
+  font-size: 14px;
+}
+body .app-shell:not(.prototype-app) .quiz-hints {
+  padding: 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--student-soft);
+}
+body .app-shell:not(.prototype-app) .practice-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--student-line);
+}
+body .app-shell:not(.prototype-app) .practice-history-item:last-child {
+  border-bottom: 0;
+}
+
+/* Growth: facts first, observations second, control of memories last. */
+body .prototype-app .stats-strip,
+body .app-shell:not(.prototype-app) .growth-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  padding: 28px 32px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: #fff;
+}
+body .prototype-app .stats-strip .od-stat,
+body .app-shell:not(.prototype-app) .growth-counts li {
+  min-width: 0;
+  padding: 0 20px;
+  border: 0;
+  border-right: 1px solid var(--student-line);
+  background: transparent;
+}
+body .prototype-app .stats-strip .od-stat:first-child,
+body .app-shell:not(.prototype-app) .growth-counts li:first-child {
+  padding-left: 0;
+}
+body .prototype-app .stats-strip .od-stat:last-child,
+body .app-shell:not(.prototype-app) .growth-counts li:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+body .prototype-app .stats-strip strong,
+body .app-shell:not(.prototype-app) .growth-counts strong {
+  color: var(--student-ink);
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+body .prototype-app .stats-strip .od-stat > span:last-child,
+body .app-shell:not(.prototype-app) .growth-counts span {
+  color: var(--student-muted);
+  font-size: 14px;
+}
+body .app-shell:not(.prototype-app) .growth-page {
+  width: min(1040px, 100%);
+  gap: 0;
+  padding: 48px 0 80px;
+}
+body .app-shell:not(.prototype-app) .growth-card {
+  margin: 0;
+  padding: 32px 0;
+  border: 0;
+  border-bottom: 1px solid var(--student-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body .app-shell:not(.prototype-app) .growth-card[data-testid="growth-evidence"] {
+  margin-bottom: 20px;
+  padding: 24px 28px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: var(--student-soft);
+}
+body .app-shell:not(.prototype-app) .growth-card h2 {
+  font-size: 22px;
+}
+body .app-shell:not(.prototype-app) .growth-observation-list > li,
+body .app-shell:not(.prototype-app) .growth-memory-list > li {
+  padding: 20px 0;
+  border: 0;
+  border-bottom: 1px solid var(--student-line);
+  border-radius: 0;
+  background: transparent;
+}
+body .app-shell:not(.prototype-app) .growth-observation-list > li:last-child,
+body .app-shell:not(.prototype-app) .growth-memory-list > li:last-child {
+  border-bottom: 0;
+}
+body .app-shell:not(.prototype-app) .growth-muted,
+body .prototype-app .observation-panel p,
+body .prototype-app .memory-item p {
+  line-height: 1.7;
+  font-size: 16px;
+}
+body .prototype-app .memory-item {
+  padding: 24px 28px;
+  border: 1px solid var(--student-line);
+}
+
+/* Reading, tools and settings */
+body .prototype-app .reader {
+  width: min(var(--student-reading), 100%);
+  max-width: none;
+  margin: 0 auto;
+  padding: 24px 0 64px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+body .prototype-app .reader header h2 {
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.45;
+}
+body .prototype-app .reader-lede,
+body .prototype-app .knowledge-block p {
+  font-size: 17px;
+  line-height: 1.85;
+}
+body .prototype-app .learning-goals,
+body .prototype-app .example-note,
+body .prototype-app .data-flow .od-stat,
+body .prototype-app .animation-explanation {
+  background: var(--student-soft);
+  border-color: var(--student-line);
+}
+body .app-shell:not(.prototype-app) .lesson-page,
+body .app-shell:not(.prototype-app) .content-page {
+  max-width: 1120px;
+  padding-top: 48px;
+  padding-bottom: 80px;
+}
+body .app-shell:not(.prototype-app) .lesson-steps {
+  gap: 8px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--student-line);
+}
+body .app-shell:not(.prototype-app) .lesson-step-active {
+  border-color: #c9cbc8;
+  background: var(--student-selected);
+  color: var(--student-ink);
+}
+body .app-shell:not(.prototype-app) :is(.lesson-status,.lesson-policy,.lesson-evidence,.lesson-actions,.lesson-ask,.lesson-run) {
+  padding: 20px 24px;
+  border-color: var(--student-line);
+  border-radius: var(--student-radius);
+  box-shadow: none;
+}
+body .app-shell:not(.prototype-app) .content-page__body {
+  gap: 20px;
+}
+body .app-shell:not(.prototype-app) :is(.content-page__rail,.content-page__main,.content-page__aside) {
+  border-color: var(--student-line);
+  border-radius: var(--student-radius);
+  box-shadow: none;
+}
+body .app-shell:not(.prototype-app) .content-page__main {
+  padding: 32px;
+}
+body .app-shell:not(.prototype-app) .content-reader {
+  max-width: var(--student-reading);
+  margin-inline: auto;
+  font-size: 17px;
+  line-height: 1.8;
+}
+body .prototype-app .code-layout {
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr);
+  align-items: start;
+}
+body .prototype-app .code-editor,
+body .prototype-app .code-console,
+body .prototype-app .animation-panel {
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  box-shadow: none;
+}
+body .prototype-app .code-editor textarea {
+  min-height: 360px;
+  background: var(--student-soft);
+}
+body .prototype-app .array-cell.current,
+body .app-shell:not(.prototype-app) .animation-cells li[data-highlighted="true"] {
+  border-color: #8a8e90;
+  background: var(--student-selected);
+  color: var(--student-ink);
+}
+body .app-shell:not(.prototype-app) .codelab-page,
+body .app-shell:not(.prototype-app) .animation-page {
+  max-width: 1180px;
+  padding-top: 48px;
+  padding-bottom: 80px;
+}
+body .app-shell:not(.prototype-app) .codelab-layout {
+  grid-template-columns: minmax(220px, .65fr) minmax(0, 1.4fr);
+  align-items: start;
+  gap: 20px;
+}
+body .app-shell:not(.prototype-app) :is(.codelab-card,.animation-picker,.animation-player) {
+  padding: 24px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: #fff;
+  box-shadow: none;
+}
+body .app-shell:not(.prototype-app) .codelab-task-list button[data-active="true"] {
+  border-color: #c9cbc8;
+  background: var(--student-selected);
+  color: var(--student-ink);
+}
+body .app-shell:not(.prototype-app) .animation-stage {
+  padding: 24px;
+  border-radius: 10px;
+  background: var(--student-soft);
+}
+body .prototype-app .settings-form,
+body .app-shell:not(.prototype-app) .auth-card.wide {
+  width: min(720px, 100%);
+  max-width: 720px;
+  padding: 32px;
+  border: 1px solid var(--student-line);
+  border-radius: var(--student-radius);
+  background: #fff;
+  box-shadow: none;
+}
+body .app-shell:not(.prototype-app) .auth-shell {
+  min-height: calc(100dvh - 88px);
+  padding: 48px 16px 80px;
+  place-items: start center;
+}
+body .prototype-app .settings-form label,
+body .app-shell:not(.prototype-app) .auth-card.wide label {
+  color: var(--student-ink);
+  font-size: 16px;
+}
+body .prototype-app .settings-data {
+  width: min(720px, 100%);
+  max-width: 720px;
+  margin-top: 32px;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--student-line);
+}
+body .app-shell:not(.prototype-app) .auth-card.wide button.secondary {
+  border: 1px solid var(--student-line);
+  background: #fff;
+  color: var(--student-ink);
+}
+
+@media (hover: hover) {
+  body .prototype-app .learning-card:hover,
+  body .app-shell:not(.prototype-app) .study-card:hover {
+    border-color: #b6b9b6;
+  }
+  body .app-shell:not(.prototype-app) .study-card .study-open-link:not(:disabled):hover {
+    background: transparent;
+    color: var(--student-ink);
+    text-decoration: underline;
+  }
+  body .prototype-app .tab-row .tab-button:hover,
+  body .app-shell:not(.prototype-app) .practice-tabs button:hover,
+  body .prototype-app .filter-button:hover,
+  body .app-shell:not(.prototype-app) .k12-filters button:hover {
+    background: var(--student-selected);
+    color: var(--student-ink);
+  }
+}
+
+@media (max-width: 1023px) {
+  body .prototype-app .resource-grid,
+  body .app-shell:not(.prototype-app) .study-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body .prototype-app .quiz-layout {
+    grid-template-columns: 1fr;
+  }
+  body .prototype-app .question-navigator {
+    position: static;
+  }
+  body .app-shell:not(.prototype-app) .codelab-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  body .prototype-app .prototype-content:not(.chat-content) {
+    padding: 28px 16px calc(112px + env(safe-area-inset-bottom));
+  }
+  body .prototype-app .page-heading,
+  body .app-shell:not(.prototype-app) :is(.study-heading,.practice-header,.growth-header,.lesson-header,.resource-library-header,.animation-header,.codelab-header) {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+  }
+  body .prototype-app .continue-panel,
+  body .app-shell:not(.prototype-app) .study-continue {
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 24px;
+  }
+  body .prototype-app .continue-actions {
+    align-items: flex-start;
+  }
+  body .prototype-app .resource-grid,
+  body .app-shell:not(.prototype-app) .study-grid {
+    grid-template-columns: 1fr;
+  }
+  body .prototype-app .learning-card,
+  body .app-shell:not(.prototype-app) .study-card {
+    min-height: 0;
+  }
+  body .prototype-app .list-view .learning-card {
+    grid-template-columns: 1fr;
+  }
+  body .prototype-app .resource-controls,
+  body .app-shell:not(.prototype-app) .study-page[data-testid="resource-center"] .k12-catalog-tools {
+    padding: 16px;
+  }
+  body .prototype-app .filters-line,
+  body .prototype-app .search-form,
+  body .app-shell:not(.prototype-app) .study-search {
+    flex-wrap: wrap;
+  }
+  body .prototype-app .search-form > button,
+  body .app-shell:not(.prototype-app) .study-search > button {
+    width: 100%;
+  }
+  body .prototype-app .practice-intro,
+  body .prototype-app .question-panel,
+  body .app-shell:not(.prototype-app) :is(.practice-starter,.practice-session,.practice-history,.practice-result,.practice-review,.quiz-card) {
+    padding: 24px;
+  }
+  body .prototype-app .stats-strip,
+  body .app-shell:not(.prototype-app) .growth-counts {
+    padding: 20px 16px;
+  }
+  body .prototype-app .stats-strip .od-stat,
+  body .app-shell:not(.prototype-app) .growth-counts li {
+    padding-inline: 8px;
+  }
+  body .prototype-app .reader {
+    padding: 0 0 48px;
+  }
+  body .prototype-app .code-layout {
+    grid-template-columns: 1fr;
+  }
+  body .app-shell:not(.prototype-app) :is(.study-page,.practice-page,.growth-page,.lesson-page,.resource-library,.animation-page,.codelab-page,.content-page) {
+    padding-top: 28px;
+    padding-bottom: calc(112px + env(safe-area-inset-bottom));
+  }
+  body .app-shell:not(.prototype-app) .practice-history-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  body .app-shell:not(.prototype-app) .resource-meta {
+    grid-template-columns: 1fr;
+  }
+  body .app-shell:not(.prototype-app) .content-page__main {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  body .prototype-app .stats-strip,
+  body .app-shell:not(.prototype-app) .growth-counts {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  body .prototype-app .stats-strip .od-stat,
+  body .app-shell:not(.prototype-app) .growth-counts li {
+    padding: 0 0 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--student-line);
+  }
+  body .prototype-app .stats-strip .od-stat:last-child,
+  body .app-shell:not(.prototype-app) .growth-counts li:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  body .prototype-app .tab-row,
+  body .app-shell:not(.prototype-app) .practice-tabs {
+    width: 100%;
+  }
+  body .prototype-app .tab-row .tab-button,
+  body .app-shell:not(.prototype-app) .practice-tabs button {
+    flex: 1;
+    padding-inline: 8px;
+  }
+  body .prototype-app .array-rail {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+  }
+  body .prototype-app .array-cell {
+    padding: 8px 0;
+  }
+  body .prototype-app .array-cell > span {
+    font-size: 18px;
+  }
+  body .prototype-app .array-cell small {
+    font-size: 10px;
+  }
+}

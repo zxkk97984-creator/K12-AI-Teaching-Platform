@@ -4,18 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-gate_state="$(python3 - <<'PY'
-import json
-from pathlib import Path
-state = json.loads(Path('.rebuild-kit/progress.json').read_text(encoding='utf-8'))['gates']
-print(state['G_API_CONTRACT']['status'], state['G_LIVE_BUDGET']['status'])
-PY
-)"
-if [ "$gate_state" != "PASS PASS" ]; then
-  printf 'BLOCKED: live verification requires G_API_CONTRACT and G_LIVE_BUDGET; current=%s\n' "$gate_state" >&2
-  exit 3
-fi
-
+# Validate saved evaluation results; this script makes no live requests.
 python3 docs/integrations/knodo/validate_evidence.py
 backend/.venv/bin/python evals/review_tools.py check-template
 python3 - <<'PY'

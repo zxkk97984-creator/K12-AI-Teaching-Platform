@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { listCourses } from "../content/api";
 import type { ChapterSummaryDTO } from "../content/types";
 import { subscribeRun } from "../conversation/api";
@@ -10,6 +17,8 @@ import type { MessageDTO, SessionSummary } from "../conversation/types";
 import { getLessonPhase, postLessonEvent } from "./api";
 import type { LessonEventName, LessonPhaseDTO } from "./types";
 import "./lesson.css";
+import { ConversationContext } from "../conversation/ConversationProvider";
+import { isTerminal } from "../conversation/controller";
 
 const PHASE_STEPS: Array<{ id: string; label: string }> = [
   { id: "ORIENT", label: "定向" },
@@ -99,8 +108,12 @@ function quizOfferFrom(messages: MessageDTO[]): QuizOffer | null {
       | undefined;
     if (!action || action.type !== "OFFER_QUIZ") continue;
     return {
-      count: typeof action.question_count === "number" ? action.question_count : null,
-      difficulty: typeof action.difficulty === "string" ? action.difficulty : null,
+      count:
+        typeof action.question_count === "number"
+          ? action.question_count
+          : null,
+      difficulty:
+        typeof action.difficulty === "string" ? action.difficulty : null,
     };
   }
   return null;
@@ -117,31 +130,67 @@ type PhaseAction = { event: LessonEventName; label: string; testId: string };
 function actionsFor(phase: string, lifecycle: string): PhaseAction[] {
   if (lifecycle === "COMPLETED") return [];
   if (lifecycle === "PAUSED") {
-    return [{ event: "RESUME_FROM_PAUSE", label: "继续学习", testId: "action-resume" }];
+    return [
+      {
+        event: "RESUME_FROM_PAUSE",
+        label: "继续学习",
+        testId: "action-resume",
+      },
+    ];
   }
   switch (phase) {
     case "ORIENT":
-      return [{ event: "START_EXPLAIN", label: "开始讲解", testId: "action-start-explain" }];
+      return [
+        {
+          event: "START_EXPLAIN",
+          label: "开始讲解",
+          testId: "action-start-explain",
+        },
+      ];
     case "EXPLAIN":
       return [
-        { event: "EXPLAIN_DONE", label: "讲解看完了", testId: "action-explain-done" },
+        {
+          event: "EXPLAIN_DONE",
+          label: "讲解看完了",
+          testId: "action-explain-done",
+        },
         { event: "SKIP_ACTIVITY", label: "跳过这一段", testId: "action-skip" },
       ];
     case "CHECK":
       return [
-        { event: "CHECK_CORRECT", label: "这题我答对了", testId: "action-check-correct" },
-        { event: "CHECK_INCORRECT", label: "这题我答错了", testId: "action-check-incorrect" },
+        {
+          event: "CHECK_CORRECT",
+          label: "这题我答对了",
+          testId: "action-check-correct",
+        },
+        {
+          event: "CHECK_INCORRECT",
+          label: "这题我答错了",
+          testId: "action-check-incorrect",
+        },
         { event: "SKIP_ACTIVITY", label: "跳过这道题", testId: "action-skip" },
       ];
     case "PRACTICE":
       return [
-        { event: "PRACTICE_DONE", label: "练习做完了", testId: "action-practice-done" },
+        {
+          event: "PRACTICE_DONE",
+          label: "练习做完了",
+          testId: "action-practice-done",
+        },
         { event: "SKIP_ACTIVITY", label: "跳过练习", testId: "action-skip" },
       ];
     case "REFLECT":
       return [
-        { event: "REFLECT_DONE", label: "复盘写完了", testId: "action-reflect-done" },
-        { event: "COMPLETE_REQUESTED", label: "我学完了，结束本节", testId: "action-complete" },
+        {
+          event: "REFLECT_DONE",
+          label: "复盘写完了",
+          testId: "action-reflect-done",
+        },
+        {
+          event: "COMPLETE_REQUESTED",
+          label: "我学完了，结束本节",
+          testId: "action-complete",
+        },
       ];
     default:
       return [];
@@ -149,6 +198,8 @@ function actionsFor(phase: string, lifecycle: string): PhaseAction[] {
 }
 
 export function LessonPage() {
+  const shared = useContext(ConversationContext);
+  const [sharedBusy, setSharedBusy] = useState(false);
   const [phase, setPhase] = useState<LessonPhaseDTO | null>(null);
   const [run, setRun] = useState<RunDTO | null>(null);
   const [messages, setMessages] = useState<MessageDTO[]>([]);
@@ -184,6 +235,10 @@ export function LessonPage() {
 
   const follow = useCallback(
     (next: RunDTO, id: string) => {
+      if (shared) {
+        shared.trackRun(next);
+        return;
+      }
       subscription.current?.close();
       setRun(next);
       subscription.current = subscribeRun(next.id, {
@@ -197,14 +252,41 @@ export function LessonPage() {
         onError: () => setError("连接中断，可刷新页面读取已保存的状态"),
       });
     },
-    [refreshMessages, refreshPhase],
+    [refreshMessages, refreshPhase, shared],
   );
+
+  useEffect(() => {
+    if (!shared || !sessionId) return;
+    let lastTerminal = "";
+    const sync = () => {
+      const current = shared.getSnapshot();
+      setSharedBusy(
+        current.sending || Boolean(current.run && !isTerminal(current.run)),
+      );
+      if (current.detail?.id === sessionId)
+        setMessages(current.detail.messages);
+      if (current.run?.session_id !== sessionId) return;
+      setRun(current.run);
+      const key = `${current.run.id}:${current.run.status}`;
+      if (isTerminal(current.run) && key !== lastTerminal) {
+        lastTerminal = key;
+        void refreshPhase(sessionId).catch(() =>
+          setError("课堂状态暂时无法刷新，请重试"),
+        );
+      }
+    };
+    sync();
+    return shared.subscribe(sync);
+  }, [shared, sessionId, refreshPhase]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [courses, history] = await Promise.all([listCourses(), listSessions()]);
+        const [courses, history] = await Promise.all([
+          listCourses(),
+          listSessions(),
+        ]);
         if (cancelled) return;
         setChapters(courses.items.flatMap((course) => course.chapters));
         setSessions(history);
@@ -233,7 +315,8 @@ export function LessonPage() {
           }
         }
       } catch (caught) {
-        if (!cancelled) setError(caught instanceof ApiError ? caught.message : "加载失败");
+        if (!cancelled)
+          setError(caught instanceof ApiError ? caught.message : "加载失败");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -264,6 +347,9 @@ export function LessonPage() {
     payload: { message?: string; idempotency_key?: string } = {},
   ) => {
     if (!sessionId) return;
+    const active = shared?.getSnapshot();
+    if (active?.sending || (active?.run && !isTerminal(active.run))) return;
+    shared?.setExternalBusy(true);
     setError(null);
     try {
       const updated = await postLessonEvent(sessionId, event, payload);
@@ -272,13 +358,18 @@ export function LessonPage() {
       if (updated.run) follow(updated.run, sessionId);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "这一步没有成功");
+    } finally {
+      shared?.setExternalBusy(false);
     }
   };
 
   const ask = async () => {
     const value = question.trim();
     if (!value) return;
-    await applyEvent("ASK", { message: value, idempotency_key: crypto.randomUUID() });
+    await applyEvent("ASK", {
+      message: value,
+      idempotency_key: crypto.randomUUID(),
+    });
     setQuestion("");
   };
 
@@ -313,7 +404,8 @@ export function LessonPage() {
                   >
                     <span>{chapter.title}</span>
                     <span className="lesson-muted">
-                      {STAGE_LABEL[chapter.stage] ?? chapter.stage} · 第 {chapter.revision} 版
+                      {STAGE_LABEL[chapter.stage] ?? chapter.stage} · 第{" "}
+                      {chapter.revision} 版
                     </span>
                   </button>
                 </li>
@@ -376,7 +468,11 @@ export function LessonPage() {
         {PHASE_STEPS.map((step) => (
           <li
             key={step.id}
-            className={currentPhase === step.id ? "lesson-step lesson-step-active" : "lesson-step"}
+            className={
+              currentPhase === step.id
+                ? "lesson-step lesson-step-active"
+                : "lesson-step"
+            }
             data-testid={`step-${step.id}`}
             aria-current={currentPhase === step.id ? "step" : undefined}
           >
@@ -396,11 +492,22 @@ export function LessonPage() {
       </section>
 
       {policy.stage ? (
-        <section aria-label="适龄策略" className="lesson-policy" data-testid="lesson-policy">
+        <section
+          aria-label="适龄策略"
+          className="lesson-policy"
+          data-testid="lesson-policy"
+        >
           <h2>这一节的适龄安排</h2>
           <ul>
-            <li>学段：{STAGE_LABEL[policy.stage] ?? policy.stage}（年级 {policy.grade ?? "未填"}）</li>
-            <li>偏好风格：{STYLE_LABEL[policy.preferred_style ?? "AUTO"] ?? policy.preferred_style}</li>
+            <li>
+              学段：{STAGE_LABEL[policy.stage] ?? policy.stage}（年级{" "}
+              {policy.grade ?? "未填"}）
+            </li>
+            <li>
+              偏好风格：
+              {STYLE_LABEL[policy.preferred_style ?? "AUTO"] ??
+                policy.preferred_style}
+            </li>
             <li>题目数量：最多 {policy.max_quiz_questions ?? "?"} 题</li>
             <li>
               难度上限：
@@ -417,8 +524,9 @@ export function LessonPage() {
             <li>讲解长度上限：{policy.max_explanation_chars ?? "?"} 字</li>
             <li>
               媒介候选：
-              {(policy.media_candidates ?? []).map((item) => MEDIA_LABEL[item] ?? item).join("、") ||
-                "未知"}
+              {(policy.media_candidates ?? [])
+                .map((item) => MEDIA_LABEL[item] ?? item)
+                .join("、") || "未知"}
             </li>
           </ul>
           <p className="lesson-muted">
@@ -428,7 +536,11 @@ export function LessonPage() {
       ) : null}
 
       {messages.length > 0 ? (
-        <section aria-label="老师的话" className="lesson-thread" data-testid="lesson-thread">
+        <section
+          aria-label="老师的话"
+          className="lesson-thread"
+          data-testid="lesson-thread"
+        >
           <h2>老师的话（已校验后保存）</h2>
           <ol className="lesson-messages">
             {messages.slice(-4).map((message) => (
@@ -440,10 +552,14 @@ export function LessonPage() {
                     : "lesson-message lesson-message-tutor"
                 }
                 data-testid={
-                  message.role === "ASSISTANT" ? "tutor-message" : "student-message"
+                  message.role === "ASSISTANT"
+                    ? "tutor-message"
+                    : "student-message"
                 }
               >
-                <p>{message.card?.message_markdown ?? message.content_markdown}</p>
+                <p>
+                  {message.card?.message_markdown ?? message.content_markdown}
+                </p>
                 {message.card && message.card.source_refs.length > 0 ? (
                   <ul className="lesson-sources" aria-label="来源">
                     {message.card.source_refs.map((ref) => (
@@ -465,7 +581,11 @@ export function LessonPage() {
       ) : null}
 
       {run ? (
-        <section className="lesson-run" data-testid="lesson-run" aria-label="老师状态">
+        <section
+          className="lesson-run"
+          data-testid="lesson-run"
+          aria-label="老师状态"
+        >
           <span>{STATUS_TEXT[run.status] ?? run.status}</span>
           {run.fixture ? (
             <span className="lesson-fixture" data-testid="fixture-badge">
@@ -484,18 +604,26 @@ export function LessonPage() {
             key={action.event}
             type="button"
             data-testid={action.testId}
-            disabled={lifecycle === "STALE" || lifecycle === "COMPLETED"}
+            disabled={
+              sharedBusy || lifecycle === "STALE" || lifecycle === "COMPLETED"
+            }
             onClick={() => void applyEvent(action.event)}
           >
             {action.label}
           </button>
         ))}
         {lifecycle === "ACTIVE" && currentPhase !== "COMPLETED" ? (
-          <button type="button" data-testid="action-pause" onClick={() => void applyEvent("PAUSE")}>
+          <button
+            type="button"
+            data-testid="action-pause"
+            onClick={() => void applyEvent("PAUSE")}
+          >
             先暂停
           </button>
         ) : null}
-        {lifecycle === "ACTIVE" && currentPhase !== "COMPLETED" && currentPhase !== "ORIENT" ? (
+        {lifecycle === "ACTIVE" &&
+        currentPhase !== "COMPLETED" &&
+        currentPhase !== "ORIENT" ? (
           <button
             type="button"
             data-testid="action-submit-complete"
@@ -506,8 +634,15 @@ export function LessonPage() {
         ) : null}
       </section>
 
-      {sessionId && chapterId && lifecycle !== "STALE" && lifecycle !== "COMPLETED" ? (
-        <section className="lesson-practice" aria-label="练习" data-testid="lesson-practice">
+      {sessionId &&
+      chapterId &&
+      lifecycle !== "STALE" &&
+      lifecycle !== "COMPLETED" ? (
+        <section
+          className="lesson-practice"
+          aria-label="练习"
+          data-testid="lesson-practice"
+        >
           <h2>练习这一节</h2>
           {quizOffer ? (
             <p data-testid="offer-quiz">
@@ -549,17 +684,26 @@ export function LessonPage() {
           maxLength={8000}
           onChange={(event) => setQuestion(event.target.value)}
         />
-        <button type="submit" data-testid="ask-teacher" disabled={!question.trim()}>
+        <button
+          type="submit"
+          data-testid="ask-teacher"
+          disabled={sharedBusy || !question.trim()}
+        >
           提问
         </button>
       </form>
 
       {evidence ? (
-        <section className="lesson-evidence" aria-label="学习证据" data-testid="lesson-evidence">
+        <section
+          className="lesson-evidence"
+          aria-label="学习证据"
+          data-testid="lesson-evidence"
+        >
           <h2>已记录的学习证据</h2>
           <p>
-            真实活动 {evidence.real_activities} 次 · 答对 {evidence.correct_activities} 次 · 跳过{" "}
-            {evidence.skipped} 次 · 等级 {evidence.evidence_level}
+            真实活动 {evidence.real_activities} 次 · 答对{" "}
+            {evidence.correct_activities} 次 · 跳过 {evidence.skipped} 次 · 等级{" "}
+            {evidence.evidence_level}
           </p>
         </section>
       ) : null}

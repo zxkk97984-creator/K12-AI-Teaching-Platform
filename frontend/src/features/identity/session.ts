@@ -9,6 +9,15 @@ export async function requireMe(): Promise<MeResponse | null> {
   }
 }
 
+type Navigator = (path: string) => void;
+let clientNavigate: Navigator | null = null;
+export function registerNavigator(navigator: Navigator): () => void {
+  clientNavigate = navigator;
+  return () => {
+    if (clientNavigate === navigator) clientNavigate = null;
+  };
+}
 export function navigate(path: string): void {
-  window.location.assign(path);
+  if (clientNavigate) clientNavigate(path);
+  else window.location.assign(path);
 }

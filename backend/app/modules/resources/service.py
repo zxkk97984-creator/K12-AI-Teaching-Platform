@@ -193,6 +193,9 @@ async def _summary(
         title=resource.title,
         description=resource.description,
         kind=resource.kind,  # type: ignore[arg-type]
+        interactive_purpose=resource.interactive_purpose,  # type: ignore[arg-type]
+        interactive_subject=resource.interactive_subject,
+        active_interactive_revision_id=resource.active_interactive_revision_id,
         stage=resource.stage,
         grade_min=resource.grade_min,
         grade_max=resource.grade_max,
@@ -256,12 +259,21 @@ async def list_student_resources(
     chapter_revision_id: uuid.UUID | None = None,
     kind: str | None = None,
     settings: Settings | None = None,
-) -> ResourceSummaryDTO:
+    limit: int = 50,
+) -> ResourceListDTO:
     candidates = await select_resource_candidates(
-        db, viewer=viewer, chapter_revision_id=chapter_revision_id, kind=kind
+        db,
+        viewer=viewer,
+        chapter_revision_id=chapter_revision_id,
+        kind=kind,
+        limit=limit,
     )
     items = [await _summary(db, resource, settings=settings) for resource in candidates]
-    items = [item for item in items if item.variants]
+    items = [
+        item
+        for item in items
+        if item.variants or (item.kind == "INTERACTIVE" and item.active_interactive_revision_id)
+    ]
     profile = viewer.profile.value if hasattr(viewer.profile, "value") else str(viewer.profile)
     return ResourceListDTO(items=items, profile=profile)
 
@@ -291,6 +303,8 @@ async def resource_detail(
     settings: Settings | None = None,
 ) -> ResourceSummaryDTO:
     resource = await load_visible_resource(db, viewer=viewer, resource_id=resource_id)
+    if resource.kind == "INTERACTIVE" and resource.active_interactive_revision_id is not None:
+        return await _summary(db, resource, settings=settings)
     if not await _variants(db, resource.id):
         # No file was ever registered: never advertise a ready resource.
         raise ResourceFileMissing("资源文件未登记")
@@ -405,6 +419,11 @@ async def create_resource(
     _validate_grade_pair(payload.stage, payload.grade_min, payload.grade_max)
     if payload.is_test_fixture != (payload.source_kind == "SYNTHETIC_FIXTURE"):
         raise ResourceError("RESOURCE_FIXTURE_FLAG", "合成夹具标记与来源类型必须一致", 422)
+    if payload.kind == "INTERACTIVE":
+        if not payload.interactive_purpose or not (payload.interactive_subject or "").strip():
+            raise ResourceError("INTERACTIVE_METADATA_REQUIRED", "互动内容需要用途和学科", 422)
+    elif payload.interactive_purpose or payload.interactive_subject:
+        raise ResourceError("INTERACTIVE_METADATA_INVALID", "普通资源不能设置互动内容字段", 422)
     existing = await db.scalar(select(Resource).where(Resource.stable_slug == payload.slug))
     if existing is not None:
         raise ResourceError("RESOURCE_SLUG_TAKEN", "资源 slug 已存在", 409)
@@ -413,6 +432,10 @@ async def create_resource(
         title=payload.title,
         description=payload.description,
         kind=payload.kind,
+        interactive_purpose=payload.interactive_purpose,
+        interactive_subject=payload.interactive_subject.strip()
+        if payload.interactive_subject
+        else None,
         stage=payload.stage,
         grade_min=payload.grade_min,
         grade_max=payload.grade_max,
@@ -435,7 +458,12 @@ async def create_resource(
 
 
 async def patch_resource(
-    db: AsyncSession, *, actor: User, resource: Resource, payload: ResourcePatchRequest
+    db: AsyncSession,
+    *,
+    actor: User,
+    resource: Resource,
+    payload: ResourcePatchRequest,
+    settings: Settings | None = None,
 ) -> Resource:
     if actor.role != "admin":
         raise ResourceError("RESOURCE_FORBIDDEN", "仅管理员可修改资源", 403)
@@ -471,7 +499,25 @@ async def patch_resource(
                 )
             if resource.review_status != "HUMAN_APPROVED":
                 raise ResourceStateError("RESOURCE_NOT_APPROVED", "资源未通过人工审校，不能发布")
-            if not await _variants(db, resource.id):
+            if resource.kind == "INTERACTIVE":
+                from app.modules.interactive.models import InteractiveRevision
+
+                revision = await db.scalar(
+                    select(InteractiveRevision).where(
+                        InteractiveRevision.id == resource.active_interactive_revision_id,
+                        InteractiveRevision.resource_id == resource.id,
+                    )
+                )
+                if revision is None:
+                    raise ResourceStateError(
+                        "INTERACTIVE_VERSION_MISSING", "请先上传并选择可运行版本"
+                    )
+                if settings is not None and not store_for(settings).exists(
+                    revision.document_storage_key
+                ):
+                    raise ResourceStateError("INTERACTIVE_FILE_MISSING", "播放文档缺失，不能发布")
+                revision.locked_at = revision.locked_at or datetime.now(UTC)
+            elif not await _variants(db, resource.id):
                 raise ResourceStateError("RESOURCE_FILE_MISSING", "资源还没有真实文件，不能发布")
         resource.publication_status = publication
 

@@ -6,10 +6,13 @@
  * a rejected parameter set shows a readable message and no animation.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError } from "../identity/api";
 import { navigate } from "../identity/session";
+import { newOpenEventId, recordOpen } from "../study/api";
 import { AnimationPlayer } from "./AnimationPlayer";
+import { GuidedAnimation } from "./GuidedAnimation";
+import { useAccount } from "../identity/AccountContext";
 import { AnimationInputError, stepsForSpec } from "./templates";
 import { listAnimations, requestAnimationSpec } from "./api";
 import type { AnimationDefinition, AnimationSpec } from "./types";
@@ -39,12 +42,16 @@ function valuesText(value: unknown): string {
 }
 
 export function AnimationPage() {
+  const stage = useAccount()?.profile?.stage;
+  const routeId = window.location.pathname.split("/").filter(Boolean)[1] ?? null;
   const [definitions, setDefinitions] = useState<AnimationDefinition[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [spec, setSpec] = useState<AnimationSpec | null>(null);
   const [errorInput, setErrorInput] = useState("");
   const [targetText, setTargetText] = useState("");
+  const openEventId = useRef<string | null>(null);
+  const openEventAnimation = useRef<string | null>(null);
 
   const load = useCallback(async () => {
     setError(null);
@@ -52,7 +59,11 @@ export function AnimationPage() {
     try {
       const payload = await listAnimations();
       setDefinitions(payload.items);
-      setSelectedId(payload.items[0]?.id ?? null);
+      setSelectedId((current) => {
+        if (current && payload.items.some((item) => item.id === current)) return current;
+        if (routeId && payload.items.some((item) => item.id === routeId)) return routeId;
+        return payload.items[0]?.id ?? null;
+      });
       if (payload.items.length === 0) {
         setError(null);
       }
@@ -64,7 +75,7 @@ export function AnimationPage() {
       setDefinitions(null);
       setError(textOf(caught, "动画列表加载失败，请稍后重试。"));
     }
-  }, []);
+  }, [routeId]);
 
   useEffect(() => {
     void load();
@@ -74,6 +85,18 @@ export function AnimationPage() {
     () => definitions?.find((item) => item.id === selectedId) ?? null,
     [definitions, selectedId],
   );
+
+  useEffect(() => {
+    if (!selected || routeId !== selected.id) return;
+    if (openEventAnimation.current !== selected.id) {
+      openEventAnimation.current = selected.id;
+      openEventId.current = null;
+    }
+    openEventId.current ??= newOpenEventId("ANIMATION", selected.id);
+    void recordOpen("ANIMATION", selected.id, openEventId.current).catch(() => {
+      // An unavailable history service must not block the deterministic player.
+    });
+  }, [routeId, selected]);
 
   useEffect(() => {
     if (!selected) return;
@@ -117,9 +140,10 @@ export function AnimationPage() {
       <header className="animation-header">
         <h1>教学动画</h1>
         <p>
-          动画只有两种固定模板（排序、二分查找），步骤由确定性函数生成；动画外始终提供文字讲解。
+          先用当前学段的四步示例观察知识点；已发布的算法动画仍由服务端提供定义与参数校验。
         </p>
       </header>
+      {stage ? <GuidedAnimation stage={stage} /> : null}
 
       {error ? (
         <p className="animation-error" role="alert" data-testid="animation-error">

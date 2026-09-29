@@ -1,10 +1,21 @@
 from __future__ import annotations
 
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import CSRF_COOKIE_NAME, SESSION_COOKIE_NAME, Settings
 from app.core.database import get_session
+from app.modules.identity.avatar import (
+    INPUT_FORMATS,
+    MAX_AVATAR_UPLOAD_BYTES,
+    AvatarInvalid,
+    get_avatar,
+    normalize_avatar,
+    remove_avatar,
+    save_avatar,
+)
 from app.modules.identity.dependencies import (
     SessionContext,
     csrf_dependency,
@@ -91,9 +102,17 @@ def _me_from_profile(user, profile) -> MeResponse:
             grade=profile.grade,
             revision=profile.revision,
             onboarding_completed=profile.stage is not None,
+            nickname=profile.nickname,
+            avatar_url=(
+                f"/api/v1/me/avatar?v={profile.avatar_sha256}"
+                if profile.avatar_sha256 is not None
+                else None
+            ),
         )
         preferences_dto = PreferencesDTO(
             preferred_style=profile.preferred_style,
+            teacher_style=profile.teacher_style,
+            companion_pet_id=profile.companion_pet_id,
             interests=profile.interests,
             proactive_guidance_enabled=profile.proactive_guidance_enabled,
             voice_preference=profile.voice_preference,
@@ -184,6 +203,79 @@ async def patch_profile(
         raise HTTPException(status_code=409, detail="学习档案尚未建立") from exc
     except IdentityError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return _me_from_profile(context.user, profile)
+
+
+@router.get(
+    "/me/avatar",
+    response_class=Response,
+    responses={200: {"content": {"image/png": {}}, "description": "当前账号的头像"}},
+)
+async def read_my_avatar(
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> Response:
+    avatar = await get_avatar(db, owner_user_id=context.user.id)
+    if avatar is None:
+        raise HTTPException(status_code=404, detail="尚未设置头像")
+    return Response(
+        content=avatar.image_png,
+        media_type="image/png",
+        headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"},
+    )
+
+
+@router.put(
+    "/me/avatar",
+    response_model=MeResponse,
+    dependencies=[Depends(csrf_dependency)],
+    openapi_extra={
+        "requestBody": {
+            "required": True,
+            "content": {
+                media_type: {"schema": {"type": "string", "format": "binary"}}
+                for media_type in INPUT_FORMATS
+            },
+        }
+    },
+)
+async def upload_my_avatar(
+    request: Request,
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> MeResponse:
+    media_type = request.headers.get("content-type", "").split(";", 1)[0].lower().strip()
+    if media_type not in INPUT_FORMATS:
+        raise HTTPException(status_code=415, detail="仅支持 PNG、JPG 或 WebP 图片")
+    size = 0
+    chunks: list[bytes] = []
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > MAX_AVATAR_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail="头像文件不能超过 2 MB")
+        chunks.append(chunk)
+    try:
+        image_png, sha256 = await asyncio.to_thread(normalize_avatar, b"".join(chunks), media_type)
+    except AvatarInvalid as caught:
+        raise HTTPException(status_code=422, detail=str(caught)) from caught
+    try:
+        profile = await save_avatar(
+            db, owner_user_id=context.user.id, image_png=image_png, sha256=sha256
+        )
+    except ProfileNotReady as caught:
+        raise HTTPException(status_code=409, detail="学习档案尚未建立") from caught
+    return _me_from_profile(context.user, profile)
+
+
+@router.delete("/me/avatar", response_model=MeResponse, dependencies=[Depends(csrf_dependency)])
+async def delete_my_avatar(
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> MeResponse:
+    try:
+        profile = await remove_avatar(db, owner_user_id=context.user.id)
+    except ProfileNotReady as caught:
+        raise HTTPException(status_code=409, detail="学习档案尚未建立") from caught
     return _me_from_profile(context.user, profile)
 
 

@@ -18,14 +18,14 @@ const studentB = {
   password: process.env.E2E_STUDENT_B_PASSWORD ?? "",
 };
 
-const EVIDENCE = "docs/acceptance/t30-evidence";
+const EVIDENCE = "test-results/screenshots";
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");
   await page.getByLabel("用户名").fill(account.username);
   await page.getByLabel("密码").fill(account.password);
   await page.getByRole("button", { name: "登录" }).click();
-  await expect(page).toHaveURL(/\/(settings|onboarding)/);
+  await expect(page).toHaveURL(/\/(settings|onboarding|conversations)/);
 }
 
 async function noHorizontalOverflow(page: Page, label: string) {

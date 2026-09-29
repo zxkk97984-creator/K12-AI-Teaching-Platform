@@ -21,7 +21,10 @@ from app.modules.codelab.router import router as codelab_router
 from app.modules.content.router import router as content_router
 from app.modules.identity.middleware import SameOriginCsrfMiddleware
 from app.modules.identity.router import router as identity_router
+from app.modules.interactive.router import admin_router as interactive_admin_router
+from app.modules.interactive.router import router as interactive_router
 from app.modules.learning.growth_router import router as growth_router
+from app.modules.learning.study_router import router as study_router
 from app.modules.memory.router import router as memory_router
 from app.modules.privacy.router import router as privacy_router
 from app.modules.recommendation.router import router as recommendation_router
@@ -75,6 +78,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(assessment_router, prefix="/api/v1")
     application.include_router(quiz_router, prefix="/api/v1")
     application.include_router(growth_router, prefix="/api/v1")
+    application.include_router(study_router, prefix="/api/v1")
     application.include_router(memory_router, prefix="/api/v1")
     application.include_router(recommendation_router, prefix="/api/v1")
     application.include_router(resources_router, prefix="/api/v1")
@@ -82,6 +86,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(authoring_router, prefix="/api/v1")
     application.include_router(privacy_router, prefix="/api/v1")
     application.include_router(resources_admin_router, prefix="/api/v1")
+    application.include_router(interactive_router, prefix="/api/v1")
+    application.include_router(interactive_admin_router, prefix="/api/v1")
     return application
 
 

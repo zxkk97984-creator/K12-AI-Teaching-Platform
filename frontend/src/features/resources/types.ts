@@ -6,7 +6,7 @@
  * storage key, a filesystem path or a signed link.
  */
 
-export type ResourceKind = "WORD" | "SLIDES" | "VIDEO" | "PDF" | "IMAGE";
+export type ResourceKind = "WORD" | "SLIDES" | "VIDEO" | "PDF" | "IMAGE" | "INTERACTIVE";
 export type ResourceVariantKind = "SOURCE" | "PREVIEW";
 
 export type ResourceVariant = {
@@ -26,6 +26,9 @@ export type ResourceSummary = {
   title: string;
   description: string;
   kind: ResourceKind;
+  interactive_purpose?: "LESSON" | "GAME" | "EXPERIMENT" | null;
+  interactive_subject?: string | null;
+  active_interactive_revision_id?: string | null;
   stage: string;
   grade_min: number | null;
   grade_max: number | null;
@@ -42,7 +45,14 @@ export type ResourceSummary = {
   variants: ResourceVariant[];
 };
 
-export type ResourceList = { items: ResourceSummary[]; profile: string };
+export type ResourceList = {
+  items: ResourceSummary[];
+  profile: string;
+  /** Pagination is included by the admin endpoint; student lists may omit it. */
+  total?: number;
+  limit?: number;
+  offset?: number;
+};
 
 export type ResourceTicket = {
   url: string;
@@ -57,6 +67,7 @@ export const KIND_LABEL: Record<ResourceKind, string> = {
   VIDEO: "教学视频",
   PDF: "PDF",
   IMAGE: "图片",
+  INTERACTIVE: "互动内容",
 };
 
 export const VARIANT_LABEL: Record<ResourceVariantKind, string> = {

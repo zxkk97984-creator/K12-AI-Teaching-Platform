@@ -79,10 +79,152 @@ def _binary_search(data: dict[str, Any]) -> int:
     return -1
 
 
+def _odd_even(data: dict[str, Any]) -> bool:
+    if set(data) != {"number"}:
+        raise ValueError("odd-even input must contain only number")
+    number = data["number"]
+    if (
+        isinstance(number, bool)
+        or not isinstance(number, int)
+        or not -1_000_000 <= number <= 1_000_000
+    ):
+        raise ValueError("number must be an integer in the declared range")
+    return number % 2 == 0
+
+
+def _even_sum(data: dict[str, Any]) -> int:
+    if set(data) != {"numbers"} or not isinstance(data["numbers"], list):
+        raise ValueError("even-sum input must contain a numbers array")
+    numbers = data["numbers"]
+    if len(numbers) > 1000:
+        raise ValueError("numbers exceeds the input limit")
+    values = [_number(item) for item in numbers]
+    if any(not isinstance(item, int) or not -1_000_000 <= item <= 1_000_000 for item in values):
+        raise ValueError("numbers must be bounded integers")
+    return sum(item for item in values if item % 2 == 0)
+
+
+def _palindrome(data: dict[str, Any]) -> bool:
+    if set(data) != {"text"} or not isinstance(data["text"], str) or len(data["text"]) > 1000:
+        raise ValueError("palindrome input must contain a string of at most 1000 characters")
+    return data["text"] == data["text"][::-1]
+
+
+def _word_frequency(data: dict[str, Any]) -> dict[str, int]:
+    if set(data) != {"words"} or not isinstance(data["words"], list):
+        raise ValueError("word-frequency input must contain a words array")
+    words = data["words"]
+    if len(words) > 1000 or any(
+        not isinstance(word, str)
+        or not 1 <= len(word) <= 30
+        or not word.isascii()
+        or not word.islower()
+        or not word.isalpha()
+        for word in words
+    ):
+        raise ValueError("words must be short lowercase English words")
+    counts: dict[str, int] = {}
+    for word in words:
+        counts[word] = counts.get(word, 0) + 1
+    return counts
+
+
+def _prediction_accuracy(data: dict[str, Any]) -> float:
+    if set(data) != {"y_true", "y_pred"}:
+        raise ValueError("accuracy input must contain y_true and y_pred")
+    actual = data["y_true"]
+    predicted = data["y_pred"]
+    if (
+        not isinstance(actual, list)
+        or not isinstance(predicted, list)
+        or not actual
+        or len(actual) != len(predicted)
+        or len(actual) > 1000
+        or any(type(value) is not int or not 0 <= value <= 9 for value in [*actual, *predicted])
+    ):
+        raise ValueError("labels must be equal non-empty lists of integers from 0 to 9")
+    return sum(left == right for left, right in zip(actual, predicted, strict=True)) / len(actual)
+
+
+def _sort_unique(data: dict[str, Any]) -> list[int]:
+    if set(data) != {"numbers"} or not isinstance(data["numbers"], list):
+        raise ValueError("sort-unique input must contain a numbers array")
+    numbers = data["numbers"]
+    if len(numbers) > 1000 or any(
+        type(number) is not int or not -1_000_000 <= number <= 1_000_000 for number in numbers
+    ):
+        raise ValueError("numbers must be bounded integers")
+    return sorted(set(numbers))
+
+
+def _balanced_brackets(data: dict[str, Any]) -> bool:
+    if (
+        set(data) != {"text"}
+        or not isinstance(data["text"], str)
+        or len(data["text"]) > 1000
+        or any(char not in "()[]{}" for char in data["text"])
+    ):
+        raise ValueError("bracket input must contain at most 1000 bracket characters")
+    pairs = {")": "(", "]": "[", "}": "{"}
+    stack: list[str] = []
+    for char in data["text"]:
+        if char in "([{":
+            stack.append(char)
+        elif not stack or stack.pop() != pairs[char]:
+            return False
+    return not stack
+
+
+def _range_sum(data: dict[str, Any]) -> list[int]:
+    if set(data) != {"numbers", "queries"}:
+        raise ValueError("range-sum input must contain numbers and queries")
+    numbers, queries = data["numbers"], data["queries"]
+    if (
+        not isinstance(numbers, list)
+        or not 1 <= len(numbers) <= 1000
+        or any(
+            type(number) is not int or not -1_000_000 <= number <= 1_000_000 for number in numbers
+        )
+        or not isinstance(queries, list)
+        or len(queries) > 1000
+    ):
+        raise ValueError("invalid numbers or queries")
+    answers = []
+    for query in queries:
+        if (
+            not isinstance(query, list)
+            or len(query) != 2
+            or type(query[0]) is not int
+            or type(query[1]) is not int
+            or not 0 <= query[0] <= query[1] < len(numbers)
+        ):
+            raise ValueError("each query must be a valid inclusive [left, right] pair")
+        answers.append(sum(numbers[query[0] : query[1] + 1]))
+    return answers
+
+
+def _climbing_stairs(data: dict[str, Any]) -> int:
+    if set(data) != {"n"} or type(data["n"]) is not int or not 0 <= data["n"] <= 30:
+        raise ValueError("n must be an integer from 0 to 30")
+    ways = [1, 1]
+    for _ in range(2, data["n"] + 1):
+        ways.append(ways[-1] + ways[-2])
+    return ways[data["n"]]
+
+
 _ORACLES: dict[str, Callable[[dict[str, Any]], Any]] = {
     "temperature-converter": _temperature,
     "list-summary": _summary,
     "binary-search": _binary_search,
+    "odd-even": _odd_even,
+    "even-sum": _even_sum,
+    "palindrome-check": _palindrome,
+    "word-frequency": _word_frequency,
+    "prediction-accuracy": _prediction_accuracy,
+    "sort-unique": _sort_unique,
+    "balanced-brackets": _balanced_brackets,
+    "range-sum": _range_sum,
+    "climbing-stairs": _climbing_stairs,
 }
 
 _CASES: dict[str, tuple[TrustedCase, ...]] = {
@@ -112,6 +254,100 @@ _CASES: dict[str, tuple[TrustedCase, ...]] = {
         TrustedCase("f2-larger", "F2", {"items": [1, 3, 5, 7, 9], "target": 100}),
         TrustedCase("f2-single", "F2", {"items": [8], "target": 8}),
         TrustedCase("r1-empty", "R1", {"items": [], "target": 5}),
+    ),
+    "odd-even": (
+        TrustedCase("f1-1", "F1", {"number": -4}),
+        TrustedCase("f1-2", "F1", {"number": 9}),
+        TrustedCase("f1-3", "F1", {"number": 0}),
+        TrustedCase("f2-1", "F2", {"number": 1}),
+        TrustedCase("f2-2", "F2", {"number": -1}),
+        TrustedCase("f2-3", "F2", {"number": 2}),
+        TrustedCase("r1-1", "R1", {"number": -1_000_000}),
+        TrustedCase("r1-2", "R1", {"number": 1_000_000}),
+    ),
+    "even-sum": (
+        TrustedCase("f1-1", "F1", {"numbers": [1, 2, 3, 4]}),
+        TrustedCase("f1-2", "F1", {"numbers": [0, -2, 5]}),
+        TrustedCase("f1-3", "F1", {"numbers": [7]}),
+        TrustedCase("f2-1", "F2", {"numbers": [-3, -4, 6]}),
+        TrustedCase("f2-2", "F2", {"numbers": [2, 2, 3]}),
+        TrustedCase("f2-3", "F2", {"numbers": [1, 3, 5]}),
+        TrustedCase("r1-1", "R1", {"numbers": []}),
+        TrustedCase("r1-2", "R1", {"numbers": [-1_000_000, 1_000_000]}),
+    ),
+    "palindrome-check": (
+        TrustedCase("f1-1", "F1", {"text": "level"}),
+        TrustedCase("f1-2", "F1", {"text": "Level"}),
+        TrustedCase("f1-3", "F1", {"text": "abca"}),
+        TrustedCase("f2-1", "F2", {"text": "上海自来水来自海上"}),
+        TrustedCase("f2-2", "F2", {"text": "a b a"}),
+        TrustedCase("f2-3", "F2", {"text": "racecar!"}),
+        TrustedCase("r1-1", "R1", {"text": ""}),
+        TrustedCase("r1-2", "R1", {"text": "x"}),
+    ),
+    "word-frequency": (
+        TrustedCase("f1-1", "F1", {"words": ["ai", "python", "ai"]}),
+        TrustedCase("f1-2", "F1", {"words": ["code", "lab"]}),
+        TrustedCase("f1-3", "F1", {"words": ["a", "a", "a"]}),
+        TrustedCase("f2-1", "F2", {"words": ["red", "blue", "red", "green"]}),
+        TrustedCase("f2-2", "F2", {"words": ["x", "y", "x", "z", "y"]}),
+        TrustedCase("f2-3", "F2", {"words": ["python"]}),
+        TrustedCase("r1-1", "R1", {"words": []}),
+        TrustedCase("r1-2", "R1", {"words": ["a" * 30, "a" * 30]}),
+    ),
+    "prediction-accuracy": (
+        TrustedCase("f1-1", "F1", {"y_true": [1, 0, 1, 1], "y_pred": [1, 0, 0, 1]}),
+        TrustedCase("f1-2", "F1", {"y_true": [1, 2, 3], "y_pred": [1, 2, 3]}),
+        TrustedCase("f1-3", "F1", {"y_true": [0, 0], "y_pred": [1, 1]}),
+        TrustedCase("f2-1", "F2", {"y_true": [2, 3, 4], "y_pred": [2, 0, 4]}),
+        TrustedCase("f2-2", "F2", {"y_true": [9, 0, 5, 5], "y_pred": [0, 0, 5, 6]}),
+        TrustedCase("f2-3", "F2", {"y_true": [7], "y_pred": [7]}),
+        TrustedCase("r1-1", "R1", {"y_true": [0], "y_pred": [1]}),
+        TrustedCase(
+            "r1-2",
+            "R1",
+            {"y_true": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "y_pred": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]},
+        ),
+    ),
+    "sort-unique": (
+        TrustedCase("f1-1", "F1", {"numbers": [3, 1, 3, 2]}),
+        TrustedCase("f1-2", "F1", {"numbers": [5, 4, 3]}),
+        TrustedCase("f1-3", "F1", {"numbers": [1, 2, 3]}),
+        TrustedCase("f2-1", "F2", {"numbers": [-2, 0, -2, 2]}),
+        TrustedCase("f2-2", "F2", {"numbers": [8, 8, 8]}),
+        TrustedCase("f2-3", "F2", {"numbers": [9, -1, 0]}),
+        TrustedCase("r1-1", "R1", {"numbers": []}),
+        TrustedCase("r1-2", "R1", {"numbers": [-1_000_000, 1_000_000]}),
+    ),
+    "balanced-brackets": (
+        TrustedCase("f1-1", "F1", {"text": "{[()]}"}),
+        TrustedCase("f1-2", "F1", {"text": "([)]"}),
+        TrustedCase("f1-3", "F1", {"text": "((()))"}),
+        TrustedCase("f2-1", "F2", {"text": "([{}])"}),
+        TrustedCase("f2-2", "F2", {"text": "((]"}),
+        TrustedCase("f2-3", "F2", {"text": "{}[]()"}),
+        TrustedCase("r1-1", "R1", {"text": ""}),
+        TrustedCase("r1-2", "R1", {"text": "("}),
+    ),
+    "range-sum": (
+        TrustedCase("f1-1", "F1", {"numbers": [1, 2, 3, 4], "queries": [[0, 1], [1, 3]]}),
+        TrustedCase("f1-2", "F1", {"numbers": [5], "queries": [[0, 0]]}),
+        TrustedCase("f1-3", "F1", {"numbers": [1, 2, 3], "queries": [[0, 2]]}),
+        TrustedCase("f2-1", "F2", {"numbers": [-3, 1, -2], "queries": [[0, 1], [1, 2]]}),
+        TrustedCase("f2-2", "F2", {"numbers": [4, 4, 4], "queries": [[1, 1], [0, 2]]}),
+        TrustedCase("f2-3", "F2", {"numbers": [0, -5, 5], "queries": [[2, 2]]}),
+        TrustedCase("r1-1", "R1", {"numbers": [1], "queries": []}),
+        TrustedCase("r1-2", "R1", {"numbers": [-1_000_000, 1_000_000], "queries": [[0, 1]]}),
+    ),
+    "climbing-stairs": (
+        TrustedCase("f1-1", "F1", {"n": 0}),
+        TrustedCase("f1-2", "F1", {"n": 1}),
+        TrustedCase("f1-3", "F1", {"n": 2}),
+        TrustedCase("f2-1", "F2", {"n": 3}),
+        TrustedCase("f2-2", "F2", {"n": 5}),
+        TrustedCase("f2-3", "F2", {"n": 10}),
+        TrustedCase("r1-1", "R1", {"n": 29}),
+        TrustedCase("r1-2", "R1", {"n": 30}),
     ),
 }
 

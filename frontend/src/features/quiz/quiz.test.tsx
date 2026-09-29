@@ -17,6 +17,9 @@ vi.mock("./api", () => ({
   saveQuizDraft: vi.fn().mockResolvedValue({ draft: { question_id: "q1", answer: "A", revision: 1, updated_at: "" }, last_submitted_answer: null }),
   saveQuizPosition: vi.fn().mockResolvedValue({ position: 0 }),
   getQuizReview: vi.fn(),
+  getQuizResult: vi.fn(),
+  listQuizSessions: vi.fn().mockResolvedValue({ items: [], total: 0 }),
+  setQuizFavorite: vi.fn(),
 }));
 
 import * as contentApi from "../content/api";
@@ -44,6 +47,8 @@ function me(userId: string): MeResponse {
     profile: { stage: "PRIMARY_LOWER", grade: 2, revision: 1, onboarding_completed: true },
     preferences: {
       preferred_style: "AUTO",
+      teacher_style: "AUTO",
+      companion_pet_id: "shuangling",
       interests: [],
       proactive_guidance_enabled: true,
       voice_preference: "DISABLED",
@@ -129,6 +134,7 @@ function cacheQuiz(userId: string, quizSessionId = QUIZ) {
 beforeEach(() => {
   vi.clearAllMocks();
   window.localStorage.clear();
+  vi.mocked(api.listQuizSessions).mockResolvedValue({ items: [], total: 0 });
   vi.mocked(identityApi.getMe).mockResolvedValue(me(USER_A));
   vi.mocked(contentApi.getChapter).mockResolvedValue(chapter);
   vi.mocked(api.getQuizReview).mockResolvedValue({
@@ -138,6 +144,23 @@ beforeEach(() => {
     items: [],
     notice: "复习建议依据本地真实作答证据；未经过教学效果官方验证。",
   });
+  vi.mocked(api.getQuizResult).mockResolvedValue({
+    session_id: QUIZ,
+    status: "COMPLETED",
+    scoring_version: "k12.quiz.scoring.v1",
+    correct: 0,
+    first_correct: 0,
+    total: 1,
+    score_percent: 0,
+    completed_at: "2026-09-19T01:00:00Z",
+    questions: [{
+      id: Q1, position: 0, type: "SINGLE_CHOICE", stem: "哪一个是正确做法？",
+      first_answer: "B", last_answer: "B", first_correct: false, is_correct: false,
+      attempts_used: 2, hints_used: 1, correct_answer: "A", explanation: "先看再判断才是对的。",
+      source_refs: [], code_result: null,
+    }],
+  });
+  vi.mocked(api.setQuizFavorite).mockResolvedValue({ is_favorite: true });
 });
 
 afterEach(() => {
@@ -145,6 +168,41 @@ afterEach(() => {
 });
 
 describe("practice entry (T17 J1/J8)", () => {
+  it("stores favorites through the owner-scoped API and filters history", async () => {
+    vi.mocked(api.listQuizSessions).mockResolvedValue({ items: [session({ is_favorite: false, title: "合成练习" })], total: 1 });
+    renderPractice("");
+    expect(await screen.findByText("合成练习")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "收藏" }));
+    await waitFor(() => expect(api.setQuizFavorite).toHaveBeenCalledWith(QUIZ, true));
+    expect(await screen.findByRole("button", { name: "取消收藏" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "已收藏" }));
+    await waitFor(() => expect(api.listQuizSessions).toHaveBeenCalledWith(undefined, true));
+  });
+
+  it("saves draft revisions sequentially and waits before leaving", async () => {
+    cacheQuiz(USER_A);
+    vi.mocked(api.getQuizSession).mockResolvedValue(session({
+      drafts: { [Q1]: { answer: "A", revision: 3, updated_at: "2026-09-19T00:00:00Z" } },
+    }));
+    vi.mocked(api.saveQuizDraft).mockResolvedValueOnce({ draft: { question_id: Q1, answer: "B", revision: 4, updated_at: "" }, last_submitted_answer: null })
+      .mockResolvedValueOnce({ draft: { question_id: Q1, answer: "A", revision: 5, updated_at: "" }, last_submitted_answer: null });
+    renderPractice(`?session=${LESSON}&chapter=${CHAPTER}`);
+    await screen.findByTestId("practice-session");
+    fireEvent.click(screen.getByText("直接猜"));
+    await waitFor(() => expect(api.saveQuizDraft).toHaveBeenCalledWith(QUIZ, Q1, "B", 3));
+    fireEvent.click(screen.getByText("先看再判断"));
+    await waitFor(() => expect(api.saveQuizDraft).toHaveBeenCalledWith(QUIZ, Q1, "A", 4));
+    fireEvent.click(screen.getByTestId("quiz-save-exit"));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith("/practice?tab=history"));
+  });
+  it("routes a direct visit to history and a real chapter selection", async () => {
+    renderPractice("");
+    expect(await screen.findByTestId("practice-history")).toBeTruthy();
+    expect(screen.getByRole("link", { name: /去学习书库选择章节/ }).getAttribute("href")).toBe("/resources?type=course");
+    fireEvent.click(screen.getByRole("button", { name: "开始练习" }));
+    expect(await screen.findByTestId("practice-choose-chapter")).toBeTruthy();
+    expect(api.createQuizSession).not.toHaveBeenCalled();
+  });
   it("does not create anything on a plain visit", async () => {
     renderPractice(`?session=${LESSON}&chapter=${CHAPTER}`);
     await screen.findByTestId("practice-starter");
@@ -495,6 +553,8 @@ describe("results and review (T17 J4/J11)", () => {
     const result = await screen.findByTestId("quiz-result");
     expect(result.textContent).toContain("答对 0 题");
     expect(screen.getByTestId("quiz-result-summary").textContent).toContain("作答 1 / 1 题");
+    expect((await screen.findByTestId("quiz-result-stats")).textContent).toContain("0%");
+    expect(result.textContent).toContain("先看再判断才是对的");
 
     const body = document.body.textContent ?? "";
     for (const forbidden of ["排行榜", "正确率", "掌握度", "积分"]) {

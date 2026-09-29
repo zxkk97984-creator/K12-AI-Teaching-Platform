@@ -50,16 +50,20 @@ class Settings(BaseSettings):
     knodo_designer_workspace_id: str | None = Field(
         default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$"
     )
-    # Current T11/T13 authorisation is capped at 20 actual requests. Zero keeps
-    # live mode disabled; the durable ledger prevents restart-based expansion.
-    knodo_max_requests: int = Field(default=0, ge=0, le=20)
+    # Zero means unlimited local Knodo calls. A positive value enables the
+    # optional durable request cap without automatically retrying failed calls.
+    knodo_max_requests: int = Field(default=0, ge=0)
     knodo_budget_ledger_path: str = Field(
         default="storage/private/knodo-request-budget.json", min_length=1, max_length=400
     )
     gateway_timeout_seconds: float = Field(default=20.0, ge=1.0, le=120.0)
+    # Bot Chat streams may spend much longer than a non-streaming operation.
+    # This is one bounded attempt, never an automatic retry.
+    knodo_stream_timeout_seconds: float = Field(default=300.0, ge=30.0, le=600.0)
     gateway_max_output_bytes: int = Field(default=262144, ge=1024, le=4194304)
     teaching_autorun: bool = True  # API schedules the in-process worker per run
     authoring_autorun: bool = True  # API schedules the in-process Designer worker per job
+    assessment_autorun: bool = True  # API schedules one in-process student generation attempt
     teaching_fixture_delay_seconds: float = Field(default=0.0, ge=0.0, le=10.0)
     teaching_lease_seconds: int = Field(default=60, ge=10, le=600)
     teaching_sse_poll_seconds: float = Field(default=0.25, ge=0.02, le=2.0)
@@ -88,6 +92,7 @@ class Settings(BaseSettings):
     # T26 local bridge: FastAPI never owns Docker; a loopback runner process does.
     codelab_runner_url: str | None = None
     codelab_runner_token: str | None = None
+    codelab_autorun: bool = True
 
     @model_validator(mode="after")
     def validate_runtime(self) -> Settings:
@@ -129,8 +134,6 @@ class Settings(BaseSettings):
                 raise ValueError(
                     f"required Knodo target configuration missing: {', '.join(missing)}"
                 )
-            if self.knodo_max_requests < 1:
-                raise ValueError("KNODO_MAX_REQUESTS must be positive when GATEWAY_MODE=knodo")
         return self
 
     @property

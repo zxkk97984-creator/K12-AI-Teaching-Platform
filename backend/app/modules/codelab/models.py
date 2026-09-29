@@ -9,6 +9,8 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    ForeignKeyConstraint,
+    Index,
     Integer,
     String,
     Text,
@@ -73,6 +75,57 @@ class CodeTaskRevision(Base):
     )
 
 
+class CodeTaskCatalog(Base):
+    """Student-facing catalogue metadata, versioned separately from task truth."""
+
+    __tablename__ = "codelab_task_catalog"
+
+    task_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    task_revision: Mapped[int] = mapped_column(Integer, primary_key=True)
+    category: Mapped[str] = mapped_column(String(32), nullable=False)
+    difficulty: Mapped[str] = mapped_column(String(16), nullable=False)
+    tags: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["task_id", "task_revision"],
+            ["codelab_task_revisions.task_id", "codelab_task_revisions.revision"],
+            ondelete="CASCADE",
+            name="fk_codelab_task_catalog_revision",
+        ),
+        CheckConstraint(
+            "category IN ('PYTHON_BASICS', 'DATA_PROCESSING', 'ALGORITHMS')",
+            name="ck_codelab_task_catalog_category",
+        ),
+        CheckConstraint(
+            "difficulty IN ('EASY', 'MEDIUM', 'HARD')",
+            name="ck_codelab_task_catalog_difficulty",
+        ),
+        CheckConstraint("sort_order >= 0", name="ck_codelab_task_catalog_sort_order"),
+        CheckConstraint("jsonb_typeof(tags) = 'array'", name="ck_codelab_task_catalog_tags"),
+    )
+
+
+class CodeTaskFavorite(Base):
+    """A student's favourite is attached to a stable task id, not a revision."""
+
+    __tablename__ = "codelab_task_favorites"
+
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("identity_users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    task_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
 class CodeDraft(Base):
     """Owner-scoped code draft for one immutable task revision."""
 
@@ -84,6 +137,10 @@ class CodeDraft(Base):
     )
     task_id: Mapped[str] = mapped_column(String(64), nullable=False)
     task_revision: Mapped[int] = mapped_column(Integer, nullable=False)
+    # ``standalone`` preserves all rows created before embedded workspaces.
+    # Embedded chapter/lesson/quiz workspaces receive a server-normalized key.
+    scope_key: Mapped[str] = mapped_column(String(220), nullable=False, default="standalone")
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     lesson_session_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     code: Mapped[str] = mapped_column(Text, nullable=False)
     code_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -93,9 +150,15 @@ class CodeDraft(Base):
 
     __table_args__ = (
         UniqueConstraint(
-            "owner_user_id", "task_id", "task_revision", name="uq_codelab_draft_owner_task"
+            "owner_user_id",
+            "task_id",
+            "task_revision",
+            "scope_key",
+            name="uq_codelab_draft_owner_task_scope",
         ),
         CheckConstraint("task_revision >= 1", name="ck_codelab_draft_revision_positive"),
+        CheckConstraint("revision >= 1", name="ck_codelab_draft_revision"),
+        CheckConstraint("length(scope_key) BETWEEN 1 AND 220", name="ck_codelab_draft_scope_key"),
         CheckConstraint("code_sha256 ~ '^[0-9a-f]{64}$'", name="ck_codelab_draft_code_sha256"),
     )
 
@@ -111,8 +174,16 @@ class CodeRun(Base):
     )
     task_id: Mapped[str] = mapped_column(String(64), nullable=False)
     task_revision: Mapped[int] = mapped_column(Integer, nullable=False)
+    scope_key: Mapped[str] = mapped_column(String(220), nullable=False, default="standalone")
+    purpose: Mapped[str] = mapped_column(String(16), nullable=False, default="GRADE")
+    quiz_session_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    question_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     lesson_session_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     idempotency_key: Mapped[str] = mapped_column(String(160), nullable=False)
+    request_hash: Mapped[str | None] = mapped_column(String(64), index=True)
+    lease_token: Mapped[str | None] = mapped_column(String(64))
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     code: Mapped[str] = mapped_column(Text, nullable=False)
     code_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
     status: Mapped[str] = mapped_column(String(24), nullable=False, default="QUEUED", index=True)
@@ -132,6 +203,8 @@ class CodeRun(Base):
             "owner_user_id", "idempotency_key", name="uq_codelab_run_owner_idempotency"
         ),
         CheckConstraint("task_revision >= 1", name="ck_codelab_run_revision_positive"),
+        CheckConstraint("length(scope_key) BETWEEN 1 AND 220", name="ck_codelab_run_scope_key"),
+        CheckConstraint("purpose IN ('EXAMPLE', 'GRADE')", name="ck_codelab_run_purpose"),
         CheckConstraint("code_sha256 ~ '^[0-9a-f]{64}$'", name="ck_codelab_run_code_sha256"),
         CheckConstraint(
             "status IN ('QUEUED', 'RUNNING', 'SUCCEEDED', 'FAILED', 'TIMEOUT', "
@@ -150,5 +223,17 @@ class CodeRun(Base):
         CheckConstraint(
             "feedback_status IN ('UNAVAILABLE', 'READY', 'FAILED', 'STALE')",
             name="ck_codelab_run_feedback_status",
+        ),
+        Index(
+            "ix_codelab_run_owner_created_id",
+            "owner_user_id",
+            "created_at",
+            "id",
+        ),
+        Index(
+            "ix_codelab_run_owner_task_revision",
+            "owner_user_id",
+            "task_id",
+            "task_revision",
         ),
     )

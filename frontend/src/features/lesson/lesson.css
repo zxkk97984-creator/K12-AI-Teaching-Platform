@@ -12,7 +12,7 @@
 }
 
 .lesson-muted {
-  color: #5c6470;
+  color: #25272a;
   font-size: 0.9rem;
   margin: 0;
 }
@@ -48,15 +48,15 @@
   text-align: center;
   padding: 8px 6px;
   border-radius: 8px;
-  border: 1px solid #d5d9e0;
-  color: #5c6470;
+  border: 1px solid #d7d8d5;
+  color: #25272a;
   font-size: 0.9rem;
 }
 
 .lesson-step-active {
-  border-color: #1f5fd6;
-  background: #eaf1ff;
-  color: #143c8c;
+  border-color: #5c6062;
+  background: #e7e7e5;
+  color: #25272a;
   font-weight: 600;
 }
 
@@ -66,7 +66,7 @@
 .lesson-actions,
 .lesson-ask,
 .lesson-run {
-  border: 1px solid #e2e5ea;
+  border: 1px solid #e7e7e5;
   border-radius: 10px;
   padding: 12px 14px;
   background: #fff;
@@ -110,8 +110,8 @@
 .lesson-actions button,
 .lesson-ask button,
 .lesson-picker button {
-  border: 1px solid #1f5fd6;
-  background: #1f5fd6;
+  border: 1px solid #5c6062;
+  background: #5c6062;
   color: #fff;
   border-radius: 8px;
   padding: 8px 12px;
@@ -134,7 +134,7 @@
   min-height: 72px;
   resize: vertical;
   border-radius: 8px;
-  border: 1px solid #c8ccd4;
+  border: 1px solid #d7d8d5;
   padding: 8px;
   font: inherit;
 }
@@ -161,7 +161,7 @@
 }
 
 .lesson-picker button .lesson-muted {
-  color: #e5ecff;
+  color: #e7e7e5;
 }
 
 .lesson-resume-list {
@@ -169,7 +169,7 @@
 }
 
 .lesson-thread {
-  border: 1px solid #e2e5ea;
+  border: 1px solid #e7e7e5;
   border-radius: 10px;
   padding: 12px 14px;
   background: #fff;
@@ -202,18 +202,18 @@
 }
 
 .lesson-message-user {
-  background: #eef2f8;
+  background: #e7e7e5;
 }
 
 .lesson-message-tutor {
-  background: #f7f9ff;
-  border: 1px solid #dbe4ff;
+  background: #fafafa;
+  border: 1px solid #e7e7e5;
 }
 
 .lesson-sources {
   margin: 0;
   padding-left: 18px;
-  color: #5c6470;
+  color: #25272a;
   font-size: 0.85rem;
 }
 

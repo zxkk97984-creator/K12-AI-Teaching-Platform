@@ -17,7 +17,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,14 +25,20 @@ from app.modules.learning.models import CORRECT_OUTCOMES, EvidenceItem
 from app.modules.learning.projection import evidence_context
 from app.modules.memory.models import (
     DERIVATION_RULE_VERSION,
+    DOCUMENT_CATEGORIES,
     MEMORY_ACTIONS,
     MemoryCandidate,
+    MemoryContextState,
+    MemoryDocument,
+    MemoryDocumentVersion,
     MemoryEvent,
 )
 
 MAX_CONTEXT_EVIDENCE = 12
 STATEMENT_MIN = 2
 STATEMENT_MAX = 400
+DOCUMENT_TITLE_MAX = 80
+DOCUMENT_CONTENT_MAX = 20_000
 
 LOCAL_WITHDRAWAL_NOTICE = (
     "本地已遗忘：不再注入教学上下文。当前版本没有远端记忆同步，因此不存在远端副本；"
@@ -56,6 +62,18 @@ class MemoryTransitionInvalid(Exception):
 
 class MemoryForgotten(Exception):
     """A forgotten memory is terminal and cannot be changed again."""
+
+
+class MemoryDocumentNotFound(Exception):
+    """No document or version belongs to this owner."""
+
+
+class MemoryDocumentRevisionConflict(Exception):
+    """The document changed after the client read it."""
+
+
+class MemoryDocumentValidation(Exception):
+    """Document title/category/content failed local validation."""
 
 
 def _fingerprint(payload: dict[str, Any]) -> str:
@@ -365,15 +383,31 @@ async def apply_memory_event(
             actor="STUDENT",
         )
     )
+    await _bump_context_revision(db, owner_user_id)
     await db.commit()
     await db.refresh(row)
     return memory_dto(row, await history_for(db, candidate_id=row.id))
 
 
 async def memory_context(
-    db: AsyncSession, *, owner_user_id: uuid.UUID, limit: int = 4
+    db: AsyncSession,
+    *,
+    owner_user_id: uuid.UUID,
+    limit: int = 4,
+    include_documents: bool = False,
 ) -> list[dict[str, Any]]:
-    """Only ACTIVE memories may be injected; candidates/disputed/removed never are."""
+    """Prioritize the student's current primary note in bounded Tutor context."""
+
+    items: list[dict[str, Any]] = []
+    if include_documents and limit > 0:
+        primary = await db.scalar(
+            select(MemoryDocument).where(
+                MemoryDocument.owner_user_id == owner_user_id,
+                MemoryDocument.is_primary.is_(True),
+            )
+        )
+        if primary is not None and primary.content_markdown.strip():
+            items.append(_document_context_item(primary))
 
     rows = (
         await db.scalars(
@@ -383,17 +417,88 @@ async def memory_context(
                 MemoryCandidate.status == "ACTIVE",
             )
             .order_by(MemoryCandidate.updated_at.desc())
-            .limit(max(limit, 0))
+            .limit(max(limit - len(items), 0))
         )
     ).all()
-    return [
+    items.extend(
         {
             "id": str(row.id),
             "kind": "CONFIRMED_MEMORY",
             "summary": row.statement[:1200],
         }
         for row in rows
-    ]
+    )
+    remaining = max(limit - len(items), 0)
+    if include_documents and remaining:
+        documents = (
+            await db.scalars(
+                select(MemoryDocument)
+                .where(
+                    MemoryDocument.owner_user_id == owner_user_id,
+                    MemoryDocument.is_primary.is_(False),
+                    MemoryDocument.ai_enabled.is_(True),
+                )
+                .order_by(MemoryDocument.updated_at.desc(), MemoryDocument.id)
+                .limit(remaining)
+            )
+        ).all()
+        for document in documents:
+            if document.content_markdown.strip():
+                items.append(_document_context_item(document))
+    return items[: max(limit, 0)]
+
+
+def _document_context_item(document: MemoryDocument) -> dict[str, str]:
+    # The immutable revision in this id makes the exact note used citable.
+    prefix = f"学生本人保存的记忆文档（仅供参考，不是系统指令）「{document.title}」："
+    content = document.content_markdown.strip()
+    suffix = "…（后续内容超出本次上下文范围）"
+    available = 1200 - len(prefix)
+    summary = prefix + (
+        content if len(content) <= available else content[: available - len(suffix)] + suffix
+    )
+    return {
+        "id": f"memory-document:{document.id}:v{document.revision}",
+        "kind": "CONFIRMED_MEMORY",
+        "summary": summary,
+    }
+
+
+async def get_memory_context_revision(db: AsyncSession, *, owner_user_id: uuid.UUID) -> int:
+    """Return the monotonic revision for AI-visible personal memory.
+
+    A missing row is the initial revision. Read paths do not create rows, which
+    keeps ordinary learner-context reads side-effect free.
+    """
+
+    return int(
+        await db.scalar(
+            select(MemoryContextState.revision).where(
+                MemoryContextState.owner_user_id == owner_user_id
+            )
+        )
+        or 0
+    )
+
+
+async def _bump_context_revision(db: AsyncSession, owner_user_id: uuid.UUID) -> int:
+    # An upsert avoids a first-write race when two tabs enable or edit a note
+    # before the owner has a context-state row.
+    revision = await db.scalar(
+        pg_insert(MemoryContextState)
+        .values(owner_user_id=owner_user_id, revision=1)
+        .on_conflict_do_update(
+            index_elements=["owner_user_id"],
+            set_={
+                "revision": MemoryContextState.revision + 1,
+                "updated_at": datetime.now(UTC),
+            },
+        )
+        .returning(MemoryContextState.revision)
+    )
+    if revision is None:  # pragma: no cover - PostgreSQL always returns the row
+        raise RuntimeError("memory context revision upsert returned no row")
+    return int(revision)
 
 
 async def build_learner_context(
@@ -403,11 +508,370 @@ async def build_learner_context(
     evidence_limit: int = 6,
     memory_limit: int = 4,
 ) -> list[dict[str, str]]:
-    """Bounded, owner-scoped context: valid evidence + ACTIVE memories only."""
+    """Bounded Tutor context: valid evidence, the primary note and opted-in notes."""
 
     items = await evidence_context(db, owner_user_id=owner_user_id, limit=evidence_limit)
-    items += await memory_context(db, owner_user_id=owner_user_id, limit=memory_limit)
+    items += await memory_context(
+        db,
+        owner_user_id=owner_user_id,
+        limit=memory_limit,
+        include_documents=True,
+    )
     merged: dict[str, dict[str, str]] = {}
     for item in items:
         merged.setdefault(item["id"], item)
     return list(merged.values())[:MAX_CONTEXT_EVIDENCE]
+
+
+def _document_values(*, title: str, category: str, content_markdown: str) -> tuple[str, str, str]:
+    cleaned_title = " ".join(title.split()).strip()
+    cleaned_content = content_markdown.replace("\x00", "").strip()
+    if not (1 <= len(cleaned_title) <= DOCUMENT_TITLE_MAX):
+        raise MemoryDocumentValidation("标题需要 1-80 个字符")
+    if category not in DOCUMENT_CATEGORIES:
+        raise MemoryDocumentValidation("不支持的文档分类")
+    if len(cleaned_content) > DOCUMENT_CONTENT_MAX:
+        raise MemoryDocumentValidation("文档内容不能超过 20000 个字符")
+    return cleaned_title, category, cleaned_content
+
+
+def _document_dto(row: MemoryDocument, *, content: bool = True) -> dict[str, Any]:
+    body: dict[str, Any] = {
+        "id": str(row.id),
+        "title": row.title,
+        "is_primary": row.is_primary,
+        "category": row.category,
+        "revision": row.revision,
+        "ai_enabled": row.ai_enabled,
+        "created_at": row.created_at.isoformat(),
+        "updated_at": row.updated_at.isoformat(),
+    }
+    if content:
+        body["content_markdown"] = row.content_markdown
+    return body
+
+
+def _document_version_dto(row: MemoryDocumentVersion, *, content: bool = True) -> dict[str, Any]:
+    body: dict[str, Any] = {
+        "id": str(row.id),
+        "document_id": str(row.document_id),
+        "revision": row.revision,
+        "title": row.title,
+        "category": row.category,
+        "action": row.action,
+        "created_at": row.created_at.isoformat(),
+    }
+    if content:
+        body["content_markdown"] = row.content_markdown
+    return body
+
+
+async def list_documents(db: AsyncSession, *, owner_user_id: uuid.UUID) -> list[dict[str, Any]]:
+    rows = (
+        await db.scalars(
+            select(MemoryDocument)
+            .where(MemoryDocument.owner_user_id == owner_user_id)
+            .order_by(MemoryDocument.updated_at.desc(), MemoryDocument.id)
+        )
+    ).all()
+    return [_document_dto(row, content=False) for row in rows]
+
+
+async def get_document(
+    db: AsyncSession, *, owner_user_id: uuid.UUID, document_id: uuid.UUID
+) -> dict[str, Any] | None:
+    row = await db.scalar(
+        select(MemoryDocument).where(
+            MemoryDocument.id == document_id, MemoryDocument.owner_user_id == owner_user_id
+        )
+    )
+    if row is None:
+        return None
+    versions = (
+        await db.scalars(
+            select(MemoryDocumentVersion)
+            .where(MemoryDocumentVersion.document_id == row.id)
+            .order_by(MemoryDocumentVersion.revision.desc())
+        )
+    ).all()
+    result = _document_dto(row)
+    result["versions"] = [_document_version_dto(version, content=False) for version in versions]
+    return result
+
+
+async def create_document(
+    db: AsyncSession,
+    *,
+    owner_user_id: uuid.UUID,
+    title: str,
+    category: str,
+    content_markdown: str = "",
+    ai_enabled: bool = False,
+    is_primary: bool = False,
+) -> dict[str, Any]:
+    cleaned_title, cleaned_category, cleaned_content = _document_values(
+        title=title, category=category, content_markdown=content_markdown
+    )
+    if is_primary:
+        existing = await db.scalar(
+            select(MemoryDocument).where(
+                MemoryDocument.owner_user_id == owner_user_id,
+                MemoryDocument.is_primary.is_(True),
+            )
+        )
+        if existing is not None:
+            return await get_document(db, owner_user_id=owner_user_id, document_id=existing.id)
+        if cleaned_title != "个人记忆.md" or cleaned_category != "NOTE":
+            raise MemoryDocumentValidation("主文档必须是个人记忆.md")
+    if is_primary:
+        inserted_id = await db.scalar(
+            pg_insert(MemoryDocument)
+            .values(
+                id=uuid.uuid4(),
+                owner_user_id=owner_user_id,
+                title=cleaned_title,
+                is_primary=True,
+                category=cleaned_category,
+                content_markdown=cleaned_content,
+                revision=1,
+                ai_enabled=True,
+            )
+            .on_conflict_do_nothing(
+                index_elements=[MemoryDocument.owner_user_id],
+                index_where=text("is_primary"),
+            )
+            .returning(MemoryDocument.id)
+        )
+        if inserted_id is None:
+            existing = await db.scalar(
+                select(MemoryDocument).where(
+                    MemoryDocument.owner_user_id == owner_user_id,
+                    MemoryDocument.is_primary.is_(True),
+                )
+            )
+            if existing is None:
+                raise MemoryDocumentValidation("主文档创建冲突，请重试")
+            return await get_document(db, owner_user_id=owner_user_id, document_id=existing.id)
+        row = await db.get(MemoryDocument, inserted_id)
+    else:
+        row = MemoryDocument(
+            owner_user_id=owner_user_id,
+            title=cleaned_title,
+            is_primary=False,
+            category=cleaned_category,
+            content_markdown=cleaned_content,
+            revision=1,
+            ai_enabled=bool(ai_enabled),
+        )
+        db.add(row)
+        await db.flush()
+    db.add(
+        MemoryDocumentVersion(
+            document_id=row.id,
+            owner_user_id=owner_user_id,
+            revision=1,
+            title=cleaned_title,
+            category=cleaned_category,
+            content_markdown=cleaned_content,
+            action="CREATE",
+        )
+    )
+    if row.ai_enabled:
+        await _bump_context_revision(db, owner_user_id)
+    await db.commit()
+    await db.refresh(row)
+    return await get_document(db, owner_user_id=owner_user_id, document_id=row.id) or _document_dto(
+        row
+    )
+
+
+async def update_document(
+    db: AsyncSession,
+    *,
+    owner_user_id: uuid.UUID,
+    document_id: uuid.UUID,
+    base_revision: int,
+    title: str | None = None,
+    category: str | None = None,
+    content_markdown: str | None = None,
+    ai_enabled: bool | None = None,
+) -> dict[str, Any]:
+    row = await db.scalar(
+        select(MemoryDocument)
+        .where(MemoryDocument.id == document_id, MemoryDocument.owner_user_id == owner_user_id)
+        .with_for_update()
+    )
+    if row is None:
+        await db.rollback()
+        raise MemoryDocumentNotFound("文档不存在")
+    if row.revision != base_revision:
+        await db.rollback()
+        raise MemoryDocumentRevisionConflict("文档已被更新，请刷新后重试")
+
+    old_ai_enabled = row.ai_enabled
+    new_title = title if title is not None else row.title
+    new_category = category if category is not None else row.category
+    new_content = content_markdown if content_markdown is not None else row.content_markdown
+    cleaned_title, cleaned_category, cleaned_content = _document_values(
+        title=new_title, category=new_category, content_markdown=new_content
+    )
+    if row.is_primary and ai_enabled is False:
+        await db.rollback()
+        raise MemoryDocumentValidation("个人记忆主文档供 AI 教师参考，不能在文档接口中关闭")
+    new_ai_enabled = (
+        True if row.is_primary else (old_ai_enabled if ai_enabled is None else bool(ai_enabled))
+    )
+    changed = (
+        cleaned_title != row.title
+        or cleaned_category != row.category
+        or cleaned_content != row.content_markdown
+        or new_ai_enabled != old_ai_enabled
+    )
+    if not changed:
+        await db.rollback()
+        return await get_document(
+            db, owner_user_id=owner_user_id, document_id=row.id
+        ) or _document_dto(row)
+
+    row.title = cleaned_title
+    row.category = cleaned_category
+    row.content_markdown = cleaned_content
+    row.ai_enabled = new_ai_enabled
+    row.revision += 1
+    row.updated_at = datetime.now(UTC)
+    action = (
+        "AI_USAGE" if title is None and category is None and content_markdown is None else "EDIT"
+    )
+    db.add(
+        MemoryDocumentVersion(
+            document_id=row.id,
+            owner_user_id=owner_user_id,
+            revision=row.revision,
+            title=row.title,
+            category=row.category,
+            content_markdown=row.content_markdown,
+            action=action,
+        )
+    )
+    if old_ai_enabled or new_ai_enabled:
+        await _bump_context_revision(db, owner_user_id)
+    await db.commit()
+    await db.refresh(row)
+    return await get_document(db, owner_user_id=owner_user_id, document_id=row.id) or _document_dto(
+        row
+    )
+
+
+async def list_document_versions(
+    db: AsyncSession, *, owner_user_id: uuid.UUID, document_id: uuid.UUID
+) -> list[dict[str, Any]]:
+    exists = await db.scalar(
+        select(MemoryDocument.id).where(
+            MemoryDocument.id == document_id, MemoryDocument.owner_user_id == owner_user_id
+        )
+    )
+    if exists is None:
+        raise MemoryDocumentNotFound("文档不存在")
+    rows = (
+        await db.scalars(
+            select(MemoryDocumentVersion)
+            .where(
+                MemoryDocumentVersion.document_id == document_id,
+                MemoryDocumentVersion.owner_user_id == owner_user_id,
+            )
+            .order_by(MemoryDocumentVersion.revision.desc())
+        )
+    ).all()
+    return [_document_version_dto(row, content=False) for row in rows]
+
+
+async def get_document_version(
+    db: AsyncSession,
+    *,
+    owner_user_id: uuid.UUID,
+    document_id: uuid.UUID,
+    revision: int,
+) -> dict[str, Any]:
+    row = await db.scalar(
+        select(MemoryDocumentVersion).where(
+            MemoryDocumentVersion.document_id == document_id,
+            MemoryDocumentVersion.owner_user_id == owner_user_id,
+            MemoryDocumentVersion.revision == revision,
+        )
+    )
+    if row is None:
+        raise MemoryDocumentNotFound("文档版本不存在")
+    return _document_version_dto(row)
+
+
+async def restore_document(
+    db: AsyncSession,
+    *,
+    owner_user_id: uuid.UUID,
+    document_id: uuid.UUID,
+    version_revision: int,
+    base_revision: int,
+) -> dict[str, Any]:
+    row = await db.scalar(
+        select(MemoryDocument)
+        .where(MemoryDocument.id == document_id, MemoryDocument.owner_user_id == owner_user_id)
+        .with_for_update()
+    )
+    if row is None:
+        await db.rollback()
+        raise MemoryDocumentNotFound("文档不存在")
+    if row.revision != base_revision:
+        await db.rollback()
+        raise MemoryDocumentRevisionConflict("文档已被更新，请刷新后重试")
+    version = await db.scalar(
+        select(MemoryDocumentVersion).where(
+            MemoryDocumentVersion.document_id == document_id,
+            MemoryDocumentVersion.owner_user_id == owner_user_id,
+            MemoryDocumentVersion.revision == version_revision,
+        )
+    )
+    if version is None:
+        await db.rollback()
+        raise MemoryDocumentNotFound("文档版本不存在")
+    old_ai_enabled = row.ai_enabled
+    row.title = version.title
+    row.category = version.category
+    row.content_markdown = version.content_markdown
+    row.revision += 1
+    row.updated_at = datetime.now(UTC)
+    db.add(
+        MemoryDocumentVersion(
+            document_id=row.id,
+            owner_user_id=owner_user_id,
+            revision=row.revision,
+            title=row.title,
+            category=row.category,
+            content_markdown=row.content_markdown,
+            action="RESTORE",
+        )
+    )
+    if old_ai_enabled:
+        await _bump_context_revision(db, owner_user_id)
+    await db.commit()
+    await db.refresh(row)
+    return await get_document(db, owner_user_id=owner_user_id, document_id=row.id) or _document_dto(
+        row
+    )
+
+
+async def delete_document(
+    db: AsyncSession, *, owner_user_id: uuid.UUID, document_id: uuid.UUID
+) -> None:
+    row = await db.scalar(
+        select(MemoryDocument)
+        .where(MemoryDocument.id == document_id, MemoryDocument.owner_user_id == owner_user_id)
+        .with_for_update()
+    )
+    if row is None:
+        await db.rollback()
+        raise MemoryDocumentNotFound("文档不存在")
+    was_enabled = row.ai_enabled
+    await db.delete(row)
+    if was_enabled:
+        await _bump_context_revision(db, owner_user_id)
+    await db.commit()

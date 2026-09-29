@@ -1,0 +1,127 @@
+{
+  "schema_version": "k12.code-task.v1",
+  "task_id": "odd-even",
+  "revision": 1,
+  "status": "DRAFT",
+  "is_test_fixture": true,
+  "review_status": "UNREVIEWED",
+  "title": "奇偶判断：看看数字能否平分",
+  "description": "编写 is_even(number)，判断整数 number 是否为偶数。0 是偶数；正数、负数和边界值均按整数除法规则判断。",
+  "starter_code": "def is_even(number):\n    \"\"\"奇偶判断：看看数字能否平分\"\"\"\n    # 在这里写下你的解题思路\n    pass\n",
+  "entrypoint": "is_even",
+  "io_contract": {
+    "protocol": "function-json.v1",
+    "language": "python",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "number"
+      ],
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": -1000000,
+          "maximum": 1000000
+        }
+      }
+    },
+    "output_schema": {
+      "type": "boolean"
+    },
+    "limits": {
+      "max_input_bytes": 65536,
+      "max_output_bytes": 16384,
+      "timeout_ms": 3000
+    },
+    "errors": [
+      "INVALID_JSON",
+      "INVALID_INPUT",
+      "STUDENT_EXCEPTION",
+      "TIMEOUT",
+      "OUTPUT_LIMIT",
+      "SYSTEM_ERROR"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "number": 0
+      },
+      "output": true
+    },
+    {
+      "input": {
+        "number": -3
+      },
+      "output": false
+    },
+    {
+      "input": {
+        "number": 8
+      },
+      "output": true
+    }
+  ],
+  "test_manifest": {
+    "oracle_boundary": "TRUSTED_RUNNER_ONLY",
+    "public_groups": [
+      {
+        "id": "F1",
+        "name": "常规用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "F2",
+        "name": "变化与组合用例",
+        "dimension": "F",
+        "max_score": 30,
+        "case_count": 3
+      },
+      {
+        "id": "R1",
+        "name": "边界用例",
+        "dimension": "R",
+        "max_score": 10,
+        "case_count": 2
+      }
+    ],
+    "hidden_case_count": 8,
+    "hidden_cases_sha256": "11caefd2e22c4670eb41976ad31eb96a421575741512cb1a3e54b1b797144ae8"
+  },
+  "rubric": {
+    "version": "k12.codelab.rubric.v1",
+    "deterministic_dimensions": [
+      {
+        "id": "F",
+        "max_score": 60
+      },
+      {
+        "id": "R",
+        "max_score": 10
+      }
+    ],
+    "score_scale": 70,
+    "ai_feedback_non_authoritative": true
+  },
+  "chapter_binding": {
+    "release_key": "legacy-k12-696364f-pending-review",
+    "course_slug": "python-first-steps",
+    "chapter_slug": "ch05",
+    "revision": 1,
+    "stage": "JUNIOR",
+    "knowledge_point_slugs": [
+      "variable",
+      "condition-if",
+      "loop"
+    ]
+  },
+  "source": {
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "source_path": "curriculum/code-tasks/odd-even-r1.json",
+    "source_sha256": "525951afec61c7d6cfa236e8e2648c551ec98c9d3f3dc1d1b04849614c726279",
+    "reference_solution_sha256": "a2b3129c7b33038fe282e824796fa97536ca3e3cecc0ae8bfbf00cce7ffc4830"
+  }
+}

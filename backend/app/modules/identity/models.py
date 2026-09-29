@@ -11,6 +11,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
+    LargeBinary,
     String,
     Text,
     func,
@@ -42,6 +43,14 @@ class PreferredStyle(enum.StrEnum):
     STORY = "STORY"
     STEP_BY_STEP = "STEP_BY_STEP"
     CODE = "CODE"
+
+
+class TeacherStyle(enum.StrEnum):
+    AUTO = "AUTO"
+    GENTLE = "GENTLE"
+    PLAYFUL = "PLAYFUL"
+    PRECISE = "PRECISE"
+    SOCRATIC = "SOCRATIC"
 
 
 class VoicePreference(enum.StrEnum):
@@ -119,9 +128,15 @@ class LearnerProfile(Base):
     )
     stage: Mapped[str | None] = mapped_column(String(32))
     grade: Mapped[int | None] = mapped_column(Integer)
+    nickname: Mapped[str | None] = mapped_column(String(24))
+    avatar_sha256: Mapped[str | None] = mapped_column(String(64))
     preferred_style: Mapped[str] = mapped_column(
         String(32), nullable=False, default=PreferredStyle.AUTO.value
     )
+    teacher_style: Mapped[str] = mapped_column(
+        String(16), nullable=False, default=TeacherStyle.AUTO.value
+    )
+    companion_pet_id: Mapped[str] = mapped_column(String(32), nullable=False, default="shuangling")
     interests: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     proactive_guidance_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     voice_preference: Mapped[str] = mapped_column(
@@ -149,8 +164,25 @@ class LearnerProfile(Base):
         ),
         CheckConstraint("revision >= 0", name="ck_learner_profiles_revision"),
         CheckConstraint(
+            "nickname IS NULL OR char_length(nickname) BETWEEN 1 AND 24",
+            name="ck_learner_profiles_nickname",
+        ),
+        CheckConstraint(
+            "avatar_sha256 IS NULL OR avatar_sha256 ~ '^[0-9a-f]{64}$'",
+            name="ck_learner_profiles_avatar_sha256",
+        ),
+        CheckConstraint(
             "preferred_style IN ('AUTO', 'EXAMPLE', 'VISUAL', 'STORY', 'STEP_BY_STEP', 'CODE')",
             name="ck_learner_profiles_preferred_style",
+        ),
+        CheckConstraint(
+            "teacher_style IN ('AUTO', 'GENTLE', 'PLAYFUL', 'PRECISE', 'SOCRATIC')",
+            name="ck_learner_profiles_teacher_style",
+        ),
+        CheckConstraint(
+            "companion_pet_id IN ('shuangling', 'anya', 'doraemon', "
+            "'kun-like', 'lulu-capybara', 'shinchan')",
+            name="ck_learner_profiles_companion_pet_id",
         ),
         CheckConstraint(
             "voice_preference IN ('DISABLED', 'INPUT_ONLY', 'OUTPUT_ONLY', 'INPUT_AND_OUTPUT')",
@@ -160,6 +192,28 @@ class LearnerProfile(Base):
             "jsonb_typeof(interests) = 'array'",
             name="ck_learner_profiles_interests_array",
         ),
+    )
+
+
+class ProfileAvatar(Base):
+    """Private, normalized avatar bytes; reads are scoped to the signed-in user."""
+
+    __tablename__ = "identity_profile_avatars"
+
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("identity_users.id", ondelete="CASCADE"), primary_key=True
+    )
+    image_png: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "octet_length(image_png) BETWEEN 1 AND 1048576", name="ck_profile_avatar_image_size"
+        ),
+        CheckConstraint("sha256 ~ '^[0-9a-f]{64}$'", name="ck_profile_avatar_sha256"),
     )
 
 

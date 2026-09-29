@@ -16,3 +16,7 @@
 ## 身份 HTTP OpenAPI
 
 `openapi.identity.json` 是 FastAPI 运行时导出的实际接口文档，包含 `/api/v1/auth/*`、`/api/v1/me`、管理员状态和会话/CSRF Cookie/Header 参数。前端类型由 `frontend/package.json` 的 `generate:identity` 从该文件生成；不要手写第二套冲突 DTO。
+
+`openapi.content.json` 同样由运行时导出，除课程、章节和阅读接口外，包含学习中心的目录、书架、打开记录、历史和继续学习接口。
+
+`openapi.learning.json` 覆盖本轮跨模块的学习、练习草稿/历史、学生出题、CodeRun 和个人文档接口；前端对应类型生成到 `frontend/src/shared/types/generated/learning.ts`。

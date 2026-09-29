@@ -24,11 +24,11 @@ function AdminNotice({ username }: { username: string }) {
     <StatePanel
       tone="empty"
       title="管理员账号不进入学生工作台"
-      description={`${username} 的角色由服务端会话校验。管理端能力（课程审校、资源发布、任务状态）属于 T22，本卡未实现；这里不提供批量用户管理入口，也不显示学生数据。`}
+      description={`${username} 的角色由服务端会话校验。管理端能力请从资源管理和课程编排进入。`}
       action={
         <>
-          <a className="wb-link" href="/settings">
-            打开设置
+          <a className="wb-link" href="/admin/resources">
+            打开资源管理
           </a>
           <button type="button" className="secondary" onClick={signOut}>
             退出登录
@@ -75,7 +75,10 @@ export function WorkbenchPage() {
     if (state.status === 401) {
       return (
         <Frame>
-          <ErrorState title="登录已失效" message="会话已过期或被撤销，正在跳转到登录页。" />
+          <ErrorState
+            title="登录已失效"
+            message="会话已过期或被撤销，正在跳转到登录页。"
+          />
         </Frame>
       );
     }

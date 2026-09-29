@@ -23,8 +23,12 @@ from app.config import Settings
 from app.core.database import get_engine
 from app.integrations.knodo.gateway import build_gateway
 from app.jobs.authoring_worker import execute_job, recover_authoring_jobs
+from app.jobs.codelab_worker import execute_code_run, recover_code_runs
 from app.jobs.teaching_worker import execute_run, recover_runs
+from app.modules.assessment.models import GenerationJob
+from app.modules.assessment.service import execute_student_generation, recover_student_generations
 from app.modules.authoring.models import AuthoringJob
+from app.modules.codelab.models import CodeRun
 from app.modules.teaching.models import AgentRun
 
 logger = logging.getLogger("k12.worker")
@@ -38,7 +42,7 @@ def _poll_seconds() -> float:
         return 1.0
 
 
-async def _queued_ids(settings: Settings) -> tuple[list[str], list[str]]:
+async def _queued_ids(settings: Settings) -> tuple[list[str], list[str], list[str], list[str]]:
     engine = get_engine(settings.active_database_url, settings.app_env)
     factory = async_sessionmaker(engine, expire_on_commit=False)
     async with factory() as db:
@@ -56,27 +60,59 @@ async def _queued_ids(settings: Settings) -> tuple[list[str], list[str]]:
                 )
             ).all()
         ]
-    return teaching, authoring
+        codelab = [
+            str(value)
+            for value in (
+                await db.scalars(select(CodeRun.id).where(CodeRun.status == "QUEUED").limit(8))
+            ).all()
+        ]
+        assessment = [
+            str(value)
+            for value in (
+                await db.scalars(
+                    select(GenerationJob.id)
+                    .where(
+                        GenerationJob.status == "QUEUED",
+                        GenerationJob.purpose == "STUDENT",
+                    )
+                    .limit(4)
+                )
+            ).all()
+        ]
+    return teaching, authoring, codelab, assessment
 
 
 async def run_once(settings: Settings | None = None) -> dict[str, int]:
     runtime = settings or Settings()
     recovered_teaching = await recover_runs(runtime)
     recovered_authoring = await recover_authoring_jobs(runtime)
-    teaching_ids, authoring_ids = await _queued_ids(runtime)
+    recovered_codelab = await recover_code_runs(runtime)
+    engine = get_engine(runtime.active_database_url, runtime.app_env)
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as db:
+        recovered_assessment = await recover_student_generations(db)
+    teaching_ids, authoring_ids, codelab_ids, assessment_ids = await _queued_ids(runtime)
     gateway = build_gateway(runtime)
     try:
         for run_id in teaching_ids:
             await execute_run(runtime, gateway, run_id)
         for job_id in authoring_ids:
             await execute_job(runtime, uuid.UUID(job_id))
+        for run_id in codelab_ids:
+            await execute_code_run(runtime, uuid.UUID(run_id))
+        for job_id in assessment_ids:
+            await execute_student_generation(runtime, gateway, uuid.UUID(job_id))
     finally:
         await gateway.aclose()
     return {
         "recovered_teaching": recovered_teaching,
         "recovered_authoring": recovered_authoring,
+        "recovered_codelab": recovered_codelab,
+        "recovered_assessment": recovered_assessment,
         "teaching_processed": len(teaching_ids),
         "authoring_processed": len(authoring_ids),
+        "codelab_processed": len(codelab_ids),
+        "assessment_processed": len(assessment_ids),
     }
 
 

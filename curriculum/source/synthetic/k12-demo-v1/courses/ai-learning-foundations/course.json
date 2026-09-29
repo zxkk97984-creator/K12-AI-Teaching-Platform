@@ -1,0 +1,161 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "ai-learning-foundations",
+  "title": "AI 通识四学段演示课",
+  "topic": "人工智能通识",
+  "description": "同一条 AI 学习主线按四个学段调整知识深度、活动和表达方式。",
+  "knowledge_points": [
+    {
+      "slug": "demo-ai-as-helper",
+      "name": "AI 是帮手",
+      "topic": "AI 通识",
+      "description": "AI 是人造的程序，按照数据和规则帮助人完成任务。"
+    },
+    {
+      "slug": "demo-ai-makes-mistakes",
+      "name": "AI 会犯错",
+      "topic": "AI 通识",
+      "description": "数据不足、分布变化或规则不完整时，AI 可能输出错误结果。"
+    },
+    {
+      "slug": "demo-data-labels",
+      "name": "数据与标签",
+      "topic": "AI 通识",
+      "description": "标签为例子提供分类线索，数据质量会影响程序的判断。"
+    },
+    {
+      "slug": "demo-condition-if",
+      "name": "条件判断",
+      "topic": "编程",
+      "description": "条件语句根据真假选择不同的执行路径。"
+    },
+    {
+      "slug": "demo-train-test-split",
+      "name": "训练集与测试集",
+      "topic": "机器学习",
+      "description": "训练集用于学习，测试集用于检查面对新数据时的表现。"
+    },
+    {
+      "slug": "demo-overfitting",
+      "name": "过拟合",
+      "topic": "机器学习",
+      "description": "模型把训练例子的细节和噪声也记住，面对新数据反而表现变差。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-primary-lower",
+      "revision": 1,
+      "order_index": 1,
+      "title": "身边的 AI：会学习的电脑",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "AI 是人造出来的程序",
+        "AI 可以从例子中学习规律",
+        "遇到不确定的回答要问大人"
+      ],
+      "knowledge_points": [
+        "demo-ai-as-helper",
+        "demo-ai-makes-mistakes"
+      ],
+      "license_code": "SYNTHETIC-FIXTURE",
+      "license_notes": "项目自有演示文本，未完成正式人工教学审校，仅用于本地比赛演示。",
+      "source": {
+        "source_commit": "0000000000000000000000000000000000000000",
+        "source_path": "sources/ch-primary-lower.txt",
+        "original_sha256": "3dcd8ef23ef11f49854e6153b28043526bce5c64e2efe359248291b0551e117b",
+        "conversion": "synthetic-original-demo-v1"
+      },
+      "content_file": "chapters/ch-primary-lower.json",
+      "example_count": 1
+    },
+    {
+      "stable_slug": "ch-primary-upper",
+      "revision": 1,
+      "order_index": 1,
+      "title": "数据小侦探：给机器贴标签",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "标签帮助程序整理例子",
+        "分类结果依赖训练数据",
+        "程序会按明确规则执行"
+      ],
+      "knowledge_points": [
+        "demo-data-labels",
+        "demo-ai-makes-mistakes",
+        "demo-condition-if"
+      ],
+      "license_code": "SYNTHETIC-FIXTURE",
+      "license_notes": "项目自有演示文本，未完成正式人工教学审校，仅用于本地比赛演示。",
+      "source": {
+        "source_commit": "0000000000000000000000000000000000000000",
+        "source_path": "sources/ch-primary-upper.txt",
+        "original_sha256": "1a6c4ffac36e6c11738762a390d0d730711c381790f523c84e7df869abbc75d9",
+        "conversion": "synthetic-original-demo-v1"
+      },
+      "content_file": "chapters/ch-primary-upper.json",
+      "example_count": 1
+    },
+    {
+      "stable_slug": "ch-junior",
+      "revision": 1,
+      "order_index": 1,
+      "title": "从数据到判断：让程序做选择",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "输入数据经过规则得到输出",
+        "条件语句控制程序分支",
+        "运行结果和代码证据需要一起检查"
+      ],
+      "knowledge_points": [
+        "demo-data-labels",
+        "demo-condition-if"
+      ],
+      "license_code": "SYNTHETIC-FIXTURE",
+      "license_notes": "项目自有演示文本，未完成正式人工教学审校，仅用于本地比赛演示。",
+      "source": {
+        "source_commit": "0000000000000000000000000000000000000000",
+        "source_path": "sources/ch-junior.txt",
+        "original_sha256": "f34c3728a0aacdc9914115f29acb07a1f5b3b874d4c51b77bf16cec7a0f6826b",
+        "conversion": "synthetic-original-demo-v1"
+      },
+      "content_file": "chapters/ch-junior.json",
+      "example_count": 1
+    },
+    {
+      "stable_slug": "ch-senior",
+      "revision": 1,
+      "order_index": 1,
+      "title": "训练与测试：模型为什么会出错",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "训练数据和测试数据职责不同",
+        "过拟合会让模型只会背例子",
+        "AI 结果需要结合证据复核"
+      ],
+      "knowledge_points": [
+        "demo-train-test-split",
+        "demo-overfitting",
+        "demo-ai-makes-mistakes"
+      ],
+      "license_code": "SYNTHETIC-FIXTURE",
+      "license_notes": "项目自有演示文本，未完成正式人工教学审校，仅用于本地比赛演示。",
+      "source": {
+        "source_commit": "0000000000000000000000000000000000000000",
+        "source_path": "sources/ch-senior.txt",
+        "original_sha256": "7b6404599048f7ec5556805755b36ad4b95252bd7caf579a8babe6aef9d40b33",
+        "conversion": "synthetic-original-demo-v1"
+      },
+      "content_file": "chapters/ch-senior.json",
+      "example_count": 1
+    }
+  ]
+}

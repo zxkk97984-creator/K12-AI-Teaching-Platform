@@ -20,6 +20,11 @@ from runner.host.runner import (
 )
 
 
+class RunnerHTTPServer(ThreadingHTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+
 class RunnerHandler(BaseHTTPRequestHandler):
     server_version = "K12Runner/0.1"
 
@@ -33,7 +38,21 @@ class RunnerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         if self.path == "/health":
-            self._json(200, {"status": "ok", "image": self.server.runner.image})  # type: ignore[attr-defined]
+            runner = self.server.runner  # type: ignore[attr-defined]
+            try:
+                runner.ensure_available()
+            except RunnerUnavailable as exc:
+                self._json(
+                    503,
+                    {
+                        "status": "unavailable",
+                        "ready": False,
+                        "image": runner.image,
+                        "error": str(exc),
+                    },
+                )
+                return
+            self._json(200, {"status": "ok", "ready": True, "image": runner.image})
             return
         self._json(404, {"error": "NOT_FOUND"})
 
@@ -73,7 +92,7 @@ def main() -> None:
     token = os.environ.get("RUNNER_CONTROL_TOKEN")
     if not token:
         raise SystemExit("RUNNER_CONTROL_TOKEN is required")
-    server = ThreadingHTTPServer((host, port), RunnerHandler)
+    server = RunnerHTTPServer((host, port), RunnerHandler)
     server.runner = DockerRunner(image=os.environ.get("RUNNER_IMAGE", DEFAULT_IMAGE))  # type: ignore[attr-defined]
     server.control_token = token  # type: ignore[attr-defined]
     server.serve_forever()

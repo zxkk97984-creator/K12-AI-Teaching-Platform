@@ -13,7 +13,7 @@ from app.integrations.knodo.operations import Operation
 from app.integrations.knodo.types import GatewayResult, GatewayStatus, GatewayUsage
 from app.jobs import teaching_worker
 from app.modules.teaching.models import AgentRun, RemoteBinding, RunStatus
-from app.modules.teaching.service import create_session, create_turn
+from app.modules.teaching.service import create_free_session, create_session, create_turn
 from tests.identity_helpers import create_synthetic_user
 from tests.teaching_helpers import prepare_fixture_course, teaching_settings
 
@@ -244,3 +244,99 @@ async def test_failed_accepted_turn_is_audited_but_not_reused(
     assert failed_binding is not None
     assert failed_binding.remote_id == f"conv-{session.id}"
     assert failed_binding.remote_metadata["completion_id"] == "completion-1"
+
+
+@pytest.mark.asyncio
+async def test_free_chat_replays_bounded_local_history_when_stream_has_no_conversation_id(
+    content_session, test_settings: Settings
+) -> None:
+    settings = teaching_settings(test_settings, gateway_mode="disabled")
+    user = await _student(settings, "t13.binding.no-stream-id")
+    session = await create_free_session(content_session, settings=settings, user=user)
+
+    class NoConversationIdGateway:
+        def __init__(self):
+            self.requests: list[dict] = []
+
+        def continuation_scope(self, _operation):
+            return "scope:tutor:stream-test"
+
+        async def invoke(self, operation, request, **_kwargs):
+            self.requests.append(request)
+            output = teaching_response_payload(Operation(operation), request)
+            output["message_markdown"] = f"第{len(self.requests)}轮答复"
+            output["source_refs"] = []
+            output["evidence_refs"] = []
+            output["action"] = None
+            return GatewayResult(
+                invocation_id=str(uuid.uuid4()),
+                operation=Operation(operation),
+                mode="knodo",
+                status=GatewayStatus.OK,
+                output=output,
+                error=None,
+                usage=GatewayUsage(input_bytes=1, output_bytes=1, duration_ms=1, upstream_calls=1),
+                remote_metadata={"conversation_id": None},
+                fixture=False,
+            )
+
+    gateway = NoConversationIdGateway()
+    scene = {"page_type": "conversation", "route": "/conversations"}
+    first, _ = await create_turn(
+        content_session,
+        user=user,
+        session=session,
+        operation=Operation.TEACH_TURN.value,
+        message="第一轮问题",
+        idempotency_key="no-id-first",
+        scene_snapshot=scene,
+    )
+    assert await teaching_worker.execute_run(settings, gateway, str(first.id)) == "SUCCEEDED"
+    second, _ = await create_turn(
+        content_session,
+        user=user,
+        session=session,
+        operation=Operation.TEACH_TURN.value,
+        message="第二轮追问",
+        idempotency_key="no-id-second",
+        scene_snapshot=scene,
+    )
+    assert await teaching_worker.execute_run(settings, gateway, str(second.id)) == "SUCCEEDED"
+
+    assert len(gateway.requests) == 2
+    assert gateway.requests[0]["student_input"].endswith("第一轮问题")
+    assert "先前对话记录" not in gateway.requests[0]["student_input"]
+    followup = gateway.requests[1]["student_input"]
+    assert "第一轮问题" in followup
+    assert "第1轮答复" in followup
+    assert followup.endswith("第二轮追问")
+    assert len(followup) <= 8000
+    assert (
+        await content_session.scalar(select(RemoteBinding).where(RemoteBinding.run_id == first.id))
+    ) is None
+
+    practice, _ = await create_turn(
+        content_session,
+        user=user,
+        session=session,
+        operation=Operation.TEACH_TURN.value,
+        message="练习页继续问",
+        idempotency_key="no-id-practice-third",
+        scene_snapshot={"page_type": "practice", "route": "/practice"},
+    )
+    assert await teaching_worker.execute_run(settings, gateway, str(practice.id)) == "SUCCEEDED"
+    assert "第一轮问题" in gateway.requests[2]["student_input"]
+    assert gateway.requests[2]["student_input"].endswith("练习页继续问")
+
+    long_message = "长" * 8000
+    long_turn, _ = await create_turn(
+        content_session,
+        user=user,
+        session=session,
+        operation=Operation.TEACH_TURN.value,
+        message=long_message,
+        idempotency_key="no-id-long-fourth",
+        scene_snapshot=scene,
+    )
+    assert await teaching_worker.execute_run(settings, gateway, str(long_turn.id)) == "SUCCEEDED"
+    assert gateway.requests[3]["student_input"] == long_message

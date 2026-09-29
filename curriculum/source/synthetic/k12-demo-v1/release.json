@@ -1,0 +1,12 @@
+{
+  "schema_version": "k12.content.release.v1",
+  "release_key": "synthetic-k12-demo-v1",
+  "source_kind": "SYNTHETIC_FIXTURE",
+  "is_test_fixture": true,
+  "description": "四学段 AI 通识演示课程，仅用于本地比赛展示，未完成人工教学审校。",
+  "license_code": "SYNTHETIC-FIXTURE",
+  "license_notes": "项目自有演示文本，不进入正式发布目录。",
+  "course_files": [
+    "courses/ai-learning-foundations/course.json"
+  ]
+}

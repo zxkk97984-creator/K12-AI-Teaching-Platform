@@ -7,10 +7,10 @@ export default defineConfig({
   retries: 0,
   reporter: [
     ["line"],
-    ["json", { outputFile: "../docs/acceptance/t05-playwright-report.json" }],
+    ["json", { outputFile: "test-results/live-report.json" }],
   ],
   use: {
-    baseURL: "http://127.0.0.1:15173",
+    baseURL: process.env.CODELAB_E2E_BASE_URL ?? "http://127.0.0.1:15173",
     browserName: "chromium",
     channel: "chrome",
     headless: true,

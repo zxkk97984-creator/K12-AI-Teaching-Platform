@@ -10,7 +10,7 @@ async function signIn(page: Page) {
   await page.getByLabel("用户名").fill(student.username);
   await page.getByLabel("密码").fill(student.password);
   await page.getByRole("button", { name: "登录" }).click();
-  await expect(page).toHaveURL(/\/(settings|onboarding)/);
+  await expect(page).toHaveURL(/\/(settings|onboarding|conversations)/);
 }
 
 async function setStage(page: Page, stage: "PRIMARY_LOWER", grade: number) {

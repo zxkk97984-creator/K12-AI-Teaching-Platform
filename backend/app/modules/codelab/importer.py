@@ -7,16 +7,19 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.config import get_settings
 from app.core.database import engine_for
 from app.modules.codelab.contracts import (
+    DEFAULT_CATALOG_METADATA_PATH,
     DEFAULT_CATALOG_ROOT,
     load_catalog,
+    load_catalog_metadata,
     task_definition_hash,
 )
-from app.modules.codelab.models import CodeTaskRevision
+from app.modules.codelab.models import CodeTaskCatalog, CodeTaskRevision
 from app.modules.codelab.trusted import validate_trusted_manifest
 
 logger = logging.getLogger(__name__)
@@ -47,9 +50,18 @@ async def import_catalog(
     session: AsyncSession,
     *,
     catalog_root: Path = DEFAULT_CATALOG_ROOT,
+    metadata_path: Path | None = None,
     dry_run: bool = False,
 ) -> ImportResult:
     loaded = load_catalog(catalog_root)
+    if metadata_path is None and catalog_root.resolve() == DEFAULT_CATALOG_ROOT.resolve():
+        metadata_path = DEFAULT_CATALOG_METADATA_PATH
+    metadata = load_catalog_metadata(metadata_path) if metadata_path is not None else {}
+    task_keys = {(task.task_id, task.revision) for _, task in loaded}
+    unexpected_metadata = set(metadata) - task_keys
+    if unexpected_metadata:
+        first = sorted(unexpected_metadata)[0]
+        raise ValueError(f"catalogue metadata has no matching task: {first[0]}@r{first[1]}")
     result = ImportResult(dry_run=dry_run)
     try:
         for _path, task in loaded:
@@ -96,6 +108,26 @@ async def import_catalog(
             )
             result.created += 1
         await session.flush()
+        for (task_id, revision), item in metadata.items():
+            statement = pg_insert(CodeTaskCatalog).values(
+                task_id=task_id,
+                task_revision=revision,
+                category=item.category,
+                difficulty=item.difficulty,
+                tags=item.tags,
+                sort_order=item.sort_order,
+            )
+            await session.execute(
+                statement.on_conflict_do_update(
+                    index_elements=[CodeTaskCatalog.task_id, CodeTaskCatalog.task_revision],
+                    set_={
+                        "category": statement.excluded.category,
+                        "difficulty": statement.excluded.difficulty,
+                        "tags": statement.excluded.tags,
+                        "sort_order": statement.excluded.sort_order,
+                    },
+                )
+            )
         if dry_run:
             await session.rollback()
         else:
@@ -106,13 +138,15 @@ async def import_catalog(
     return result
 
 
-async def _run(catalog_root: Path, dry_run: bool) -> ImportResult:
+async def _run(catalog_root: Path, metadata_path: Path | None, dry_run: bool) -> ImportResult:
     settings = get_settings()
     engine = engine_for(settings)
     factory = async_sessionmaker(engine, expire_on_commit=False)
     try:
         async with factory() as session:
-            return await import_catalog(session, catalog_root=catalog_root, dry_run=dry_run)
+            return await import_catalog(
+                session, catalog_root=catalog_root, metadata_path=metadata_path, dry_run=dry_run
+            )
     finally:
         await engine.dispose()
 
@@ -120,10 +154,11 @@ async def _run(catalog_root: Path, dry_run: bool) -> ImportResult:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Import immutable CodeLab task revisions")
     parser.add_argument("--catalog-root", type=Path, default=DEFAULT_CATALOG_ROOT)
+    parser.add_argument("--metadata-path", type=Path)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    result = asyncio.run(_run(args.catalog_root, args.dry_run))
+    result = asyncio.run(_run(args.catalog_root, args.metadata_path, args.dry_run))
     print(
         f"import_codelab_tasks: created={result.created} reused={result.reused} "
         f"total={len(result.tasks)} dry_run={result.dry_run}"

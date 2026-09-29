@@ -14,6 +14,7 @@ CONTENT_PATH_PREFIXES = (
     "/api/v1/chapters",
     "/api/v1/content/",
     "/api/v1/reading-events",
+    "/api/v1/learning/",
 )
 
 

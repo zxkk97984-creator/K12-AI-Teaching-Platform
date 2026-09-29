@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { login } from "../../features/identity/api";
 import { navigate } from "../../features/identity/session";
-import { CalmBackground } from "../../features/background/CalmBackground";
+import "./login.css";
 
 export function LoginPage() {
   const [username, setUsername] = useState("");
@@ -11,12 +11,13 @@ export function LoginPage() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (!username.trim() || !password) { setError("请输入用户名和密码。"); return; }
     setBusy(true);
     setError(null);
     try {
       const result = await login({ username, password });
       if (result.user.role === "admin") navigate("/admin/resources");
-      else navigate(result.profile?.onboarding_completed ? "/conversations" : "/onboarding");
+      else navigate(result.profile?.onboarding_completed ? "/workbench" : "/onboarding");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "登录失败");
     } finally {
@@ -24,21 +25,27 @@ export function LoginPage() {
     }
   }
 
-  return (
-    <main className="auth-shell">
-      {/* The blobs are a welcome-surface treatment only; the workspace stays plain. */}
-      <CalmBackground />
-      <section className="auth-card">
-        <p className="eyebrow">霜铃 · 本地身份</p>
-        <h1>回到你的学习空间</h1>
-        <p className="muted">本轮只使用合成账户，不开放真实未成年人自助注册。</p>
-        <form onSubmit={submit}>
-          <label>用户名<input autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} /></label>
-          <label>密码<input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
-          {error && <p className="form-error" role="alert">{error}</p>}
-          <button type="submit" disabled={busy}>{busy ? "正在登录…" : "登录"}</button>
-        </form>
+  return <main className="od-login">
+    <div className="od-login-layout">
+      <section className="od-login-intro" aria-labelledby="login-title">
+        <p className="od-login-wordmark"><img src="/shuangling-brand.svg" width="32" height="32" alt="" />霜铃 K12</p>
+        <p className="od-login-kicker">继续你的学习</p>
+        <h1 id="login-title">回到你的<br />学习空间</h1>
+        <p className="od-login-lede">登录后进入学习首页，继续课程，也能找回书架里的内容。</p>
+        <p className="od-login-intro-note">让每个问题都有回应</p>
       </section>
-    </main>
-  );
+      <section className="od-login-panel" aria-labelledby="login-form-title">
+        <p className="od-login-kicker">账号入口 · 本地演示</p>
+        <h2 id="login-form-title">登录</h2>
+        <p className="od-login-panel-copy">使用已配置的演示账号继续。</p>
+        <form onSubmit={(event) => void submit(event)}>
+          {error && <p className="od-login-error" role="alert">{error}</p>}
+          <label>用户名<input name="username" autoComplete="username" required value={username} onChange={(event) => setUsername(event.target.value)} /></label>
+          <label>密码<input name="password" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} /></label>
+          <button type="submit" disabled={busy}>{busy ? "正在登录…" : "登录并继续"}<span aria-hidden="true">→</span></button>
+        </form>
+        <p className="od-login-privacy">本轮使用合成账户，不开放真实未成年人自助注册。登录由服务端验证，密码不会保存在浏览器。</p>
+      </section>
+    </div>
+  </main>;
 }

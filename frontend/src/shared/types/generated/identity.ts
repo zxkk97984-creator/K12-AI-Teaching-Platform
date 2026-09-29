@@ -123,6 +123,25 @@ export interface paths {
         patch: operations["patch_profile_api_v1_me_profile_patch"];
         trace?: never;
     };
+    "/api/v1/me/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read My Avatar */
+        get: operations["read_my_avatar_api_v1_me_avatar_get"];
+        /** Upload My Avatar */
+        put: operations["upload_my_avatar_api_v1_me_avatar_put"];
+        post?: never;
+        /** Delete My Avatar */
+        delete: operations["delete_my_avatar_api_v1_me_avatar_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/preferences": {
         parameters: {
             query?: never;
@@ -247,6 +266,9 @@ export interface components {
         /** PreferencesDTO */
         PreferencesDTO: {
             preferred_style: components["schemas"]["PreferredStyle"];
+            teacher_style: components["schemas"]["TeacherStyle"];
+            /** Companion Pet Id */
+            companion_pet_id: string;
             /** Interests */
             interests: string[];
             /** Proactive Guidance Enabled */
@@ -260,6 +282,9 @@ export interface components {
             /** Base Revision */
             base_revision: number;
             preferred_style?: components["schemas"]["PreferredStyle"] | null;
+            teacher_style?: components["schemas"]["TeacherStyle"] | null;
+            /** Companion Pet Id */
+            companion_pet_id?: string | null;
             /** Interests */
             interests?: string[] | null;
             /** Proactive Guidance Enabled */
@@ -280,6 +305,10 @@ export interface components {
             revision: number;
             /** Onboarding Completed */
             onboarding_completed: boolean;
+            /** Nickname */
+            nickname?: string | null;
+            /** Avatar Url */
+            avatar_url?: string | null;
         };
         /** ProfilePatch */
         ProfilePatch: {
@@ -288,12 +317,19 @@ export interface components {
             stage?: components["schemas"]["Stage"] | null;
             /** Grade */
             grade?: number | null;
+            /** Nickname */
+            nickname?: string | null;
         };
         /**
          * Stage
          * @enum {string}
          */
         Stage: "PRIMARY_LOWER" | "PRIMARY_UPPER" | "JUNIOR" | "SENIOR";
+        /**
+         * TeacherStyle
+         * @enum {string}
+         */
+        TeacherStyle: "AUTO" | "GENTLE" | "PLAYFUL" | "PRECISE" | "SOCRATIC";
         /** UserDTO */
         UserDTO: {
             /**
@@ -520,6 +556,113 @@ export interface operations {
                 "application/json": components["schemas"]["ProfilePatch"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_my_avatar_api_v1_me_avatar_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 当前账号的头像 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_my_avatar_api_v1_me_avatar_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "image/png": string;
+                "image/jpeg": string;
+                "image/webp": string;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_my_avatar_api_v1_me_avatar_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

@@ -34,7 +34,7 @@ from app.modules.identity.models import Base
 
 DRAFT_STATUSES = ("DRAFT", "AUTO_VALIDATED", "HUMAN_APPROVED")
 DRAFT_ORIGINS = ("FIXTURE", "MODEL_DRAFT", "TEMPLATE")
-JOB_STATUSES = ("RUNNING", "SUCCEEDED", "REJECTED", "FAILED")
+JOB_STATUSES = ("QUEUED", "RUNNING", "SUCCEEDED", "REJECTED", "FAILED")
 
 
 class DesignerSession(Base):
@@ -47,17 +47,18 @@ class DesignerSession(Base):
         nullable=False,
         index=True,
     )
-    chapter_id: Mapped[uuid.UUID] = mapped_column(
+    chapter_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapters.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
-    revision_id: Mapped[uuid.UUID] = mapped_column(
+    revision_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapter_revisions.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
     )
+    source_conversation_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     curriculum_revision: Mapped[str] = mapped_column(String(160), nullable=False)
     stage: Mapped[str] = mapped_column(String(16), nullable=False)
     purpose: Mapped[str] = mapped_column(String(32), nullable=False, default="QUIZ_DRAFT")
@@ -91,18 +92,32 @@ class GenerationJob(Base):
         ForeignKey("assessment_designer_sessions.id", ondelete="CASCADE"),
         nullable=False,
     )
-    chapter_id: Mapped[uuid.UUID] = mapped_column(
+    chapter_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapters.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
-    revision_id: Mapped[uuid.UUID] = mapped_column(
+    revision_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapter_revisions.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
     )
+    source_conversation_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), index=True)
+    source_message_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     operation: Mapped[str] = mapped_column(String(32), nullable=False, default="QUIZ_DRAFT")
+    idempotency_key: Mapped[str | None] = mapped_column(String(160), nullable=True, index=True)
+    # STUDENT jobs are queued and consumed by the shared worker. Existing
+    # administrator jobs keep their synchronous API path and are marked ADMIN.
+    purpose: Mapped[str] = mapped_column(String(16), nullable=False, default="ADMIN")
+    request_id: Mapped[str | None] = mapped_column(String(160))
+    request_hash: Mapped[str | None] = mapped_column(String(64), index=True)
+    request_config: Mapped[dict | None] = mapped_column(JSONB)
+    lease_token: Mapped[str | None] = mapped_column(String(64))
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    quiz_session_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("assessment_quiz_sessions.id", ondelete="SET NULL")
+    )
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="RUNNING")
     error_code: Mapped[str | None] = mapped_column(String(48))
     error_detail: Mapped[str | None] = mapped_column(Text)
@@ -121,8 +136,12 @@ class GenerationJob(Base):
 
     __table_args__ = (
         CheckConstraint("operation = 'QUIZ_DRAFT'", name="ck_assessment_job_operation"),
+        CheckConstraint("purpose IN ('ADMIN', 'STUDENT')", name="ck_assessment_job_purpose"),
+        UniqueConstraint(
+            "owner_user_id", "idempotency_key", name="uq_assessment_generation_owner_key"
+        ),
         CheckConstraint(
-            "status IN ('RUNNING', 'SUCCEEDED', 'REJECTED', 'FAILED')",
+            "status IN ('QUEUED', 'RUNNING', 'SUCCEEDED', 'REJECTED', 'FAILED')",
             name="ck_assessment_job_status",
         ),
     )
@@ -143,17 +162,18 @@ class QuizDraft(Base):
         nullable=False,
         index=True,
     )
-    chapter_id: Mapped[uuid.UUID] = mapped_column(
+    chapter_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapters.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
-    revision_id: Mapped[uuid.UUID] = mapped_column(
+    revision_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapter_revisions.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
     )
+    source_conversation_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     curriculum_revision: Mapped[str] = mapped_column(String(160), nullable=False)
     stage: Mapped[str] = mapped_column(String(16), nullable=False)
     request_id: Mapped[str] = mapped_column(String(160), nullable=False)
@@ -223,17 +243,20 @@ class QuizSession(Base):
         nullable=False,
         index=True,
     )
-    chapter_id: Mapped[uuid.UUID] = mapped_column(
+    chapter_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapters.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
-    revision_id: Mapped[uuid.UUID] = mapped_column(
+    revision_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("content_chapter_revisions.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
     )
+    source_conversation_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), index=True)
+    source_message_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    source_title: Mapped[str] = mapped_column(String(200), nullable=False, default="")
     draft_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("assessment_quiz_drafts.id", ondelete="SET NULL")
     )
@@ -251,6 +274,8 @@ class QuizSession(Base):
     thresholds_version: Mapped[str] = mapped_column(String(64), nullable=False)
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="ACTIVE")
     base_revision: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    current_position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_favorite: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -276,10 +301,44 @@ class QuizSession(Base):
         ),
         CheckConstraint("max_hints BETWEEN 1 AND 3", name="ck_assessment_quiz_session_max_hints"),
         CheckConstraint("base_revision >= 0", name="ck_assessment_quiz_session_base_revision"),
+        CheckConstraint("current_position >= 0", name="ck_assessment_quiz_session_position"),
         CheckConstraint(
             "status <> 'COMPLETED' OR completed_at IS NOT NULL",
             name="ck_assessment_quiz_session_completed_at",
         ),
+    )
+
+
+class QuizAnswerDraft(Base):
+    """Owner-scoped, unscored answer draft for one immutable quiz question."""
+
+    __tablename__ = "assessment_quiz_answer_drafts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("identity_users.id", ondelete="CASCADE"), nullable=False
+    )
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("assessment_quiz_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    question_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("assessment_quiz_questions.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    answer: Mapped[object] = mapped_column(JSONB, nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "owner_user_id", "session_id", "question_id", name="uq_assessment_answer_draft_owner"
+        ),
+        CheckConstraint("revision >= 1", name="ck_assessment_answer_draft_revision"),
     )
 
 
@@ -302,14 +361,21 @@ class QuizQuestion(Base):
     stem: Mapped[str] = mapped_column(Text, nullable=False)
     options: Mapped[list | None] = mapped_column(JSONB)
     items: Mapped[list | None] = mapped_column(JSONB)
-    correct_answer: Mapped[object] = mapped_column(JSONB, nullable=False)
-    explanation: Mapped[str] = mapped_column(Text, nullable=False)
+    # CODE snapshots intentionally have no answer key or explanation.  The
+    # trusted runner owns correctness for those questions.
+    correct_answer: Mapped[object | None] = mapped_column(JSONB, nullable=True)
+    explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
     hints: Mapped[list] = mapped_column(JSONB, nullable=False)
     source_refs: Mapped[list] = mapped_column(JSONB, nullable=False)
     origin: Mapped[str] = mapped_column(String(16), nullable=False)
     source_draft_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("assessment_quiz_drafts.id", ondelete="SET NULL")
     )
+    code_task_revision_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("codelab_task_revisions.id", ondelete="RESTRICT")
+    )
+    code_snapshot: Mapped[dict | None] = mapped_column(JSONB)
+    is_demo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -318,7 +384,7 @@ class QuizQuestion(Base):
         UniqueConstraint("session_id", "position", name="uq_assessment_question_position"),
         UniqueConstraint("session_id", "question_key", name="uq_assessment_question_key"),
         CheckConstraint(
-            "type IN ('SINGLE_CHOICE', 'TRUE_FALSE', 'ORDERING')",
+            "type IN ('SINGLE_CHOICE', 'TRUE_FALSE', 'ORDERING', 'CODE')",
             name="ck_assessment_question_type",
         ),
         CheckConstraint(

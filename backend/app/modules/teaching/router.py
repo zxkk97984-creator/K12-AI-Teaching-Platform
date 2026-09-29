@@ -8,9 +8,10 @@ import time
 import uuid
 from collections.abc import AsyncIterator
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
@@ -19,6 +20,7 @@ from app.modules.identity.dependencies import SessionContext, csrf_dependency, r
 from app.modules.identity.models import LearnerProfile
 from app.modules.learning.policy import LearningPolicyError
 from app.modules.learning.service import ensure_policy_snapshot, evidence_summary, snapshot_for
+from app.modules.learning.study_content import bind_interactive_scene, bind_scene
 from app.modules.teaching.models import (
     TERMINAL_RUN_STATUSES,
     AgentRun,
@@ -27,6 +29,8 @@ from app.modules.teaching.models import (
 )
 from app.modules.teaching.phase import LessonEvent
 from app.modules.teaching.schemas import (
+    ConversationCreateRequest,
+    ConversationUpdateRequest,
     LessonEventRequest,
     LessonPhaseDTO,
     RunDTO,
@@ -43,8 +47,10 @@ from app.modules.teaching.service import (
     SessionBindingStale,
     SessionNotVisible,
     apply_lesson_event,
+    create_free_session,
     create_session,
     create_turn,
+    delete_session,
     ensure_session_binding,
     get_run,
     get_session_detail,
@@ -53,6 +59,7 @@ from app.modules.teaching.service import (
     run_dto,
     stale_pending_runs,
     start_event_run,
+    update_session,
 )
 
 router = APIRouter(tags=["teaching"])
@@ -63,6 +70,17 @@ _TERMINAL_EVENT = {
     RunStatus.CANCELLED.value: "cancelled",
     RunStatus.STALE.value: "stale",
 }
+
+
+async def _summary_for(db: AsyncSession, *, user, session_id: uuid.UUID) -> SessionSummary:
+    detail = await get_session_detail(
+        db,
+        user=user,
+        session_id=session_id,
+    )
+    if detail is None:  # pragma: no cover - caller just created/owned the row
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="会话不存在")
+    return SessionSummary(**detail.model_dump(exclude={"messages"}))
 
 
 @router.post(
@@ -78,13 +96,24 @@ async def open_session(
     db: AsyncSession = Depends(get_session),
 ) -> SessionSummary:
     try:
-        await create_session(
+        session = await create_session(
             db, settings=request.app.state.settings, user=context.user, chapter_id=body.chapter_id
         )
+    except IntegrityError:
+        await db.rollback()
+        if body.idempotency_key is None:
+            raise
+        session = await db.scalar(
+            select(LessonSession).where(
+                LessonSession.owner_user_id == context.user.id,
+                LessonSession.creation_key == body.idempotency_key,
+            )
+        )
+        if session is None:
+            raise
     except SessionNotVisible as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="章节不可用") from exc
-    rows = await list_sessions(db, user=context.user, limit=1)
-    return rows[0]
+    return await _summary_for(db, user=context.user, session_id=session.id)
 
 
 @router.get("/lesson-sessions", response_model=list[SessionSummary])
@@ -93,6 +122,124 @@ async def list_lesson_sessions(
     db: AsyncSession = Depends(get_session),
 ) -> list[SessionSummary]:
     return await list_sessions(db, user=context.user)
+
+
+@router.post(
+    "/conversations",
+    response_model=SessionSummary,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(csrf_dependency)],
+)
+async def open_conversation(
+    body: ConversationCreateRequest,
+    request: Request,
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> SessionSummary:
+    """Open a free conversation, optionally pinned to a visible chapter."""
+
+    try:
+        if body.chapter_id is None:
+            session = await create_free_session(
+                db,
+                settings=request.app.state.settings,
+                user=context.user,
+                title=body.title,
+                idempotency_key=body.idempotency_key,
+            )
+        else:
+            session = await create_session(
+                db,
+                settings=request.app.state.settings,
+                user=context.user,
+                chapter_id=body.chapter_id,
+            )
+            if body.title is not None:
+                updated = await update_session(
+                    db,
+                    user=context.user,
+                    session_id=session.id,
+                    title=body.title,
+                    title_provided=True,
+                )
+                if updated is not None:
+                    session = updated
+    except SessionNotVisible as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="章节不可用") from exc
+    return await _summary_for(db, user=context.user, session_id=session.id)
+
+
+@router.get("/conversations", response_model=list[SessionSummary])
+async def list_conversations(
+    q: str | None = None,
+    include_archived: bool = False,
+    limit: int = Query(default=20, ge=1, le=100),
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> list[SessionSummary]:
+    return await list_sessions(
+        db,
+        user=context.user,
+        include_archived=include_archived,
+        query=q,
+        limit=limit,
+    )
+
+
+@router.get("/conversations/{session_id}", response_model=SessionDetail)
+async def get_conversation(
+    session_id: uuid.UUID,
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> SessionDetail:
+    detail = await get_session_detail(db, user=context.user, session_id=session_id)
+    if detail is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="会话不存在")
+    return detail
+
+
+@router.patch(
+    "/conversations/{session_id}",
+    response_model=SessionSummary,
+    dependencies=[Depends(csrf_dependency)],
+)
+async def update_conversation(
+    session_id: uuid.UUID,
+    body: ConversationUpdateRequest,
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> SessionSummary:
+    if not body.model_fields_set:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="没有可更新字段"
+        )
+    session = await update_session(
+        db,
+        user=context.user,
+        session_id=session_id,
+        title=body.title,
+        archived=body.archived,
+        title_provided="title" in body.model_fields_set,
+    )
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="会话不存在")
+    return await _summary_for(db, user=context.user, session_id=session.id)
+
+
+@router.delete(
+    "/conversations/{session_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(csrf_dependency)],
+)
+async def delete_conversation(
+    session_id: uuid.UUID,
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> Response:
+    deleted = await delete_session(db, user=context.user, session_id=session_id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="会话不存在")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/lesson-sessions/{session_id}", response_model=SessionDetail)
@@ -127,21 +274,36 @@ async def create_lesson_turn(
     )
     if session is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="会话不存在")
+    if session.archived_at is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="会话已归档")
 
     profile = await db.scalar(
         select(LearnerProfile).where(LearnerProfile.user_id == context.user.id)
     )
-    try:
-        await ensure_session_binding(
-            db, settings=request.app.state.settings, session=session, profile=profile
-        )
-    except SessionBindingStale as exc:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="该课时已随章节版本变化失效，请重新进入章节",
-        ) from exc
+    if session.chapter_id is not None:
+        try:
+            await ensure_session_binding(
+                db, settings=request.app.state.settings, session=session, profile=profile
+            )
+        except SessionBindingStale as exc:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="该课时已随章节版本变化失效，请重新进入章节",
+            ) from exc
 
     try:
+        scene = body.scene.model_dump(mode="json") if body.scene else None
+        scene = (
+            await bind_interactive_scene(
+                db,
+                scene=scene,
+                owner_id=context.user.id,
+                profile=profile,
+                settings=request.app.state.settings,
+            )
+            if scene and scene.get("content_kind") == "INTERACTIVE"
+            else bind_scene(scene, stage=session.stage)
+        )
         run, created = await create_turn(
             db,
             user=context.user,
@@ -149,7 +311,10 @@ async def create_lesson_turn(
             operation=body.operation,
             message=body.message,
             idempotency_key=body.idempotency_key,
+            scene_snapshot=scene,
         )
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     except RunConflict as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="同一幂等键对应不同请求体"
@@ -157,6 +322,83 @@ async def create_lesson_turn(
 
     if created and request.app.state.settings.teaching_autorun:
         # The short transaction has committed: schedule the gateway call now.
+        await schedule_run(request.app.state.settings, request.app.state.gateway, str(run.id))
+    return TurnAccepted(run=await run_dto(db, run, replay=not created))
+
+
+@router.post(
+    "/conversations/{session_id}/messages",
+    response_model=TurnAccepted,
+    status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(csrf_dependency)],
+)
+async def create_conversation_message(
+    session_id: uuid.UUID,
+    body: TurnCreateRequest,
+    request: Request,
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> TurnAccepted:
+    """Queue a turn in a free or chapter-backed conversation.
+
+    The run is handled by the same bounded worker and Knodo gateway as the
+    legacy lesson endpoint. Chapter sessions still undergo revision binding
+    checks; free sessions intentionally have no chapter to validate.
+    """
+
+    session = await db.scalar(
+        select(LessonSession).where(
+            LessonSession.id == session_id, LessonSession.owner_user_id == context.user.id
+        )
+    )
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="会话不存在")
+    if session.archived_at is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="会话已归档")
+
+    profile = await db.scalar(
+        select(LearnerProfile).where(LearnerProfile.user_id == context.user.id)
+    )
+    if session.chapter_id is not None:
+        try:
+            await ensure_session_binding(
+                db, settings=request.app.state.settings, session=session, profile=profile
+            )
+        except SessionBindingStale as exc:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="该课时已随章节版本变化失效，请重新进入章节",
+            ) from exc
+
+    try:
+        scene = body.scene.model_dump(mode="json") if body.scene else None
+        scene = (
+            await bind_interactive_scene(
+                db,
+                scene=scene,
+                owner_id=context.user.id,
+                profile=profile,
+                settings=request.app.state.settings,
+            )
+            if scene and scene.get("content_kind") == "INTERACTIVE"
+            else bind_scene(scene, stage=session.stage)
+        )
+        run, created = await create_turn(
+            db,
+            user=context.user,
+            session=session,
+            operation=body.operation,
+            message=body.message,
+            idempotency_key=body.idempotency_key,
+            scene_snapshot=scene,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except RunConflict as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="同一幂等键对应不同请求体"
+        ) from exc
+    if created and request.app.state.settings.teaching_autorun:
         await schedule_run(request.app.state.settings, request.app.state.gateway, str(run.id))
     return TurnAccepted(run=await run_dto(db, run, replay=not created))
 
@@ -203,10 +445,15 @@ async def stream_agent_run(
 
     settings = request.app.state.settings
     owner_id = context.user.id
+    # FastAPI keeps yield dependencies alive for the entire StreamingResponse.
+    # Authentication and ownership have already been checked; release their
+    # transaction/connection before this potentially long-lived SSE response.
+    # Otherwise one idle browser stream occupies half of the production pool.
+    await db.rollback()
 
     async def event_stream() -> AsyncIterator[bytes]:
         factory = session_factory(settings)
-        last_status: str | None = None
+        last_state: tuple[str, str | None] | None = None
         last_emit = time.monotonic()
         while True:
             async with factory() as stream_db:
@@ -219,8 +466,9 @@ async def stream_agent_run(
                     yield b'event: failed\ndata: {"status": "MISSING"}\n\n'
                     return
                 payload = (await run_dto(stream_db, current)).model_dump(mode="json")
-            if payload["status"] != last_status:
-                last_status = payload["status"]
+            state = (payload["status"], payload["draft_markdown"])
+            if state != last_state:
+                last_state = state
                 last_emit = time.monotonic()
                 body_text = json.dumps(payload, ensure_ascii=False)
                 yield f"event: update\ndata: {body_text}\n\n".encode()

@@ -8,13 +8,13 @@
       "name": "tutor-v1.zip",
       "kind": "bot_system_prompt",
       "source_path": "platform/knodo/tutor/v1",
-      "sha256": "e2f4012b3d4fd0fa8823f3de18cdc64f40c402203749cc8f6642ed5602a5f38f",
-      "bytes": 3772,
+      "sha256": "dda40ce75a272a074ce5b88080076b9865dfc30ba94924a37e8b0768ef196ca2",
+      "bytes": 3748,
       "entries": [
         {
           "name": "tutor/v1/README.md",
-          "sha256": "fe25dc5405fa6b0274cb1a29d7c5c503c127a4132d67b3f37fc63b8c162c4aec",
-          "bytes": 675
+          "sha256": "235008ec75c07dc463b4dd982ca92c390067de8e8cceff7638bf18bc94776098",
+          "bytes": 661
         },
         {
           "name": "tutor/v1/bot-profile.json",
@@ -32,13 +32,13 @@
       "name": "designer-v1.zip",
       "kind": "bot_system_prompt",
       "source_path": "platform/knodo/designer/v1",
-      "sha256": "f95fd0d712df8d3791c81f6b2957fa8d16707e07108f5d8f0765f8d7d1caca9f",
-      "bytes": 4664,
+      "sha256": "8f551f5fea46fd71bdd584ebca36823946f53ac0d453e8db12d3e36035009179",
+      "bytes": 4645,
       "entries": [
         {
           "name": "designer/v1/README.md",
-          "sha256": "86f01eb45b7204cb6b1d2c9c3b24fa61c06b8b45fb97e62171993745479bdbc5",
-          "bytes": 685
+          "sha256": "2045c20032ee67a5e575e9cc28c80ae3ccd195f1d37de4b55b2dfd7d9f655f6a",
+          "bytes": 668
         },
         {
           "name": "designer/v1/bot-profile.json",
@@ -47,8 +47,8 @@
         },
         {
           "name": "designer/v1/examples/README.md",
-          "sha256": "ba044210a6ca6bc2f366227beefb5c1152f52d2d77f9463ccbb1b01222e85242",
-          "bytes": 776
+          "sha256": "1860991756a1c8fd978902ffd77212bcf52fc49a63ba78fdbcf42a059814cff3",
+          "bytes": 769
         },
         {
           "name": "designer/v1/examples/quiz-draft.sample.json",
@@ -181,7 +181,7 @@
   ],
   "deployment_manifest": {
     "path": "deployment-manifest.json",
-    "sha256": "0e1110336a448e1363cd513bb5035f80a6cff1018292d0bfd719b7d74664896b"
+    "sha256": "5a34c02cbbb5b7ee5788213942faefc7bcc1781ae4b65a30008b86e9c388bf33"
   },
   "bundle_summary": {
     "bundle_kind": "TEST_FIXTURE_BUNDLE",

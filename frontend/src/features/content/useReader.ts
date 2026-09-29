@@ -39,22 +39,37 @@ function errorState(reason: unknown): ReaderState {
  * page context server-validated. Behaviour events are best-effort: a failed
  * event must never break reading, and no event records mastery.
  */
-export function useReader(chapterId: string) {
+export function useReader(chapterId: string, requestedRevision?: number) {
   const [state, setState] = useState<ReaderState>({ kind: "loading" });
   const [resume, setResume] = useState<ReadingStateDTO | null>(null);
   const [context, setContext] = useState<PageContextView | null>(null);
   const [contextError, setContextError] = useState<string | null>(null);
   const sentEvents = useRef<Set<string>>(new Set());
+  const visitKey = useRef<string | null>(null);
+  const visitId = useRef<string | null>(null);
+  const positionTimer = useRef<number | null>(null);
+  const pendingPosition = useRef<string | null>(null);
+  const lastPosition = useRef<string | null>(null);
+  const positionSequence = useRef(0);
   const stateRef = useRef<ReaderState>(state);
   stateRef.current = state;
 
   // Leaving or switching a chapter must never keep the previous selection.
   useEffect(() => {
+    const key = `${chapterId}:${requestedRevision ?? "latest"}`;
+    if (visitKey.current === key) return;
+    visitKey.current = key;
+    visitId.current = newEventId(`visit-${chapterId.replace(/-/g, "").slice(0, 8)}`);
     setResume(null);
     setContext(null);
     setContextError(null);
     sentEvents.current = new Set();
-  }, [chapterId]);
+    pendingPosition.current = null;
+    lastPosition.current = null;
+    positionSequence.current = 0;
+    if (positionTimer.current !== null) window.clearTimeout(positionTimer.current);
+    positionTimer.current = null;
+  }, [chapterId, requestedRevision]);
 
   const sendEvent = useCallback(async (payload: ReadingEventRequest) => {
     try {
@@ -67,13 +82,16 @@ export function useReader(chapterId: string) {
   useEffect(() => {
     let active = true;
     setState({ kind: "loading" });
-    Promise.all([getChapter(chapterId), getReadingState(chapterId).catch(() => null)])
+    Promise.all([
+      getChapter(chapterId, requestedRevision),
+      getReadingState(chapterId, requestedRevision).catch(() => null),
+    ])
       .then(([chapter, readingState]) => {
         if (!active) return;
         setState({ kind: "ready", chapter });
         if (readingState) setResume(readingState);
         void sendEvent({
-          client_event_id: newEventId(`enter-${chapterId.replace(/-/g, "").slice(0, 8)}`),
+          client_event_id: `${visitId.current ?? newEventId("visit")}-enter`,
           chapter_id: chapter.chapter_id,
           revision: chapter.revision,
           event_kind: "ENTER",
@@ -88,7 +106,7 @@ export function useReader(chapterId: string) {
     return () => {
       active = false;
     };
-  }, [chapterId, sendEvent]);
+  }, [chapterId, requestedRevision, sendEvent]);
 
   const selectText = useCallback(
     async (blockId: string | null, rawText: string) => {
@@ -112,9 +130,9 @@ export function useReader(chapterId: string) {
           updatedAt: Date.now(),
         });
         setContextError(null);
-        const clientEventId = `select-${chapter.chapter_id}-${
-          validated.block_id ?? "chapter"
-        }-${Math.min(validated.selected_text_chars, 9999)}`;
+      const clientEventId = `select-${visitId.current ?? "visit"}-${
+        validated.block_id ?? "chapter"
+      }-${Math.min(validated.selected_text_chars, 9999)}`;
         if (!sentEvents.current.has(clientEventId)) {
           sentEvents.current.add(clientEventId);
           void sendEvent({
@@ -139,5 +157,33 @@ export function useReader(chapterId: string) {
     setContextError(null);
   }, []);
 
-  return { state, resume, context, contextError, selectText, clearContext };
+  const recordPosition = useCallback(
+    (blockId: string | null) => {
+      const current = stateRef.current;
+      if (current.kind !== "ready" || !blockId) return;
+      const chapter = current.chapter;
+      if (lastPosition.current === blockId) return;
+      pendingPosition.current = blockId;
+      if (positionTimer.current !== null) window.clearTimeout(positionTimer.current);
+      positionTimer.current = window.setTimeout(() => {
+        const nextBlock = pendingPosition.current;
+        if (!nextBlock || lastPosition.current === nextBlock) return;
+        lastPosition.current = nextBlock;
+        positionSequence.current += 1;
+        const clientEventId = `position-${visitId.current ?? "visit"}-${positionSequence.current}-${nextBlock}`;
+        void sendEvent({
+          client_event_id: clientEventId,
+          chapter_id: chapter.chapter_id,
+          revision: chapter.revision,
+          event_kind: "BLOCK_VIEW",
+          block_id: nextBlock,
+          section_key: null,
+          selected_text_length: null,
+        });
+      }, 250);
+    },
+    [sendEvent],
+  );
+
+  return { state, resume, context, contextError, selectText, clearContext, recordPosition };
 }

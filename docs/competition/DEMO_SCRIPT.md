@@ -1,37 +1,33 @@
-# 演示脚本（合成数据；现场默认不新增付费调用）
+# 比赛演示脚本
 
-## 开始前
+## 准备
 
-    ./scripts/bootstrap.sh
+首次执行 `./k12 setup`，之后用 `./k12 start --build` 启动，使用 `./k12 status` 确认服务。
+需要编程执行时改用 `./k12 setup --with-runner` 和 `./k12 start --with-runner`。
+已有开发服务可直接复用，不必重复初始化。
 
-演示账号只在 development/test profile 使用，密码从安全环境注入；不把真实学生或 PAT 放入
-命令、浏览器、截图或报告。若需要真实 Docker CodeLab，另启 T24 loopback runner；否则页面
-会如实显示 runner unavailable。
+准备专用演示账号、已发布课程、互动内容和练习。按现场网络选择真实 Knodo 或离线 fixture，
+明确说明当前模式。学生登录后进入 `/workbench`，管理员进入 `/admin/resources`；
+未完成首次设置的学生先选择年级。账号配置见[本地开发说明](../operations/LOCAL_DEV.md)。
 
-## 建议顺序
+## 建议演示顺序
 
-1. 打开 /settings：展示 session、四档 profile、CSRF/owner 边界。
-2. 打开 /courses → /lessons：进入章节，观察 fixture Tutor 卡、phase/lifecycle、暂停/恢复、
-   活动与刷新恢复；强调这是本地 fixture，不是 Knodo 真实教师。
-3. 打开 /practice：答错、提示、再答、刷新；展示服务端快照和确定性结果。
-4. 打开 /resources：用 T20 合成 Word/PPT/video 展示下载、视频播放、stage 过滤和撤回后旧入口失效。
-5. 打开 /animations：在 development/test profile 选择明确标注的合成 fixture，展示单步/暂停/重置、
-   文字替代说明和低动效；正式 profile 若没有 human-approved senior chapter，展示“没有已发布动画”的
-   fail-closed 空态，不把 fixture 当正式内容。
-6. 打开 /code?task=temperature-converter：错误实现 → PARTIAL/10 → 修正 →真实 Docker runner
-   PASSED/70 → fixture feedback；强调 AI feedback 不改 deterministic score。
-7. 打开 /growth 和 /learn：展示证据、记忆确认/质疑/遗忘、下一步投影；不展示掌握度百分比或排行榜。
-8. 如需异常演示：停止 runner 看 UNAVAILABLE；换账号看不到对方 draft/run；用无 CSRF 删除请求得到 403。
+1. 展示学习首页，再从 `/settings` 更换具体年级，说明小学低段、小学高段、初中、高中的首页与导航差异。保存昵称、教师风格或桌宠，刷新确认账号设置保留。
+2. 从 `/resources` 或 `/study` 打开资料、课程、书架和阅读历史。小学可展示绘本续读；教材阅读可展示目录跳转和“问问老师”。
+3. 打开 `/conversations`，不选课程直接提问，再切换历史会话。展示桌宠中的轻量提问与完整对话页；语音是否可用以当前浏览器能力和权限为准。
+4. 从内容页提问，说明老师会收到发送时的页面上下文。需要课堂流程时进入 `/study/lesson`，演示课程讲解、活动切换和暂停恢复。
+5. 小学从 `/animations` 或 `/practice` 进入已发布的互动讲解或小游戏；初高中从 `/activities` 进入互动探索。完成一个场景后刷新，展示活动状态恢复和保存失败时的重试。
+6. 从教师回复生成练习，或在 `/practice` 选择章节生成。答题、查看提示和结果，再展示收藏／错题回顾；生成失败如实展示，不能用示例题冒充实时生成。
+7. 初高中进入 `/code`，展示各学段 6 道题的搜索、筛选、收藏和历史。保存草稿后运行公开示例，再提交正式判题；公开示例不产生分数，正式成绩来自 runner 的可信用例，AI 建议不改变成绩。
+8. 进入 `/growth`，创建“个人记忆.md”，写下学习偏好并保存，再展示预览、版本历史和恢复。主文档当前版本会提供给 AI 教师；空文档不注入，较长内容截断。当前没有自动总结聊天写入记忆的功能，也没有候选记忆确认界面。
+9. 管理员打开 `/admin/resources/interactive`，展示 HTML／ZIP 导入、校验、预览和发布；有时间再展示 `/admin/authoring` 的题目与课程草稿。
 
-## 评委复现入口
+## 答辩重点
 
-- 离线全回归：PYTHONPATH=. backend/.venv/bin/pytest backend/tests -q
-- 前端：npm test --prefix frontend && npm run typecheck --prefix frontend && npm run build --prefix frontend
-- 浏览器：scripts/verify.sh（需本机合成账号和 T22 revision）
-- 真实 sandbox：./scripts/runner-live-test.sh
-- 平台 live：展示已保存的 T11/T13/T31 脱敏证据；现场默认不重跑已封顶的 T31 ledger。
+- 四学段界面围绕同一账号、课程版本和学习记录展开，切换页面后保留学习过程。
+- Tutor 负责教学互动和编程反馈，Designer 负责内容草稿，成绩和数据归属由本地服务处理。
+- 互动包在受限播放器中运行；普通 HTML 的自报结果与服务器判分、可信 runner 结果分别介绍。
+- 个人记忆是可编辑、可追溯版本的教学参考，不宣称自动建立完整学生画像。
+- 真实 Knodo、fixture、浏览器合成测试和历史评测分开说明，不推断未经验证的学习效果。
 
-## 不可宣称
-
-可以宣称“成人参赛者 + 合成数据范围内完成真实 Knodo 技术验证”；不能宣称已验证真实成本/usage、已完成四档人工审校、已开放真实未成年人、
-已证明学习效果、已完成平台删除或绝对安全。
+完整操作与内容规范见[本地开发说明](../operations/LOCAL_DEV.md)和[互动内容接入说明](../operations/INTERACTIVE_CONTENT.md)。

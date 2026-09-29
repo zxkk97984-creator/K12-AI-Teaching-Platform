@@ -27,6 +27,15 @@ TASK_REVISIONS = {
     "temperature-converter": 1,
     "list-summary": 1,
     "binary-search": 1,
+    "odd-even": 1,
+    "even-sum": 1,
+    "palindrome-check": 1,
+    "word-frequency": 1,
+    "prediction-accuracy": 1,
+    "sort-unique": 1,
+    "balanced-brackets": 1,
+    "range-sum": 1,
+    "climbing-stairs": 1,
 }
 TOKEN_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,95}$")
 ENTRYPOINT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")

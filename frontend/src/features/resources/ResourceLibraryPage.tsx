@@ -1,91 +1,62 @@
-/** Student resource library (T20).
- *
- * Everything comes from the server-side filtered `/api/v1/resources` read
- * model: unpublished, withdrawn, wrong-stage or fixture-without-label
- * resources never reach the browser. Empty and failure states are honest —
- * the page never shows a placeholder "ready" card.
- */
+import { useEffect, useState } from "react";
+import { useAccount } from "../identity/AccountContext";
+import { openCompanion } from "../companion/openCompanion";
+import { addBookmark, getStudentContent, isStudentFacingLearningItem, listCatalog, removeBookmark, type LearningItem, type StudentPicturebook } from "../study/api";
+import "./resource-library.css";
 
-import { useCallback, useEffect, useState } from "react";
-import { ApiError } from "../identity/api";
-import { navigate } from "../identity/session";
-import { listResources } from "./api";
-import { ResourceCard } from "./ResourceCard";
-import type { ResourceList } from "./types";
-import "./resources.css";
-
-function messageOf(caught: unknown, fallback: string): string {
-  if (caught instanceof ApiError) {
-    const detail = caught.message.replace(/^[A-Z_]+:\s*/, "");
-    if (caught.status === 401) return "登录已失效，请重新登录。";
-    return detail || fallback;
-  }
-  return fallback;
-}
+type Filter = "ALL" | "PICTUREBOOK" | LearningItem["kind"];
+const labels: Record<Filter, string> = {
+  ALL: "全部", PICTUREBOOK: "绘本", COURSE: "课程", RESOURCE: "资料", ANIMATION: "动画",
+};
 
 export function ResourceLibraryPage() {
-  const [data, setData] = useState<ResourceList | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const stage = useAccount()?.profile?.stage;
+  const [items, setItems] = useState<LearningItem[]>([]);
+  const [books, setBooks] = useState<StudentPicturebook[]>([]);
+  const [query, setQuery] = useState("");
+  const [applied, setApplied] = useState("");
+  const [filter, setFilter] = useState<Filter>("ALL");
   const [loading, setLoading] = useState(true);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      setData(await listResources());
-    } catch (caught) {
-      if (caught instanceof ApiError && caught.status === 401) {
-        navigate("/login");
-        return;
-      }
-      setData(null);
-      setError(messageOf(caught, "资源列表加载失败，请稍后重试。"));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  const [error, setError] = useState("");
+  const [busyBookmark, setBusyBookmark] = useState("");
+  const [refresh, setRefresh] = useState(0);
   useEffect(() => {
-    void load();
-  }, [load]);
-
-  return (
-    <main className="resource-library" data-testid="resource-library">
-      <header className="resource-library-header">
-        <h1>学习资源</h1>
-        <p>这里的 Word、PPT 和视频都已登记来源与授权，可按老师安排的章节打开。</p>
-        <button type="button" onClick={() => void load()} data-testid="resource-refresh">
-          刷新
-        </button>
-      </header>
-
-      {loading ? <p data-testid="resource-loading">正在加载资源…</p> : null}
-
-      {error ? (
-        <p className="resource-error" role="alert" data-testid="resource-error">
-          {error}
-        </p>
-      ) : null}
-
-      {!loading && !error && data && data.items.length === 0 ? (
-        <p data-testid="resource-empty">
-          目前还没有你所在学段已发布的资源。老师发布后会自动出现在这里。
-        </p>
-      ) : null}
-
-      {!loading && !error && data && data.items.length > 0 ? (
-        <section className="resource-grid" data-testid="resource-grid">
-          {data.items.map((item) => (
-            <ResourceCard key={item.id} resource={item} />
-          ))}
-        </section>
-      ) : null}
-
-      {!loading && data ? (
-        <p className="resource-footnote" data-testid="resource-footnote">
-          共 {data.items.length} 个资源；内容范围与发布状态由服务端按学段过滤。
-        </p>
-      ) : null}
-    </main>
-  );
+    const controller = new AbortController();
+    let active = true;
+    setLoading(true); setError(""); setItems([]); setBooks([]);
+    void Promise.all([listCatalog({ q: applied, limit: 100 }, controller.signal), getStudentContent(controller.signal)]).then(([catalog, content]) => {
+      if (!active || content.stage !== stage) return;
+      setItems(catalog.items.filter(isStudentFacingLearningItem));
+      setBooks(content.picturebooks);
+    }).catch((caught) => { if (active && !controller.signal.aborted) setError(caught instanceof Error ? caught.message : "学习书库暂时无法读取"); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; controller.abort(); };
+  }, [stage, applied, refresh]);
+  const visibleBooks = filter === "ALL" || filter === "PICTUREBOOK"
+    ? books.filter((book) => `${book.title} ${book.subtitle} ${book.topic}`.includes(applied)) : [];
+  const visibleItems = filter === "PICTUREBOOK" ? [] : items.filter((item) => filter === "ALL" || item.kind === filter);
+  const toggle = async (item: LearningItem) => {
+    const key = `${item.kind}:${item.id}`;
+    if (busyBookmark) return;
+    setBusyBookmark(key); setError("");
+    try {
+      if (item.is_bookmarked) await removeBookmark(item.kind, item.id);
+      else await addBookmark(item.kind, item.id);
+      setItems((rows) => rows.map((row) => row.id === item.id && row.kind === item.kind ? { ...row, is_bookmarked: !item.is_bookmarked } : row));
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "收藏状态未保存"); }
+    finally { setBusyBookmark(""); }
+  };
+  return <main className="od-library" data-testid="resource-center">
+    <header className="od-library-intro"><div><h1>{stage === "PRIMARY_LOWER" ? "绘本书库" : stage === "JUNIOR" ? "学科资料" : stage === "SENIOR" ? "专题资料" : "学习书库"}</h1><p>找到适合当前学段的阅读、讲解和练习。</p></div><button type="button" onClick={() => openCompanion({ page_type: "library", visible_section: "学习书库", activity_type: "search", suggestedQuestion: "请帮我找适合当前学段的学习内容。" })}>问问老师</button></header>
+    <div className="od-library-tools"><form onSubmit={(event) => { event.preventDefault(); setApplied(query.trim()); }}><label>搜索学习内容<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="故事、知识点或课程名称" /></label><button type="submit" disabled={loading}>搜索</button></form>
+      <div className="od-library-filters" role="group" aria-label="内容类型">{(Object.keys(labels) as Filter[]).filter((kind) => kind !== "PICTUREBOOK" || books.length > 0).map((kind) => <button key={kind} type="button" aria-pressed={filter === kind} onClick={() => setFilter(kind)}>{labels[kind]}</button>)}</div></div>
+    <div className="od-library-heading"><h2>书库内容</h2><span aria-live="polite">共 {visibleBooks.length + visibleItems.length} 项</span></div>
+    {loading && <p role="status">正在读取当前学段内容…</p>}
+    {error && <div role="alert" className="od-library-error">{error} <button type="button" onClick={() => setRefresh((n) => n + 1)}>重试</button></div>}
+    {!loading && !error && visibleBooks.length + visibleItems.length === 0 && <div className="od-library-empty"><h3>没有找到匹配内容</h3><p>试试更短的关键词，或查看全部内容。</p><button type="button" onClick={() => { setQuery(""); setApplied(""); setFilter("ALL"); }}>清除筛选</button></div>}
+    <div className="od-library-list">
+      {visibleBooks.map((book) => <article className="od-library-row" key={book.id}><img src={book.image} alt={`${book.title}插图`} /><div><span>绘本故事 · 合成示例</span><h3>{book.title}</h3><p>{book.subtitle}</p></div><a href={`/picturebooks/${book.id}`}>开始阅读</a></article>)}
+      {visibleItems.map((item) => <article className="od-library-row" key={`${item.kind}:${item.id}`}><span className="od-library-icon" aria-hidden="true">{item.kind === "ANIMATION" ? "▷" : "▤"}</span><div><span>{labels[item.kind]}{item.is_test_fixture ? " · 合成示例" : ""}</span><h3>{item.title}</h3><p>{item.description}</p></div><div className="od-library-actions"><a href={item.route}>{item.kind === "ANIMATION" ? "观看讲解" : "打开学习"}</a><button type="button" aria-pressed={Boolean(item.is_bookmarked)} disabled={busyBookmark === `${item.kind}:${item.id}`} onClick={() => void toggle(item)}>{item.is_bookmarked ? "已收藏" : "收藏"}</button></div></article>)}
+    </div>
+  </main>;
 }

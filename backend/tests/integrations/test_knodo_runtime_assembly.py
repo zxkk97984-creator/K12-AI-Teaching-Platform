@@ -1,4 +1,4 @@
-"""T11 runtime assembly: live mode is explicit, bounded, and fail-closed."""
+"""Knodo runtime assembly: live mode keeps its fixed targets and safety checks."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from pydantic import ValidationError
 
 from app.config import Settings
 from app.integrations.knodo import build_gateway
+from app.integrations.knodo.budget import UnlimitedRequestBudget
 
 
 def base_settings(**overrides):
@@ -31,7 +32,7 @@ def base_settings(**overrides):
     return payload
 
 
-def test_knodo_mode_requires_fixed_targets_and_positive_bounded_budget(
+def test_knodo_mode_requires_fixed_targets_and_nonnegative_optional_budget(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("KNODO_PAT", "synthetic-pat-for-tests")
@@ -45,10 +46,10 @@ def test_knodo_mode_requires_fixed_targets_and_positive_bounded_budget(
         with pytest.raises(ValidationError):
             Settings(**base_settings(**{missing: None}))
 
+    assert Settings(**base_settings(knodo_max_requests=0)).knodo_max_requests == 0
+    assert Settings(**base_settings(knodo_max_requests=21)).knodo_max_requests == 21
     with pytest.raises(ValidationError):
-        Settings(**base_settings(knodo_max_requests=0))
-    with pytest.raises(ValidationError):
-        Settings(**base_settings(knodo_max_requests=21))
+        Settings(**base_settings(knodo_max_requests=-1))
 
 
 @pytest.mark.parametrize(
@@ -90,3 +91,28 @@ async def test_build_gateway_enables_verified_mapper_without_exposing_configurat
     assert "tutor-bot-synthetic" not in rendered
     assert "tutor-workspace-synthetic" not in rendered
     await gateway.aclose()
+
+
+@pytest.mark.asyncio
+async def test_unlimited_gateway_ignores_exhausted_old_ledger(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("KNODO_PAT", "synthetic-pat-for-tests")
+    ledger = tmp_path / "budget.json"
+    previous_state = {
+        "schema_version": "k12.knodo.request-budget.v1",
+        "authorized_max_requests": 20,
+        "reserved_requests": 20,
+    }
+    ledger.write_text(json.dumps(previous_state), encoding="utf-8")
+    settings = Settings(**base_settings(knodo_max_requests=0, knodo_budget_ledger_path=str(ledger)))
+
+    gateway = build_gateway(settings)
+    try:
+        assert isinstance(gateway._backend._budget, UnlimitedRequestBudget)
+        for _ in range(21):
+            assert await gateway._backend._budget.reserve() is True
+        assert json.loads(ledger.read_text(encoding="utf-8")) == previous_state
+    finally:
+        await gateway.aclose()

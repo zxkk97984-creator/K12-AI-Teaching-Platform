@@ -1,6 +1,5 @@
 .env
 .env.*
-!.env.example
 # Python/runtime environments and caches
 .venv/
 backend/.venv/
@@ -17,6 +16,13 @@ frontend/node_modules/
 frontend/dist/
 frontend/.vite/
 frontend/test-results/
+frontend/playwright-report/
+# Browser outputs from older scripts are local artifacts, not documentation.
+frontend/docs/
+docs/competition/screenshots/
+docs/acceptance/t30-evidence/
+docs/acceptance/t05-playwright-report.json
+/ui-html-export/
 *.tsbuildinfo
 frontend/vite.config.js
 frontend/vite.config.d.ts
@@ -34,6 +40,8 @@ platform/knodo/bundles/authoring/
 *.dump
 *.bak
 *.log
+# Regenerate browser evidence when needed; do not commit stale UI snapshots.
+docs/acceptance/ui-reuse/*.png
 .DS_Store
 .snapshots/
 
@@ -48,9 +56,6 @@ platform/knodo/bundles/authoring/
 *.swp
 *.swo
 
-# Original planning attachments and binary skill bundles are kept locally
-# and reviewed separately from the source baseline.
-.rebuild-kit/references/*.docx
-.rebuild-kit/platform/*.zip
-.rebuild-kit/references/*.zip
+# Local competition brief and generated bundles.
+docs/competition/*.docx
 **/*.zip

@@ -52,6 +52,9 @@ def test_production_rejects_fixture_mode() -> None:
 
 
 def test_knodo_mode_requires_base_url_and_token(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Missing-config checks must not inherit the developer's runtime settings.
+    monkeypatch.delenv("KNODO_BASE_URL", raising=False)
+    monkeypatch.delenv("KNODO_PAT", raising=False)
     with pytest.raises(ValidationError):
         Settings(**base_settings(gateway_mode="knodo"))
 

@@ -1,4 +1,5 @@
 import { listCourses } from "../content/api";
+import { ApiError } from "../identity/api";
 import type { ChapterSummaryDTO } from "../content/types";
 import * as api from "./api";
 import type { RunDTO, SceneSnapshot, SessionDetail, SessionSummary } from "./types";
@@ -22,6 +23,7 @@ export interface ConversationState {
   loading: boolean;
   selecting: boolean;
   sending: boolean;
+  transport: "stream" | "polling" | null;
   error: string | null;
 }
 const initial = (): ConversationState => ({
@@ -33,6 +35,7 @@ const initial = (): ConversationState => ({
   loading: false,
   selecting: false,
   sending: false,
+  transport: null,
   error: null,
 });
 
@@ -49,8 +52,10 @@ export class ConversationController {
   private selectingId: string | null = null;
   private initialized = false;
   private subscription: api.RunSubscription | null = null;
+  private followVersion = 0;
   private pending: { session: string; message: string; key: string } | null =
     null;
+  private pageContext: (Partial<SceneSnapshot> & { route: string }) | null = null;
   getSnapshot = () => this.state;
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -77,15 +82,32 @@ export class ConversationController {
           ? "chapter_reader"
           : "conversation";
     const selected = window.getSelection?.()?.toString().trim().slice(0, 4000) || null;
+    const pageContext = this.pageContext?.route === route ? this.pageContext : null;
     return {
       route,
-      page_type: pageType,
+      page_type: pageContext?.page_type ?? pageType,
       chapter_id: detail.chapter_id,
       chapter_title: detail.chapter_title,
-      selected_text: selected,
-      activity_type: pageType,
+      selected_text: pageContext?.selected_text ?? selected,
+      content_kind: pageContext?.content_kind,
+      content_id: pageContext?.content_id,
+      content_version: pageContext?.content_version,
+      section_index: pageContext?.section_index,
+      visible_section: pageContext?.visible_section,
+      knowledge_points: pageContext?.knowledge_points,
+      quiz_session_id: pageContext?.quiz_session_id,
+      question_id: pageContext?.question_id,
+      interactive_session_id: pageContext?.interactive_session_id,
+      interactive_scene_id: pageContext?.interactive_scene_id,
+      interactive_prompt_id: pageContext?.interactive_prompt_id,
+      activity_type: pageContext?.activity_type ?? pageType,
     };
   }
+  setPageContext = (context: Partial<SceneSnapshot> | null) => {
+    this.pageContext = context
+      ? { ...context, route: `${window.location.pathname}${window.location.search}`.slice(0, 240) }
+      : null;
+  };
   setDraft = (draft: string) => this.patch({ draft });
   initialize = async () => {
     if (this.initialized) return;
@@ -127,9 +149,23 @@ export class ConversationController {
     this.patch({ detail: null, draft: "", selecting: true, error: null });
     try {
       const detail = await api.getSession(id);
+      // A refreshed page has no in-memory run. Recover the accepted run from
+      // the owner-scoped session before enabling the composer again.
+      let activeRun: RunDTO | null = null;
+      let restoreError: unknown = null;
+      if (detail.active_run_id && (!this.state.run || isTerminal(this.state.run))) {
+        try {
+          activeRun = await api.getRun(detail.active_run_id);
+        } catch (error) {
+          if (error instanceof ApiError && error.status === 404) detail.active_run_id = null;
+          else restoreError = error;
+        }
+      }
       if (epoch === this.epoch && selection === this.selection) {
         this.selectingId = null;
-        this.patch({ detail, selecting: false });
+        this.patch({ detail, selecting: Boolean(restoreError) });
+        if (activeRun && (!this.state.run || isTerminal(this.state.run))) this.follow(activeRun);
+        if (restoreError) this.fail(restoreError);
       }
     } catch (error) {
       if (epoch === this.epoch && selection === this.selection) {
@@ -189,19 +225,20 @@ export class ConversationController {
     this.subscription?.close();
     this.subscription = null;
     const epoch = this.epoch;
+    const version = ++this.followVersion;
     // A new run supersedes any earlier stream problem: the note belongs to the
     // run it describes, not to the session for the rest of its life.
-    this.patch({ run, error: null });
+    this.patch({ run, transport: isTerminal(run) ? null : "stream", error: null });
     if (isTerminal(run)) {
       void this.refresh(run.session_id, epoch);
       return;
     }
     this.subscription = api.subscribeRun(run.id, {
       onUpdate: (update) => {
-        if (epoch !== this.epoch) return;
+        if (epoch !== this.epoch || version !== this.followVersion || this.state.transport === "polling") return;
         // Reaching a terminal state is the evidence that the connection
         // worked, so any "connection lost" note is no longer true.
-        this.patch({ run: update, error: null });
+        this.patch({ run: update, transport: isTerminal(update) ? null : "stream", error: null });
         if (isTerminal(update)) {
           this.subscription?.close();
           this.subscription = null;
@@ -210,17 +247,13 @@ export class ConversationController {
         }
       },
       onError: () => {
-        // The stream dropping does not mean the run stopped: the server keeps
-        // generating and the result is already persisted. Tell the student the
-        // live view paused and fall back to polling, rather than abandoning a
-        // run that is still in flight.
-        if (epoch !== this.epoch) return;
+        // The accepted run keeps generating on the server. Its latest draft is
+        // stored with the run, so polling can continue the same answer.
+        if (epoch !== this.epoch || version !== this.followVersion || this.state.transport === "polling") return;
         this.subscription?.close();
         this.subscription = null;
-        this.patch({
-          error: "实时连接中断，正在改用轮询读取进度；问题不会重复发送。",
-        });
-        this.pollRun(run.id, epoch);
+        this.patch({ transport: "polling" });
+        this.pollRun(run.id, epoch, version);
       },
     });
   }
@@ -229,26 +262,33 @@ export class ConversationController {
    * Fallback for a dropped event stream: poll the run until it reaches a
    * terminal state. Bounded, so a run that never finishes cannot poll forever.
    */
-  private pollRun(runId: string, epoch: number) {
-    const intervalMs = 3000;
-    const maxAttempts = 100;
+  private pollRun(runId: string, epoch: number, version: number) {
+    const intervalMs = 2000;
+    const maxAttempts = 150;
     let attempt = 0;
     const tick = async () => {
-      if (epoch !== this.epoch || attempt >= maxAttempts) return;
+      if (epoch !== this.epoch || version !== this.followVersion || this.state.run?.id !== runId) return;
+      if (attempt >= maxAttempts) {
+        this.patch({ transport: null, error: "暂时无法继续读取回复，请重新读取状态。" });
+        return;
+      }
       attempt += 1;
       try {
         const run = await api.getRun(runId);
-        if (epoch !== this.epoch) return;
+        if (epoch !== this.epoch || version !== this.followVersion) return;
         if (isTerminal(run)) {
-          this.patch({ run, error: null });
+          this.patch({ run, transport: null, error: null });
           void this.refresh(run.session_id, epoch);
           window.dispatchEvent(new Event("learning:updated"));
           return;
         }
-        this.patch({ run });
-      } catch {
-        // Keep the note already shown; a failed poll is not new information.
-        if (epoch !== this.epoch) return;
+        this.patch({ run, error: null });
+      } catch (error) {
+        if (epoch !== this.epoch || version !== this.followVersion) return;
+        if (error instanceof ApiError && error.status === 404) {
+          this.patch({ run: null, transport: null, error: "这次回复已不存在，请重新提问。" });
+          return;
+        }
       }
       window.setTimeout(() => void tick(), intervalMs);
     };
@@ -330,10 +370,11 @@ export class ConversationController {
   };
   clearSelection = () => {
     this.epoch++;
+    this.followVersion++;
     this.subscription?.close();
     this.subscription = null;
     this.pending = null;
-    this.patch({ detail: null, draft: "", run: null, selecting: false, sending: false });
+    this.patch({ detail: null, draft: "", run: null, transport: null, selecting: false, sending: false });
   };
   reconnect = async () => {
     const epoch = this.epoch;
@@ -342,10 +383,20 @@ export class ConversationController {
       if (this.state.run) {
         const run = await api.getRun(this.state.run.id);
         if (epoch === this.epoch) this.follow(run);
+      } else if (this.state.detail?.active_run_id) {
+        try {
+          const run = await api.getRun(this.state.detail.active_run_id);
+          if (epoch === this.epoch) this.follow(run);
+        } catch (error) {
+          if (!(error instanceof ApiError) || error.status !== 404) throw error;
+          // The run vanished between reading the session and retrying it.
+          // Stop blocking the composer; the next detail refresh will confirm.
+          if (epoch === this.epoch) this.patch({ run: null, transport: null });
+        }
       }
       if (this.state.detail) await this.refresh(this.state.detail.id, epoch);
       const sessions = await api.listSessions();
-      if (epoch === this.epoch) this.patch({ sessions });
+      if (epoch === this.epoch) this.patch({ sessions, selecting: false });
       await this.initialize();
     } catch (error) {
       if (epoch === this.epoch) this.fail(error);
@@ -354,6 +405,7 @@ export class ConversationController {
   dispose = () => {
     this.disposed = true;
     this.epoch++;
+    this.followVersion++;
     this.selection++;
     this.subscription?.close();
     this.subscription = null;

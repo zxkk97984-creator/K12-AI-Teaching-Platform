@@ -19,7 +19,7 @@ async function signIn(page: Page, account: typeof studentA) {
   await page.getByLabel("用户名").fill(account.username);
   await page.getByLabel("密码").fill(account.password);
   await page.getByRole("button", { name: "登录" }).click();
-  await expect(page).toHaveURL(/\/(settings|onboarding)/);
+  await expect(page).toHaveURL(/\/(settings|onboarding|conversations)/);
 }
 
 async function openNewConversation(page: Page): Promise<string> {

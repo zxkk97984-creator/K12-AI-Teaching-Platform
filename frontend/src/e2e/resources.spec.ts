@@ -26,7 +26,7 @@ const otherStage = {
   password: process.env.E2E_T20_SENIOR_PASSWORD ?? "",
 };
 
-const EVIDENCE = "docs/acceptance/t30-evidence";
+const EVIDENCE = "test-results/screenshots";
 const FIXTURES = resolve(process.cwd(), "backend/tests/fixtures/t20");
 const RUN_ID = `t30-${Date.now()}`;
 const DOC_TITLE = `合成 Word 资源 ${RUN_ID}`;
@@ -39,7 +39,7 @@ async function signIn(page: Page, account: { username: string; password: string 
   await page.getByLabel("密码").fill(account.password);
   await page.getByRole("button", { name: "登录" }).click();
   // T05 sends admins to the home shell and students into onboarding/settings.
-  await expect(page).toHaveURL(/\/(settings|onboarding|conversations)$/);
+  await expect(page).toHaveURL(/\/(settings|onboarding|conversations|admin\/resources)$/);
 }
 
 async function registerAndPublish(
@@ -174,6 +174,9 @@ test("real docx/pptx/video open for a student, then withdrawal kills the old lin
   // ---- withdrawal: the old links stop working for the enrolled student
   await signIn(page, admin);
   await page.goto("/admin/resources");
+  await page.getByPlaceholder("标题或 slug").fill(`${RUN_ID}-video`);
+  await page.getByRole("button", { name: "筛选" }).click();
+  await expect(videoRow).toBeVisible({ timeout: 15_000 });
   await videoRow.getByRole("button", { name: "撤回" }).click();
   await expect(videoRow).toContainText("WITHDRAWN", { timeout: 15_000 });
 

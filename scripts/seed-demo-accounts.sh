@@ -18,6 +18,7 @@ cd "$ROOT"
 : "${POSTGRES_DEV_PASSWORD:?POSTGRES_DEV_PASSWORD is required}"
 : "${DEMO_STUDENT_JUNIOR_USERNAME:?DEMO_STUDENT_JUNIOR_USERNAME is required}"
 : "${DEMO_STUDENT_LOWER_USERNAME:?DEMO_STUDENT_LOWER_USERNAME is required}"
+: "${DEMO_STUDENT_SENIOR_USERNAME:?DEMO_STUDENT_SENIOR_USERNAME is required}"
 : "${DEMO_ADMIN_USERNAME:?DEMO_ADMIN_USERNAME is required}"
 : "${DEMO_STUDENT_JUNIOR_PASSWORD:?DEMO_STUDENT_JUNIOR_PASSWORD is required}"
 
@@ -35,16 +36,21 @@ from app.modules.identity.models import User, UserRole
 from app.modules.identity.security import PasswordManager
 
 # username -> (role, stage, grade, style, interests)
+# The browser specs address accounts by role rather than by one fixed name, so
+# map each role to the demo account that plays it.
 ACCOUNTS = {
     os.environ["DEMO_STUDENT_JUNIOR_USERNAME"]: (
         UserRole.STUDENT, "JUNIOR", 8, "CODE", ["编程", "算法"]),
     os.environ["DEMO_STUDENT_LOWER_USERNAME"]: (
         UserRole.STUDENT, "PRIMARY_LOWER", 2, "STORY", ["机器人", "绘画"]),
+    os.environ["DEMO_STUDENT_SENIOR_USERNAME"]: (
+        UserRole.STUDENT, "SENIOR", 11, "CODE", ["算法", "人工智能"]),
     os.environ["DEMO_ADMIN_USERNAME"]: (UserRole.ADMIN, None, None, "AUTO", []),
 }
 PASSWORDS = {
     os.environ["DEMO_STUDENT_JUNIOR_USERNAME"]: os.environ["DEMO_STUDENT_JUNIOR_PASSWORD"],
     os.environ["DEMO_STUDENT_LOWER_USERNAME"]: os.environ["DEMO_STUDENT_LOWER_PASSWORD"],
+    os.environ["DEMO_STUDENT_SENIOR_USERNAME"]: os.environ["DEMO_STUDENT_SENIOR_PASSWORD"],
     os.environ["DEMO_ADMIN_USERNAME"]: os.environ["DEMO_ADMIN_PASSWORD"],
 }
 

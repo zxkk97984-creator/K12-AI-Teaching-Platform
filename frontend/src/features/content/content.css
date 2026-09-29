@@ -229,9 +229,9 @@
   display: grid;
   gap: 6px;
   padding: var(--sl-space-3);
-  border: 1px solid #cfe0f5;
+  border: 1px solid #d7d8d5;
   border-radius: var(--sl-radius-sm);
-  background: #f4f8ff;
+  background: #fafafa;
 }
 
 .content-kc__title {
@@ -280,9 +280,9 @@
   display: grid;
   gap: 6px;
   padding: var(--sl-space-3);
-  border: 1px dashed #c7d6ea;
+  border: 1px dashed #d7d8d5;
   border-radius: var(--sl-radius-sm);
-  background: #fbfdff;
+  background: #fafafa;
   color: var(--sl-text-muted);
 }
 

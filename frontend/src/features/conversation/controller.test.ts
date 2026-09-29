@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ConversationController } from "./controller";
 import * as api from "./api";
 import { listCourses } from "../content/api";
+import { ApiError } from "../identity/api";
 import type { RunDTO, SessionDetail } from "./types";
 vi.mock("./api", () => ({
   listSessions: vi.fn(),
@@ -62,6 +63,39 @@ describe("shared conversation ownership", () => {
     expect(c.getSnapshot().detail?.id).toBe("b");
     c.dispose();
   });
+  it("resumes an accepted run after loading a session without sending it again", async () => {
+    const c = new ConversationController();
+    vi.mocked(api.getSession).mockResolvedValue({ ...detail(), active_run_id: "run-a" });
+    vi.mocked(api.getRun).mockResolvedValue({ ...run(), draft_markdown: "已经生成的一部分" });
+
+    await c.select("a");
+
+    expect(api.getRun).toHaveBeenCalledWith("run-a");
+    expect(api.subscribeRun).toHaveBeenCalledTimes(1);
+    expect(api.createTurn).not.toHaveBeenCalled();
+    expect(c.getSnapshot().run?.draft_markdown).toBe("已经生成的一部分");
+    c.dispose();
+  });
+  it("keeps the composer blocked until a failed run restoration can be retried", async () => {
+    const c = new ConversationController();
+    vi.mocked(api.getSession).mockResolvedValue({ ...detail(), active_run_id: "run-a" });
+    vi.mocked(api.getRun)
+      .mockRejectedValueOnce(new Error("暂时无法读取运行"))
+      .mockResolvedValueOnce(run());
+
+    await c.select("a");
+    expect(c.getSnapshot().selecting).toBe(true);
+    expect(c.getSnapshot().error).toContain("暂时无法读取运行");
+    c.setDraft("不要重复发送");
+    await c.send();
+    expect(api.createTurn).not.toHaveBeenCalled();
+
+    await c.reconnect();
+    expect(c.getSnapshot().selecting).toBe(false);
+    expect(c.getSnapshot().run?.id).toBe("run-a");
+    expect(api.subscribeRun).toHaveBeenCalledOnce();
+    c.dispose();
+  });
   it("clears account state and ignores a late accepted turn after logout", async () => {
     const c = new ConversationController();
     await c.select("a");
@@ -107,23 +141,29 @@ describe("shared conversation ownership", () => {
     expect(c.getSnapshot().detail?.id).toBe("b");
     c.dispose();
   });
-  it("clears a dropped-connection note once the run reaches a terminal state", async () => {
-    // Regression: the note used to persist for the rest of the session, so a
-    // run that finished normally still showed "connection lost".
+  it("keeps a dropped stream as a quiet polling state and clears it on completion", async () => {
+    vi.useFakeTimers();
     const c = new ConversationController();
     vi.mocked(api.subscribeRun).mockReturnValue({ close: vi.fn() });
+    vi.mocked(api.getRun).mockResolvedValue(run("SUCCEEDED"));
     await c.select("a");
     c.setDraft("hello");
     await c.send();
     const callback = vi.mocked(api.subscribeRun).mock.calls[0][1];
 
     callback.onError?.();
-    expect(c.getSnapshot().error).toContain("实时连接中断");
+    expect(c.getSnapshot().error).toBeNull();
+    expect(c.getSnapshot().transport).toBe("polling");
 
+    // Events from the closed stream cannot overwrite a newer poll result.
     callback.onUpdate(run("SUCCEEDED"));
+    expect(c.getSnapshot().run?.status).toBe("RUNNING");
+    await vi.advanceTimersByTimeAsync(2100);
     expect(c.getSnapshot().error).toBeNull();
     expect(c.getSnapshot().run?.status).toBe("SUCCEEDED");
+    expect(c.getSnapshot().transport).toBeNull();
     c.dispose();
+    vi.useRealTimers();
   });
 
   it("polls instead of abandoning the run when the stream drops", async () => {
@@ -140,11 +180,49 @@ describe("shared conversation ownership", () => {
 
     callback.onError?.();
     vi.mocked(api.getRun).mockResolvedValue(run("SUCCEEDED"));
-    await vi.advanceTimersByTimeAsync(3100);
+    await vi.advanceTimersByTimeAsync(2100);
 
     expect(api.getRun).toHaveBeenCalled();
     expect(c.getSnapshot().run?.status).toBe("SUCCEEDED");
     expect(c.getSnapshot().error).toBeNull();
+    c.dispose();
+    vi.useRealTimers();
+  });
+
+  it("updates the same provisional answer through SSE and polling", async () => {
+    vi.useFakeTimers();
+    const c = new ConversationController();
+    await c.select("a");
+    c.setDraft("hello");
+    await c.send();
+    const callback = vi.mocked(api.subscribeRun).mock.calls[0][1];
+    callback.onUpdate({ ...run(), draft_markdown: "第一句" });
+    expect(c.getSnapshot().run?.draft_markdown).toBe("第一句");
+
+    callback.onError?.();
+    vi.mocked(api.getRun).mockResolvedValue({ ...run(), draft_markdown: "第一句，第二句" });
+    await vi.advanceTimersByTimeAsync(2100);
+    expect(c.getSnapshot().run?.draft_markdown).toBe("第一句，第二句");
+    expect(api.createTurn).toHaveBeenCalledTimes(1);
+    c.dispose();
+    vi.useRealTimers();
+  });
+
+  it("unblocks the composer when a vanished run cannot be polled", async () => {
+    vi.useFakeTimers();
+    const c = new ConversationController();
+    await c.select("a");
+    c.setDraft("hello");
+    await c.send();
+    const callback = vi.mocked(api.subscribeRun).mock.calls[0][1];
+    vi.mocked(api.getRun).mockRejectedValue(new ApiError(404, "NOT_FOUND", "运行不存在", null));
+
+    callback.onError?.();
+    await vi.advanceTimersByTimeAsync(2100);
+
+    expect(c.getSnapshot().run).toBeNull();
+    expect(c.getSnapshot().transport).toBeNull();
+    expect(c.getSnapshot().error).toContain("已不存在");
     c.dispose();
     vi.useRealTimers();
   });

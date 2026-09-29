@@ -1,0 +1,39 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-senior",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "训练与测试：模型为什么会出错"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "理解训练集、测试集和过拟合，用简单实验分析模型局限并讨论 AI 责任。"
+    },
+    {
+      "type": "SECTION",
+      "key": "evaluation",
+      "text": "训练成绩不等于真实能力"
+    },
+    {
+      "type": "KNOWLEDGE_CARD",
+      "title": "训练与测试",
+      "text": "训练集帮助模型学习，测试集用来检查它能否面对新数据。只在训练集上表现很好，可能是过拟合。",
+      "example": {
+        "label": "分析一下",
+        "text": "为什么测试集不能和训练集完全相同？"
+      }
+    },
+    {
+      "type": "CALLOUT",
+      "title": "项目任务",
+      "text": "完成模型诊断，比较训练和测试结果，并说明一条模型局限。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "demo-train-test-split",
+    "demo-overfitting",
+    "demo-ai-makes-mistakes"
+  ]
+}

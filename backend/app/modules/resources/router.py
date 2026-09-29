@@ -16,7 +16,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import FileResponse
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
@@ -32,6 +32,7 @@ from app.modules.identity.dependencies import (
 from app.modules.identity.models import LearnerProfile
 from app.modules.resources.models import Resource, ResourceVariant
 from app.modules.resources.schemas import (
+    AdminResourceListDTO,
     ResourceCreateRequest,
     ResourceListDTO,
     ResourcePatchRequest,
@@ -204,17 +205,62 @@ async def read_resource_by_ticket(
 # --------------------------------------------------------------------------- #
 # admin
 # --------------------------------------------------------------------------- #
-@admin_router.get("/admin/resources", response_model=ResourceListDTO)
+@admin_router.get("/admin/resources", response_model=AdminResourceListDTO)
 async def admin_list_resources(
     request: Request,
+    q: str | None = Query(default=None, max_length=100),
+    kind: str | None = Query(default=None, pattern="^(WORD|SLIDES|VIDEO|PDF|IMAGE|INTERACTIVE)$"),
+    stage: str | None = Query(
+        default=None, pattern="^(PRIMARY_LOWER|PRIMARY_UPPER|JUNIOR|SENIOR)$"
+    ),
+    status: str | None = Query(
+        default=None,
+        pattern="^(DRAFT|PUBLISHED|WITHDRAWN|UNREVIEWED|AUTO_VALIDATED|HUMAN_APPROVED)$",
+    ),
+    limit: int = Query(default=100, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
     context: SessionContext = Depends(require_admin),
     db: AsyncSession = Depends(get_session),
-) -> ResourceListDTO:
+) -> AdminResourceListDTO:
     settings = _settings(request)
-    rows = list(await db.scalars(select(Resource).order_by(Resource.stable_slug)))
-    return ResourceListDTO(
+    conditions = []
+    if q:
+        escaped = q.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        if escaped:
+            pattern = f"%{escaped}%"
+            conditions.append(
+                or_(
+                    Resource.title.ilike(pattern, escape="\\"),
+                    Resource.stable_slug.ilike(pattern, escape="\\"),
+                )
+            )
+    if kind:
+        conditions.append(Resource.kind == kind)
+    if stage:
+        conditions.append(Resource.stage == stage)
+    if status:
+        column = (
+            Resource.publication_status
+            if status in {"DRAFT", "PUBLISHED", "WITHDRAWN"}
+            else Resource.review_status
+        )
+        conditions.append(column == status)
+    total = int(await db.scalar(select(func.count()).select_from(Resource).where(*conditions)) or 0)
+    rows = list(
+        await db.scalars(
+            select(Resource)
+            .where(*conditions)
+            .order_by(Resource.stable_slug, Resource.id)
+            .limit(limit)
+            .offset(offset)
+        )
+    )
+    return AdminResourceListDTO(
         items=[await resource_summary(db, row, settings=settings) for row in rows],
         profile=settings.app_env,
+        total=total,
+        limit=limit,
+        offset=offset,
     )
 
 
@@ -253,7 +299,13 @@ async def admin_patch_resource(
     if resource is None:
         raise HTTPException(status_code=404, detail="RESOURCE_NOT_FOUND: 资源不存在")
     try:
-        await patch_resource(db, actor=context.user, resource=resource, payload=payload)
+        await patch_resource(
+            db,
+            actor=context.user,
+            resource=resource,
+            payload=payload,
+            settings=request.app.state.settings,
+        )
     except ResourceError as error:
         _raise(error)
     return await resource_summary(db, resource, settings=_settings(request))

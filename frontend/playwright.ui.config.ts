@@ -1,7 +1,7 @@
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./src/e2e",
-  testMatch: "ui-reuse.spec.ts",
+  testMatch: ["ui-reuse.spec.ts", "codelab-ui.spec.ts"],
   timeout: 30000,
   workers: 1,
   retries: 0,

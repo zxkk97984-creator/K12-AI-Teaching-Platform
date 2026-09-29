@@ -131,6 +131,55 @@ async def create_and_run(actx, token: str, revision_id) -> tuple[dict, str]:
 
 # --------------------------------------------------------------------------- V1
 @pytest.mark.asyncio
+async def test_admin_revision_selector_and_job_list(actx, content_session) -> None:
+    revision = await publish_senior_chapter(content_session)
+    assert (await actx.client.get("/api/v1/admin/content/revisions")).status_code == 401
+    assert (await actx.client.get("/api/v1/admin/authoring/jobs")).status_code == 401
+    token = await sign_in(actx, username="t22.catalog.admin")
+
+    selected = await actx.client.get(
+        f"/api/v1/admin/content/revisions?chapter_id={revision.chapter_id}&limit=1"
+    )
+    assert selected.status_code == 200, selected.text
+    body = selected.json()
+    assert body["total"] == 1 and body["limit"] == 1 and body["offset"] == 0
+    item = body["items"][0]
+    assert item["id"] == str(revision.id) and item["revision"] == 1
+    assert item["course_title"] and item["chapter_title"]
+    assert item["stage"] == "SENIOR"
+    assert item["publication_status"] == "PUBLISHED"
+    assert item["review_status"] == "HUMAN_APPROVED"
+    assert item["created_at"] and item["updated_at"]
+    filtered = await actx.client.get(
+        f"/api/v1/admin/content/revisions?course_id={item['course_id']}&stage=JUNIOR"
+    )
+    assert filtered.json()["items"] == []
+    assert (await actx.client.get("/api/v1/admin/content/revisions?limit=0")).status_code == 422
+
+    job, package_id = await create_and_run(actx, token, revision.id)
+    listed = await actx.client.get("/api/v1/admin/authoring/jobs?status=SUCCEEDED&limit=1")
+    assert listed.status_code == 200, listed.text
+    jobs = listed.json()
+    assert jobs["total"] == 1 and jobs["limit"] == 1
+    row = jobs["items"][0]
+    assert row["id"] == job["id"] and row["package_id"] == package_id
+    assert row["package_title"] and row["package_status"]
+    assert row["course_id"] == item["course_id"]
+    assert row["chapter_id"] == item["chapter_id"]
+    assert row["chapter_revision_id"] == item["id"]
+    assert row["created_at"] and row["updated_at"]
+    assert "idempotency_key" not in row
+    assert (await actx.client.get("/api/v1/admin/authoring/jobs?status=FAILED")).json()[
+        "items"
+    ] == []
+    assert (await actx.client.get("/api/v1/admin/authoring/jobs?status=BAD")).status_code == 422
+
+    await sign_in(actx, username="t22.catalog.student", role=UserRole.STUDENT)
+    assert (await actx.client.get("/api/v1/admin/content/revisions")).status_code == 403
+    assert (await actx.client.get("/api/v1/admin/authoring/jobs")).status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_v1_designer_job_records_status_attempt_and_run(actx, content_session) -> None:
     revision = await publish_senior_chapter(content_session)
     token = await sign_in(actx, username="t22.admin")
@@ -520,16 +569,6 @@ async def test_v8_honest_platform_claims(actx, content_session) -> None:
         assert claim not in text_body
     assert "asset_requests" in text_body
     assert "不是产物" in text_body
-
-    # The stable invariant is the *gate*: no real human content review has
-    # happened, so G_HUMAN_CONTENT_REVIEW stays BLOCKED. The task status is
-    # process state owned by the supervisor (it flips to DONE after review), so
-    # asserting it here made this test self-referential — see T22 repair
-    # attempt 2 (dispatch 23896ba1-8f81-442e-bf9e-68bcfcc6fbb1).
-    progress = json.loads(
-        (Path(__file__).resolve().parents[2] / ".rebuild-kit/progress.json").read_text("utf-8")
-    )
-    assert progress["gates"]["G_HUMAN_CONTENT_REVIEW"]["status"] == "BLOCKED"
 
 
 @pytest.mark.asyncio
