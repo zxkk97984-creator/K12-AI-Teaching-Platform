@@ -1,0 +1,89 @@
+{
+  "schema_version": "k12.knodo.classroom-item.v1",
+  "source_id": "chapter:ai-learning-foundations/ch-primary-lower",
+  "binding": {
+    "chapter_uuid": null,
+    "resolved_by": "local_app",
+    "note": "文件系统镜像不含数据库 UUID；由本地应用在部署时绑定。"
+  },
+  "course": {
+    "slug": "ai-learning-foundations",
+    "title": "AI 通识四学段演示课",
+    "topic": "人工智能通识"
+  },
+  "chapter": {
+    "slug": "ch-primary-lower",
+    "title": "身边的 AI：会学习的电脑",
+    "revision": 1,
+    "stage": "PRIMARY_LOWER",
+    "grade_min": 1,
+    "grade_max": 3,
+    "objectives": [
+      "AI 是人造出来的程序",
+      "AI 可以从例子中学习规律",
+      "遇到不确定的回答要问大人"
+    ],
+    "knowledge_points": [
+      {
+        "slug": "demo-ai-as-helper",
+        "name": "AI 是帮手",
+        "topic": "AI 通识",
+        "description": "AI 是人造的程序，按照数据和规则帮助人完成任务。"
+      },
+      {
+        "slug": "demo-ai-makes-mistakes",
+        "name": "AI 会犯错",
+        "topic": "AI 通识",
+        "description": "数据不足、分布变化或规则不完整时，AI 可能输出错误结果。"
+      }
+    ],
+    "blocks": [
+      {
+        "text": "身边的 AI：会学习的电脑",
+        "type": "TITLE"
+      },
+      {
+        "text": "用故事和生活例子认识 AI，知道 AI 会按数据和指令完成任务，也可能犯错。",
+        "type": "PARAGRAPH"
+      },
+      {
+        "key": "story",
+        "text": "先观察一个生活中的小问题",
+        "type": "SECTION"
+      },
+      {
+        "example": {
+          "label": "想一想",
+          "text": "如果 AI 认错了图片，你会先检查什么？"
+        },
+        "text": "把 AI 想成会按照例子做事的小帮手。它能帮忙，但遇到没见过的情况也可能答错。",
+        "title": "AI 是帮手",
+        "type": "KNOWLEDGE_CARD"
+      },
+      {
+        "text": "完成一次AI 也会犯错，再告诉老师你发现了什么。",
+        "title": "今天的任务",
+        "type": "CALLOUT"
+      }
+    ]
+  },
+  "provenance": {
+    "release_key": "synthetic-k12-demo-v1",
+    "release_manifest_hash": "054174810f286ec8e1f6027302ffac26c6137b5ea9a4e50b64fc874aa007bf4b",
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "is_test_fixture": true,
+    "source_commit": "0000000000000000000000000000000000000000",
+    "source_path": "sources/ch-primary-lower.txt",
+    "license_code": "SYNTHETIC-FIXTURE"
+  },
+  "review": {
+    "review_status": "UNREVIEWED",
+    "publication_status": "DRAFT",
+    "human_reviewed": false
+  },
+  "usage": {
+    "for_real_students": false,
+    "notice": "测试内容，未作人工教学审校"
+  },
+  "content_hash": "b4822ea0ab4d55c0e76b984432d120d4be0db7bcfe3b079680a5f4736d83318b"
+}

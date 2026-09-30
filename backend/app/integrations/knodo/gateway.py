@@ -107,7 +107,9 @@ class AgentGateway:
         if closer is not None:
             await closer()
 
-    def continuation_scope(self, operation: str | Operation) -> str | None:
+    def continuation_scope(
+        self, operation: str | Operation, *, target: KnodoTarget | None = None
+    ) -> str | None:
         builder = getattr(self._backend, "continuation_scope", None)
         if builder is None:
             return None
@@ -118,7 +120,9 @@ class AgentGateway:
         contract_version = self.registry.contract_version
         if not contract_version:
             return None
-        return builder(parsed, contract_version=contract_version)
+        return builder(
+            parsed, contract_version=contract_version, **({"target": target} if target else {})
+        )
 
     # -- status ---------------------------------------------------------- #
     @property
@@ -140,6 +144,7 @@ class AgentGateway:
         operation: str | Operation,
         payload: Any,
         *,
+        target: KnodoTarget | None = None,
         scenario: FixtureScenario = FixtureScenario.SUCCESS,
         timeout_seconds: float | None = None,
         cancel: Any = None,
@@ -194,6 +199,7 @@ class AgentGateway:
         outcome = await self._backend.invoke(
             parsed,
             payload,
+            **({"target": target} if target and self.mode == "knodo" else {}),
             scenario=scenario,
             timeout_seconds=timeout_seconds or self.timeout_seconds,
             cancel=cancel,
@@ -352,14 +358,13 @@ def build_gateway(settings: Any) -> AgentGateway:
             )
         try:
             targets = {
-                "tutor": KnodoTarget(
-                    bot_id=settings.knodo_tutor_bot_id,
-                    workspace_id=settings.knodo_tutor_workspace_id,
-                ),
-                "designer": KnodoTarget(
-                    bot_id=settings.knodo_designer_bot_id,
-                    workspace_id=settings.knodo_designer_workspace_id,
-                ),
+                role: KnodoTarget(
+                    bot_id=getattr(settings, f"knodo_{role}_bot_id"),
+                    workspace_id=getattr(settings, f"knodo_{role}_workspace_id"),
+                )
+                for role in ("tutor", "designer")
+                if getattr(settings, f"knodo_{role}_bot_id", None)
+                and getattr(settings, f"knodo_{role}_workspace_id", None)
             }
             max_requests = int(settings.knodo_max_requests)
             budget = (

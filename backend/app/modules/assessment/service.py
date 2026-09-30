@@ -23,6 +23,7 @@ from app.config import Settings
 from app.integrations.knodo.gateway import AgentGateway
 from app.integrations.knodo.operations import Operation
 from app.integrations.knodo.types import GatewayStatus
+from app.modules.ai.service import target_arguments
 from app.modules.assessment.errors import (
     AssessmentError,
     DesignerRequestInvalid,
@@ -124,7 +125,11 @@ async def create_quiz_draft_job(
     await db.commit()
     await db.refresh(job)
 
-    result = await gateway.invoke(Operation.QUIZ_DRAFT, request)
+    target_options = await target_arguments(
+        db, Operation.QUIZ_DRAFT, request, require_route=getattr(gateway, "mode", None) == "knodo"
+    )
+    await db.commit()
+    result = await gateway.invoke(Operation.QUIZ_DRAFT, request, **target_options)
     job.gateway_invocation_id = result.invocation_id
     job.usage = result.usage.model_dump(mode="json")
 
@@ -501,8 +506,15 @@ async def execute_student_generation(
             await db.commit()
             return "FAILED"
 
+        target_options = await target_arguments(
+            db,
+            Operation.QUIZ_DRAFT,
+            request,
+            require_route=getattr(gateway, "mode", None) == "knodo",
+        )
+
     try:
-        result = await gateway.invoke(Operation.QUIZ_DRAFT, request)
+        result = await gateway.invoke(Operation.QUIZ_DRAFT, request, **target_options)
     except Exception:
         result = None
 

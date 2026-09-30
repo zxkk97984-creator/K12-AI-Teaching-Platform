@@ -5,6 +5,437 @@
     "version": "0.2.0"
   },
   "paths": {
+    "/api/v1/admin/ai/configuration": {
+      "get": {
+        "tags": [
+          "ai-administration"
+        ],
+        "summary": "Read Configuration",
+        "operationId": "read_configuration_api_v1_admin_ai_configuration_get",
+        "parameters": [
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ai-administration"
+        ],
+        "summary": "Write Configuration",
+        "operationId": "write_configuration_api_v1_admin_ai_configuration_put",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Origin"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Csrf-Token"
+            }
+          },
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          },
+          {
+            "name": "sl_csrf",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Csrf"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistryUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/ai/agents/{agent_id}/verify": {
+      "post": {
+        "tags": [
+          "ai-administration"
+        ],
+        "summary": "Verify Binding",
+        "operationId": "verify_binding_api_v1_admin_ai_agents__agent_id__verify_post",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Origin"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Csrf-Token"
+            }
+          },
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          },
+          {
+            "name": "sl_csrf",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Csrf"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Verify Binding Api V1 Admin Ai Agents  Agent Id  Verify Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/ai/agents/{agent_id}/prompt-template": {
+      "get": {
+        "tags": [
+          "ai-administration"
+        ],
+        "summary": "Prompt Template",
+        "description": "Explicit local assets only; no user-supplied path or remote fetch.",
+        "operationId": "prompt_template_api_v1_admin_ai_agents__agent_id__prompt_template_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Prompt Template Api V1 Admin Ai Agents  Agent Id  Prompt Template Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/ai/agents/{agent_id}/probe": {
+      "post": {
+        "tags": [
+          "ai-administration"
+        ],
+        "summary": "Probe Agent",
+        "operationId": "probe_agent_api_v1_admin_ai_agents__agent_id__probe_post",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Origin"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Csrf-Token"
+            }
+          },
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          },
+          {
+            "name": "sl_csrf",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Csrf"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Probe Agent Api V1 Admin Ai Agents  Agent Id  Probe Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/content/revisions": {
       "get": {
         "tags": [
@@ -2703,6 +3134,191 @@
         ],
         "title": "AdminResourceListDTO"
       },
+      "AgentDefinition": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Description",
+            "default": ""
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "teacher",
+              "designer",
+              "memory"
+            ],
+            "title": "Role",
+            "default": "teacher"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": false
+          },
+          "bot_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bot Id"
+          },
+          "workspace_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace Id"
+          },
+          "prompt_version": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Prompt Version",
+            "default": "v1"
+          },
+          "remote_memory_disabled": {
+            "type": "boolean",
+            "title": "Remote Memory Disabled",
+            "default": false
+          },
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Capabilities"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "AgentDefinition"
+      },
+      "CapabilityDefinition": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,79}$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "version": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Version",
+            "default": "1"
+          },
+          "executor": {
+            "type": "string",
+            "enum": [
+              "KNODO_SKILL",
+              "BACKEND"
+            ],
+            "title": "Executor",
+            "default": "KNODO_SKILL"
+          },
+          "plugin_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plugin Id"
+          },
+          "binding_scope": {
+            "type": "string",
+            "enum": [
+              "WORKSPACE",
+              "ASSISTANT"
+            ],
+            "title": "Binding Scope",
+            "default": "WORKSPACE"
+          },
+          "handler": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handler"
+          },
+          "input_contract": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Input Contract",
+            "default": ""
+          },
+          "output_contract": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Output Contract",
+            "default": ""
+          },
+          "allowed_context": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "course",
+                "conversation",
+                "personal_memory"
+              ]
+            },
+            "type": "array",
+            "title": "Allowed Context"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "CapabilityDefinition"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -3152,6 +3768,93 @@
           "idempotency_key"
         ],
         "title": "PublishRequest"
+      },
+      "RegistryData": {
+        "properties": {
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/AgentDefinition"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Agents"
+          },
+          "routes": {
+            "items": {
+              "$ref": "#/components/schemas/RouteDefinition"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Routes"
+          },
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/CapabilityDefinition"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Capabilities"
+          },
+          "verifications": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "object",
+            "maxProperties": 100,
+            "title": "Verifications"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "agents",
+          "routes",
+          "capabilities"
+        ],
+        "title": "RegistryData"
+      },
+      "RegistryUpdate": {
+        "properties": {
+          "base_revision": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Base Revision"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RegistryData"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "base_revision",
+          "data"
+        ],
+        "title": "RegistryUpdate"
+      },
+      "RegistryView": {
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RegistryData"
+          },
+          "persisted": {
+            "type": "boolean",
+            "title": "Persisted"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "revision",
+          "data",
+          "persisted"
+        ],
+        "title": "RegistryView"
       },
       "ResourceCreateRequest": {
         "properties": {
@@ -3765,6 +4468,39 @@
         "additionalProperties": false,
         "type": "object",
         "title": "ReviewRequest"
+      },
+      "RouteDefinition": {
+        "properties": {
+          "operation": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Operation"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "*",
+              "PRIMARY_LOWER",
+              "PRIMARY_UPPER",
+              "JUNIOR",
+              "SENIOR"
+            ],
+            "title": "Stage",
+            "default": "*"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "operation",
+          "agent_id"
+        ],
+        "title": "RouteDefinition"
       },
       "SceneSpec": {
         "properties": {

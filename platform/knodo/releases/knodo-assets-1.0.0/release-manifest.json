@@ -5,26 +5,65 @@
   "contract_version": "1.0.0",
   "artifacts": [
     {
+      "name": "memory-v1.zip",
+      "kind": "bot-config",
+      "source_path": "platform/knodo/memory/v1",
+      "sha256": "ef5021cfd972e310383ec175426bc327586be45bd01ff4eefd94d15ddc6dbf09",
+      "bytes": 2572,
+      "entries": [
+        {
+          "name": "memory/v1/memory-extract-request.schema.json",
+          "sha256": "c89778793fff9e73df9f6e5df28ee21a09265db56895245b7fb72097a39128b2",
+          "bytes": 1462
+        },
+        {
+          "name": "memory/v1/memory-extract-response.schema.json",
+          "sha256": "b55ace43e647325daa554450590d876cf41b54127ca141fa081ab4edd8220822",
+          "bytes": 3006
+        },
+        {
+          "name": "memory/v1/system-prompt.md",
+          "sha256": "1ee51107be5463c7063a0939d9494e27588b3858b75b9fe1a220b3f3c89aa4c9",
+          "bytes": 1596
+        }
+      ]
+    },
+    {
       "name": "tutor-v1.zip",
       "kind": "bot_system_prompt",
       "source_path": "platform/knodo/tutor/v1",
-      "sha256": "dda40ce75a272a074ce5b88080076b9865dfc30ba94924a37e8b0768ef196ca2",
-      "bytes": 3748,
+      "sha256": "dc295330c33d503bd23e944102bcfd39103f4baa2d72ee4f8606e90b515f2372",
+      "bytes": 13098,
       "entries": [
         {
           "name": "tutor/v1/README.md",
-          "sha256": "235008ec75c07dc463b4dd982ca92c390067de8e8cceff7638bf18bc94776098",
-          "bytes": 661
+          "sha256": "be7ca534e24b5853a96a2b6baa18fc390ed3c84172ea2f4be00d2872f4893bc5",
+          "bytes": 1013
         },
         {
           "name": "tutor/v1/bot-profile.json",
-          "sha256": "e76ea46633802ee781543d7e8f28afe3b47640fc9dc6c8f39ba23d175b91041e",
-          "bytes": 904
+          "sha256": "7d798f6e6c3ca34115b47b4677fdfdd0e796e339833fe7655c0965e6c9a6dd70",
+          "bytes": 1107
+        },
+        {
+          "name": "tutor/v1/stages/junior.md",
+          "sha256": "50c0a95ebfff587913f0d9cab294dd616aafe82b9a2e6c50b936faf66d15b3d7",
+          "bytes": 4440
+        },
+        {
+          "name": "tutor/v1/stages/primary.md",
+          "sha256": "6bdfb2b78c594ad52ad1be5abc2ada8c8428aa73bfb566cc1faad949cc0dc2b5",
+          "bytes": 4537
+        },
+        {
+          "name": "tutor/v1/stages/senior.md",
+          "sha256": "8e5ba81cf078b94deb4668088108445b06268e23414b438b9857f6509a261e12",
+          "bytes": 4416
         },
         {
           "name": "tutor/v1/system-prompt.md",
-          "sha256": "0f31c505a538ef37c57138c22e32fb2d78e6699e72e291d1b8cb6d964db43cf5",
-          "bytes": 3471
+          "sha256": "2bd32ab10360a666eddb03ce4e440b45e090bb8aa299cec21821bd5b77d1c8a8",
+          "bytes": 4194
         }
       ]
     },
@@ -32,13 +71,13 @@
       "name": "designer-v1.zip",
       "kind": "bot_system_prompt",
       "source_path": "platform/knodo/designer/v1",
-      "sha256": "8f551f5fea46fd71bdd584ebca36823946f53ac0d453e8db12d3e36035009179",
-      "bytes": 4645,
+      "sha256": "96af0d54b5e42246688b50d60601464bd31a7a0036a255be52fa810985aac793",
+      "bytes": 4919,
       "entries": [
         {
           "name": "designer/v1/README.md",
-          "sha256": "2045c20032ee67a5e575e9cc28c80ae3ccd195f1d37de4b55b2dfd7d9f655f6a",
-          "bytes": 668
+          "sha256": "6c80a8001f0684433569697f5c143250d6b95bd4f9997d359873753a12ca028f",
+          "bytes": 1157
         },
         {
           "name": "designer/v1/bot-profile.json",
@@ -66,13 +105,33 @@
       "name": "bundles-classroom.zip",
       "kind": "knowledge_bundle",
       "source_path": "platform/knodo/bundles/classroom",
-      "sha256": "ef42a2b5027392337566953f253611f44e416ee8b5b7cf3d3f9423146f068d3c",
-      "bytes": 4387,
+      "sha256": "6f207e73c4ccacf60ee664f6252f977f6c4fef9f14d9a15f435494b604526d0d",
+      "bytes": 11404,
       "entries": [
         {
           "name": "README.md",
           "sha256": "740e066e70f09b79adc9cf9329217edaa582d4ed873b0ac4bcd85d7990177d76",
           "bytes": 838
+        },
+        {
+          "name": "content/ai-learning-foundations/ch-junior-r1.json",
+          "sha256": "b48cf0e4cd892136c58412c58fe44250ddf55618d660ccdc7a3fd793563bacad",
+          "bytes": 2882
+        },
+        {
+          "name": "content/ai-learning-foundations/ch-primary-lower-r1.json",
+          "sha256": "48c865e160ea3f13b05f277804ab580e5d3a39ecc9681319051b81b24633a94d",
+          "bytes": 2856
+        },
+        {
+          "name": "content/ai-learning-foundations/ch-primary-upper-r1.json",
+          "sha256": "2e0c3744d3a8760cf816abb3e8e4c69205c0832a06b0bcc179f811d807054431",
+          "bytes": 3109
+        },
+        {
+          "name": "content/ai-learning-foundations/ch-senior-r1.json",
+          "sha256": "64497902bc1d9fc24d5624a35ef91c03f9073b8b9ac3f8c5e82b69a4dd091396",
+          "bytes": 3149
         },
         {
           "name": "content/t06-fixture-course/ch01-r1.json",
@@ -86,8 +145,8 @@
         },
         {
           "name": "manifest.json",
-          "sha256": "d8efc337b5e3eb8c968f290c1a783893e4c6dfda0080f9bff57948c91f0b5f69",
-          "bytes": 914
+          "sha256": "8793c8cd355ef2527ce11ac375700df1d8287276dc47b8329217b3d1e05d1fec",
+          "bytes": 2304
         }
       ]
     },
@@ -95,13 +154,13 @@
       "name": "skill-k12-teaching-core.zip",
       "kind": "skill",
       "source_path": "platform/knodo/skills/k12-teaching-core",
-      "sha256": "3aae0b731435d62a21fe8d8bb9cc1b1ac0039687ac0ebf5d7c76506573d71d18",
-      "bytes": 4858,
+      "sha256": "cc14522d593090585e958a0e17896c5b751b83a349d34ab17371c6811adcec27",
+      "bytes": 5063,
       "entries": [
         {
           "name": "SKILL.md",
-          "sha256": "aa736eb79f0c2fa1c48a2dcd018b6333b6b1e2df67fdc10e18accc6e0f54da42",
-          "bytes": 1451
+          "sha256": "61bf37f2bc3262aeed56d1251f49aa91a1581d2d6c7023d6cf156aa94606512d",
+          "bytes": 1558
         },
         {
           "name": "references/stage-policy.json",
@@ -110,11 +169,50 @@
         },
         {
           "name": "references/teaching-request.schema.json",
-          "sha256": "44352de0fb7682b41fe69ee677029a29b6f3f37b22369ae2a60ce07c6cdc0bcc",
-          "bytes": 9108
+          "sha256": "49121de20ed9e5414269fe5cb892503e944640ea06a9a4e7ce7edebc2cfdd0a1",
+          "bytes": 10135
         },
         {
           "name": "references/teaching-response.schema.json",
+          "sha256": "2ab409b4d8880dcb981857270dcb6cdf75f011a96a8ad58193fea25d87fd3f97",
+          "bytes": 4956
+        }
+      ]
+    },
+    {
+      "name": "plugin-k12-teaching-core.zip",
+      "kind": "plugin",
+      "source_path": "platform/knodo/skills/k12-teaching-core",
+      "sha256": "6d4e4e6a181fc4d506fd868e1a0bfcace4ee7a8dd29f3367f37dbab72f5c078c",
+      "bytes": 5928,
+      "entries": [
+        {
+          "name": ".claude-plugin/plugin.json",
+          "sha256": "a7c0f43a95a2a8b337be0bfc1bd500c7a2972c290475c7b72fd3ab71aa67b23b",
+          "bytes": 270
+        },
+        {
+          "name": "plugin.yaml",
+          "sha256": "d1a3b9029cda4efa28e1e083044c5384f1f00f40f0a9b777e37c68320dffee25",
+          "bytes": 214
+        },
+        {
+          "name": "skills/k12-teaching-core/SKILL.md",
+          "sha256": "61bf37f2bc3262aeed56d1251f49aa91a1581d2d6c7023d6cf156aa94606512d",
+          "bytes": 1558
+        },
+        {
+          "name": "skills/k12-teaching-core/references/stage-policy.json",
+          "sha256": "e83d580a18c6b0a6ee6aa19c6abc1e4b31f3d4758f24397f1bf018171fc218e5",
+          "bytes": 1530
+        },
+        {
+          "name": "skills/k12-teaching-core/references/teaching-request.schema.json",
+          "sha256": "49121de20ed9e5414269fe5cb892503e944640ea06a9a4e7ce7edebc2cfdd0a1",
+          "bytes": 10135
+        },
+        {
+          "name": "skills/k12-teaching-core/references/teaching-response.schema.json",
           "sha256": "2ab409b4d8880dcb981857270dcb6cdf75f011a96a8ad58193fea25d87fd3f97",
           "bytes": 4956
         }
@@ -150,6 +248,45 @@
       ]
     },
     {
+      "name": "plugin-k12-assessment-author.zip",
+      "kind": "plugin",
+      "source_path": "platform/knodo/skills/k12-assessment-author",
+      "sha256": "2df575453ba785e14d074c12d6605da271acb33d95a21a5f40300114174351c1",
+      "bytes": 5025,
+      "entries": [
+        {
+          "name": ".claude-plugin/plugin.json",
+          "sha256": "c46f0e856cbdd08e3505f847d43fbc2579358d5291d3b01bbedff51eb442607c",
+          "bytes": 268
+        },
+        {
+          "name": "plugin.yaml",
+          "sha256": "07d27af2738ae3f0aa7f17e4d5799689b478ac248806f257cd7e406fe448a4e9",
+          "bytes": 212
+        },
+        {
+          "name": "skills/k12-assessment-author/SKILL.md",
+          "sha256": "a2b9676a548170d1fc6904086ff109e7fe61bebbc0ac8fe94170c6cf5c1a953c",
+          "bytes": 1194
+        },
+        {
+          "name": "skills/k12-assessment-author/references/designer-request.schema.json",
+          "sha256": "2ed58820bd94366240fbc9f46b798f2018eb80ae7a47d95a7cef7876d96e00ff",
+          "bytes": 4988
+        },
+        {
+          "name": "skills/k12-assessment-author/references/quiz-draft.schema.json",
+          "sha256": "6832ff64596f1b2b6a4e5cc57f03c1d8ea52f5cc8685a30ccfbd218199ad155e",
+          "bytes": 10610
+        },
+        {
+          "name": "skills/k12-assessment-author/references/stage-policy.json",
+          "sha256": "e83d580a18c6b0a6ee6aa19c6abc1e4b31f3d4758f24397f1bf018171fc218e5",
+          "bytes": 1530
+        }
+      ]
+    },
+    {
       "name": "skill-k12-content-author.zip",
       "kind": "skill",
       "source_path": "platform/knodo/skills/k12-content-author",
@@ -177,16 +314,55 @@
           "bytes": 1530
         }
       ]
+    },
+    {
+      "name": "plugin-k12-content-author.zip",
+      "kind": "plugin",
+      "source_path": "platform/knodo/skills/k12-content-author",
+      "sha256": "4e63b9cb6ce1fcf5596e80d6a30880ee26cd6a513ffa9d81e338d8dd8c7d42cf",
+      "bytes": 5070,
+      "entries": [
+        {
+          "name": ".claude-plugin/plugin.json",
+          "sha256": "82cf0825841813a959f24ca87586b23d75f3040555ff70e69642ae02b6cc51f1",
+          "bytes": 265
+        },
+        {
+          "name": "plugin.yaml",
+          "sha256": "297630ffae298021dad8657257aeec970b9ea79e26d91144821ee7da6064b368",
+          "bytes": 209
+        },
+        {
+          "name": "skills/k12-content-author/SKILL.md",
+          "sha256": "411a3b79163b6643e9615a1c59b0cb09f06ac819770d4713f37aed009296a34d",
+          "bytes": 1164
+        },
+        {
+          "name": "skills/k12-content-author/references/designer-request.schema.json",
+          "sha256": "2ed58820bd94366240fbc9f46b798f2018eb80ae7a47d95a7cef7876d96e00ff",
+          "bytes": 4988
+        },
+        {
+          "name": "skills/k12-content-author/references/lesson-package-draft.schema.json",
+          "sha256": "218d0728ebffecbbc1981c81e726e50b93326ae6cc487cf151c46071c8adf311",
+          "bytes": 5847
+        },
+        {
+          "name": "skills/k12-content-author/references/stage-policy.json",
+          "sha256": "e83d580a18c6b0a6ee6aa19c6abc1e4b31f3d4758f24397f1bf018171fc218e5",
+          "bytes": 1530
+        }
+      ]
     }
   ],
   "deployment_manifest": {
     "path": "deployment-manifest.json",
-    "sha256": "5a34c02cbbb5b7ee5788213942faefc7bcc1781ae4b65a30008b86e9c388bf33"
+    "sha256": "196917e1ba0da44814b1f56f47f7dc6f8e3472d3cf334d4709a0c78ea85ff0d6"
   },
   "bundle_summary": {
     "bundle_kind": "TEST_FIXTURE_BUNDLE",
     "for_real_students": false,
-    "tutor_visible_count": 2,
+    "tutor_visible_count": 6,
     "designer_private_count": 0,
     "answers_in_tutor_bundle": false,
     "excluded_sources": [

@@ -1717,9 +1717,16 @@ async def request_code_feedback(
                 "reason": "DETERMINISTIC_RESULT_UNAVAILABLE",
             }
 
+        from app.modules.ai.service import target_arguments
+
+        target_options = await target_arguments(
+            db, Operation.CODE_FEEDBACK, payload, require_route=settings.gateway_mode == "knodo"
+        )
+        await db.commit()
         outcome = await request.app.state.gateway.invoke(
             Operation.CODE_FEEDBACK,
             payload,
+            **target_options,
             timeout_seconds=settings.gateway_timeout_seconds,
         )
         if outcome.status == GatewayStatus.OK and outcome.output is not None:

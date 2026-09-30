@@ -57,7 +57,9 @@ async def clean_test_db(migrated_test_db: None, test_settings: Settings) -> Asyn
     async with engine.begin() as connection:
         await connection.execute(
             text(
-                "TRUNCATE privacy_deletion_requests, codelab_task_favorites, "
+                "TRUNCATE ai_configurations, personal_memory_tasks, personal_memory_summaries, "
+                "personal_memory_events, personal_memory_items, personal_memory_states, "
+                "privacy_deletion_requests, codelab_task_favorites, "
                 "codelab_task_catalog, codelab_code_runs, codelab_code_drafts, "
                 "codelab_task_revisions, "
                 "authoring_publications, authoring_reviews, "

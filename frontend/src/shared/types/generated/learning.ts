@@ -683,6 +683,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/growth/personal-memory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Overview */
+        get: operations["read_overview_api_v1_growth_personal_memory_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/growth/personal-memory/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Write Settings */
+        patch: operations["write_settings_api_v1_growth_personal_memory_settings_patch"];
+        trace?: never;
+    };
+    "/api/v1/growth/personal-memory/items/{item_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Events */
+        get: operations["read_events_api_v1_growth_personal_memory_items__item_id__events_get"];
+        put?: never;
+        /** Write Item */
+        post: operations["write_item_api_v1_growth_personal_memory_items__item_id__events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/growth/personal-memory/backfill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Backfill */
+        post: operations["backfill_api_v1_growth_personal_memory_backfill_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/growth/personal-memory/tasks/{task_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update Task */
+        post: operations["update_task_api_v1_growth_personal_memory_tasks__task_id__events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/interactive/resources": {
         parameters: {
             query?: never;
@@ -885,6 +971,11 @@ export interface components {
             answer: unknown;
             /** Idempotency Key */
             idempotency_key: string;
+        };
+        /** BackfillRequest */
+        BackfillRequest: {
+            /** Session Ids */
+            session_ids: string[];
         };
         /** BookmarkDTO */
         BookmarkDTO: {
@@ -1576,6 +1667,18 @@ export interface components {
             resource: components["schemas"]["InteractiveResourceRefDTO"];
             manifest: components["schemas"]["InteractiveManifestV1"];
         };
+        /** ItemUpdate */
+        ItemUpdate: {
+            /** Base Revision */
+            base_revision: number;
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "EDIT" | "FORGET" | "RESTORE" | "ALLOW_AUTO" | "CONFIRM";
+            /** Statement */
+            statement?: string | null;
+        };
         /** LearningItemDTO */
         LearningItemDTO: {
             /**
@@ -1675,6 +1778,101 @@ export interface components {
             content_markdown?: string | null;
             /** Ai Enabled */
             ai_enabled?: boolean | null;
+        };
+        /** MemoryItemView */
+        MemoryItemView: {
+            /** Id */
+            id: string;
+            /** Key */
+            key: string;
+            /** Category */
+            category: string;
+            /** Statement */
+            statement: string;
+            /** Status */
+            status: string;
+            /** Manual */
+            manual: boolean;
+            /** Revision */
+            revision: number;
+            /** Sources */
+            sources: components["schemas"]["MemorySourceView"][];
+            /** Valid Until */
+            valid_until: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** MemoryOverviewView */
+        MemoryOverviewView: {
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Offset
+             * @default 0
+             */
+            offset: number;
+            /**
+             * Has More
+             * @default false
+             */
+            has_more: boolean;
+            settings: components["schemas"]["MemorySettingsView"];
+            /** Content Revision */
+            content_revision: number;
+            /** Last Updated At */
+            last_updated_at: string | null;
+            /** Items */
+            items: components["schemas"]["MemoryItemView"][];
+            /** Summary Markdown */
+            summary_markdown: string;
+            /** Tasks */
+            tasks: components["schemas"]["MemoryTaskView"][];
+            /** Notice */
+            notice: string;
+        };
+        /** MemorySettingsView */
+        MemorySettingsView: {
+            /** Auto Enabled */
+            auto_enabled: boolean;
+            /** Use Enabled */
+            use_enabled: boolean;
+            /** Revision */
+            revision: number;
+        };
+        /** MemorySourceView */
+        MemorySourceView: {
+            /** Session Id */
+            session_id: string;
+            /** Message Id */
+            message_id: string;
+            /** Observed At */
+            observed_at: string;
+            /** Deleted */
+            deleted: boolean;
+        };
+        /** MemoryTaskView */
+        MemoryTaskView: {
+            /** Id */
+            id: string;
+            /** Session Id */
+            session_id: string;
+            /** Status */
+            status: string;
+            /** Reason */
+            reason: string | null;
+            /** Attempt */
+            attempt: number;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** OpenEventReceipt */
         OpenEventReceipt: {
@@ -1924,6 +2122,15 @@ export interface components {
              */
             restart: boolean;
         };
+        /** SettingsUpdate */
+        SettingsUpdate: {
+            /** Base Revision */
+            base_revision: number;
+            /** Auto Enabled */
+            auto_enabled: boolean;
+            /** Use Enabled */
+            use_enabled: boolean;
+        };
         /** StudentGenerationCreate */
         StudentGenerationCreate: {
             /** Chapter Id */
@@ -1950,6 +2157,14 @@ export interface components {
             coding_task_refs?: ({
                 [key: string]: unknown;
             } | string)[] | null;
+        };
+        /** TaskAction */
+        TaskAction: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "CANCEL" | "RETRY";
         };
         /** ValidationError */
         ValidationError: {
@@ -3796,6 +4011,241 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["MemoryDocumentRestoreRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_overview_api_v1_growth_personal_memory_get: {
+        parameters: {
+            query?: {
+                q?: string;
+                category?: string | null;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemoryOverviewView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    write_settings_api_v1_growth_personal_memory_settings_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemoryOverviewView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_events_api_v1_growth_personal_memory_items__item_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    write_item_api_v1_growth_personal_memory_items__item_id__events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemoryItemView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    backfill_api_v1_growth_personal_memory_backfill_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BackfillRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_task_api_v1_growth_personal_memory_tasks__task_id__events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskAction"];
             };
         };
         responses: {

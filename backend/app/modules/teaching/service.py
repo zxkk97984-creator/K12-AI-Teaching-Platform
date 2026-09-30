@@ -25,6 +25,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
+from app.modules.ai.service import public_teacher, resolve
 from app.modules.content.models import Chapter, ChapterRevision, Release
 from app.modules.content.service import viewer_scope_from_profile, visible_chapter_detail
 from app.modules.identity.models import LearnerProfile, Stage, User
@@ -144,6 +145,7 @@ async def create_session(
         context=context,
         fixture_allowance=allowance,
     )
+    session.teacher_snapshot = await resolve(db, "TEACH_TURN", session.stage)
     db.add(session)
     await db.commit()
     await db.refresh(session)
@@ -208,6 +210,7 @@ async def create_free_session(
         creation_key=idempotency_key,
         fixture_allowance=allowance,
     )
+    session.teacher_snapshot = await resolve(db, "TEACH_TURN", session.stage)
     db.add(session)
     await db.commit()
     await db.refresh(session)
@@ -255,6 +258,7 @@ async def list_sessions(
     return [
         SessionSummary(
             id=session.id,
+            teacher=public_teacher(session.teacher_snapshot),
             chapter_id=session.chapter_id,
             chapter_title=title or "",
             conversation_type=session.conversation_type,
@@ -301,6 +305,7 @@ async def get_session_detail(
         .limit(1)
     )
     summary = SessionSummary(
+        teacher=public_teacher(session.teacher_snapshot),
         id=session.id,
         chapter_id=session.chapter_id,
         chapter_title=title or "",
@@ -357,7 +362,9 @@ async def update_session(
     return session
 
 
-async def delete_session(db: AsyncSession, *, user: User, session_id: uuid.UUID) -> bool:
+async def delete_session(
+    db: AsyncSession, *, user: User, session_id: uuid.UUID, forget_memories: bool = False
+) -> bool:
     session = await db.scalar(
         select(LessonSession).where(
             LessonSession.id == session_id, LessonSession.owner_user_id == user.id
@@ -365,6 +372,9 @@ async def delete_session(db: AsyncSession, *, user: User, session_id: uuid.UUID)
     )
     if session is None:
         return False
+    from app.modules.memory.automatic import delete_chat_memory
+
+    await delete_chat_memory(db, user.id, session_id, forget_memories)
     await db.delete(session)
     await db.commit()
     return True
@@ -684,6 +694,9 @@ async def finalize_run(
     )
     if session is not None:
         session.base_revision = session.base_revision + 1
+    from app.modules.memory.automatic import enqueue_run
+
+    await enqueue_run(db, run)
     await db.commit()
     return RunStatus.SUCCEEDED.value
 

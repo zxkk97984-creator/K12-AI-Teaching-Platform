@@ -298,9 +298,9 @@ run_start() {
   fi
   "$ROOT/scripts/compose.sh" up -d postgres-dev
   if [ "$build" -eq 1 ]; then
-    "$ROOT/scripts/compose.sh" up -d --build api worker web
+    "$ROOT/scripts/compose.sh" up -d --build api worker memory-worker web
   else
-    "$ROOT/scripts/compose.sh" up -d api worker web
+    "$ROOT/scripts/compose.sh" up -d api worker memory-worker web
   fi
   wait_for_app
   printf '霜铃 K12 已启动：前端 http://127.0.0.1:15173，API http://127.0.0.1:18081\n'
@@ -324,7 +324,7 @@ run_restart() {
     # Build first so a failed typecheck or image build leaves the existing app up.
     install_and_build
     if [ "$with_runner" -eq 0 ]; then
-      "$ROOT/scripts/compose.sh" build api worker web
+      "$ROOT/scripts/compose.sh" build api worker memory-worker web
     else
       "$ROOT/scripts/build-runner.sh"
     fi
@@ -361,7 +361,7 @@ run_stop() {
       sleep 0.5
     done
   fi
-  "$ROOT/scripts/compose.sh" stop api worker web
+  "$ROOT/scripts/compose.sh" stop api worker memory-worker web
   printf 'K12 应用已停止；数据库、上传文件、预算账本和数据卷仍保留。\n'
 }
 
@@ -372,6 +372,15 @@ run_status() {
   "$ROOT/scripts/compose.sh" ps
   if pid="$(verified_dev_pid)"; then
     printf '本机开发进程：运行中（PID %s）\n' "$pid"
+    local memory_pid=""
+    if [ -f "$K12_RUNTIME_STATE_DIR/memory-worker.pid" ]; then
+      read -r memory_pid < "$K12_RUNTIME_STATE_DIR/memory-worker.pid" || true
+    fi
+    if [[ "$memory_pid" =~ ^[0-9]+$ ]] && kill -0 "$memory_pid" 2>/dev/null; then
+      printf '个人记忆 Worker：运行中（PID %s）\n' "$memory_pid"
+    else
+      printf '个人记忆 Worker：未运行；重启本机开发服务以加载新组件。\n'
+    fi
     if curl -fsS --max-time 2 "http://127.0.0.1:${RUNNER_PORT:-18090}/health" >/dev/null 2>&1; then
       printf 'runner：健康（本机端口 %s）\n' "${RUNNER_PORT:-18090}"
     else
@@ -385,7 +394,7 @@ run_status() {
 run_logs() {
   load_config
   if [ "$#" -eq 0 ]; then
-    "$ROOT/scripts/compose.sh" logs --tail 100 api worker web
+    "$ROOT/scripts/compose.sh" logs --tail 100 api worker memory-worker web
   else
     "$ROOT/scripts/compose.sh" logs "$@"
   fi

@@ -1,0 +1,95 @@
+{
+  "schema_version": "k12.knodo.classroom-item.v1",
+  "source_id": "chapter:ai-learning-foundations/ch-senior",
+  "binding": {
+    "chapter_uuid": null,
+    "resolved_by": "local_app",
+    "note": "文件系统镜像不含数据库 UUID；由本地应用在部署时绑定。"
+  },
+  "course": {
+    "slug": "ai-learning-foundations",
+    "title": "AI 通识四学段演示课",
+    "topic": "人工智能通识"
+  },
+  "chapter": {
+    "slug": "ch-senior",
+    "title": "训练与测试：模型为什么会出错",
+    "revision": 1,
+    "stage": "SENIOR",
+    "grade_min": 10,
+    "grade_max": 12,
+    "objectives": [
+      "训练数据和测试数据职责不同",
+      "过拟合会让模型只会背例子",
+      "AI 结果需要结合证据复核"
+    ],
+    "knowledge_points": [
+      {
+        "slug": "demo-train-test-split",
+        "name": "训练集与测试集",
+        "topic": "机器学习",
+        "description": "训练集用于学习，测试集用于检查面对新数据时的表现。"
+      },
+      {
+        "slug": "demo-overfitting",
+        "name": "过拟合",
+        "topic": "机器学习",
+        "description": "模型把训练例子的细节和噪声也记住，面对新数据反而表现变差。"
+      },
+      {
+        "slug": "demo-ai-makes-mistakes",
+        "name": "AI 会犯错",
+        "topic": "AI 通识",
+        "description": "数据不足、分布变化或规则不完整时，AI 可能输出错误结果。"
+      }
+    ],
+    "blocks": [
+      {
+        "text": "训练与测试：模型为什么会出错",
+        "type": "TITLE"
+      },
+      {
+        "text": "理解训练集、测试集和过拟合，用简单实验分析模型局限并讨论 AI 责任。",
+        "type": "PARAGRAPH"
+      },
+      {
+        "key": "evaluation",
+        "text": "训练成绩不等于真实能力",
+        "type": "SECTION"
+      },
+      {
+        "example": {
+          "label": "分析一下",
+          "text": "为什么测试集不能和训练集完全相同？"
+        },
+        "text": "训练集帮助模型学习，测试集用来检查它能否面对新数据。只在训练集上表现很好，可能是过拟合。",
+        "title": "训练与测试",
+        "type": "KNOWLEDGE_CARD"
+      },
+      {
+        "text": "完成模型诊断，比较训练和测试结果，并说明一条模型局限。",
+        "title": "项目任务",
+        "type": "CALLOUT"
+      }
+    ]
+  },
+  "provenance": {
+    "release_key": "synthetic-k12-demo-v1",
+    "release_manifest_hash": "054174810f286ec8e1f6027302ffac26c6137b5ea9a4e50b64fc874aa007bf4b",
+    "source_kind": "SYNTHETIC_FIXTURE",
+    "is_test_fixture": true,
+    "source_commit": "0000000000000000000000000000000000000000",
+    "source_path": "sources/ch-senior.txt",
+    "license_code": "SYNTHETIC-FIXTURE"
+  },
+  "review": {
+    "review_status": "UNREVIEWED",
+    "publication_status": "DRAFT",
+    "human_reviewed": false
+  },
+  "usage": {
+    "for_real_students": false,
+    "notice": "测试内容，未作人工教学审校"
+  },
+  "content_hash": "66ff3c2c50e36df919f3843959ba726daebbaced54cf7feb3132e26fc3fab940"
+}

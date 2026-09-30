@@ -68,6 +68,7 @@ class ConversationUpdateRequest(BaseModel):
 
 
 class SessionSummary(BaseModel):
+    teacher: dict[str, str] | None = None
     id: uuid.UUID
     chapter_id: uuid.UUID | None
     chapter_title: str

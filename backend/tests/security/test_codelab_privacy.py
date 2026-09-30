@@ -123,6 +123,12 @@ async def test_export_and_local_delete_are_owner_scoped_and_platform_honest(
         "learning_bookmarks": 0,
         "memory_documents": 0,
         "memory_context_states": 0,
+        "memory_candidates": 0,
+        "personal_memory_items": 0,
+        "personal_memory_events": 0,
+        "personal_memory_summaries": 0,
+        "personal_memory_tasks": 0,
+        "personal_memory_states": 1,
         "assessment_answer_drafts": 0,
     }
     replay = await client.post(

@@ -31,9 +31,11 @@ from app.core.database import get_engine
 from app.integrations.knodo import AgentGateway, GatewayStatus
 from app.integrations.knodo.fixture import FixtureScenario
 from app.integrations.knodo.operations import Operation
+from app.modules.ai.teaching_context import build_runtime_context
 from app.modules.identity.models import LearnerProfile
 from app.modules.learning.projection import merge_learner_context, project_and_observe
 from app.modules.learning.service import snapshot_for
+from app.modules.memory.automatic import state_for
 from app.modules.memory.service import build_learner_context, derive_candidates
 from app.modules.recommendation.service import refresh_snapshot as refresh_recommendation
 from app.modules.teaching.context import build_teaching_request
@@ -132,6 +134,7 @@ async def execute_run(
                 owner_user_id=session.owner_user_id,
                 evidence_limit=settings.growth_context_evidence_limit,
                 memory_limit=settings.growth_context_memory_limit,
+                query=await _student_input(db, run),
             )
             # T19: a tutor run is an event, so the single next-step decision is
             # re-projected here (same session, same fail-closed rule). The read
@@ -229,7 +232,22 @@ async def execute_run(
             and isinstance(scene_route, str)
             and scene_route.split("?", 1)[0].rstrip("/") == "/conversations"
         )
-        continuation_scope = gateway.continuation_scope(operation)
+        try:
+            runtime_context = await build_runtime_context(
+                db,
+                settings=settings,
+                gateway=gateway,
+                session=session,
+                operation=operation,
+                query=student_input,
+            )
+        except ValueError:
+            return await finalize_run(
+                db, run_id=run_id, lease_token=token, error_category="AI_TARGET_UNAVAILABLE"
+            )
+        selected_target = runtime_context.target
+        continuation_scope = runtime_context.continuation_scope
+        personal_items = runtime_context.personal_items
         remote_conversation_id = (
             await reusable_remote_conversation(
                 db,
@@ -279,6 +297,11 @@ async def execute_run(
     # the existing (frozen) `evidence` field, and widen only this run's allowed
     # evidence ids so validation keeps rejecting anything not injected here.
     request["evidence"] = merge_learner_context(context, learner_context)
+    if personal_items:
+        request["personal_context"] = {
+            "schema_version": "k12.personal-context.v1",
+            "items": personal_items[:8],
+        }
 
     signal = cancel_signal or _CANCEL_SIGNALS.get(run_id)
     # Dev/test only: an explicitly configured fixture delay turns the synthetic
@@ -337,6 +360,7 @@ async def execute_run(
     result = await gateway.invoke(
         operation.value,
         request,
+        **({"target": selected_target} if selected_target else {}),
         scenario=fixture_scenario,
         timeout_seconds=settings.gateway_timeout_seconds,
         cancel=signal,
@@ -457,11 +481,14 @@ async def _student_input(db: AsyncSession, run: AgentRun) -> str:
 async def _free_history_input(db: AsyncSession, *, run: AgentRun, current: str) -> str:
     """Carry recent successful turns when no reusable upstream ID is available."""
 
+    memory_state = await state_for(db, run.owner_user_id, create=False)
+    cutoff = memory_state.history_after if memory_state else None
     rows = (
         await db.execute(
             select(ConversationMessage.role, ConversationMessage.content_markdown)
             .join(AgentRun, AgentRun.id == ConversationMessage.run_id)
             .where(
+                *([ConversationMessage.created_at > cutoff] if cutoff else []),
                 AgentRun.id != run.id,
                 AgentRun.session_id == run.session_id,
                 AgentRun.owner_user_id == run.owner_user_id,

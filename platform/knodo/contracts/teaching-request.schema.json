@@ -389,6 +389,49 @@
           "type": "null"
         }
       ]
+    },
+    "personal_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "k12.personal-context.v1"
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "maxLength": 160
+              },
+              "source": {
+                "enum": [
+                  "AUTO_SUMMARIZED",
+                  "USER_EDITED",
+                  "SESSION_SUMMARY"
+                ]
+              },
+              "summary": {
+                "type": "string",
+                "maxLength": 2400
+              }
+            },
+            "required": [
+              "id",
+              "source",
+              "summary"
+            ]
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "items"
+      ]
     }
   },
   "required": [

@@ -31,23 +31,28 @@ command -v setsid >/dev/null 2>&1 || {
 api_pid=""
 web_pid=""
 worker_pid=""
+memory_worker_pid=""
 runner_pid=""
 dev_pid_file=""
 
 cleanup() {
   local pid
-  for pid in "$web_pid" "$api_pid" "$worker_pid" "$runner_pid"; do
+  for pid in "$web_pid" "$api_pid" "$worker_pid" "$memory_worker_pid" "$runner_pid"; do
     # npm and uvicorn spawn children. Each service has its own session, so
     # stop the entire service group even if its original parent exited.
     if [ -n "$pid" ]; then
       kill -TERM -- "-$pid" 2>/dev/null || true
     fi
   done
-  for pid in "$web_pid" "$api_pid" "$worker_pid" "$runner_pid"; do
+  for pid in "$web_pid" "$api_pid" "$worker_pid" "$memory_worker_pid" "$runner_pid"; do
     if [ -n "$pid" ]; then
       wait "$pid" 2>/dev/null || true
     fi
   done
+  if [ -n "$memory_worker_pid" ] && [ -f "$K12_RUNTIME_STATE_DIR/memory-worker.pid" ] \
+    && [ "$(cat "$K12_RUNTIME_STATE_DIR/memory-worker.pid")" = "$memory_worker_pid" ]; then
+    rm -f -- "$K12_RUNTIME_STATE_DIR/memory-worker.pid"
+  fi
   if [ -n "$dev_pid_file" ] && [ -f "$dev_pid_file" ] \
     && [ "$(cat "$dev_pid_file")" = "$$" ]; then
     rm -f -- "$dev_pid_file"
@@ -179,6 +184,7 @@ reuse_or_start_runner() {
 # Compose project, then fail closed if any unknown process still owns a port.
 stop_project_service api
 stop_project_service worker
+stop_project_service memory-worker
 stop_project_service web
 for port in 18081 15173; do
   for _ in $(seq 1 15); do
@@ -218,6 +224,10 @@ if [ "$with_runner" -eq 1 ]; then
   setsid uv run --project backend --locked python -m app.jobs.worker &
   worker_pid=$!
 fi
+
+setsid uv run --project backend --locked python -m app.jobs.memory_worker &
+memory_worker_pid=$!
+printf '%s\n' "$memory_worker_pid" > "$K12_RUNTIME_STATE_DIR/memory-worker.pid"
 
 for _ in $(seq 1 45); do
   if curl -fsS --max-time 2 http://127.0.0.1:18081/health/ready >/dev/null \

@@ -5,7 +5,7 @@
   "deployment_status": "NOT_DEPLOYED",
   "deployment_verified": false,
   "bot_roles": {
-    "tutor": {
+    "primary": {
       "bot_id": null,
       "workspace_id": null,
       "operations": [
@@ -15,8 +15,54 @@
       "skills": [
         "k12-teaching-core"
       ],
-      "packaged_config_hash": "dda40ce75a272a074ce5b88080076b9865dfc30ba94924a37e8b0768ef196ca2",
-      "packaged_knowledge_bundle_hash": "ef42a2b5027392337566953f253611f44e416ee8b5b7cf3d3f9423146f068d3c",
+      "system_prompt": "tutor/v1/stages/primary.md",
+      "stages": [
+        "PRIMARY_LOWER",
+        "PRIMARY_UPPER"
+      ],
+      "response_mode": "STREAMING_STRUCTURED",
+      "packaged_config_hash": "dc295330c33d503bd23e944102bcfd39103f4baa2d72ee4f8606e90b515f2372",
+      "packaged_knowledge_bundle_hash": "6f207e73c4ccacf60ee664f6252f977f6c4fef9f14d9a15f435494b604526d0d",
+      "deployed_config_hash": null,
+      "deployment_verified": false
+    },
+    "junior": {
+      "bot_id": null,
+      "workspace_id": null,
+      "operations": [
+        "TEACH_TURN",
+        "CODE_FEEDBACK"
+      ],
+      "skills": [
+        "k12-teaching-core"
+      ],
+      "system_prompt": "tutor/v1/stages/junior.md",
+      "stages": [
+        "JUNIOR"
+      ],
+      "response_mode": "STREAMING_STRUCTURED",
+      "packaged_config_hash": "dc295330c33d503bd23e944102bcfd39103f4baa2d72ee4f8606e90b515f2372",
+      "packaged_knowledge_bundle_hash": "6f207e73c4ccacf60ee664f6252f977f6c4fef9f14d9a15f435494b604526d0d",
+      "deployed_config_hash": null,
+      "deployment_verified": false
+    },
+    "senior": {
+      "bot_id": null,
+      "workspace_id": null,
+      "operations": [
+        "TEACH_TURN",
+        "CODE_FEEDBACK"
+      ],
+      "skills": [
+        "k12-teaching-core"
+      ],
+      "system_prompt": "tutor/v1/stages/senior.md",
+      "stages": [
+        "SENIOR"
+      ],
+      "response_mode": "STREAMING_STRUCTURED",
+      "packaged_config_hash": "dc295330c33d503bd23e944102bcfd39103f4baa2d72ee4f8606e90b515f2372",
+      "packaged_knowledge_bundle_hash": "6f207e73c4ccacf60ee664f6252f977f6c4fef9f14d9a15f435494b604526d0d",
       "deployed_config_hash": null,
       "deployment_verified": false
     },
@@ -31,8 +77,26 @@
         "k12-assessment-author",
         "k12-content-author"
       ],
-      "packaged_config_hash": "8f551f5fea46fd71bdd584ebca36823946f53ac0d453e8db12d3e36035009179",
+      "system_prompt": "designer/v1/system-prompt.md",
+      "response_mode": "BUFFERED_STRUCTURED",
+      "live_operations": [
+        "QUIZ_DRAFT"
+      ],
+      "packaged_config_hash": "96af0d54b5e42246688b50d60601464bd31a7a0036a255be52fa810985aac793",
       "packaged_knowledge_bundle_hash": null,
+      "deployed_config_hash": null,
+      "deployment_verified": false
+    },
+    "memory": {
+      "bot_id": null,
+      "workspace_id": null,
+      "operations": [
+        "MEMORY_EXTRACT"
+      ],
+      "skills": [],
+      "system_prompt": "memory/v1/system-prompt.md",
+      "response_mode": "BUFFERED_STRUCTURED",
+      "packaged_config_hash": "ef5021cfd972e310383ec175426bc327586be45bd01ff4eefd94d15ddc6dbf09",
       "deployed_config_hash": null,
       "deployment_verified": false
     }
@@ -40,17 +104,9 @@
   "agent_os": null,
   "runtime_model_id": null,
   "native_subagents_required": false,
-  "response_mode": "BUFFERED_STRUCTURED",
   "actual_permissions_reviewed": false,
   "fixture_is_not_live": true,
-  "gates_snapshot": {
-    "G_API_CONTRACT": "BLOCKED",
-    "G_LIVE_BUDGET": "BLOCKED",
-    "G_AGENT_ISOLATION": "BLOCKED",
-    "G_K12_TERMS": "BLOCKED",
-    "G_HUMAN_CONTENT_REVIEW": "BLOCKED"
-  },
-  "not_deployed_reason": "本卡无平台操作授权：未创建 Bot、未上传 Skill、未验证租户读取。",
+  "not_deployed_reason": "此清单仅描述可复现本地资产，不记录个人部署凭据或远端验收结果；实际绑定以数据库注册表及实时核验为准。",
   "manual_steps_ref": "docs/integrations/knodo/DEPLOYMENT_GUIDE.md",
   "boundaries_ref": "docs/integrations/knodo/ASSET_BOUNDARIES.md"
 }

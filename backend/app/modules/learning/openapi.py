@@ -9,6 +9,7 @@ from pathlib import Path
 from app.modules.identity.openapi import prune_schema
 
 LEARNING_PREFIXES = (
+    "/api/v1/growth/personal-memory",
     "/api/v1/learning/",
     "/api/v1/quiz-options",
     "/api/v1/quiz-generation-jobs",

@@ -8,11 +8,24 @@ import uuid
 import pytest
 from sqlalchemy import select
 
+from app.integrations.knodo.operations import Operation
+from app.integrations.knodo.wire import _protocol_instruction
 from app.jobs import teaching_worker
+from app.modules.teaching.context import build_free_session_context
 from app.modules.teaching.models import LessonSession
 from app.modules.teaching.service import acquire_lease, finalize_run
 from tests.identity_helpers import create_synthetic_user, login
 from tests.teaching_helpers import create_app_client, csrf_headers, teaching_settings
+
+
+def test_free_chat_disallows_quiz_action_without_curriculum_objective():
+    context = build_free_session_context(stage="SENIOR")
+
+    assert context["chapter"]["objective_ids"] == ["free-conversation"]
+    assert context["allowed_actions"] == []
+    instruction = _protocol_instruction(Operation.TEACH_TURN)
+    assert "若REQUEST_JSON.allowed_actions为空，action必须为null" in instruction
+    assert "objective_ids必须非空并从REQUEST_JSON.chapter.objective_ids中复制" in instruction
 
 
 @pytest.mark.asyncio
