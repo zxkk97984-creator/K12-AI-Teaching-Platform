@@ -39,11 +39,27 @@ test(`CodeLab ${stage} saves drafts, separates examples from grading, and preser
   page,
 }) => {
   test.setTimeout(120_000);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   await signIn(page);
   await page.goto("/code");
   await expect(page.getByTestId("codelab-page")).toBeVisible();
   await expect(page.getByRole("heading", { name: isSenior ? "编程与算法练习" : "编程入门" })).toBeVisible();
   await expect(page.getByText("共 6 道题")).toBeVisible();
+  const screenshotDir = process.env.CODELAB_QA_SCREENSHOTS_DIR;
+  if (screenshotDir) {
+    for (const size of [{ width: 1366, height: 768 }, { width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 820 }]) {
+      await page.setViewportSize(size);
+      await page.screenshot({ path: `${screenshotDir}/live-bank-${stage.toLowerCase()}-${size.width}x${size.height}.png` });
+      const rows = page.getByTestId("codelab-task-row");
+      for (let index = 0; index < 4; index++) {
+        const r = (await rows.nth(index).boundingBox())!;
+        expect(r.y + r.height).toBeLessThanOrEqual(size.height - (size.width < 768 ? 76 : 0) + 1);
+      }
+    }
+    await page.setViewportSize({ width: 1366, height: 768 });
+  }
   await page.getByRole("searchbox", { name: "搜索题目、编号或知识点" }).fill(searchTerm);
   await page.getByRole("button", { name: "搜索", exact: true }).click();
   await expect.poll(() => new URL(page.url()).searchParams.get("q")).toBe(searchTerm);
@@ -55,8 +71,22 @@ test(`CodeLab ${stage} saves drafts, separates examples from grading, and preser
   await page.getByRole("button", { name: "开始练习" }).click();
   await expect(page.getByTestId("codelab-workspace")).toBeVisible();
   await expect(page.getByRole("heading", { name: taskTitle })).toBeVisible();
-  await expect(page.getByText(/真实 runner/)).toBeVisible();
+  await expect(page.locator(".codelab-runner-badge")).toContainText("runner 已就绪");
 
+  if (screenshotDir) {
+    for (const size of [{ width: 1366, height: 768 }, { width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 820 }]) {
+      await page.setViewportSize(size);
+      if (size.width < 1024) await page.getByRole("button", { name: "代码", exact: true }).click();
+      const r = (await page.getByTestId("codelab-editor").boundingBox())!;
+      if (size.width >= 1024) expect(r.height).toBeGreaterThanOrEqual(240);
+      for (const name of ["运行示例", "提交判题"]) {
+        const bounds = (await page.getByRole("button", { name, exact: true }).boundingBox())!;
+        expect(bounds.y + bounds.height).toBeLessThanOrEqual(size.height - (size.width < 768 ? 76 : 0) + 1);
+      }
+      await page.screenshot({ path: `${screenshotDir}/live-workspace-${stage.toLowerCase()}-${size.width}x${size.height}.png` });
+    }
+    await page.setViewportSize({ width: 1366, height: 768 });
+  }
   await replaceEditor(page, incorrectCode);
   await page.getByRole("button", { name: "保存草稿" }).click();
   await page.reload();
@@ -83,25 +113,28 @@ test(`CodeLab ${stage} saves drafts, separates examples from grading, and preser
   await expect(passedResult).toContainText("代码执行完成");
   await expect(passedResult).toContainText("PASSED");
   await expect(passedResult).toContainText("70 / 70");
+  if (screenshotDir) await page.screenshot({ path: `${screenshotDir}/live-passed-${stage.toLowerCase()}.png` });
 
-  const feedbackButton = passedResult.getByRole("button", { name: /请求 AI 建议|重试 AI 建议/ });
-  await expect(feedbackButton).toBeVisible();
-  const feedbackResponsePromise = page.waitForResponse((response) =>
-    response.url().includes("/api/v1/code-runs/") && response.url().endsWith("/feedback"),
-  );
-  await feedbackButton.click();
-  const feedbackResponse = await feedbackResponsePromise;
-  expect(feedbackResponse.status()).toBe(200);
-  const feedbackBody = await feedbackResponse.json();
-  expect(feedbackBody.run.deterministic_score).toBe(70);
-  expect(feedbackBody.fixture).toBe(false);
-  expect(["READY", "FAILED"]).toContain(feedbackBody.run.feedback_status);
-  expect(feedbackBody.run.feedback.source).toBe("KNODO");
-  if (feedbackBody.run.feedback_status === "READY") {
-    expect(feedbackBody.run.feedback.summary.trim()).not.toBe("");
+  if (process.env.E2E_CODELAB_SKIP_AI !== "1") {
+    const feedbackButton = passedResult.getByRole("button", { name: /请求 AI 建议|重试 AI 建议/ });
+    await expect(feedbackButton).toBeVisible();
+    const feedbackResponsePromise = page.waitForResponse((response) =>
+      response.url().includes("/api/v1/code-runs/") && response.url().endsWith("/feedback"),
+    );
+    await feedbackButton.click();
+    const feedbackResponse = await feedbackResponsePromise;
+    expect(feedbackResponse.status()).toBe(200);
+    const feedbackBody = await feedbackResponse.json();
+    expect(feedbackBody.run.deterministic_score).toBe(70);
+    expect(feedbackBody.fixture).toBe(false);
+    expect(["READY", "FAILED"]).toContain(feedbackBody.run.feedback_status);
+    expect(feedbackBody.run.feedback.source).toBe("KNODO");
+    if (feedbackBody.run.feedback_status === "READY") {
+      expect(feedbackBody.run.feedback.summary.trim()).not.toBe("");
+    }
+    await expect(passedResult).toContainText("70 / 70");
+    await expect(passedResult).toContainText(/Knodo|建议暂时不可用/);
   }
-  await expect(passedResult).toContainText("70 / 70");
-  await expect(passedResult).toContainText(/Knodo|建议暂时不可用/);
 
   await page.getByRole("button", { name: "本题记录" }).click();
   const history = page.getByTestId("codelab-history");
@@ -119,4 +152,5 @@ test(`CodeLab ${stage} saves drafts, separates examples from grading, and preser
   await historyDetail.getByRole("button", { name: "用这份代码继续" }).click();
   await expect(page.getByTestId("codelab-workspace")).toBeVisible();
   await expect(page.locator(".cm-content")).toContainText(correctCode.split("\n")[1].trim());
+  expect(errors).toEqual([]);
 });

@@ -204,6 +204,11 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
     : pathname.startsWith("/settings") ? "学习设置"
     : items.find((item) => item.path === currentSection)?.label ?? "学习平台";
   const conversationPage = pathname.startsWith("/conversations");
+  const codeParams = new URLSearchParams(search);
+  const codeSurface = pathname === "/code"
+    ? Boolean(codeParams.get("task")) && !(codeParams.get("tab") === "history" && codeParams.get("view") === "record" && Boolean(codeParams.get("run")))
+      ? "workspace" : "catalog"
+    : undefined;
   // One topbar, not two: when a conversation is open its title replaces the
   // generic nav label rather than sitting in a second header beneath it.
   const activeTitle = conversationPage && activeConversation
@@ -214,7 +219,7 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
   const startConversation = () => { void controller.start().then((id) => { if (id) navigateTo(`/conversations?session=${id}`); }); };
 
   const readingSurface = pathname === "/resources" || pathname.startsWith("/books/");
-  return <div className="app-shell" data-stage={stage ?? ""} data-admin={adminPage} data-reading-surface={readingSurface}>
+  return <div className="app-shell" data-stage={stage ?? ""} data-admin={adminPage} data-reading-surface={readingSurface} data-code-surface={codeSurface}>
     <a href="#page-content" className="skip-link">跳到主要内容</a>
     {adminPage ? <button type="button" className="app-mobile-toggle" aria-label={mobileNavOpen ? "关闭导航" : "打开导航"} aria-expanded={mobileNavOpen} onClick={() => setMobileNavOpen((value) => !value)}><Icon name="book" /></button> : <NavLink to="/settings" className="k12-mobile-settings" aria-label="打开学习设置"><Icon name="settings" /></NavLink>}
     {mobileNavOpen ? <button type="button" className="app-sidebar-backdrop" aria-label="关闭导航" onClick={closeMobile} /> : null}
@@ -233,6 +238,7 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
       </NavLink>
     </aside>
     <div className={`app-main${conversationPage ? " app-main--conversation" : ""}`}>
+      {codeSurface ? <span className="codelab-pet-slot" aria-hidden="true" /> : null}
       <header className={`app-topbar${conversationPage ? " app-topbar--conversation" : ""}`}><div className="app-topbar-title"><p className="app-breadcrumb">{adminPage ? "管理端" : "我的学习"}</p>{conversationPage ? <h1 className="app-topbar-page-title">{activeTitle}</h1> : <p className="app-topbar-page-title">{activeTitle}</p>}</div>{activeChapter && activeChapter !== activeTitle ? <span className="conv-context-chip">当前参考：{activeChapter}</span> : null}<div className="app-topbar-account">{conversationPage ? <><button type="button" className="secondary" onClick={() => historyDialog.current?.showModal()}>对话记录</button><button type="button" onClick={startConversation}>新对话</button></> : <>{!adminPage ? <NavLink to="/conversations" className="k12-mobile-chat" aria-label="打开完整聊天界面"><Icon name="chat" /><span>聊天</span></NavLink> : null}<span className="app-stage-label">{adminPage ? "管理员" : gradeLabel(me.profile?.grade)}</span></>}</div></header>
       <div id="page-content" className={`app-content${conversationPage ? " app-content--conversation" : ""}`} tabIndex={-1}>{adminPage && !admin ? <main><h1>仅管理员可访问</h1><a href="/conversations">返回学习平台</a></main> : children}</div>
     </div>

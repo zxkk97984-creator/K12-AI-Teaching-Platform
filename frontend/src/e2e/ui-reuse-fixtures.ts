@@ -1,6 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import type { CodeTask } from "../features/codelab/types";
+import type { CodeTask, CodeRun } from "../features/codelab/types";
 
 const interactiveBridge = readFileSync(new URL("../../../backend/app/modules/interactive/bridge.js", import.meta.url), "utf8");
 const interactiveManifest = {
@@ -145,13 +145,19 @@ export const courses = [
 ];
 export async function fixture(
   page: Page,
-  options: { admin?: boolean; empty?: boolean; stage?: string; rich?: boolean; interactive?: boolean; codeTasksCount?: number } = {},
+  options: { admin?: boolean; empty?: boolean; stage?: string; rich?: boolean; interactive?: boolean; codeTasksCount?: number; codeRunnerAvailable?: boolean; codeCourseLink?: boolean } = {},
 ) {
   const state = {
     code: "def double(x):\n    return x * 2\n",
     codeDraftRevision: 0,
     codeFavorite: false,
     codeTasksCount: options.codeTasksCount ?? 1,
+    codeRunnerAvailable: options.codeRunnerAvailable ?? false,
+    codeSaveFailure: false,
+    codeSaveDelayMs: 0,
+    codeSaveConflict: false,
+    codeRunStatus: "QUEUED",
+    codeRuns: [] as CodeRun[],
     account: structuredClone(me),
     turns: 0,
     lastScene: null as Record<string, unknown> | null,
@@ -442,7 +448,7 @@ export async function fixture(
       });
       return json({ run: run() });
     }
-    if (path.endsWith("/cancel")) {
+    if (path.endsWith("/cancel") && !path.startsWith("/api/v1/code-runs/")) {
       state.runStatus = "CANCELLED";
       return json(run());
     }
@@ -587,7 +593,7 @@ export async function fixture(
     if (path === "/api/v1/growth/memories")
       return json({ items: [], notice: "由你掌控学习记忆" });
     if (path === "/api/v1/code-runner/status")
-      return json({ available: false, reason: "UI fixture 不执行代码；请在真实 runner 环境验证运行。" });
+      return json({ available: state.codeRunnerAvailable, reason: state.codeRunnerAvailable ? "UI fixture 模拟状态，不执行真实代码。" : "UI fixture 不执行代码；请在真实 runner 环境验证运行。" });
     if (path === "/api/v1/code-tasks") {
       const task: CodeTask = {
             schema_version: "fixture",
@@ -672,12 +678,12 @@ export async function fixture(
         schema_version: "fixture", task_id: "double", revision: 1, status: "DRAFT",
         is_test_fixture: true, review_status: "UNREVIEWED", title: "把数字翻倍",
         description: "写一个函数，返回输入数字的两倍。", starter_code: state.code,
-        entrypoint: "double", io_contract: {}, examples: [{ input: { x: 2 }, output: 4 }],
+        entrypoint: "double", io_contract: { protocol: "function-json.v1", input_schema: { type: "object", required: ["x"], additionalProperties: false, properties: { x: { type: "integer", minimum: -1000, maximum: 1000 } } }, output_schema: { type: "integer" } }, examples: [{ input: { x: 2 }, output: 4 }, { input: { x: 0 }, output: 0 }],
         public_test_groups: [], chapter_binding: { course_slug: "python", chapter_slug: "double", revision: 1, stage: state.account.profile.stage, knowledge_point_slugs: [] },
         catalog: { category: "PYTHON_BASICS", difficulty: "EASY", tags: ["函数"], sort_order: 0 },
         is_favorite: state.codeFavorite,
         progress: { status: state.codeDraftRevision ? "IN_PROGRESS" : "NOT_STARTED", has_draft: Boolean(state.codeDraftRevision), best_score: null, latest_run_id: null, latest_activity_at: null },
-        course_link: null,
+        course_link: options.codeCourseLink ? { course_slug: "python", chapter_slug: "double", course_title: courses[0].title, chapter_title: chapter.title, href: "/chapters/chapter-ui?revision=1", available: true } : null,
       });
     }
     if (path === "/api/v1/code-tasks/double/favorite") {
@@ -687,6 +693,10 @@ export async function fixture(
     }
     if (path === "/api/v1/code-tasks/double/draft") {
       if (method !== "GET") {
+        expect(request.headers()["x-csrf-token"]).toBe("synthetic-ui-csrf");
+        if (state.codeSaveFailure) return json({ error: { code: "SAVE_FAILED", message: "合成场景：草稿保存失败" } }, 503);
+        if (state.codeSaveConflict) { state.codeSaveConflict = false; state.codeDraftRevision += 1; return json({ error: { code: "DRAFT_CONFLICT", message: "合成场景：其他窗口更新了草稿" } }, 409); }
+        if (state.codeSaveDelayMs) await new Promise((resolve) => setTimeout(resolve, state.codeSaveDelayMs));
         state.code = request.postDataJSON().code;
         state.codeDraftRevision += 1;
       }
@@ -700,6 +710,40 @@ export async function fixture(
       });
     }
     if (path === "/api/v1/code-runs/22222222-2222-4222-8222-222222222222") return json(codeHistoryDetail);
+    const codeRunId = path.match(/^\/api\/v1\/code-runs\/(fixture-code-\d+)(?:\/(feedback|cancel))?$/)?.[1];
+    if (codeRunId) {
+      const item = state.codeRuns.find((run) => run.id === codeRunId);
+      if (!item) return json({ error: { code: "NOT_FOUND", message: "合成运行不存在" } }, 404);
+      if (path.endsWith("/feedback")) {
+        expect(request.headers()["x-csrf-token"]).toBe("synthetic-ui-csrf");
+        item.feedback_status = "READY";
+        item.feedback = { status: "READY", source: "FIXTURE", summary: "合成 AI 建议：尝试解释函数的输入与返回值。", references: [] };
+        return json({ run: item, fixture: true });
+      }
+      if (path.endsWith("/cancel")) {
+        expect(request.headers()["x-csrf-token"]).toBe("synthetic-ui-csrf");
+        state.codeRunStatus = "CANCELLED";
+        item.status = "CANCELLED";
+        return json({ run: item });
+      }
+      item.status = state.codeRunStatus;
+      item.execution_status = state.codeRunStatus;
+      const passed = item.code.includes("* 2");
+      const graded = item.purpose === "GRADE" && item.status === "SUCCEEDED";
+      item.feedback_eligible = graded;
+      item.correctness_status = graded ? passed ? "PASSED" : "FAILED" : "NOT_VERIFIED";
+      item.deterministic_score = graded ? passed ? 70 : 0 : null;
+      item.result = graded ? { grading: { status: item.correctness_status, deterministic_score: item.deterministic_score, groups: [] }, observations: [] } : { observations: [] };
+      if (item.status === "SYSTEM_ERROR") Object.assign(item.result, { error: "合成场景：runner 服务异常，未形成判分" });
+      return json({ ...codeHistoryDetail, run: item });
+    }
+    if (path === "/api/v1/code-runs" && method === "POST") {
+      expect(request.headers()["x-csrf-token"]).toBe("synthetic-ui-csrf");
+      const body = request.postDataJSON();
+      const item = { ...structuredClone(codeHistoryDetail.run), id: `fixture-code-${state.codeRuns.length + 1}`, purpose: body.purpose, code: body.code, status: "QUEUED", execution_status: "QUEUED", correctness_status: "NOT_VERIFIED", deterministic_score: null, result: null } as CodeRun;
+      state.codeRuns.push(item);
+      return json({ run: item, idempotent_replay: false });
+    }
     if (path === "/api/v1/code-runs") return json({ items: [], total: 0, limit: 10, offset: 0 });
     if (path === "/api/v1/resources" || path === "/api/v1/animations")
       return json({ items: [] });

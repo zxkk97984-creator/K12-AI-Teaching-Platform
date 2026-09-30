@@ -93,6 +93,8 @@ CODELAB_E2E_BASE_URL=http://127.0.0.1:15174 E2E_CODELAB_STAGE=JUNIOR \
   npx playwright test --config playwright.config.ts src/e2e/codelab.spec.ts --reporter=line
 ```
 
+只验证布局、草稿和真实 Docker runner 时，可显式设置 `E2E_CODELAB_SKIP_AI=1`；该运行不验证真实 Knodo 建议。设置 `CODELAB_QA_SCREENSHOTS_DIR=test-results/codelab-layout` 可保存四种视口的题库、工作台和判题截图，`CODELAB_E2E_REPORT_FILE` 可指定每个学段的 JSON 结果文件。Playwright 的临时输出分别放在 `test-results/playwright-ui` 和 `test-results/playwright-live`，避免后续测试清空最终截图。
+
 ## 验证入口与结果范围
 
 `./k12 check` 使用隔离数据库和 fixture 网关，不发起真实 Knodo 调用。浏览器合成回归使用拦截 API，验证实际页面交互；真实模型调用需单独执行：

@@ -15,15 +15,26 @@ import {
 } from "../lib/geometry";
 import type { CompanionAiState } from "../types";
 
-export function useCompanionPosition(userId: string) {
+function clampCompact(x: number, y: number): Point {
+  return {
+    x: Math.max(12, Math.min(x, window.innerWidth - 56)),
+    y: Math.max(8, Math.min(y, window.innerHeight - (window.innerWidth < 768 ? 132 : 56))),
+  };
+}
+
+export function useCompanionPosition(userId: string, parkingTarget?: string) {
   const key = `k12:companion:${userId}:position:v1`;
+  const manuallyPlaced = useRef(false);
   const [position, setPosition] = useState<Point>(() => {
     try {
       const p = JSON.parse(localStorage.getItem(key) ?? "null");
-      if (p && Number.isFinite(p.x) && Number.isFinite(p.y))
+      if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) {
+        manuallyPlaced.current = p.manual !== false;
+        if (parkingTarget) return clampCompact(p.x, p.y);
         return p.viewport && Number.isFinite(p.viewport.width) && Number.isFinite(p.viewport.height)
           ? remapDockPosition(p, p.viewport)
           : clampDock(p.x, p.y);
+      }
     } catch {
       /* storage is optional */
     }
@@ -31,6 +42,12 @@ export function useCompanionPosition(userId: string) {
   });
   const [movement, setMovement] = useState<CompanionAiState | null>(null);
   const current = useRef(position);
+  const [parkingPosition, setParkingPosition] = useState<Point | null>(null);
+  const [parked, setParked] = useState(false);
+  const effectivePosition = parkingTarget && parked && parkingPosition ? parkingPosition : position;
+  const clampPosition = (x: number, y: number): Point => parkingTarget
+    ? clampCompact(x, y)
+    : clampDock(x, y);
   const previousViewport = useRef({ width: window.innerWidth, height: window.innerHeight });
   const drag = useRef<{
     x: number;
@@ -43,26 +60,47 @@ export function useCompanionPosition(userId: string) {
     setPosition(p);
     if (persist) {
       try {
-        localStorage.setItem(key, JSON.stringify({ ...p, viewport: { width: window.innerWidth, height: window.innerHeight } }));
+        localStorage.setItem(key, JSON.stringify({ ...p, manual: manuallyPlaced.current, viewport: { width: window.innerWidth, height: window.innerHeight } }));
       } catch {
         /* session-only fallback */
       }
     }
   };
   useEffect(() => {
+    if (!parkingTarget) { setParked(false); return; }
+    const slot = document.querySelector(parkingTarget);
+    if (!slot) return;
+    const update = () => {
+      const bounds = slot.getBoundingClientRect();
+      if (!bounds.width) return;
+      setParkingPosition({ x: bounds.left, y: bounds.top });
+      const p = current.current;
+      const intersectsControls = [...document.querySelectorAll(".codelab-workspace-toolbar, .codelab-editor, .codelab-result-panel, .codelab-workspace-actions, .codelab-filters, .codelab-bank-heading, .codelab-task-list")].some((element) => {
+        const r = element.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && p.x < r.right && p.x + 44 > r.left && p.y < r.bottom && p.y + 44 > r.top;
+      });
+      setParked(!manuallyPlaced.current || intersectsControls);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(slot);
+    window.addEventListener("resize", update);
+    return () => { observer.disconnect(); window.removeEventListener("resize", update); };
+  }, [parkingTarget, key]);
+  useEffect(() => {
     const resize = () => {
-      move(remapDockPosition(current.current, previousViewport.current), true);
+      move(parkingTarget ? clampCompact(current.current.x, current.current.y) : remapDockPosition(current.current, previousViewport.current), manuallyPlaced.current);
       previousViewport.current = { width: window.innerWidth, height: window.innerHeight };
     };
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
-  }, [key]);
+  }, [key, parkingTarget]);
   const pointerDown = (event: PointerEvent<HTMLButtonElement>) => {
     if (event.button !== 0) return;
     drag.current = {
       x: event.clientX,
       y: event.clientY,
-      origin: current.current,
+      origin: effectivePosition,
       moved: false,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -74,8 +112,10 @@ export function useCompanionPosition(userId: string) {
       dy = event.clientY - d.y;
     if (Math.abs(dx) + Math.abs(dy) > DOCK_DRAG_THRESHOLD) d.moved = true;
     if (!d.moved) return;
+    manuallyPlaced.current = true;
+    setParked(false);
     setMovement(dx >= 0 ? "running-right" : "running-left");
-    move(clampDock(d.origin.x + dx, d.origin.y + dy));
+    move(clampPosition(d.origin.x + dx, d.origin.y + dy));
   };
   const pointerUp = () => {
     if (drag.current?.moved) move(current.current, true);
@@ -101,10 +141,12 @@ export function useCompanionPosition(userId: string) {
     const d = delta[event.key];
     if (!d) return;
     event.preventDefault();
-    move(clampDock(current.current.x + d.x, current.current.y + d.y), true);
+    manuallyPlaced.current = true;
+    setParked(false);
+    move(clampPosition(effectivePosition.x + d.x, effectivePosition.y + d.y), true);
   };
   return {
-    position,
+    position: effectivePosition,
     movement,
     pointerDown,
     pointerMove,

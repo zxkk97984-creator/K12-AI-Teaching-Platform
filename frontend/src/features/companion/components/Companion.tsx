@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useLocation } from "react-router-dom";
 import { ConversationCompactOptions, ConversationContent } from "../../conversation/ConversationContent";
 import { useConversation } from "../../conversation/ConversationProvider";
@@ -23,9 +23,10 @@ export function Companion({ userId }: { userId: string }) {
   const [rect, setRect] = useState<PanelRect | null>(null);
   const dock = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLElement>(null);
-  const position = useCompanionPosition(userId);
-  const { controller, run, sending, draft, error } = useConversation();
   const location = useLocation();
+  const codeSurface = location.pathname === "/code";
+  const position = useCompanionPosition(userId, codeSurface ? ".codelab-pet-slot" : undefined);
+  const { controller, run, sending, draft, error } = useConversation();
   const autoMinimized = useRef(false);
   const minimizedBeforeAuto = useRef(false);
   const chapterId = location.pathname.startsWith("/chapters/")
@@ -102,7 +103,7 @@ export function Companion({ userId }: { userId: string }) {
   const readingSurface = location.pathname === "/resources" || location.pathname.startsWith("/books/");
   const mobileConversation = narrowViewport && location.pathname.startsWith("/conversations");
   useEffect(() => {
-    const shouldMinimize = readingSurface || mobileConversation || narrowViewport;
+    const shouldMinimize = readingSurface || mobileConversation || narrowViewport || codeSurface;
     if (shouldMinimize && !autoMinimized.current) {
       minimizedBeforeAuto.current = minimized;
       autoMinimized.current = true;
@@ -112,7 +113,7 @@ export function Companion({ userId }: { userId: string }) {
       autoMinimized.current = false;
       setMinimized(minimizedBeforeAuto.current);
     }
-  }, [readingSurface, mobileConversation, narrowViewport, open, minimized]);
+  }, [readingSurface, mobileConversation, narrowViewport, codeSurface, open, minimized]);
   useEffect(() => {
     if (!open) return;
     const update = () => {
@@ -160,7 +161,9 @@ export function Companion({ userId }: { userId: string }) {
         style={{
           left: position.position.x,
           top: position.position.y,
-        }}
+          "--codelab-pet-left": `${position.position.x}px`,
+          "--codelab-pet-top": `${position.position.y}px`,
+        } as CSSProperties}
       >
         {!minimized ? (
           <button

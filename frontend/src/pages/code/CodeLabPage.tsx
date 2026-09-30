@@ -351,7 +351,7 @@ export function CodeLabPage() {
       next.delete("run");
       next.delete("view");
       next.delete("restore_run");
-      if (!next.has("tab")) next.set("tab", "bank");
+      if (!next.has("tab") || next.get("tab") === "history") next.set("tab", "bank");
     });
   }
 

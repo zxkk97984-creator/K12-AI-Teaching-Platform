@@ -87,14 +87,10 @@ export function CodeLabBank({
   const title = stage === "JUNIOR" ? "编程入门" : "编程与算法练习";
 
   return (
-    <main className="codelab-page" data-testid="codelab-page">
-      <header className="codelab-page-header">
-        <div>
-          <CodeLabBackButton onClick={onPrevious} />
-          <p className="eyebrow">在线练习</p>
-          <h1>{title}</h1>
-          <p className="codelab-muted">挑一道题，写下思路，再用真实运行和可信测试检查结果。</p>
-        </div>
+    <main className="codelab-page codelab-bank" data-testid="codelab-page">
+      <header className="codelab-bank-heading">
+        <h1>{title}</h1>
+        <CodeLabBackButton onClick={onPrevious} />
       </header>
 
       <nav className="codelab-tabs" aria-label="编程练习页面">
@@ -105,33 +101,33 @@ export function CodeLabBank({
 
       <section className="codelab-filters" aria-label="筛选题目">
         <form className="codelab-search" onSubmit={(event) => { event.preventDefault(); onSearch(); }}>
-          <label htmlFor="codelab-search-input">搜索题目、编号或知识点</label>
+          <label className="sr-only" htmlFor="codelab-search-input">搜索题目、编号或知识点</label>
           <div>
             <input
               id="codelab-search-input"
               type="search"
               value={query}
               onChange={(event) => onQueryChange(event.target.value)}
-              placeholder="例如：二分查找、列表、range-sum"
+              placeholder="搜索题目或知识点"
               maxLength={120}
             />
             <button type="submit" disabled={loading}>搜索</button>
           </div>
         </form>
         <div className="codelab-filter-grid">
-          <label>分类
+          <label><span className="sr-only">分类</span>
             <select aria-label="筛选分类" value={category} onChange={(event) => onCategory(event.target.value)}>
               <option value="">全部分类</option>
               {categories.map((value) => <option key={value} value={value}>{CATEGORY_LABELS[value] ?? value}</option>)}
             </select>
           </label>
-          <label>难度
+          <label><span className="sr-only">难度</span>
             <select aria-label="筛选难度" value={difficulty} onChange={(event) => onDifficulty(event.target.value)}>
               <option value="">全部难度</option>
               {difficulties.map((value) => <option key={value} value={value}>{DIFFICULTY_LABELS[value] ?? value}</option>)}
             </select>
           </label>
-          <label>完成状态
+          <label><span className="sr-only">完成状态</span>
             <select aria-label="筛选完成状态" value={progress} onChange={(event) => onProgress(event.target.value)}>
               <option value="">全部状态</option>
               {Object.entries(PROGRESS_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
@@ -162,34 +158,31 @@ export function CodeLabBank({
         <div className="codelab-task-list" aria-label="编程题目">
           {tasks.map((task) => (
             <article className="codelab-task-row" key={`${task.task_id}:${task.revision}`} data-testid="codelab-task-row">
-              <div className="codelab-task-copy">
-                <div className="codelab-task-meta">
-                  <span>{CATEGORY_LABELS[task.catalog.category ?? ""] ?? "未分类"}</span>
-                  <span>{DIFFICULTY_LABELS[task.catalog.difficulty ?? ""] ?? "难度未标注"}</span>
-                  {task.is_test_fixture ? <span>合成练习</span> : null}
-                </div>
-                <h3>{task.title}</h3>
-                <p>{task.description}</p>
-                <div className="codelab-tags">
-                  <code>{task.task_id}</code>
-                  {task.catalog.tags.map((tag) => <span key={tag}>{tag}</span>)}
-                </div>
-              </div>
+              <button
+                type="button"
+                className="secondary codelab-favorite"
+                aria-label={task.is_favorite ? `取消收藏：${task.title}` : `收藏：${task.title}`}
+                aria-pressed={task.is_favorite}
+                disabled={favoritePending === task.task_id}
+                onClick={() => onToggleFavorite(task)}
+                title={task.is_favorite ? "取消收藏" : "收藏题目"}
+              >
+                <span aria-hidden="true">{favoritePending === task.task_id ? "…" : task.is_favorite ? "★" : "☆"}</span>
+              </button>
               <div className="codelab-task-state">
                 <span data-progress={task.progress.status}>{PROGRESS_LABELS[task.progress.status] ?? task.progress.status}</span>
                 {task.progress.best_score !== null ? <small>最高 {task.progress.best_score} / 70</small> : null}
               </div>
+              <div className="codelab-task-copy">
+                <h3><button className="codelab-title-link" type="button" onClick={() => onOpenTask(task)}>{task.title}</button></h3>
+                <div className="codelab-task-meta">
+                  <span>{CATEGORY_LABELS[task.catalog.category ?? ""] ?? "未分类"}</span>
+                  {task.catalog.tags.slice(0, 2).map((tag) => <span key={tag} title={tag}>{tag}</span>)}
+                  {task.is_test_fixture ? <span className="codelab-fixture-label">合成练习</span> : null}
+                </div>
+              </div>
+              <span className="codelab-difficulty">{DIFFICULTY_LABELS[task.catalog.difficulty ?? ""] ?? "未标注"}</span>
               <div className="codelab-task-actions">
-                <button
-                  type="button"
-                  className="secondary codelab-favorite"
-                  aria-label={task.is_favorite ? `取消收藏：${task.title}` : `收藏：${task.title}`}
-                  aria-pressed={task.is_favorite}
-                  disabled={favoritePending === task.task_id}
-                  onClick={() => onToggleFavorite(task)}
-                >
-                  {favoritePending === task.task_id ? "正在保存…" : task.is_favorite ? "已收藏" : "收藏"}
-                </button>
                 <button type="button" onClick={() => onOpenTask(task)}>
                   {task.progress.status === "IN_PROGRESS" ? "继续练习" : "开始练习"}
                 </button>

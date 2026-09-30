@@ -2,12 +2,13 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./src/e2e",
+  outputDir: "test-results/playwright-live",
   timeout: 45_000,
   workers: 1,
   retries: 0,
   reporter: [
     ["line"],
-    ["json", { outputFile: "test-results/live-report.json" }],
+    ["json", { outputFile: process.env.CODELAB_E2E_REPORT_FILE ?? "test-results/live-report.json" }],
   ],
   use: {
     baseURL: process.env.CODELAB_E2E_BASE_URL ?? "http://127.0.0.1:15173",

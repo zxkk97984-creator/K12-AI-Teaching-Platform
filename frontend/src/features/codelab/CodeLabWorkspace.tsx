@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useBeforeUnload, useBlocker, useLocation, useNavigate, type BlockerFunction } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { ApiError } from "../identity/api";
@@ -13,6 +13,8 @@ import {
 } from "./api";
 import { CodeEditor } from "./CodeEditor";
 import { CodeLabBackButton } from "./CodeLabBackButton";
+import { CodeTaskProblem } from "./CodeTaskProblem";
+import { WorkspaceSplitter } from "./WorkspaceSplitter";
 import type { CodeDraft, CodeRun, CodeTask } from "./types";
 
 type Props = {
@@ -137,7 +139,14 @@ export function CodeLabWorkspace({
   const [feedbackError, setFeedbackError] = useState("");
   const [runError, setRunError] = useState("");
   const [mobilePane, setMobilePane] = useState<Pane>("problem");
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
+  const [problemPercent, setProblemPercent] = useState(38);
+  const [resultPercent, setResultPercent] = useState(30);
+  const [resultExpanded, setResultExpanded] = useState(true);
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
+  const submittingRef = useRef(false);
+  const overwritingRef = useRef(false);
   const [cancelBusy, setCancelBusy] = useState(false);
   const latestCode = useRef(code);
   const savedCodeRef = useRef(savedCode);
@@ -189,7 +198,7 @@ export function CodeLabWorkspace({
   }, [draft.code, task, userId]);
 
   useEffect(() => {
-    if (!recoveryReady) return;
+    if (!recoveryReady || recovery) return;
     const key = recoveryKey(userId, task);
     try {
       if (code !== savedCode) {
@@ -205,7 +214,7 @@ export function CodeLabWorkspace({
     } catch {
       setStorageAvailable(false);
     }
-  }, [code, draftRevision, recoveryReady, savedCode, task, userId]);
+  }, [code, draftRevision, recovery, recoveryReady, savedCode, task, userId]);
 
   const saveLatest = useCallback(async (): Promise<boolean> => {
     if (conflictDraft) return false;
@@ -281,6 +290,11 @@ export function CodeLabWorkspace({
     [hasUnsavedChanges],
   );
   const blocker = useBlocker(shouldBlock);
+  const blockerRef = useRef(blocker);
+  const saveLatestRef = useRef(saveLatest);
+  blockerRef.current = blocker;
+  saveLatestRef.current = saveLatest;
+  const blockedLocationKey = blocker.state === "blocked" ? blocker.location.key : null;
   useBeforeUnload((event) => {
     if (!hasUnsavedChanges) return;
     event.preventDefault();
@@ -288,27 +302,32 @@ export function CodeLabWorkspace({
   });
 
   useEffect(() => {
-    if (blocker.state !== "blocked") return;
+    if (!blockedLocationKey) return;
     let active = true;
+    const currentBlocker = () => {
+      const current = blockerRef.current;
+      return active && current.state === "blocked" && current.location.key === blockedLocationKey ? current : null;
+    };
     const leave = async () => {
       const saveBeforeLeave = window.confirm("当前代码还没有同步到服务器。确定先保存并离开吗？取消会留在当前页面。" );
       if (!saveBeforeLeave) {
-        blocker.reset();
+        currentBlocker()?.reset();
         return;
       }
-      const saved = await saveLatest();
-      if (!active) return;
+      const saved = await saveLatestRef.current();
+      const current = currentBlocker();
+      if (!current) return;
       if (saved) {
-        blocker.proceed();
+        current.proceed();
       } else if (window.confirm("草稿未保存。确定放弃未保存修改并离开吗？")) {
-        blocker.proceed();
+        current.proceed();
       } else {
-        blocker.reset();
+        current.reset();
       }
     };
     void leave();
     return () => { active = false; };
-  }, [blocker, saveLatest]);
+  }, [blockedLocationKey]);
 
   const applyServerDraft = () => {
     if (!conflictDraft) return;
@@ -325,29 +344,34 @@ export function CodeLabWorkspace({
   };
 
   const overwriteServerDraft = async () => {
-    if (!conflictDraft) return;
+    if (!conflictDraft || overwritingRef.current) return;
     const confirmed = window.confirm("将使用当前编辑内容覆盖服务器上的新草稿。继续吗？");
     if (!confirmed) return;
+    overwritingRef.current = true;
+    setSaveStatus("saving");
+    const snapshot = latestCode.current;
     try {
       const response = await saveCodeDraft(
         task.task_id,
         task.revision,
-        latestCode.current,
+        snapshot,
         undefined,
         SCOPE,
         conflictDraft.revision_number ?? 0,
       );
       draftRevisionRef.current = response.revision_number ?? 0;
-      savedCodeRef.current = latestCode.current;
-      setSavedCode(latestCode.current);
+      savedCodeRef.current = snapshot;
+      setSavedCode(snapshot);
       setSavedAt(response.updated_at);
       setDraftRevision(draftRevisionRef.current);
       setConflictDraft(null);
-      setSaveStatus("saved");
+      setSaveStatus(latestCode.current === snapshot ? "saved" : "unsaved");
       setSaveError("");
     } catch (caught) {
       setSaveError(caught instanceof Error ? caught.message : "覆盖保存失败");
       setSaveStatus("conflict");
+    } finally {
+      overwritingRef.current = false;
     }
   };
 
@@ -374,31 +398,28 @@ export function CodeLabWorkspace({
   }, []);
 
   async function submitRun(purpose: Purpose) {
-    if (!runnerAvailable || busyPurpose || anyRunning || conflictDraft) return;
-    setRunError("");
-    if (!(await saveLatest())) {
-      setRunError("草稿尚未成功保存，请先解决保存问题，再运行这份代码。");
-      return;
-    }
-    const snapshot = latestCode.current;
+    if (!runnerAvailable || submittingRef.current || anyRunning || conflictDraft) return;
+    submittingRef.current = true;
     setBusyPurpose(purpose);
+    setRunError("");
+    setResultExpanded(true);
+    setActiveResult(purpose);
     try {
+      if (!(await saveLatest())) {
+        setRunError("草稿尚未成功保存，请先解决保存问题，再运行这份代码。");
+        return;
+      }
       const response = await createCodeRun(
-        task.task_id,
-        task.revision,
-        snapshot,
-        crypto.randomUUID(),
-        undefined,
-        purpose,
-        SCOPE,
+        task.task_id, task.revision, latestCode.current, crypto.randomUUID(),
+        undefined, purpose, SCOPE,
       );
       updateRun(response.run);
       onRunStarted(response.run.id);
-      setActiveResult(purpose);
       setMobilePane("result");
     } catch (caught) {
       setRunError(caught instanceof Error ? caught.message : "提交运行失败");
     } finally {
+      submittingRef.current = false;
       setBusyPurpose(null);
     }
   }
@@ -470,154 +491,54 @@ export function CodeLabWorkspace({
     ? "尚无可信分数"
     : `${gradeRun.deterministic_score} / 70`;
   const taskNeedsReview = task.is_test_fixture || task.status === "DRAFT" || task.review_status !== "HUMAN_REVIEWED";
-  const taskSourceLabel = task.is_test_fixture ? "合成练习" : taskNeedsReview ? "草稿／未完成人工审校" : "课程编程任务";
+
+  const saveLabel = saveStatus === "saved" ? "草稿已保存" : saveStatus === "saving" ? "正在保存草稿…" : saveStatus === "conflict" ? "检测到其他窗口修改" : saveStatus === "failed" ? "保存失败" : "有尚未保存的代码";
+  const layoutStyle = { "--problem-percent": problemPercent, "--result-percent": resultPercent } as CSSProperties;
 
   return (
-    <main className="codelab-page" data-testid="codelab-workspace">
+    <main className="codelab-page codelab-workspace" data-testid="codelab-workspace" style={layoutStyle}>
       <RunPoller run={examplesRun} onUpdate={updatePolledRun} onError={setRunError} />
       <RunPoller run={gradeRun} onUpdate={updatePolledRun} onError={setRunError} />
-      <header className="codelab-page-header">
-        <div>
-          <CodeLabBackButton onClick={onPrevious} />
-          <p className="eyebrow">{task.chapter_binding.stage === "JUNIOR" ? "初中编程入门" : "高中编程与算法"}</p>
-          <h1>{task.title}</h1>
-          <p className="codelab-muted">{taskSourceLabel} · r{task.revision} · {task.catalog.tags.join(" · ")}</p>
-        </div>
+      <header className="codelab-workspace-toolbar">
+        <div className="codelab-workspace-title"><h1>{task.title}</h1><span className="codelab-difficulty">{task.catalog.difficulty === "EASY" ? "入门" : task.catalog.difficulty === "MEDIUM" ? "基础" : task.catalog.difficulty === "HARD" ? "进阶" : "未标注"}</span></div>
         <div className="codelab-header-actions">
-          <button type="button" className="secondary" onClick={onHistory}>本题记录</button>
+          <span className={`codelab-runner-badge${runnerAvailable ? " is-ready" : ""}`} role="status" title={runnerReason}>{runnerAvailable ? runnerReason : "runner 不可用"}</span>
+          <CodeLabBackButton onClick={onPrevious} />
           <button type="button" className="secondary" onClick={onBack}>返回题库</button>
+          <button type="button" className="secondary" onClick={onHistory}>本题记录</button>
         </div>
       </header>
-      {taskNeedsReview ? (
-        <p className="codelab-notice" role="status">{task.is_test_fixture ? "合成练习内容，尚未人工审校。" : "本任务尚未完成人工审校。"} 运行使用真实 runner；正式判分只依据服务端可信用例。</p>
-      ) : null}
-      <p className={runnerAvailable ? "codelab-status" : "codelab-error"} role="status">{runnerReason}</p>
-      {isMobile ? (
-        <nav className="codelab-mobile-panes" aria-label="编程工作区">
-          {([
-            ["problem", "题目"],
-            ["code", "代码"],
-            ["result", "结果"],
-          ] as const).map(([pane, label]) => (
-            <button key={pane} type="button" aria-pressed={mobilePane === pane} onClick={() => setMobilePane(pane)}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      ) : null}
-      <div className="codelab-workspace-grid">
-        <section
-          className="codelab-panel codelab-problem-panel"
-          hidden={isMobile && mobilePane !== "problem"}
-          aria-label="题目说明"
-          data-testid="codelab-problem"
-        >
-          <div className="codelab-panel-heading">
-            <p className="eyebrow">题目说明</p>
-            <span className={`codelab-difficulty codelab-difficulty--${task.catalog.difficulty?.toLowerCase() ?? "unknown"}`}>
-              {task.catalog.difficulty === "EASY" ? "入门" : task.catalog.difficulty === "MEDIUM" ? "基础" : task.catalog.difficulty === "HARD" ? "进阶" : "未标注难度"}
-            </span>
-          </div>
-          <p>{task.description}</p>
-          <dl className="codelab-contract">
-            <div><dt>函数签名</dt><dd><code>{task.entrypoint}</code></dd></div>
-            <div><dt>语言</dt><dd>Python · function-json.v1</dd></div>
-          </dl>
-          <section className="codelab-io-contract" aria-label="输入输出范围">
-            <h2>输入与输出范围</h2>
-            <details>
-              <summary>查看输入字段、类型与合法范围</summary>
-              <pre>{formatOutput(task.io_contract.input_schema)}</pre>
-            </details>
-            <details>
-              <summary>查看返回值类型</summary>
-              <pre>{formatOutput(task.io_contract.output_schema)}</pre>
-            </details>
-          </section>
-          {task.course_link ? (
-            <section className="codelab-course-link">
-              <p className="eyebrow">关联课程</p>
-              <h2>{task.course_link.course_title}</h2>
-              <p>{task.course_link.chapter_title}</p>
-              {task.course_link.available && task.course_link.href ? <a href={task.course_link.href}>打开关联章节</a> : <span>当前不可打开</span>}
-            </section>
-          ) : <p className="codelab-muted">这道题目前没有可访问的课程章节链接。</p>}
-          <section className="codelab-examples" aria-label="公开示例">
-            <h2>公开示例</h2>
-            {task.examples.map((example, index) => (
-              <details key={`${task.task_id}-example-${index}`}>
-                <summary>示例 {index + 1}</summary>
-                <dl>
-                  <div><dt>输入</dt><dd><pre>{formatOutput(example.input)}</pre></dd></div>
-                  <div><dt>预期输出</dt><dd><pre>{formatOutput(example.output)}</pre></dd></div>
-                </dl>
-              </details>
-            ))}
-          </section>
+      {taskNeedsReview ? <p className="codelab-notice codelab-review-notice" role="status">{task.is_test_fixture ? "合成练习 · 尚未人工审校" : "尚未完成人工审校"} · 正式判分依据服务端可信用例</p> : null}
+      {!runnerAvailable ? <p className="codelab-error" role="alert">{runnerReason}</p> : null}
+      {isMobile ? <nav className="codelab-mobile-panes" aria-label="编程工作区">
+        {([["problem", "题目"], ["code", "代码"], ["result", "结果"]] as const).map(([pane, label]) => <button key={pane} type="button" aria-pressed={mobilePane === pane} onClick={() => setMobilePane(pane)}>{label}</button>)}
+      </nav> : null}
+      <div className="codelab-workspace-grid" ref={workspaceRef}>
+        <section className="codelab-panel codelab-problem-panel" hidden={isMobile && mobilePane !== "problem"} aria-label="题目说明" data-testid="codelab-problem">
+          <CodeTaskProblem task={task} />
         </section>
-
-        <div className="codelab-workspace-right">
-          <section
-            className="codelab-panel codelab-code-panel"
-            hidden={isMobile && mobilePane !== "code"}
-            aria-label="代码编辑器"
-            data-testid="codelab-code-pane"
-          >
-            <div className="codelab-panel-heading">
-              <div><p className="eyebrow">Python 编辑器</p><span className="codelab-save-status" role="status" data-state={saveStatus}>
-                {saveStatus === "saved" ? `草稿已保存${savedAt ? ` · ${new Date(savedAt).toLocaleString()}` : ""}` : saveStatus === "saving" ? "正在保存草稿…" : saveStatus === "conflict" ? "检测到其他窗口修改" : saveStatus === "failed" ? "保存失败" : "有尚未保存的代码"}
-              </span></div>
-              <button type="button" className="secondary" onClick={() => void saveLatest()} disabled={saveStatus === "saving" || code === savedCode}>保存草稿</button>
-            </div>
-            <CodeEditor value={code} onChange={(value) => { setCode(value); setSaveStatus("unsaved"); }} ariaLabel={`${task.title} 的 Python 代码`} />
-            <div className="codelab-actions">
-              <button type="button" className="secondary" onClick={() => void submitRun("EXAMPLE")} disabled={!runnerAvailable || Boolean(busyPurpose) || anyRunning || Boolean(conflictDraft)}>
-                {busyPurpose === "EXAMPLE" || exampleRunning ? "运行中…" : "运行示例"}
-              </button>
-              <button type="button" onClick={() => void submitRun("GRADE")} disabled={!runnerAvailable || Boolean(busyPurpose) || anyRunning || Boolean(conflictDraft)}>
-                {busyPurpose === "GRADE" || gradeRunning ? "提交中…" : "提交判题"}
-              </button>
-              {anyRunning ? <button type="button" className="secondary" onClick={() => void cancelRun()} disabled={cancelBusy}>{cancelBusy ? "正在取消…" : "取消运行"}</button> : null}
-              <button type="button" className="secondary" onClick={() => { void navigator.clipboard?.writeText(code).catch(() => setRunError("无法访问剪贴板，请用编辑器快捷键复制。")); }}>复制代码</button>
-            </div>
-            {saveError ? <p className="codelab-error" role="alert">{saveError}</p> : null}
-            {!storageAvailable ? <p className="codelab-muted" role="status">本浏览器不允许本标签页恢复副本；服务端草稿保存仍可使用。</p> : null}
-            {runError ? <p className="codelab-error" role="alert">{runError}</p> : null}
-            {conflictDraft ? (
-              <div className="codelab-conflict" role="alert">
-                <p>另一个窗口已经更新了服务器草稿。当前编辑内容仍保留。</p>
-                <button type="button" className="secondary" onClick={applyServerDraft}>使用服务器版本</button>
-                <button type="button" onClick={() => void overwriteServerDraft()}>用当前内容覆盖</button>
-              </div>
-            ) : null}
-            {recovery ? (
-              <div className="codelab-recovery" role="status">
-                <p>本标签页发现尚未同步的代码（{new Date(recovery.updatedAt).toLocaleString()}）。</p>
-                {recovery.baseRevision !== draft.revision_number ? <p>服务器版本已变化；恢复后仍要先解决草稿冲突。</p> : null}
-                <button type="button" onClick={() => { setCode(recovery.code); latestCode.current = recovery.code; setRecovery(null); setSaveStatus("unsaved"); }}>恢复本地代码</button>
-                <button type="button" className="secondary" onClick={() => { window.sessionStorage.removeItem(recoveryKey(userId, task)); setRecovery(null); }}>使用服务器草稿</button>
-              </div>
-            ) : null}
+        {!isMobile ? <WorkspaceSplitter container={workspaceRef} axis="x" value={problemPercent} onChange={setProblemPercent} label="调整题目与编辑器宽度" min={32} max={46} /> : null}
+        <div className={`codelab-workspace-right${!resultExpanded ? " is-result-collapsed" : ""}`} ref={rightRef} hidden={isMobile && mobilePane === "problem"}>
+          <section className="codelab-panel codelab-code-panel" hidden={isMobile && mobilePane !== "code"} aria-label="代码编辑器" data-testid="codelab-code-pane">
+            <div className="codelab-panel-heading"><p className="eyebrow">Python 编辑器</p><button type="button" className="secondary" onClick={() => { void navigator.clipboard?.writeText(code).catch(() => setRunError("无法访问剪贴板，请用编辑器快捷键复制。")); }}>复制代码</button></div>
+            <CodeEditor fillParent readOnly={Boolean(recovery)} value={code} onChange={(value) => { setCode(value); setSaveStatus(value === savedCodeRef.current ? "saved" : "unsaved"); }} ariaLabel={`${task.title} 的 Python 代码`} />
           </section>
-
-          <section
-            className="codelab-panel codelab-result-panel"
-            hidden={isMobile && mobilePane !== "result"}
-            aria-label="运行与判题结果"
-            data-testid="codelab-result-panel"
-          >
+          {!isMobile && resultExpanded ? <WorkspaceSplitter container={rightRef} axis="y" reverse value={resultPercent} onChange={setResultPercent} label="调整结果面板高度" min={22} max={48} /> : null}
+          <section className="codelab-panel codelab-result-panel" hidden={isMobile && mobilePane !== "result"} aria-label="运行与判题结果" data-testid="codelab-result-panel">
             <div className="codelab-panel-heading">
-              <div><p className="eyebrow">结果</p><span className="codelab-muted">公开运行、可信判分和 AI 建议分开展示</span></div>
-              {anyRunning ? <span role="status">{labelForStatus(currentRun?.status ?? "RUNNING")}</span> : null}
+              <p className="eyebrow">结果 <span className="codelab-muted">{currentRun ? labelForStatus(currentRun.status) : "等待运行"}</span></p>
+              {!isMobile ? <button type="button" className="secondary codelab-result-toggle" aria-expanded={resultExpanded} onClick={() => setResultExpanded((value) => !value)}>{resultExpanded ? "折叠结果" : "展开结果"}</button> : null}
             </div>
             <div className="codelab-result-tabs" role="tablist" aria-label="选择结果类型">
               <button type="button" role="tab" aria-selected={activeResult === "EXAMPLE"} onClick={() => setActiveResult("EXAMPLE")}>示例运行</button>
               <button type="button" role="tab" aria-selected={activeResult === "GRADE"} onClick={() => setActiveResult("GRADE")}>正式判题</button>
             </div>
+            <div className="codelab-result-scroll" hidden={!isMobile && !resultExpanded}>
             {currentRun ? (
               <div className="codelab-result-body" data-testid={`codelab-result-${activeResult.toLowerCase()}`}>
                 <p className="codelab-result-status"><strong>{labelForStatus(currentRun.status)}</strong><span>· {currentRun.code_hash === "" ? "" : `代码快照 ${currentRun.code_hash.slice(0, 12)}`}</span></p>
                 {currentRun.code !== code ? <p className="codelab-notice">以下结果对应上次运行的代码快照；当前编辑内容尚未判定。</p> : null}
+                {activeResult === "EXAMPLE" && currentRun.result?.error ? <p className="codelab-error" role="alert">{currentRun.result.error}</p> : null}
                 {activeResult === "EXAMPLE" ? (
                   <>
                     <p>此结果只执行公开示例，不代表正式判题。</p>
@@ -632,7 +553,9 @@ export function CodeLabWorkspace({
                   </>
                 ) : (
                   <>
-                    <p><strong>可信判定：{currentRun.correctness_status}</strong> · 得分 {scoreLabel}</p>
+                    <p><strong>可信判定：{currentRun.correctness_status}（{({ PASSED: "通过", PARTIAL: "部分通过", FAILED: "未通过", NOT_VERIFIED: "未形成判分" } as Record<string, string>)[currentRun.correctness_status] ?? currentRun.correctness_status}）</strong> · 得分 {scoreLabel}</p>
+                    {currentRun.result?.error ? <p className="codelab-error" role="alert">{currentRun.result.error}</p> : null}
+                    {currentRun.result?.observations?.filter((item) => item.stderr || item.error).map((item, index) => <details key={`error-${index}`}><summary>执行错误 {index + 1}</summary><pre>{String(item.stderr ?? item.error)}</pre></details>)}
                     {grade?.groups?.length ? <ul className="codelab-grade-groups">{grade.groups.map((group, index) => <li key={`${String(group.id)}-${index}`}>{String(group.name ?? group.id)}：{String(group.score ?? "—")} / {String(group.max_score ?? "—")} · 通过 {String(group.passed ?? 0)} · 失败 {String(group.failed ?? 0)}</li>)}</ul> : null}
                     <div className="codelab-feedback">
                       <h3>AI 代码建议</h3>
@@ -647,9 +570,31 @@ export function CodeLabWorkspace({
             ) : (
               <div className="codelab-result-empty"><h2>{activeResult === "EXAMPLE" ? "运行公开示例" : "提交正式判题"}</h2><p>{activeResult === "EXAMPLE" ? "查看代码在公开示例下的真实运行输出。" : "提交后，服务端可信测试会给出正式判定和 70 分制成绩。"}</p></div>
             )}
+            </div>
           </section>
         </div>
       </div>
+      <div className="codelab-workspace-alerts" aria-label="草稿与执行提示">
+        {saveError ? <p className="codelab-error" role="alert">{saveError}</p> : null}
+        {runError ? <p className="codelab-error" role="alert">{runError}</p> : null}
+        {!storageAvailable ? <p className="codelab-muted" role="status">本浏览器无法保留标签页恢复副本；服务端草稿仍可保存。</p> : null}
+        {conflictDraft ? <div className="codelab-conflict" role="alert"><p>另一个窗口已经更新了服务器草稿。当前编辑内容仍保留。</p><button type="button" className="secondary" disabled={saveStatus === "saving"} onClick={applyServerDraft}>使用服务器版本</button><button type="button" disabled={saveStatus === "saving"} onClick={() => void overwriteServerDraft()}>用当前内容覆盖</button></div> : null}
+        {recovery ? <div className="codelab-recovery" role="status"><p>本标签页发现尚未同步的代码（{new Date(recovery.updatedAt).toLocaleString()}）。</p>{recovery.baseRevision !== (draft.revision_number ?? 0) ? <p>服务器版本已变化，恢复后需要解决草稿冲突。</p> : null}<button type="button" onClick={() => {
+          setCode(recovery.code); latestCode.current = recovery.code;
+          if (recovery.baseRevision !== (draft.revision_number ?? 0)) { setConflictDraft(draft); setSaveStatus("conflict"); }
+          else setSaveStatus("unsaved");
+          setRecovery(null); setMobilePane("code");
+        }}>恢复本地代码</button><button type="button" className="secondary" onClick={() => { window.sessionStorage.removeItem(recoveryKey(userId, task)); setRecovery(null); }}>使用服务器草稿</button></div> : null}
+      </div>
+      <footer className="codelab-workspace-actions">
+        <span className="codelab-save-status" role="status" data-state={saveStatus} title={savedAt ? `保存于 ${new Date(savedAt).toLocaleString()}` : undefined}>{saveLabel}</span>
+        <button type="button" className="secondary codelab-save-button" onClick={() => void saveLatest()} disabled={saveStatus === "saving" || code === savedCode}>保存草稿</button>
+        <div className="codelab-actions">
+          <button type="button" className="secondary" onClick={() => void submitRun("EXAMPLE")} disabled={!runnerAvailable || Boolean(busyPurpose) || anyRunning || Boolean(conflictDraft)}>{busyPurpose === "EXAMPLE" || exampleRunning ? "运行中…" : "运行示例"}</button>
+          <button type="button" onClick={() => void submitRun("GRADE")} disabled={!runnerAvailable || Boolean(busyPurpose) || anyRunning || Boolean(conflictDraft)}>{busyPurpose === "GRADE" || gradeRunning ? "提交中…" : "提交判题"}</button>
+          {anyRunning ? <button type="button" className="secondary" onClick={() => void cancelRun()} disabled={cancelBusy}>{cancelBusy ? "正在取消…" : "取消运行"}</button> : null}
+        </div>
+      </footer>
     </main>
   );
 }
