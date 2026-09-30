@@ -363,8 +363,8 @@ export class ConversationController {
     if (this.state.detail?.id === sessionId) this.clearSelection();
     await this.reconnect();
   };
-  remove = async (sessionId: string) => {
-    await api.deleteSession(sessionId);
+  remove = async (sessionId: string, forgetMemories = false) => {
+    await api.deleteSession(sessionId, forgetMemories);
     if (this.state.detail?.id === sessionId) this.clearSelection();
     await this.reconnect();
   };

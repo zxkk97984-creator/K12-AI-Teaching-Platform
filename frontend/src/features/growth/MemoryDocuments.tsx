@@ -45,7 +45,7 @@ async function request<T>(path: string, init: RequestInit = {}, mutation = false
   return body as T;
 }
 
-function MarkdownContent({ content }: { content: string }) {
+export function MarkdownContent({ content }: { content: string }) {
   return (
     <div className="growth-markdown-content">
       {content.trim() ? (

@@ -1,3 +1,5 @@
+import { createPortal } from "react-dom";
+import "../growth/automatic-memory.css";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { useConversation } from "./ConversationProvider";
 import { isTerminal, STATUS_TEXT } from "./controller";
@@ -9,6 +11,7 @@ import { navigate } from "../identity/session";
 import { useAccount } from "../identity/AccountContext";
 
 const FAILURE_TEXT: Record<string, string> = {
+  AI_TARGET_UNAVAILABLE: "这位教师的配置已变化，请新建对话或联系管理员。",
   CONFIG: "老师服务暂时不可用，请稍后再试。",
   UNSUPPORTED_OPERATION: "这类问题暂时无法处理，请换个问题试试。",
   VALIDATION: "回复格式未通过检查，请重新提问。",
@@ -246,7 +249,7 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
 }
 
 function ConversationThread({ detail, run, transport, draft, inputId, inputRef, busy, sending, onDraft, onVoice, onSend, onCancel }: {
-  detail: { id: string; chapter_id?: string | null; chapter_title: string | null; title?: string | null; conversation_type?: string; type?: string; messages: Parameters<typeof MessageView>[0]["message"][] };
+  detail: { teacher?: { name: string } | null; id: string; chapter_id?: string | null; chapter_title: string | null; title?: string | null; conversation_type?: string; type?: string; messages: Parameters<typeof MessageView>[0]["message"][] };
   run: ReturnType<typeof useConversation>["run"];
   transport: ReturnType<typeof useConversation>["transport"];
   draft: string;
@@ -308,6 +311,7 @@ function ConversationThread({ detail, run, transport, draft, inputId, inputRef, 
   }}>
     {detail.messages.length === 0 ? <li className="conv-thread-starter">
       <span>新的对话</span>
+      {detail.teacher && <p className="growth-muted">{detail.teacher.name}</p>}
       <h2>{detail.chapter_id && detail.chapter_title ? `一起读懂「${detail.chapter_title}」` : "今天想弄懂什么？"}</h2>
       <p>{detail.chapter_id ? "霜铃会参考这章课程内容。先在下方写下你的问题吧。" : "从一个问题开始，霜铃会和你一起找思路。"}</p>
     </li> : null}
@@ -383,6 +387,7 @@ function SessionActions({ sessionId, controller }: { sessionId: string; controll
   // R30: renaming and archiving are not idempotent from the UI's point of view,
   // so a second click while one is in flight must be refused rather than
   // firing a duplicate request.
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const run = async (action: () => Promise<void>) => {
     if (busyAction) return;
@@ -391,14 +396,21 @@ function SessionActions({ sessionId, controller }: { sessionId: string; controll
     catch (error) { window.alert(error instanceof Error ? error.message : "操作失败，请重试"); }
     finally { setBusyAction(null); }
   };
-  return <span className="conv-session-actions" onClick={(event) => event.stopPropagation()}>
+  return <><span className="conv-session-actions" onClick={(event) => event.stopPropagation()}>
     <button type="button" aria-label="重命名对话" title="重命名" disabled={busyAction !== null} onClick={() => {
       const title = window.prompt("给这段对话取个名字");
       if (title?.trim()) void run(() => controller.rename(sessionId, title.trim()));
     }}>改名</button>
     <button type="button" aria-label="归档对话" title="归档" disabled={busyAction !== null} onClick={() => void run(() => controller.archive(sessionId))}>归档</button>
     <button type="button" aria-label="删除对话" title="删除" onClick={() => {
-      if (window.confirm("确认删除这段对话？删除后不可恢复。")) void run(() => controller.remove(sessionId));
+      setDeleteOpen(true);
     }}>删除</button>
-  </span>;
+  </span>{deleteOpen && <DeleteConversationDialog busy={busyAction !== null} onClose={() => setDeleteOpen(false)} onDelete={(forget) => void run(async () => { await controller.remove(sessionId, forget); setDeleteOpen(false); })} />}</>;
+}
+
+function DeleteConversationDialog({ busy, onClose, onDelete }: { busy: boolean; onClose: () => void; onDelete: (forget: boolean) => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const [forget, setForget] = useState(false);
+  useEffect(() => { ref.current?.showModal(); }, []);
+  return createPortal(<dialog className="memory-native-dialog" ref={ref} onCancel={onClose} aria-labelledby="delete-conversation-title"><h2 id="delete-conversation-title">删除这段对话？</h2><p>聊天记录删除后不可恢复。默认保留已整理的个人记忆。</p><label><input type="checkbox" checked={forget} onChange={(e) => setForget(e.target.checked)} /> 同时遗忘相关自动记忆（保留手写内容）</label><div className="memory-actions"><button type="button" disabled={busy} onClick={onClose}>取消</button><button type="button" disabled={busy} onClick={() => onDelete(forget)}>确认删除</button></div></dialog>, document.body);
 }

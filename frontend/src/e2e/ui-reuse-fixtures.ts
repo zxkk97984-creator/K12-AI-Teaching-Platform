@@ -538,6 +538,7 @@ export async function fixture(
         { id: "quiz-ui-2", chapter_id: "chapter-2", title: "温度转换器", status: "COMPLETED", progress: { answered: 3, correct: 2, total: 3 }, created_at: "2026-09-20T08:00:00Z", completed_at: "2026-09-20T08:15:00Z" },
       ] : [], total: options.rich && !options.empty && state.account.profile.stage === "JUNIOR" ? 2 : 0, limit: Number(url.searchParams.get("limit") ?? 3), offset: 0 });
     if (path === "/api/v1/quiz-sessions" && method === "GET") return json({ items: [], total: 0 });
+    if (path === "/api/v1/growth/personal-memory") return json({ settings: { auto_enabled: true, use_enabled: true, revision: 1 }, content_revision: 0, last_updated_at: null, items: [], summary_markdown: "", tasks: [], total: 0, offset: 0, has_more: false, notice: "合成记忆界面测试" });
     if (path === "/api/v1/growth/documents") {
       if (method === "POST") {
         state.memory = { id: "doc-ui", title: "个人记忆.md", is_primary: true, category: "NOTE", revision: 1, ai_enabled: true, updated_at: session.created_at, content_markdown: "", versions: [{ revision: 1, action: "CREATED", created_at: session.created_at, content_markdown: "" }] };
