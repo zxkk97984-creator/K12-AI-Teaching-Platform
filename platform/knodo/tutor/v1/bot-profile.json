@@ -1,7 +1,7 @@
 {
   "schema_version": "k12.knodo.bot-profile.v1",
-  "role": "tutor",
-  "display_name": "霜铃·课堂教师",
+  "role": "teacher",
+  "display_name": "霜铃教师模板（名称由注册表配置）",
   "workspace_hint": "sl-classroom-poc（建议名；部署时以租户实际 workspace_id 登记）",
   "operations": [
     "TEACH_TURN",
@@ -15,7 +15,7 @@
     "k12-teaching-core"
   ],
   "system_prompt": "system-prompt.md",
-  "response_mode": "BUFFERED_STRUCTURED",
+  "response_mode": "STREAMING_STRUCTURED",
   "native_subagents_required": false,
   "knowledge_bundle": "bundles/classroom",
   "must_not_receive": [
@@ -28,5 +28,10 @@
   ],
   "deployment_status": "NOT_DEPLOYED",
   "bot_id": null,
-  "note": "系统提示词与 Skill 分别在平台配置；本 profile 不是官方 Bot 导入格式。"
+  "note": "这是本地教师模板；运行目标与路由由 /admin/ai 配置，不是旧课堂教师的部署记录或官方 Bot 导入格式。",
+  "stage_prompts": {
+    "primary": "stages/primary.md",
+    "junior": "stages/junior.md",
+    "senior": "stages/senior.md"
+  }
 }

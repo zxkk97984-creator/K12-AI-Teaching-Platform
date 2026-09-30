@@ -86,6 +86,7 @@ class LessonSession(Base):
     creation_key: Mapped[str | None] = mapped_column(String(160), nullable=True)
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
     curriculum_revision: Mapped[str] = mapped_column(String(160), nullable=False)
+    teacher_snapshot: Mapped[dict | None] = mapped_column(JSONB)
     stage: Mapped[str] = mapped_column(String(16), nullable=False)
     grade: Mapped[int | None] = mapped_column(Integer)
     base_revision: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

@@ -16,6 +16,7 @@ import { NextStepPage } from "./features/learning-next/NextStepPage";
 import { ResourceDetailPage } from "./features/resources/ResourceDetailPage";
 import { AnimationPage } from "./features/animation/AnimationPage";
 import { AdminResourcesPage } from "./pages/admin/AdminResourcesPage";
+const AdminAIPage = lazy(() => import("./pages/admin/AdminAIPage").then((module) => ({ default: module.AdminAIPage })));
 import { AdminAuthoringPage } from "./pages/admin/AdminAuthoringPage";
 import { StudyPage } from "./features/study/StudyPage";
 import { PicturebookPage } from "./features/picturebooks/PicturebookPage";
@@ -57,6 +58,7 @@ function Page() {
   if (path.startsWith("/growth")) return <GrowthPage />;
   if (path === "/learn") return <Navigate to="/study" replace />;
   if (path.startsWith("/learn/")) return <NextStepPage />;
+  if (path.startsWith("/admin/ai")) return <AdminAIPage />;
   if (path.startsWith("/admin/authoring")) return <AdminAuthoringPage />;
   if (path.startsWith("/admin/resources/interactive")) return <AdminInteractivePage />;
   if (path.startsWith("/admin/resources")) return <AdminResourcesPage />;
@@ -134,7 +136,7 @@ const ROUTE_PATHS = [
   "/books/:bookSlug", "/picturebooks", "/picturebooks/:storyId",
   "/practice", "/practice/sessions/:quizId", "/code", "/growth", "/settings", "/workbench",
   "/learn", "/learn/:path", "/animations", "/animations/:animationId", "/activities", "/interactive/:resourceId", "/more", "/lessons",
-  "/admin", "/admin/resources", "/admin/resources/interactive", "/admin/authoring", "/status",
+  "/admin", "/admin/ai", "/admin/resources", "/admin/resources/interactive", "/admin/authoring", "/status",
 ];
 const router = createBrowserRouter([
   ...ROUTE_PATHS.map((path) => ({ path, element: <App /> })),

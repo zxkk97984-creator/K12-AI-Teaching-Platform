@@ -7,6 +7,7 @@ export type RunStatus =
   | "STALE";
 
 export type SessionSummary = {
+  teacher?: { id: string; name: string; description?: string } | null;
   id: string;
   /** A free conversation has no chapter context. */
   conversation_type?: "FREE" | "LESSON" | string;

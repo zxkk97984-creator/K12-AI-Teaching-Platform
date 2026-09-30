@@ -162,7 +162,9 @@ def build_free_session_context(*, stage: str) -> dict[str, Any]:
         "curriculum_revision": "free-conversation:v1",
         "policy_revision": POLICY_REVISION,
         "knowledge_context": [],
-        "allowed_actions": ["OFFER_QUIZ"],
+        # A free chat has no curriculum objective to bind a quiz offer to.
+        # Keep interaction in text; formal lessons may offer schema-bound quizzes.
+        "allowed_actions": [],
         "allowed_resource_ids": [],
         "allowed_animation_ids": [],
         "allowed_code_task_ids": [],

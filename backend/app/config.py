@@ -5,7 +5,7 @@ from functools import lru_cache
 from typing import Literal
 from urllib.parse import urlsplit
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 SESSION_COOKIE_NAME = "sl_session"
@@ -74,6 +74,9 @@ class Settings(BaseSettings):
     growth_projection_max_events: int = Field(default=200, ge=10, le=2000)
     growth_context_evidence_limit: int = Field(default=6, ge=0, le=8)
     growth_context_memory_limit: int = Field(default=4, ge=0, le=6)
+    memory_coalesce_seconds: int = Field(default=30, ge=0, le=300)
+    memory_max_wait_seconds: int = Field(default=120, ge=1, le=600)
+    memory_extract_timeout_seconds: float = Field(default=90, ge=5, le=300)
     # T19: conservative bounds for the single next-step decision.
     recommendation_evidence_limit: int = Field(default=100, ge=10, le=500)
     recommendation_memory_limit: int = Field(default=4, ge=0, le=6)
@@ -93,6 +96,18 @@ class Settings(BaseSettings):
     codelab_runner_url: str | None = None
     codelab_runner_token: str | None = None
     codelab_autorun: bool = True
+
+    @field_validator(
+        "knodo_tutor_bot_id",
+        "knodo_tutor_workspace_id",
+        "knodo_designer_bot_id",
+        "knodo_designer_workspace_id",
+        mode="before",
+    )
+    @classmethod
+    def empty_bootstrap_target(cls, value):
+        # The runtime template leaves optional legacy pairs blank after migration.
+        return None if value == "" else value
 
     @model_validator(mode="after")
     def validate_runtime(self) -> Settings:
@@ -123,17 +138,12 @@ class Settings(BaseSettings):
                 raise ValueError("KNODO_BASE_URL must be a bare HTTPS origin")
             if not os.environ.get(self.knodo_token_env_var):
                 raise ValueError(f"{self.knodo_token_env_var} must be set when GATEWAY_MODE=knodo")
-            required_targets = {
-                "KNODO_TUTOR_BOT_ID": self.knodo_tutor_bot_id,
-                "KNODO_TUTOR_WORKSPACE_ID": self.knodo_tutor_workspace_id,
-                "KNODO_DESIGNER_BOT_ID": self.knodo_designer_bot_id,
-                "KNODO_DESIGNER_WORKSPACE_ID": self.knodo_designer_workspace_id,
-            }
-            missing = [name for name, value in required_targets.items() if not value]
-            if missing:
-                raise ValueError(
-                    f"required Knodo target configuration missing: {', '.join(missing)}"
-                )
+            # Legacy pairs are optional once targets live in the AI registry.
+            for role in ("tutor", "designer"):
+                bot = getattr(self, f"knodo_{role}_bot_id")
+                workspace = getattr(self, f"knodo_{role}_workspace_id")
+                if bool(bot) != bool(workspace):
+                    raise ValueError(f"incomplete legacy Knodo {role} target pair")
         return self
 
     @property

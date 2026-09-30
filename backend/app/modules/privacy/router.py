@@ -15,7 +15,15 @@ from app.modules.codelab.models import CodeDraft, CodeRun, CodeTaskFavorite
 from app.modules.identity.dependencies import SessionContext, csrf_dependency, require_student
 from app.modules.identity.models import LearnerProfile
 from app.modules.learning.models import LearningBookmark, LearningOpenEvent
-from app.modules.memory.models import MemoryContextState, MemoryDocument
+from app.modules.memory.automatic import state_for
+from app.modules.memory.automatic_models import (
+    ConversationMemorySummary,
+    MemoryTask,
+    PersonalMemoryEvent,
+    PersonalMemoryItem,
+    PersonalMemoryState,
+)
+from app.modules.memory.models import MemoryCandidate, MemoryContextState, MemoryDocument
 from app.modules.privacy.models import PrivacyDeletionRequest
 from app.modules.teaching.models import LessonSession
 
@@ -115,7 +123,19 @@ async def export_my_data(
             .order_by(QuizAnswerDraft.updated_at, QuizAnswerDraft.id)
         )
     ).all()
+    automatic_memory = {}
+    for model in (PersonalMemoryItem, PersonalMemoryEvent, MemoryTask, ConversationMemorySummary):
+        rows = list(await db.scalars(select(model).where(model.owner_user_id == context.user.id)))
+        automatic_memory[model.__tablename__] = [
+            {
+                column.name: getattr(row, column.name)
+                for column in model.__table__.columns
+                if column.name != "lease_token"
+            }
+            for row in rows
+        ]
     return {
+        "automatic_memory": automatic_memory,
         "schema_version": "k12.local-data-export.v1",
         "exported_at": datetime.now(UTC),
         "identity": {
@@ -281,6 +301,19 @@ async def request_local_deletion(
     if existing is not None:
         return {"request": _deletion_view(existing), "idempotent_replay": True}
 
+    # Same account lock as the memory writer: no late extraction can survive deletion.
+    await state_for(db, context.user.id, lock=True)
+    deleted_memory = {}
+    for model in (
+        MemoryTask,
+        ConversationMemorySummary,
+        PersonalMemoryEvent,
+        PersonalMemoryItem,
+        MemoryCandidate,
+        PersonalMemoryState,
+    ):
+        result = await db.execute(delete(model).where(model.owner_user_id == context.user.id))
+        deleted_memory[model.__tablename__] = result.rowcount or 0
     deleted_drafts = await db.execute(
         delete(CodeDraft).where(CodeDraft.owner_user_id == context.user.id)
     )
@@ -321,13 +354,17 @@ async def request_local_deletion(
                 "teaching_conversations": deleted_conversations.rowcount or 0,
                 "learning_open_events": deleted_open_events.rowcount or 0,
                 "learning_bookmarks": deleted_bookmarks.rowcount or 0,
+                **deleted_memory,
                 "memory_documents": deleted_documents.rowcount or 0,
                 "memory_context_states": deleted_context.rowcount or 0,
                 "assessment_answer_drafts": deleted_quiz_drafts.rowcount or 0,
             },
             "platform": {
                 "status": "NOT_REQUESTED",
-                "reason": "Knodo is not connected in this local profile",
+                "reason": (
+                    "Only local data was deleted; "
+                    "remote Knodo history was not requested for deletion"
+                ),
             },
         },
         requested_at=now,

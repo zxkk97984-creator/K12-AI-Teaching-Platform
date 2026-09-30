@@ -1,0 +1,139 @@
+{
+  "$defs": {
+    "ExtractedFact": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "maxLength": 160,
+          "minLength": 2,
+          "title": "Key",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "PREFERENCE",
+            "INTEREST",
+            "GOAL",
+            "PLAN",
+            "EXPERIENCE",
+            "LEARNING"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "statement": {
+          "maxLength": 400,
+          "minLength": 2,
+          "title": "Statement",
+          "type": "string"
+        },
+        "source_message_id": {
+          "title": "Source Message Id",
+          "type": "string"
+        },
+        "quote": {
+          "maxLength": 1000,
+          "minLength": 2,
+          "title": "Quote",
+          "type": "string"
+        },
+        "certainty": {
+          "enum": [
+            "EXPLICIT",
+            "UNCERTAIN"
+          ],
+          "title": "Certainty",
+          "type": "string"
+        },
+        "valid_until": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid Until"
+        }
+      },
+      "required": [
+        "key",
+        "category",
+        "statement",
+        "source_message_id",
+        "quote",
+        "certainty"
+      ],
+      "title": "ExtractedFact",
+      "type": "object"
+    },
+    "ExtractedSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 1200,
+          "minLength": 2,
+          "title": "Summary",
+          "type": "string"
+        },
+        "source_message_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Source Message Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "session_id",
+        "summary",
+        "source_message_ids"
+      ],
+      "title": "ExtractedSummary",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "k12.memory.extract.response.v1",
+      "default": "k12.memory.extract.response.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "facts": {
+      "items": {
+        "$ref": "#/$defs/ExtractedFact"
+      },
+      "maxItems": 40,
+      "title": "Facts",
+      "type": "array"
+    },
+    "summaries": {
+      "items": {
+        "$ref": "#/$defs/ExtractedSummary"
+      },
+      "maxItems": 20,
+      "title": "Summaries",
+      "type": "array"
+    }
+  },
+  "required": [
+    "request_id",
+    "facts"
+  ],
+  "title": "ExtractionResponse",
+  "type": "object"
+}

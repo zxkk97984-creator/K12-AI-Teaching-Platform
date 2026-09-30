@@ -28,6 +28,7 @@ from app.integrations.knodo.gateway import AgentGateway, build_gateway
 from app.integrations.knodo.operations import Operation
 from app.integrations.knodo.schema_models import default_registry
 from app.integrations.knodo.types import GatewayStatus
+from app.modules.ai.service import target_arguments
 from app.modules.authoring.errors import AuthoringError
 from app.modules.authoring.material import build_package_request, load_authoring_material
 from app.modules.authoring.models import AuthoringJob
@@ -82,6 +83,10 @@ async def execute_job(settings: Settings, job_id: uuid.UUID) -> str:
             return "FAILED"
         request = build_package_request(material, request_id=run_ref or f"designer-{job.id}")
 
+        target_options = await target_arguments(
+            db, Operation.LESSON_PACKAGE_DRAFT, request, require_route=gateway_mode == "knodo"
+        )
+
     if gateway_mode == "knodo":
         # no live authorisation is recorded for T22: fail closed, never call out
         async with factory() as db:
@@ -96,7 +101,7 @@ async def execute_job(settings: Settings, job_id: uuid.UUID) -> str:
     try:
         if gateway_mode == "fixture" and settings.authoring_fixture_delay_seconds > 0:
             await asyncio.sleep(settings.authoring_fixture_delay_seconds)
-        result = await gateway.invoke(Operation.LESSON_PACKAGE_DRAFT, request)
+        result = await gateway.invoke(Operation.LESSON_PACKAGE_DRAFT, request, **target_options)
     except Exception as error:  # gateway failures are recorded, never guessed
         logger.warning("designer gateway failed for job %s: %s", run_ref, type(error).__name__)
         async with factory() as db:

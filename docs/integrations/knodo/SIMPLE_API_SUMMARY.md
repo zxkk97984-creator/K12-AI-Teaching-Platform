@@ -1,7 +1,6 @@
 # Knodo《常用 API》简要说明
 
-核查日期：2026-09-20。直接访问 `https://knodo.vip/docs/api/simple-api` 会跳转登录页，因此本文依据
-Knodo 官方 `https://knodo.vip/llms-full.txt` 中标注“来源：`/docs/api/simple-api`”的完整段落整理。
+更新日期：2026-09-30。文档页访问是否需登录取决于当前会话；本文依据 [Knodo 官方完整文档](https://knodo.vip/llms-full.txt) 中的[常用 API](https://knodo.vip/docs/api/simple-api)及实际 HTTP 适配整理。`source-snapshots` 保存的是早期调查证据，不是当前配置快照。
 
 ## 1. 文档讲了什么
 
@@ -27,16 +26,20 @@ Knodo 官方 `https://knodo.vip/llms-full.txt` 中标注“来源：`/docs/api/s
 4. 非流式响应从 `choices[0].message.content` 读取正文，并记录 `conversationId`、`model`、
    `finish_reason` 和官方返回的 usage。
 5. 需要核对会话所属 workspace 时，再读取对应 workspace 的会话消息或状态接口。
+6. 本项目在 `/admin/ai` 保存服务端目标与路由，不接受学生指定的 Bot 或工作空间；创建本地会话时固定教师快照，目标／提示词版本变化时重建远端会话。
 
 ## 4. 使用注意事项
 
 - PAT 代表创建者本人，不提升权限；还会检查令牌能力分类和创建者当前业务权限。
 - 当前 PAT 不再依靠历史资源范围收窄访问，因此优先使用专用低权限账号和最小能力分类。若组织不允许
-  邀请专用账号，只能使用管理员 PAT 时，应仅启用 `AI / Chat 调用`、设置短有效期，并在测试后立即撤销。
+  邀请专用账号，只能使用管理员 PAT 时，按实际所需配置调用和只读核验能力，设置有效期；凭据轮换时同步更新运行配置并重启，撤销正在使用的 PAT 会中断服务。
 - PAT 只放服务端环境变量；不要提交、打印、截图或发给浏览器。
 - Bot Chat 的 `model` 只是兼容字段，实际使用 Bot 配置模型；本项目不发送该字段。
 - 官方默认 `permissionMode` 为 `bypassPermissions`，本项目显式发送较保守的 `default`。
-- 本项目使用 `stream=false`，严格解析单个 JSON 对象；任何前后说明文字、Markdown 代码块、截断输出
-  或 `finish_reason != stop` 都判失败。
+- 教学调用支持 SSE；记忆整理使用非流式调用。最终结果都严格解析单个 JSON 对象，
+  教学返回不接受 Markdown 包裹，记忆解析允许原始 JSON 或一个完整的 JSON 代码块，仍不接受前后说明、多对象、截断输出或 `finish_reason != stop`。
 - 官方未说明 Bot Chat 的远端取消和幂等语义；本项目不自动重试，超时/读失败按“可能已受理”处理。
 - 429 只表示限流，不能自行解释为余额不足；费用只采用平台账单，不按字符数估算。
+- 记忆 worker 可有限重试明确的 429；上游是否受理不明的超时保持待重试状态，不反复自动调用。失败不会阻止已经保存的教学回复。
+
+共享课堂／教研空间的 `memoryEnabled` 与 `memoryPluginEnabled` 均需明确为 `false`，还需解除跨学生共享的 `knodo-mem` Skill。平台学生账号的个人记忆由本地服务隔离，不能用 PAT 所属 Knodo 用户的原生记忆代替。

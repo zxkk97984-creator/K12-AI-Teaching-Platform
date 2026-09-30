@@ -10,6 +10,7 @@ from pathlib import Path
 from app.modules.identity.openapi import prune_schema
 
 ADMIN_PATH_PREFIXES = (
+    "/api/v1/admin/ai/",
     "/api/v1/admin/content/revisions",
     "/api/v1/admin/authoring/",
     "/api/v1/admin/resources",

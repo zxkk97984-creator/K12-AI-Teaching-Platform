@@ -233,10 +233,13 @@ async def update_conversation(
 )
 async def delete_conversation(
     session_id: uuid.UUID,
+    forget_memories: bool = False,
     context: SessionContext = Depends(require_student),
     db: AsyncSession = Depends(get_session),
 ) -> Response:
-    deleted = await delete_session(db, user=context.user, session_id=session_id)
+    deleted = await delete_session(
+        db, user=context.user, session_id=session_id, forget_memories=forget_memories
+    )
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="会话不存在")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

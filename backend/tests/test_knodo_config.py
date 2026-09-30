@@ -67,6 +67,31 @@ def test_knodo_mode_requires_base_url_and_token(monkeypatch: pytest.MonkeyPatch)
         Settings(**base_settings(gateway_mode="knodo", knodo_base_url="not-a-url"))
 
 
+@pytest.mark.parametrize("gateway_mode", ["fixture", "knodo"])
+def test_empty_legacy_pairs_allow_database_registry_targets(monkeypatch, gateway_mode) -> None:
+    monkeypatch.setenv("KNODO_PAT", "synthetic-pat-for-tests")
+    for role in ("TUTOR", "DESIGNER"):
+        monkeypatch.setenv(f"KNODO_{role}_BOT_ID", "")
+        monkeypatch.setenv(f"KNODO_{role}_WORKSPACE_ID", "")
+    settings = Settings(
+        **base_settings(gateway_mode=gateway_mode, knodo_base_url="https://knodo.invalid")
+    )
+    for role in ("tutor", "designer"):
+        assert getattr(settings, f"knodo_{role}_bot_id") is None
+        assert getattr(settings, f"knodo_{role}_workspace_id") is None
+
+
+@pytest.mark.parametrize("role", ["tutor", "designer"])
+def test_half_configured_legacy_pair_is_still_rejected(monkeypatch, role) -> None:
+    monkeypatch.setenv("KNODO_PAT", "synthetic-pat-for-tests")
+    for target in ("TUTOR", "DESIGNER"):
+        monkeypatch.setenv(f"KNODO_{target}_BOT_ID", "")
+        monkeypatch.setenv(f"KNODO_{target}_WORKSPACE_ID", "")
+    monkeypatch.setenv(f"KNODO_{role.upper()}_BOT_ID", "synthetic-bot")
+    with pytest.raises(ValidationError, match=f"incomplete legacy Knodo {role} target pair"):
+        Settings(**base_settings(gateway_mode="knodo", knodo_base_url="https://knodo.invalid"))
+
+
 def test_production_requires_https_and_token(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("KNODO_PAT", "synthetic-pat-for-tests")
     with pytest.raises(ValidationError):

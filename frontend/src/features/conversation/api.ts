@@ -91,9 +91,9 @@ export function updateSession(
   );
 }
 
-export async function deleteSession(sessionId: string): Promise<void> {
+export async function deleteSession(sessionId: string, forgetMemories = false): Promise<void> {
   await request<void>(
-    `${API_BASE}/conversations/${sessionId}`,
+    `${API_BASE}/conversations/${sessionId}?forget_memories=${forgetMemories}`,
     { method: "DELETE" },
     true,
   );

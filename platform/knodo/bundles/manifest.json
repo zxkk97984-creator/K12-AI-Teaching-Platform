@@ -7,6 +7,38 @@
   "formal_bundle_requirement": "需要 HUMAN_APPROVED + PUBLISHED 的课程修订；当前仓库没有通过真实人工审校的内容",
   "tutor_visible": [
     {
+      "source_id": "chapter:ai-learning-foundations/ch-junior",
+      "revision": 1,
+      "stage": "JUNIOR",
+      "sha256": "b48cf0e4cd892136c58412c58fe44250ddf55618d660ccdc7a3fd793563bacad",
+      "path": "platform/knodo/bundles/classroom/content/ai-learning-foundations/ch-junior-r1.json",
+      "is_test_fixture": true
+    },
+    {
+      "source_id": "chapter:ai-learning-foundations/ch-primary-lower",
+      "revision": 1,
+      "stage": "PRIMARY_LOWER",
+      "sha256": "48c865e160ea3f13b05f277804ab580e5d3a39ecc9681319051b81b24633a94d",
+      "path": "platform/knodo/bundles/classroom/content/ai-learning-foundations/ch-primary-lower-r1.json",
+      "is_test_fixture": true
+    },
+    {
+      "source_id": "chapter:ai-learning-foundations/ch-primary-upper",
+      "revision": 1,
+      "stage": "PRIMARY_UPPER",
+      "sha256": "2e0c3744d3a8760cf816abb3e8e4c69205c0832a06b0bcc179f811d807054431",
+      "path": "platform/knodo/bundles/classroom/content/ai-learning-foundations/ch-primary-upper-r1.json",
+      "is_test_fixture": true
+    },
+    {
+      "source_id": "chapter:ai-learning-foundations/ch-senior",
+      "revision": 1,
+      "stage": "SENIOR",
+      "sha256": "64497902bc1d9fc24d5624a35ef91c03f9073b8b9ac3f8c5e82b69a4dd091396",
+      "path": "platform/knodo/bundles/classroom/content/ai-learning-foundations/ch-senior-r1.json",
+      "is_test_fixture": true
+    },
+    {
       "source_id": "chapter:t06-fixture-course/ch01",
       "revision": 1,
       "stage": "PRIMARY_LOWER",
@@ -31,7 +63,7 @@
     "note": "答案/解析/隐藏测试/参考解不进入任何随包发布目录"
   },
   "separation": {
-    "tutor_visible_count": 2,
+    "tutor_visible_count": 6,
     "designer_private_count": 0,
     "answers_in_tutor_bundle": false
   },

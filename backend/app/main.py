@@ -14,6 +14,7 @@ from app.integrations.knodo.gateway import build_gateway
 from app.integrations.knodo.router import router as ai_gateway_router
 from app.jobs.authoring_worker import recover_authoring_jobs
 from app.jobs.teaching_worker import recover_runs
+from app.modules.ai.router import router as ai_admin_router
 from app.modules.assessment.quiz_router import router as quiz_router
 from app.modules.assessment.router import router as assessment_router
 from app.modules.authoring.router import router as authoring_router
@@ -25,6 +26,7 @@ from app.modules.interactive.router import admin_router as interactive_admin_rou
 from app.modules.interactive.router import router as interactive_router
 from app.modules.learning.growth_router import router as growth_router
 from app.modules.learning.study_router import router as study_router
+from app.modules.memory.automatic_router import router as automatic_memory_router
 from app.modules.memory.router import router as memory_router
 from app.modules.privacy.router import router as privacy_router
 from app.modules.recommendation.router import router as recommendation_router
@@ -37,6 +39,11 @@ from app.modules.teaching.router import router as teaching_router
 def _make_lifespan(settings: Settings):
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+        from app.jobs.teaching_worker import session_factory
+        from app.modules.ai.service import initialize
+
+        async with session_factory(settings)() as db:
+            await initialize(db, settings)
         await recover_runs(settings)
         await recover_authoring_jobs(settings)
         try:
@@ -69,6 +76,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         expose_headers=["X-Request-ID"],
     )
     install_error_handlers(application)
+    application.include_router(ai_admin_router, prefix="/api/v1")
     application.include_router(health_router)
     application.include_router(identity_router, prefix="/api/v1")
     application.include_router(content_router, prefix="/api/v1")
@@ -80,6 +88,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(growth_router, prefix="/api/v1")
     application.include_router(study_router, prefix="/api/v1")
     application.include_router(memory_router, prefix="/api/v1")
+    application.include_router(automatic_memory_router, prefix="/api/v1")
     application.include_router(recommendation_router, prefix="/api/v1")
     application.include_router(resources_router, prefix="/api/v1")
     application.include_router(animation_router, prefix="/api/v1")

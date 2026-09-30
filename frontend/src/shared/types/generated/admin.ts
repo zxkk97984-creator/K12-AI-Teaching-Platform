@@ -4,6 +4,78 @@
  */
 
 export interface paths {
+    "/api/v1/admin/ai/configuration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Configuration */
+        get: operations["read_configuration_api_v1_admin_ai_configuration_get"];
+        /** Write Configuration */
+        put: operations["write_configuration_api_v1_admin_ai_configuration_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/agents/{agent_id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify Binding */
+        post: operations["verify_binding_api_v1_admin_ai_agents__agent_id__verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/agents/{agent_id}/prompt-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Prompt Template
+         * @description Explicit local assets only; no user-supplied path or remote fetch.
+         */
+        get: operations["prompt_template_api_v1_admin_ai_agents__agent_id__prompt_template_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/agents/{agent_id}/probe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Probe Agent */
+        post: operations["probe_agent_api_v1_admin_ai_agents__agent_id__probe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/content/revisions": {
         parameters: {
             query?: never;
@@ -469,6 +541,90 @@ export interface components {
             /** Offset */
             offset: number;
         };
+        /** AgentDefinition */
+        AgentDefinition: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Role
+             * @default teacher
+             * @enum {string}
+             */
+            role: "teacher" | "designer" | "memory";
+            /**
+             * Enabled
+             * @default false
+             */
+            enabled: boolean;
+            /** Bot Id */
+            bot_id?: string | null;
+            /** Workspace Id */
+            workspace_id?: string | null;
+            /**
+             * Prompt Version
+             * @default v1
+             */
+            prompt_version: string;
+            /**
+             * Remote Memory Disabled
+             * @default false
+             */
+            remote_memory_disabled: boolean;
+            /** Capabilities */
+            capabilities?: string[];
+        };
+        /** CapabilityDefinition */
+        CapabilityDefinition: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Version
+             * @default 1
+             */
+            version: string;
+            /**
+             * Executor
+             * @default KNODO_SKILL
+             * @enum {string}
+             */
+            executor: "KNODO_SKILL" | "BACKEND";
+            /** Plugin Id */
+            plugin_id?: string | null;
+            /**
+             * Binding Scope
+             * @default WORKSPACE
+             * @enum {string}
+             */
+            binding_scope: "WORKSPACE" | "ASSISTANT";
+            /** Handler */
+            handler?: string | null;
+            /**
+             * Input Contract
+             * @default
+             */
+            input_contract: string;
+            /**
+             * Output Contract
+             * @default
+             */
+            output_contract: string;
+            /** Allowed Context */
+            allowed_context?: ("course" | "conversation" | "personal_memory")[];
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -631,6 +787,35 @@ export interface components {
         PublishRequest: {
             /** Idempotency Key */
             idempotency_key: string;
+        };
+        /** RegistryData */
+        RegistryData: {
+            /** Agents */
+            agents: components["schemas"]["AgentDefinition"][];
+            /** Routes */
+            routes: components["schemas"]["RouteDefinition"][];
+            /** Capabilities */
+            capabilities: components["schemas"]["CapabilityDefinition"][];
+            /** Verifications */
+            verifications?: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        /** RegistryUpdate */
+        RegistryUpdate: {
+            /** Base Revision */
+            base_revision: number;
+            data: components["schemas"]["RegistryData"];
+        };
+        /** RegistryView */
+        RegistryView: {
+            /** Revision */
+            revision: number;
+            data: components["schemas"]["RegistryData"];
+            /** Persisted */
+            persisted: boolean;
         };
         /** ResourceCreateRequest */
         ResourceCreateRequest: {
@@ -824,6 +1009,19 @@ export interface components {
              */
             comment: string;
         };
+        /** RouteDefinition */
+        RouteDefinition: {
+            /** Operation */
+            operation: string;
+            /**
+             * Stage
+             * @default *
+             * @enum {string}
+             */
+            stage: "*" | "PRIMARY_LOWER" | "PRIMARY_UPPER" | "JUNIOR" | "SENIOR";
+            /** Agent Id */
+            agent_id: string;
+        };
         /** SceneSpec */
         SceneSpec: {
             /** Id */
@@ -858,6 +1056,189 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    read_configuration_api_v1_admin_ai_configuration_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegistryView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    write_configuration_api_v1_admin_ai_configuration_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+                sl_csrf?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegistryUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegistryView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_binding_api_v1_admin_ai_agents__agent_id__verify_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+                sl_csrf?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    prompt_template_api_v1_admin_ai_agents__agent_id__prompt_template_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                agent_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    probe_agent_api_v1_admin_ai_agents__agent_id__probe_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+                sl_csrf?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_admin_chapter_revisions_api_v1_admin_content_revisions_get: {
         parameters: {
             query?: {

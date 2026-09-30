@@ -40,13 +40,19 @@ DEFAULT_RELEASE_ID = "knodo-assets-1.0.0"
 
 SKILLS = ("k12-teaching-core", "k12-assessment-author", "k12-content-author")
 SKILL_SCHEMAS = {
-    "k12-teaching-core": ("teaching-request.schema.json", "teaching-response.schema.json"),
+    "k12-teaching-core": (
+        "teaching-request.schema.json",
+        "teaching-response.schema.json",
+    ),
     "k12-assessment-author": ("designer-request.schema.json", "quiz-draft.schema.json"),
-    "k12-content-author": ("designer-request.schema.json", "lesson-package-draft.schema.json"),
+    "k12-content-author": (
+        "designer-request.schema.json",
+        "lesson-package-draft.schema.json",
+    ),
 }
-FROZEN_CONTRACT_VERSION = json.loads((CONTRACTS / "version.json").read_text(encoding="utf-8"))[
-    "contract_version"
-]
+FROZEN_CONTRACT_VERSION = json.loads(
+    (CONTRACTS / "version.json").read_text(encoding="utf-8")
+)["contract_version"]
 
 ZIP_DATE = (1980, 1, 1, 0, 0, 0)
 ZIP_MODE = 0o100644
@@ -109,7 +115,9 @@ def read_json(path: Path) -> dict:
 
 def write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def rel(path: Path) -> str:
@@ -148,7 +156,11 @@ def build_classroom_item(snapshot: dict) -> dict:
             "resolved_by": "local_app",
             "note": "文件系统镜像不含数据库 UUID；由本地应用在部署时绑定。",
         },
-        "course": {"slug": course["slug"], "title": course["title"], "topic": course["topic"]},
+        "course": {
+            "slug": course["slug"],
+            "title": course["title"],
+            "topic": course["topic"],
+        },
         "chapter": {
             "slug": chapter["slug"],
             "title": chapter["title"],
@@ -279,13 +291,20 @@ def build_zip(zip_path: Path, entries: list[tuple[Path, str]]) -> None:
     """Deterministic ZIP: fixed order, fixed timestamps, fixed compression."""
 
     zip_path.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+    with zipfile.ZipFile(
+        zip_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+    ) as archive:
         for source, arcname in sorted(entries, key=lambda item: item[1]):
             info = zipfile.ZipInfo(arcname, date_time=ZIP_DATE)
             info.compress_type = zipfile.ZIP_DEFLATED
             info.create_system = 3
             info.external_attr = ZIP_MODE << 16
-            archive.writestr(info, source.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            archive.writestr(
+                info,
+                source.read_bytes(),
+                compress_type=zipfile.ZIP_DEFLATED,
+                compresslevel=9,
+            )
 
 
 def zip_safety_problems(archive: zipfile.ZipFile) -> list[str]:
@@ -317,12 +336,18 @@ def zip_entry_records(zip_path: Path) -> list[dict]:
         if problems:
             raise CheckFailed(f"{zip_path.name}: unsafe ZIP entries: {problems}")
         return [
-            {"name": info.filename, "sha256": sha256_bytes(archive.read(info)), "bytes": info.file_size}
+            {
+                "name": info.filename,
+                "sha256": sha256_bytes(archive.read(info)),
+                "bytes": info.file_size,
+            }
             for info in sorted(archive.infolist(), key=lambda item: item.filename)
         ]
 
 
-def assert_zip_entries_match(zip_path: Path, expected: list[dict], *, where: str) -> None:
+def assert_zip_entries_match(
+    zip_path: Path, expected: list[dict], *, where: str
+) -> None:
     actual = zip_entry_records(zip_path)
     if actual != sorted(expected, key=lambda item: item["name"]):
         raise CheckFailed(f"{where}: ZIP entries differ from the release manifest")
@@ -335,6 +360,12 @@ def assert_zip_entries_match(zip_path: Path, expected: list[dict], *, where: str
 
 def artifact_specs() -> list[dict]:
     specs: list[dict] = [
+        {
+            "name": "memory-v1.zip",
+            "root": PACKAGE / "memory" / "v1",
+            "prefix": "memory/v1",
+            "kind": "bot-config",
+        },
         {
             "name": "tutor-v1.zip",
             "root": PACKAGE / "tutor" / "v1",
@@ -363,6 +394,14 @@ def artifact_specs() -> list[dict]:
                 "kind": "skill",
             }
         )
+        specs.append(
+            {
+                "name": f"plugin-{skill}.zip",
+                "root": PACKAGE / "skills" / skill,
+                "prefix": f"skills/{skill}",
+                "kind": "plugin",
+            }
+        )
     return specs
 
 
@@ -376,6 +415,79 @@ def collect_entries(root: Path, prefix: str) -> list[tuple[Path, str]]:
     return entries
 
 
+def build_artifact(zip_path: Path, spec: dict) -> None:
+    entries = collect_entries(spec["root"], spec["prefix"])
+    if spec["kind"] != "plugin":
+        build_zip(zip_path, entries)
+        return
+    problems = verify_skill_tree(spec["root"], where=spec["name"])
+    if problems:
+        raise CheckFailed("; ".join(problems))
+    skill = spec["root"].name
+    description = (
+        re.search(
+            r"^description:\s*(.+)$",
+            (spec["root"] / "SKILL.md").read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+        .group(1)
+        .strip()
+    )
+    metadata = {
+        "name": skill,
+        "version": read_json(PACKAGE / "VERSION.json")["package_version"],
+        "description": description,
+        "author": {"name": "霜铃 K12 项目"},
+        "skills": "./skills/",
+    }
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        plugin_json = root / "plugin.json"
+        write_json(plugin_json, metadata)
+        # JSON scalar quoting is valid YAML and avoids another packaging dependency.
+        plugin_yaml = root / "plugin.yaml"
+        plugin_yaml.write_text(
+            "\n".join(
+                f"{key}: {json.dumps(metadata[key], ensure_ascii=False)}"
+                for key in ("name", "version", "description", "author")
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        build_zip(
+            zip_path,
+            entries
+            + [
+                (plugin_json, ".claude-plugin/plugin.json"),
+                (plugin_yaml, "plugin.yaml"),
+            ],
+        )
+
+
+def verify_plugin_archive(zip_path: Path, skill: str) -> None:
+    """Catch upload-format errors before handing a Plugin ZIP to Knodo."""
+    try:
+        with zipfile.ZipFile(zip_path) as archive:
+            metadata = json.loads(archive.read(".claude-plugin/plugin.json"))
+            if not isinstance(metadata, dict) or metadata.get("name") != skill:
+                raise CheckFailed(f"{zip_path.name}: plugin name mismatch")
+            author = metadata.get("author")
+            if (
+                not isinstance(author, dict)
+                or not isinstance(author.get("name"), str)
+                or not author["name"].strip()
+            ):
+                raise CheckFailed(
+                    f"{zip_path.name}: plugin author must be an object with a name"
+                )
+            if metadata.get("skills") != "./skills/":
+                raise CheckFailed(f"{zip_path.name}: plugin skills directory mismatch")
+            if f"skills/{skill}/SKILL.md" not in archive.namelist():
+                raise CheckFailed(f"{zip_path.name}: nested SKILL.md missing")
+    except (KeyError, ValueError, zipfile.BadZipFile) as exc:
+        raise CheckFailed(f"{zip_path.name}: invalid Plugin manifest") from exc
+
+
 def deployment_manifest(release_id: str, hashes: dict[str, str]) -> dict:
     return {
         "schema_version": "k12.knodo.deployment-manifest.v1",
@@ -384,23 +496,49 @@ def deployment_manifest(release_id: str, hashes: dict[str, str]) -> dict:
         "deployment_status": "NOT_DEPLOYED",
         "deployment_verified": False,
         "bot_roles": {
-            "tutor": {
-                "bot_id": None,
-                "workspace_id": None,
-                "operations": ["TEACH_TURN", "CODE_FEEDBACK"],
-                "skills": ["k12-teaching-core"],
-                "packaged_config_hash": hashes.get("tutor-v1.zip"),
-                "packaged_knowledge_bundle_hash": hashes.get("bundles-classroom.zip"),
-                "deployed_config_hash": None,
-                "deployment_verified": False,
+            **{
+                role: {
+                    "bot_id": None,
+                    "workspace_id": None,
+                    "operations": ["TEACH_TURN", "CODE_FEEDBACK"],
+                    "skills": ["k12-teaching-core"],
+                    "system_prompt": f"tutor/v1/stages/{role}.md",
+                    "stages": stages,
+                    "response_mode": "STREAMING_STRUCTURED",
+                    "packaged_config_hash": hashes.get("tutor-v1.zip"),
+                    "packaged_knowledge_bundle_hash": hashes.get(
+                        "bundles-classroom.zip"
+                    ),
+                    "deployed_config_hash": None,
+                    "deployment_verified": False,
+                }
+                for role, stages in (
+                    ("primary", ["PRIMARY_LOWER", "PRIMARY_UPPER"]),
+                    ("junior", ["JUNIOR"]),
+                    ("senior", ["SENIOR"]),
+                )
             },
             "designer": {
                 "bot_id": None,
                 "workspace_id": None,
                 "operations": ["QUIZ_DRAFT", "LESSON_PACKAGE_DRAFT"],
                 "skills": ["k12-assessment-author", "k12-content-author"],
+                "system_prompt": "designer/v1/system-prompt.md",
+                "response_mode": "BUFFERED_STRUCTURED",
+                "live_operations": ["QUIZ_DRAFT"],
                 "packaged_config_hash": hashes.get("designer-v1.zip"),
                 "packaged_knowledge_bundle_hash": None,
+                "deployed_config_hash": None,
+                "deployment_verified": False,
+            },
+            "memory": {
+                "bot_id": None,
+                "workspace_id": None,
+                "operations": ["MEMORY_EXTRACT"],
+                "skills": [],
+                "system_prompt": "memory/v1/system-prompt.md",
+                "response_mode": "BUFFERED_STRUCTURED",
+                "packaged_config_hash": hashes.get("memory-v1.zip"),
                 "deployed_config_hash": None,
                 "deployment_verified": False,
             },
@@ -408,17 +546,9 @@ def deployment_manifest(release_id: str, hashes: dict[str, str]) -> dict:
         "agent_os": None,
         "runtime_model_id": None,
         "native_subagents_required": False,
-        "response_mode": "BUFFERED_STRUCTURED",
         "actual_permissions_reviewed": False,
         "fixture_is_not_live": True,
-        "gates_snapshot": {
-            "G_API_CONTRACT": "BLOCKED",
-            "G_LIVE_BUDGET": "BLOCKED",
-            "G_AGENT_ISOLATION": "BLOCKED",
-            "G_K12_TERMS": "BLOCKED",
-            "G_HUMAN_CONTENT_REVIEW": "BLOCKED",
-        },
-        "not_deployed_reason": "本卡无平台操作授权：未创建 Bot、未上传 Skill、未验证租户读取。",
+        "not_deployed_reason": "此清单仅描述可复现本地资产，不记录个人部署凭据或远端验收结果；实际绑定以数据库注册表及实时核验为准。",
         "manual_steps_ref": "docs/integrations/knodo/DEPLOYMENT_GUIDE.md",
         "boundaries_ref": "docs/integrations/knodo/ASSET_BOUNDARIES.md",
     }
@@ -435,7 +565,7 @@ def build_release(release_id: str) -> dict:
     hashes: dict[str, str] = {}
     for spec in artifact_specs():
         zip_path = release_dir / spec["name"]
-        build_zip(zip_path, collect_entries(spec["root"], spec["prefix"]))
+        build_artifact(zip_path, spec)
         hashes[spec["name"]] = sha256_file(zip_path)
         artifacts.append(
             {
@@ -455,7 +585,9 @@ def build_release(release_id: str) -> dict:
 
     version = read_json(PACKAGE / "VERSION.json")
     if version["contract_version"] != FROZEN_CONTRACT_VERSION:
-        raise CheckFailed("VERSION.json contract_version differs from contracts/version.json")
+        raise CheckFailed(
+            "VERSION.json contract_version differs from contracts/version.json"
+        )
 
     release_manifest = {
         "schema_version": "k12.knodo.release-manifest.v1",
@@ -471,8 +603,12 @@ def build_release(release_id: str) -> dict:
             "bundle_kind": bundle_manifest["bundle_kind"],
             "for_real_students": bundle_manifest["for_real_students"],
             "tutor_visible_count": bundle_manifest["separation"]["tutor_visible_count"],
-            "designer_private_count": bundle_manifest["separation"]["designer_private_count"],
-            "answers_in_tutor_bundle": bundle_manifest["separation"]["answers_in_tutor_bundle"],
+            "designer_private_count": bundle_manifest["separation"][
+                "designer_private_count"
+            ],
+            "answers_in_tutor_bundle": bundle_manifest["separation"][
+                "answers_in_tutor_bundle"
+            ],
             "excluded_sources": bundle_manifest["excluded_sources"],
         },
         "rules": {
@@ -582,7 +718,9 @@ def verify_quiz_sample(sample: Path, *, where: str) -> list[str]:
         if answer is None:
             problems.append(f"{where}: question {index} has no private answer field")
         if question.get("type") == "SINGLE_CHOICE" and answer not in keys:
-            problems.append(f"{where}: question {index} answer is not one of the options")
+            problems.append(
+                f"{where}: question {index} answer is not one of the options"
+            )
 
         # The student-visible projection is what the app may send to a student.
         projection = {
@@ -594,16 +732,20 @@ def verify_quiz_sample(sample: Path, *, where: str) -> list[str]:
             "source_refs": question.get("source_refs"),
         }
         projection_text = json.dumps(projection, ensure_ascii=False)
-        if question.get("correct_answer") and str(question["correct_answer"]) in json.dumps(
-            question.get("options"), ensure_ascii=False
-        ):
+        if question.get("correct_answer") and str(
+            question["correct_answer"]
+        ) in json.dumps(question.get("options"), ensure_ascii=False):
             pass  # option keys are legitimately visible; only the private field must not be
         problems.extend(walk_keys(projection, where=f"{where}#q{index}"))
         explanation = question.get("explanation")
         if explanation and explanation in projection_text:
-            problems.append(f"{where}: question {index} leaks the explanation into the projection")
+            problems.append(
+                f"{where}: question {index} leaks the explanation into the projection"
+            )
         if "correct_answer" in projection_text or "explanation" in projection_text:
-            problems.append(f"{where}: question {index} projection carries private keys")
+            problems.append(
+                f"{where}: question {index} projection carries private keys"
+            )
 
     problems.extend(scan_text(json.dumps(payload, ensure_ascii=False), where=where))
     return problems
@@ -620,7 +762,9 @@ def verify_release(release_id: str, *, check_reproducible: bool = True) -> list[
     manifest = read_json(manifest_path)
 
     if manifest["contract_version"] != FROZEN_CONTRACT_VERSION:
-        problems.append("release manifest contract_version differs from frozen contracts")
+        problems.append(
+            "release manifest contract_version differs from frozen contracts"
+        )
 
     # SHA256SUMS covers every file in the release directory
     sums_path = release_dir / "SHA256SUMS"
@@ -654,7 +798,9 @@ def verify_release(release_id: str, *, check_reproducible: bool = True) -> list[
             if sha256_file(zip_path) != artifact["sha256"]:
                 problems.append(f"artifact hash mismatch: {artifact['name']}")
             try:
-                assert_zip_entries_match(zip_path, artifact["entries"], where=artifact["name"])
+                assert_zip_entries_match(
+                    zip_path, artifact["entries"], where=artifact["name"]
+                )
             except CheckFailed as exc:
                 problems.append(str(exc))
                 continue
@@ -664,13 +810,19 @@ def verify_release(release_id: str, *, check_reproducible: bool = True) -> list[
             for entry in artifact["entries"]:
                 extracted = target / entry["name"]
                 if not extracted.is_file():
-                    problems.append(f"{artifact['name']}: extracted entry missing {entry['name']}")
+                    problems.append(
+                        f"{artifact['name']}: extracted entry missing {entry['name']}"
+                    )
                 elif sha256_file(extracted) != entry["sha256"]:
-                    problems.append(f"{artifact['name']}: extracted entry hash mismatch {entry['name']}")
+                    problems.append(
+                        f"{artifact['name']}: extracted entry hash mismatch {entry['name']}"
+                    )
 
     # Skills inside the package tree
     for skill in SKILLS:
-        problems.extend(verify_skill_tree(PACKAGE / "skills" / skill, where=f"skills/{skill}"))
+        problems.extend(
+            verify_skill_tree(PACKAGE / "skills" / skill, where=f"skills/{skill}")
+        )
         archive_path = release_dir / f"skill-{skill}.zip"
         if not archive_path.is_file():
             problems.append(f"skill zip missing: skill-{skill}.zip")
@@ -679,6 +831,10 @@ def verify_release(release_id: str, *, check_reproducible: bool = True) -> list[
             names = archive.namelist()
         if "SKILL.md" not in names:
             problems.append(f"skill-{skill}.zip: SKILL.md is not at the archive root")
+        try:
+            verify_plugin_archive(release_dir / f"plugin-{skill}.zip", skill)
+        except (CheckFailed, FileNotFoundError) as exc:
+            problems.append(str(exc))
 
     # Tutor pack must not carry answer material
     tutor_zip = release_dir / "tutor-v1.zip"
@@ -695,7 +851,10 @@ def verify_release(release_id: str, *, check_reproducible: bool = True) -> list[
         problems.append("classroom bundle declares answer material")
     for item in classroom_manifest["items"]:
         problems.extend(
-            scan_text(json.dumps(read_json(ROOT / item["path"]), ensure_ascii=False), where=item["path"])
+            scan_text(
+                json.dumps(read_json(ROOT / item["path"]), ensure_ascii=False),
+                where=item["path"],
+            )
         )
         problems.extend(walk_keys(read_json(ROOT / item["path"]), where=item["path"]))
     bundle_manifest = read_json(PACKAGE / "bundles" / "manifest.json")
@@ -716,11 +875,12 @@ def verify_release(release_id: str, *, check_reproducible: bool = True) -> list[
     deploy = read_json(PACKAGE / "deployment-manifest.json")
     if deploy.get("deployment_status") != "NOT_DEPLOYED":
         if not deploy.get("deployment_verified"):
-            problems.append("deployment manifest claims deployment without verification")
-    if deploy.get("bot_roles", {}).get("tutor", {}).get("bot_id") is not None:
-        problems.append("tutor bot_id present without platform evidence")
-    if deploy.get("bot_roles", {}).get("designer", {}).get("bot_id") is not None:
-        problems.append("designer bot_id present without platform evidence")
+            problems.append(
+                "deployment manifest claims deployment without verification"
+            )
+    for role, target in deploy.get("bot_roles", {}).items():
+        if target.get("bot_id") is not None or target.get("workspace_id") is not None:
+            problems.append(f"{role}: deployment IDs belong in the server registry")
     if deploy.get("deployment_verified") is not False:
         problems.append("deployment_verified must stay false without platform evidence")
     if deploy["release_id"] != release_id:
@@ -734,9 +894,13 @@ def verify_release(release_id: str, *, check_reproducible: bool = True) -> list[
         with tempfile.TemporaryDirectory() as tmp:
             rebuilt = Path(tmp)
             for artifact in manifest["artifacts"]:
-                spec = next(item for item in artifact_specs() if item["name"] == artifact["name"])
+                spec = next(
+                    item
+                    for item in artifact_specs()
+                    if item["name"] == artifact["name"]
+                )
                 candidate = rebuilt / spec["name"]
-                build_zip(candidate, collect_entries(spec["root"], spec["prefix"]))
+                build_artifact(candidate, spec)
                 if sha256_file(candidate) != artifact["sha256"]:
                     problems.append(f"artifact not reproducible: {artifact['name']}")
     return problems
@@ -748,7 +912,11 @@ def scan_package_tree(root: Path = PACKAGE) -> list[str]:
         if not path.is_file() or path.suffix not in TEXT_SUFFIXES:
             continue
         text = path.read_text(encoding="utf-8", errors="ignore")
-        where = rel(path) if path.is_relative_to(ROOT) else str(path.relative_to(root)).replace("\\", "/")
+        where = (
+            rel(path)
+            if path.is_relative_to(ROOT)
+            else str(path.relative_to(root)).replace("\\", "/")
+        )
         problems.extend(scan_text(text, where=where))
     return problems
 
@@ -784,6 +952,27 @@ def selftest() -> int:
     with tempfile.TemporaryDirectory() as tmp:
         tmpdir = Path(tmp)
 
+        # Plugin replacement uploads require an author object, unlike bare Skill ZIPs.
+        plugin_zip = release_dir / "plugin-k12-teaching-core.zip"
+        missing_author = tmpdir / "missing-author.zip"
+        with (
+            zipfile.ZipFile(plugin_zip) as source,
+            zipfile.ZipFile(missing_author, "w") as target,
+        ):
+            for entry in source.infolist():
+                data = source.read(entry)
+                if entry.filename == ".claude-plugin/plugin.json":
+                    metadata = json.loads(data)
+                    metadata.pop("author")
+                    data = json.dumps(metadata, ensure_ascii=False).encode("utf-8")
+                target.writestr(entry, data)
+        expect_failure(
+            "missing Plugin author",
+            lambda: verify_plugin_archive(missing_author, "k12-teaching-core"),
+        )
+        verify_plugin_archive(plugin_zip, "k12-teaching-core")
+        print("OK   Plugin author control: complete manifest stays valid")
+
         # 1. tampered entry vs manifest
         target = tmpdir / "tutor-v1.zip"
         shutil.copyfile(tutor_zip, target)
@@ -791,11 +980,15 @@ def selftest() -> int:
         with zipfile.ZipFile(target) as archive:
             archive.extractall(tampered)
         prompt = next(tampered.rglob("system-prompt.md"))
-        prompt.write_text(prompt.read_text(encoding="utf-8") + "\n篡改\n", encoding="utf-8")
+        prompt.write_text(
+            prompt.read_text(encoding="utf-8") + "\n篡改\n", encoding="utf-8"
+        )
         entries = collect_entries(tampered, "")
         rebuilt = tmpdir / "tampered.zip"
         build_zip(rebuilt, entries)
-        expected = next(a for a in manifest["artifacts"] if a["name"] == "tutor-v1.zip")["entries"]
+        expected = next(
+            a for a in manifest["artifacts"] if a["name"] == "tutor-v1.zip"
+        )["entries"]
         expect_failure(
             "tampered entry",
             lambda: assert_zip_entries_match(rebuilt, expected, where="tampered.zip"),
@@ -840,7 +1033,9 @@ def selftest() -> int:
         expect_failure("injected secret", injected_secret_detected)
         clean_problems = scan_package_tree(clean_root)
         if clean_problems:
-            failures.append(f"injected secret control: clean tree was flagged ({clean_problems[0]})")
+            failures.append(
+                f"injected secret control: clean tree was flagged ({clean_problems[0]})"
+            )
         else:
             print("OK   injected secret control: clean tree stays clean")
 
@@ -856,14 +1051,24 @@ def selftest() -> int:
             tmpdir / "skills" / "k12-teaching-core" / "SKILL.md",
         )
         shutil.copyfile(
-            PACKAGE / "skills" / "k12-teaching-core" / "references" / "stage-policy.json",
+            PACKAGE
+            / "skills"
+            / "k12-teaching-core"
+            / "references"
+            / "stage-policy.json",
             skills_dir / "stage-policy.json",
         )
         shutil.copyfile(
-            PACKAGE / "skills" / "k12-teaching-core" / "references" / "teaching-response.schema.json",
+            PACKAGE
+            / "skills"
+            / "k12-teaching-core"
+            / "references"
+            / "teaching-response.schema.json",
             skills_dir / "teaching-response.schema.json",
         )
-        problems = verify_skill_tree(tmpdir / "skills" / "k12-teaching-core", where="tampered-skill")
+        problems = verify_skill_tree(
+            tmpdir / "skills" / "k12-teaching-core", where="tampered-skill"
+        )
         if any("differs from frozen contract" in problem for problem in problems):
             print("OK   modified schema: detected -> schema byte comparison failed")
         else:
@@ -890,10 +1095,14 @@ def selftest() -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    build_bundles_cmd = sub.add_parser("build-bundles", help="regenerate the classroom bundle")
+    build_bundles_cmd = sub.add_parser(
+        "build-bundles", help="regenerate the classroom bundle"
+    )
     build_bundles_cmd.add_argument("--release-id", default=DEFAULT_RELEASE_ID)
 
     build_cmd = sub.add_parser("build", help="build the release ZIPs and manifests")
@@ -918,19 +1127,27 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "build":
         manifest = build_release(args.release_id)
-        print(f"release {manifest['release_id']} built with {len(manifest['artifacts'])} artifacts")
+        print(
+            f"release {manifest['release_id']} built with {len(manifest['artifacts'])} artifacts"
+        )
         for artifact in manifest["artifacts"]:
-            print(f"  {artifact['name']}: {artifact['sha256']} ({artifact['bytes']} bytes)")
+            print(
+                f"  {artifact['name']}: {artifact['sha256']} ({artifact['bytes']} bytes)"
+            )
         return 0
 
     if args.command == "verify":
-        problems = verify_release(args.release_id, check_reproducible=not args.no_reproducible)
+        problems = verify_release(
+            args.release_id, check_reproducible=not args.no_reproducible
+        )
         problems.extend(scan_package_tree())
         if problems:
             for problem in problems:
                 print(f"FAIL {problem}", file=sys.stderr)
             return 1
-        print("PASS verify: ZIP safety, hashes, schemas, answer separation, deployment status")
+        print(
+            "PASS verify: ZIP safety, hashes, schemas, answer separation, deployment status"
+        )
         return 0
 
     if args.command == "scan":
