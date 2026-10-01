@@ -152,8 +152,10 @@ test("administrators configure agents and routes without claiming remote skill a
   await expect(
     page.getByRole("heading", { name: "AI 教师与能力" }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "编辑 霜铃·小学教师" }).click();
   await page.getByLabel("显示名称").fill("霜铃·小学探索教师");
-  await page.getByRole("button", { name: "保存配置" }).click();
+  await page.getByRole("button", { name: "应用到草稿" }).click();
+  await page.getByRole("button", { name: "保存全部配置" }).click();
   await expect(page.getByText("配置版本 2")).toBeVisible();
   await page.screenshot({
     path: new URL("../../test-results/ai-teachers-desktop.png", import.meta.url)
@@ -163,7 +165,7 @@ test("administrators configure agents and routes without claiming remote skill a
   });
   await page.getByRole("button", { name: "学段与任务路由" }).click();
   await expect(
-    page.getByRole("combobox", { name: "学段", exact: true }),
+    page.getByRole("combobox", { name: "学段 1", exact: true }),
   ).toHaveValue("PRIMARY_LOWER");
   await page.getByRole("button", { name: "Skill 与能力", exact: true }).click();
   await expect(page.getByText(/实际插件安装/)).toBeVisible();

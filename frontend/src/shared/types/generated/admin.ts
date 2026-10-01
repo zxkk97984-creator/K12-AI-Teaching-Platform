@@ -258,7 +258,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Admin Read Resource */
+        get: operations["admin_read_resource_api_v1_admin_resources__resource_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -275,7 +276,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Admin Read Content
+         * @description Allow human review of draft bytes without changing student visibility.
+         */
+        get: operations["admin_read_content_api_v1_admin_resources__resource_id__content_get"];
         /** Admin Upload Content */
         put: operations["admin_upload_content_api_v1_admin_resources__resource_id__content_put"];
         post?: never;
@@ -1737,6 +1742,39 @@ export interface operations {
             };
         };
     };
+    admin_read_resource_api_v1_admin_resources__resource_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resource_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceSummaryDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     admin_patch_resource_api_v1_admin_resources__resource_id__patch: {
         parameters: {
             query?: never;
@@ -1765,6 +1803,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResourceSummaryDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_read_content_api_v1_admin_resources__resource_id__content_get: {
+        parameters: {
+            query?: {
+                variant?: string;
+                disposition?: string;
+            };
+            header?: never;
+            path: {
+                resource_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

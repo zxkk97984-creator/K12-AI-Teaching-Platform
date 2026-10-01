@@ -109,6 +109,10 @@ export function adminCreateResource(body: Record<string, unknown>): Promise<Reso
   );
 }
 
+export function adminGetResource(resourceId: string): Promise<ResourceSummary> {
+  return request<ResourceSummary>(`${API_BASE}/admin/resources/${encodeURIComponent(resourceId)}`);
+}
+
 export function adminPatchResource(
   resourceId: string,
   body: Record<string, unknown>,

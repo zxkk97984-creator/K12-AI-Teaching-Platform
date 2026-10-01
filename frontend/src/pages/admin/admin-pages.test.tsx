@@ -84,6 +84,7 @@ describe("admin resources", () => {
       .mockRejectedValueOnce(new Error("连接中断"))
       .mockResolvedValueOnce({ sha256: "a".repeat(64), size_bytes: 3, mime: "application/octet-stream" });
     render(<AdminResourcesPage />);
+    fireEvent.click(screen.getByRole("button", { name: "新增资源" }));
     fireEvent.change(screen.getByTestId("admin-slug"), { target: { value: resource.slug } });
     fireEvent.change(screen.getByTestId("admin-title"), { target: { value: resource.title } });
     fireEvent.change(screen.getByTestId("admin-file"), { target: { files: [new File(["abc"], "lesson.docx")] } });
@@ -126,8 +127,8 @@ describe("admin authoring", () => {
     });
     render(<MemoryRouter initialEntries={["/admin/authoring?job=" + jobId]}><AdminAuthoringPage /><LocationProbe /></MemoryRouter>);
     expect(await screen.findByTestId("authoring-package")).toBeTruthy();
-    expect(screen.getByTestId("authoring-job-status").textContent).toBe("SUCCEEDED");
-    expect(screen.getByTestId("authoring-package-status").textContent).toBe("HUMAN_APPROVED");
+    expect(screen.getByTestId("authoring-job-status").textContent).toBe("生成完成");
+    expect(screen.getByTestId("authoring-package-status").textContent).toBe("人工审校通过");
     expect(screen.getByTestId("current-location").textContent).toContain("?job=" + jobId);
     expect(authoringApi.getAuthoringJob).toHaveBeenCalledWith(jobId);
     expect(authoringApi.getAuthoringPackage).toHaveBeenCalledWith(packageId);

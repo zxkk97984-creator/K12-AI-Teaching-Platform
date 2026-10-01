@@ -1862,9 +1862,144 @@
             }
           }
         }
+      },
+      "get": {
+        "tags": [
+          "resources-admin"
+        ],
+        "summary": "Admin Read Resource",
+        "operationId": "admin_read_resource_api_v1_admin_resources__resource_id__get",
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resource Id"
+            }
+          },
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceSummaryDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/admin/resources/{resource_id}/content": {
+      "get": {
+        "tags": [
+          "resources-admin"
+        ],
+        "summary": "Admin Read Content",
+        "description": "Allow human review of draft bytes without changing student visibility.",
+        "operationId": "admin_read_content_api_v1_admin_resources__resource_id__content_get",
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Resource Id"
+            }
+          },
+          {
+            "name": "variant",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(SOURCE|PREVIEW)$",
+              "default": "SOURCE",
+              "title": "Variant"
+            }
+          },
+          {
+            "name": "disposition",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(inline|attachment)$",
+              "default": "attachment",
+              "title": "Disposition"
+            }
+          },
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "resources-admin"

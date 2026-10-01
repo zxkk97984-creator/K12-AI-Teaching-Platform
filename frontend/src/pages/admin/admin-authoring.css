@@ -250,3 +250,33 @@
     flex-direction: column;
   }
 }
+
+.admin-authoring__layout { grid-template-columns:minmax(290px,360px) minmax(0,1fr); gap:24px; }
+.admin-authoring__main { position:sticky; top:16px; }
+.admin-job-search { margin-top:16px; }
+.admin-job-filter { margin:14px 0; width:100%; }
+.admin-job-list li { padding:12px; gap:8px; }
+.admin-job-list li.is-selected { background:#fff9e7; border-color:var(--admin-accent-line); }
+.admin-authoring .admin-job-open { display:grid; justify-content:stretch; min-height:38px; }
+.admin-job-open strong { max-width:100%; }
+.admin-job-list li { flex-wrap:wrap; }
+.admin-job-list .admin-badge { margin-left:auto; }
+.admin-package-spec { font:13px/1.6 ui-monospace,monospace; padding:14px; background:var(--admin-soft); white-space:pre-wrap; overflow-wrap:anywhere; max-height:360px; overflow:auto; }
+.admin-drawer .admin-authoring__card { padding:0; border:0; }
+.admin-authoring__table { min-width:500px; }
+.admin-authoring__table th:nth-child(4) { width:20%; }
+.admin-package-facts div { border-radius:6px; }
+@media(max-width:1060px) { .admin-authoring__layout { grid-template-columns:1fr; } .admin-authoring__main { position:static; } .admin-job-list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .admin-job-list { grid-template-columns:1fr; } }
+.admin-authoring .admin-job-list .admin-job-open { display:grid; grid-template-columns:minmax(0,1fr); width:100%; flex:1 1 180px; justify-content:stretch; align-items:start; text-align:left; color:var(--admin-ink); background:transparent; border:0; padding:0; white-space:normal; }
+.admin-authoring .admin-job-list .admin-job-open:hover { background:transparent; color:var(--admin-ink); }
+.admin-authoring .admin-job-list .admin-job-open strong,.admin-authoring .admin-job-list .admin-job-open span,.admin-authoring .admin-job-list .admin-job-open small { display:block; width:100%; }
+.admin-revision-fields { display:grid; gap:14px; }
+.admin-generated-content { overflow-wrap:anywhere; }
+.admin-generated-content h4 { margin:16px 0 8px; font-size:14px; }
+.admin-generated-content li { margin:8px 0; }
+.admin-generated-content li p { margin:4px 0; }
+.admin-generated-markdown { padding:14px; background:var(--admin-soft); border-radius:7px; }
+.admin-generated-markdown p:first-child { margin-top:0; }
+.admin-generated-markdown p:last-child { margin-bottom:0; }
+.admin-generated-markdown pre { white-space:pre-wrap; overflow-wrap:anywhere; }

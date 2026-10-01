@@ -45,9 +45,9 @@ const STUDENT_SIDEBAR_EXTRA: Pick<NavigationItem, "path" | "label" | "icon">[] =
 
 const ADMIN_NAV: NavigationItem[] = [
   { path: "/admin/ai", label: "AI 教师与能力", mobileLabel: "教师", icon: "chat" },
-  { path: "/admin/resources", label: "资源管理", mobileLabel: "资源", icon: "resource" },
-  { path: "/admin/resources/interactive", label: "互动内容", mobileLabel: "互动", icon: "resource" },
-  { path: "/admin/authoring", label: "课程编排", mobileLabel: "课程", icon: "book" },
+  { path: "/admin/resources", label: "资源管理", mobileLabel: "资源", icon: "resource", end: true },
+  { path: "/admin/resources/interactive", label: "互动内容", mobileLabel: "互动", icon: "interactive" },
+  { path: "/admin/authoring", label: "课程编排", mobileLabel: "课程", icon: "practice" },
 ];
 
 function studentSection(pathname: string, search = ""): string | null {
@@ -79,6 +79,7 @@ function Icon({ name }: { name: string }) {
     strokeLinejoin: "round" as const,
     "aria-hidden": true,
   };
+  if (name === "interactive") return <svg {...common}><rect x="3" y="4" width="18" height="13" rx="2" /><path d="m10 8 5 3-5 3zM8 21h8M12 17v4" /></svg>;
   if (name === "home") return <svg {...common}><path d="m3 10 9-7 9 7v10H3z" /><path d="M9 20v-7h6v7" /></svg>;
   if (name === "code") return <svg {...common}><path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 5l-4 14" /></svg>;
   if (name === "book") return <svg {...common}><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z" /><path d="M4 5.5v16A2.5 2.5 0 0 1 6.5 19H20" /><path d="M8 7h8M8 11h7" /></svg>;

@@ -1050,3 +1050,49 @@ async def test_r7_lookup_failure_is_fail_closed(rctx, content_session, monkeypat
         )
     sessions = await content_session.scalar(select(func.count()).select_from(LessonSession))
     assert sessions == 0
+
+
+@pytest.mark.asyncio
+async def test_admin_reviews_draft_files_without_changing_student_visibility(rctx, content_session):
+    missing_url = f"/api/v1/admin/resources/{uuid.uuid4()}/content"
+    assert (await rctx.client.get(missing_url)).status_code == 401
+    token = await as_admin(rctx)
+    created = await register(rctx, token, slug="admin-review-draft", kind="WORD")
+    resource_id = created.json()["id"]
+    url = f"/api/v1/admin/resources/{resource_id}/content"
+    assert (await rctx.client.get(url)).status_code == 404
+    assert (await rctx.client.get(url + "?variant=arbitrary")).status_code == 422
+    assert (await upload(rctx, token, resource_id, DOCX)).status_code == 200
+    response = await rctx.client.get(url)
+    assert response.status_code == 200
+    assert response.content == DOCX.read_bytes()
+    assert response.headers["Content-Disposition"].startswith("attachment")
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert "no-store" in response.headers["Cache-Control"]
+    assert "sandbox" in response.headers["Content-Security-Policy"]
+    detail = await rctx.client.get(f"/api/v1/admin/resources/{resource_id}")
+    assert detail.status_code == 200
+    assert detail.json()["publication_status"] == "DRAFT"
+
+    # Even legacy active bytes cannot execute in the admin origin.
+    variant = await content_session.scalar(
+        select(ResourceVariant).where(ResourceVariant.resource_id == uuid.UUID(resource_id))
+    )
+    store = LocalFileStore(Path(rctx.settings.resource_storage_root))
+    forced = store.resolve(f"resources/{resource_id}/source-forced.html")
+    forced.parent.mkdir(parents=True, exist_ok=True)
+    forced.write_bytes(HTML_DECOY.read_bytes())
+    variant.storage_key = f"resources/{resource_id}/source-forced.html"
+    variant.detected_mime = "text/html"
+    await content_session.commit()
+    response = await rctx.client.get(url + "?disposition=inline")
+    assert response.status_code == 200
+    assert response.headers["Content-Disposition"].startswith("attachment")
+    assert "sandbox" in response.headers["Content-Security-Policy"]
+    forced.unlink()
+    assert (await rctx.client.get(url)).status_code == 404
+    assert (await rctx.client.get(missing_url)).status_code == 404
+    await as_student(rctx, username="admin-review.student")
+    assert (await rctx.client.get(url)).status_code == 403
+    assert (await rctx.client.get(f"/api/v1/admin/resources/{resource_id}")).status_code == 403
+    assert (await rctx.client.get(f"/api/v1/resources/{resource_id}/content")).status_code == 404

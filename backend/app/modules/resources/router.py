@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
 from app.core.database import get_session
+from app.core.storage import StorageError
 from app.modules.content.schemas import ViewerScope
 from app.modules.content.service import viewer_scope_from_profile
 from app.modules.identity.dependencies import (
@@ -309,6 +310,48 @@ async def admin_patch_resource(
     except ResourceError as error:
         _raise(error)
     return await resource_summary(db, resource, settings=_settings(request))
+
+
+@admin_router.get("/admin/resources/{resource_id}", response_model=ResourceSummaryDTO)
+async def admin_read_resource(
+    resource_id: uuid.UUID,
+    request: Request,
+    context: SessionContext = Depends(require_admin),
+    db: AsyncSession = Depends(get_session),
+) -> ResourceSummaryDTO:
+    resource = await db.scalar(select(Resource).where(Resource.id == resource_id))
+    if resource is None:
+        raise HTTPException(404, "RESOURCE_NOT_FOUND: 资源不存在")
+    return await resource_summary(db, resource, settings=_settings(request))
+
+
+@admin_router.get("/admin/resources/{resource_id}/content")
+async def admin_read_content(
+    resource_id: uuid.UUID,
+    request: Request,
+    variant: Annotated[str, SOURCE_OR_PREVIEW] = "SOURCE",
+    disposition: str = Query(default="attachment", pattern="^(inline|attachment)$"),
+    context: SessionContext = Depends(require_admin),
+    db: AsyncSession = Depends(get_session),
+) -> FileResponse:
+    """Allow human review of draft bytes without changing student visibility."""
+    resource = await db.scalar(select(Resource).where(Resource.id == resource_id))
+    if resource is None:
+        raise HTTPException(404, "RESOURCE_NOT_FOUND: 资源不存在")
+    row = await db.scalar(
+        select(ResourceVariant).where(
+            ResourceVariant.resource_id == resource_id, ResourceVariant.variant == variant
+        )
+    )
+    if row is None:
+        raise HTTPException(404, "RESOURCE_FILE_MISSING: 资源文件未登记")
+    try:
+        path = store_for(_settings(request)).resolve(row.storage_key)
+    except StorageError:
+        raise HTTPException(404, "RESOURCE_FILE_MISSING: 资源文件不可用") from None
+    if not path.is_file():
+        raise HTTPException(404, "RESOURCE_FILE_MISSING: 资源文件缺失")
+    return _file_response(row, path, inline=disposition == "inline")
 
 
 @admin_router.put(

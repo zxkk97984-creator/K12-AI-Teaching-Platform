@@ -26,7 +26,12 @@ export function EditingGuardProvider({ children }: { children: ReactNode }) {
   // The context value must keep a stable identity across renders, otherwise
   // consumers that depend on it re-run their registration effect forever.
   const value = useMemo(() => ({ register }), [register]);
-  const blocker = useBlocker(dirty);
+  // Admin object selection updates the query on the same page. Its panels
+  // confirm discarded edits themselves. Browser Back/Forward and page changes
+  // still use the guard because they bypass those panel controls.
+  const blocker = useBlocker(({ currentLocation, nextLocation, historyAction }) => dirty && !(
+    historyAction !== "POP" && currentLocation.pathname.startsWith("/admin/") && currentLocation.pathname === nextLocation.pathname
+  ));
   useBeforeUnload((event) => {
     if (!dirty) return;
     event.preventDefault();
