@@ -367,6 +367,1256 @@
     "answers_in_tutor_bundle": false,
     "excluded_sources": [
       {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-algorithms/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-012-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-013-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-coding/ch-014-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-ml/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-ml/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-ml/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-ml/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-ml/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-ml/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-ml/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-network/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-network/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-network/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-network/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-network/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-network/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-network/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-012-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-013-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-014-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "junior-python/ch-015-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-001-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-001-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-002-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-002-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-003-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-003-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-004-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-004-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-005-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-005-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-006-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-006-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-007-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-008-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-009-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-010-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-010-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-011-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-011-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-012-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-013-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-014-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-014-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-015-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-ai/ch-016-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-computer/ch-001-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-computer/ch-001-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-computer/ch-002-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-computer/ch-002-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-computer/ch-003-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-computer/ch-004-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-001-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-001-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-002-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-002-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-003-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-003-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-004-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-005-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-005-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-006-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-007-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-008-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-009-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-010-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-010-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-011-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-011-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-012-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-safety/ch-012-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-001-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-001-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-002-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-002-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-003-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-003-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-004-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-005-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-006-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-007-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-008-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-009-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-scratch/ch-010-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-001-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-001-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-002-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-003-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-004-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-004-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-005-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-005-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-006-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-007-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-008-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-008-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-009-lower",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "primary-unplugged/ch-009-upper",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-012-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-algorithms/ch-013-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-012-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-013-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-014-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-015-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-016-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-017-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-018-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-019-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-020-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-coding/ch-021-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-data-structures/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-data-structures/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-data-structures/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-data-structures/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-data-structures/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-data-structures/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-012-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-013-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-014-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-015-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-016-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-017-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-deep-learning/ch-018-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-ml/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-ml/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-ml/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-ml/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-ml/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-ml/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-network/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-olympiad/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-olympiad/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-olympiad/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-olympiad/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-olympiad/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-olympiad/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-pathways/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-pathways/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-pathways/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-pathways/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-pathways/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-pathways/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-012-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-013-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-014-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-015-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-016-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-017-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-018-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-python/ch-019-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-001-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-002-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-003-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-004-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-005-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-006-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-007-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-008-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-009-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-010-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-011-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-012-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
+        "release_key": "computing-ai-md-v1-db6ffb6b663b",
+        "chapter": "senior-systems/ch-013-main",
+        "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+      },
+      {
         "release_key": "legacy-k12-696364f-pending-review",
         "chapter": "algorithm-everyday/ch03",
         "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"

@@ -1,0 +1,581 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "senior-python",
+  "title": "Python 进阶",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习Python 进阶，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "senior-python-topic-01",
+      "name": "第1章 Python数据模型",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第1章 Python数据模型」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-02",
+      "name": "第2章 丰富的序列",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第2章 丰富的序列」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-03",
+      "name": "第3章 字典和集合",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第3章 字典和集合」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-04",
+      "name": "第4章 Unicode文本和字节序列",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第4章 Unicode文本和字节序列」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-05",
+      "name": "第5章 数据类构建器",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第5章 数据类构建器」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-06",
+      "name": "第6章 对象引用、可变性和垃圾回收",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第6章 对象引用、可变性和垃圾回收」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-07",
+      "name": "第7章 函数是一等对象",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第7章 函数是一等对象」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-08",
+      "name": "第8章 函数中的类型提示",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第8章 函数中的类型提示」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-09",
+      "name": "第9章 装饰器和闭包",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第9章 装饰器和闭包」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-10",
+      "name": "第10章 使用一等函数实现设计模式",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第10章 使用一等函数实现设计模式」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-11",
+      "name": "第11章 符合Python风格的对象",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第11章 符合Python风格的对象」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-12",
+      "name": "第12章 序列的特殊方法",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第12章 序列的特殊方法」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-13",
+      "name": "第13章 接口、协议和抽象基类",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第13章 接口、协议和抽象基类」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-14",
+      "name": "第14章 继承：瑕瑜互见",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第14章 继承：瑕瑜互见」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-15",
+      "name": "第15-16章 类型提示进阶与运算符重载",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第15-16章 类型提示进阶与运算符重载」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-16",
+      "name": "第17章 迭代器、生成器和经典协程",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第17章 迭代器、生成器和经典协程」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-17",
+      "name": "第18章 with、match和else块",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第18章 with、match和else块」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-18",
+      "name": "第19章 Python并发模型",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第19章 Python并发模型」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-python-topic-19",
+      "name": "第20章 并发执行器",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第20章 并发执行器」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "第1章 Python数据模型",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第1章 Python数据模型」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "第2章 丰富的序列",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第2章 丰富的序列」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "第3章 字典和集合",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第3章 字典和集合」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "第4章 Unicode文本和字节序列",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第4章 Unicode文本和字节序列」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "第5章 数据类构建器",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第5章 数据类构建器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "第6章 对象引用、可变性和垃圾回收",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第6章 对象引用、可变性和垃圾回收」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-main",
+      "revision": 1,
+      "order_index": 14,
+      "title": "第7章 函数是一等对象",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第7章 函数是一等对象」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-008-main",
+      "revision": 1,
+      "order_index": 16,
+      "title": "第8章 函数中的类型提示",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第8章 函数中的类型提示」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-08"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-008-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-009-main",
+      "revision": 1,
+      "order_index": 18,
+      "title": "第9章 装饰器和闭包",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第9章 装饰器和闭包」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-09"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-009-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-010-main",
+      "revision": 1,
+      "order_index": 20,
+      "title": "第10章 使用一等函数实现设计模式",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第10章 使用一等函数实现设计模式」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-10"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-010-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-011-main",
+      "revision": 1,
+      "order_index": 22,
+      "title": "第11章 符合Python风格的对象",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第11章 符合Python风格的对象」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-11"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-011-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-012-main",
+      "revision": 1,
+      "order_index": 24,
+      "title": "第12章 序列的特殊方法",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第12章 序列的特殊方法」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-12"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-012-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-013-main",
+      "revision": 1,
+      "order_index": 26,
+      "title": "第13章 接口、协议和抽象基类",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第13章 接口、协议和抽象基类」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-13"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-013-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-014-main",
+      "revision": 1,
+      "order_index": 28,
+      "title": "第14章 继承：瑕瑜互见",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第14章 继承：瑕瑜互见」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-14"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-014-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-015-main",
+      "revision": 1,
+      "order_index": 30,
+      "title": "第15-16章 类型提示进阶与运算符重载",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第15-16章 类型提示进阶与运算符重载」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-15"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-015-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-016-main",
+      "revision": 1,
+      "order_index": 32,
+      "title": "第17章 迭代器、生成器和经典协程",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第17章 迭代器、生成器和经典协程」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-16"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-016-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-017-main",
+      "revision": 1,
+      "order_index": 34,
+      "title": "第18章 with、match和else块",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第18章 with、match和else块」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-17"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-017-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-018-main",
+      "revision": 1,
+      "order_index": 36,
+      "title": "第19章 Python并发模型",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第19章 Python并发模型」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-18"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-018-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-019-main",
+      "revision": 1,
+      "order_index": 38,
+      "title": "第20章 并发执行器",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第20章 并发执行器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-python-topic-19"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/c829500fe97ce5ec/01-流畅的Python.md",
+        "original_sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-019-main-r1.json"
+    }
+  ]
+}

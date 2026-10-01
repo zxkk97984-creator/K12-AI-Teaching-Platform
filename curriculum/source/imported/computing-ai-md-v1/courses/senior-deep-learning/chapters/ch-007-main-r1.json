@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-007-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第7章 现代卷积神经网络"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第7章 现代卷积神经网络。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "- **AlexNet（2012）**：加深网络、用 ReLU、Dropout、GPU 训练，引爆深度学习。\n- **VGG**：重复用 3×3 卷积块，结构规整。\n- **NiN**：用 1×1 卷积增加通道交互。\n- **GoogLeNet**：Inception 并行多尺度卷积。\n- **BatchNorm**：每层归一化输入，加速训练、稳定。\n- **ResNet（2015）**：残差连接 `y = F(x) + x`，让超深网络（152 层）可训练。这是最重要的创新之一。\n- **DenseNet**：每层与所有前层密集连接。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-07"
+  ]
+}

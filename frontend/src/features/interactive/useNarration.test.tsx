@@ -2,12 +2,13 @@ import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useNarration } from "./useNarration";
 import type { InteractivePrompt } from "./api";
+import { narrationVoiceId } from "./narrationVoices";
 
 const prompt: InteractivePrompt = {
   id: "question-1", scene_id: "main", text: "你看到了什么？", trigger: "MANUAL", audio: null,
 };
 
-function installSpeech(voices: Array<{ lang: string }>) {
+function installSpeech(voices: Array<{ lang: string; name?: string; voiceURI?: string; default?: boolean }>) {
   const synthesis = {
     getVoices: vi.fn(() => voices),
     speak: vi.fn((utterance: { onstart?: () => void }) => utterance.onstart?.()),
@@ -30,9 +31,89 @@ function installSpeech(voices: Array<{ lang: string }>) {
   return synthesis;
 }
 
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); localStorage.removeItem('k12:interactive:voice:v1'); localStorage.removeItem('voice-test'); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 describe("platform narration", () => {
+  it("prefers mainland Mandarin even when Cantonese is first and the browser default", async () => {
+    const synthesis = installSpeech([{lang: 'zh-HK', name: 'Cantonese', default: true}, {lang: 'zh-TW', name: 'Taiwan'}, {lang: 'zh-CN', name: 'Mandarin'}]);
+    const {result} = renderHook(() => useNarration(() => '/audio'));
+    await act(async () => { expect(await result.current.play(prompt)).toBe(true); });
+    expect(synthesis.speak.mock.calls[0][0]).toMatchObject({voice: {name: 'Mandarin'}, lang: 'zh-CN'});
+    expect(result.current.voiceNotice).toContain('自动普通话');
+  });
+  it("requires an explicit selection to use Cantonese", async () => {
+    const voice = {lang: 'zh-HK', name: 'Cantonese', voiceURI: 'hk'};
+    const synthesis = installSpeech([voice]);
+    const {result} = renderHook(() => useNarration(() => '/audio'));
+    await act(async () => { expect(await result.current.play(prompt)).toBe(false); });
+    expect(synthesis.speak).not.toHaveBeenCalled();
+    expect(result.current.voiceNotice).toContain('没有可用的普通话');
+    act(() => result.current.selectVoice(narrationVoiceId(voice as SpeechSynthesisVoice)));
+    await act(async () => { expect(await result.current.play(prompt)).toBe(true); });
+    expect(synthesis.speak.mock.calls[0][0]).toMatchObject({lang: 'zh-HK'});
+  });
+  it("remembers a chosen voice and explains a temporary Mandarin fallback without overwriting it", async () => {
+    const voices = [{lang: 'zh-CN', name: 'A', voiceURI: 'a'}, {lang: 'zh-CN', name: 'B', voiceURI: 'b'}];
+    const synthesis = installSpeech(voices);
+    const id = narrationVoiceId(voices[1] as SpeechSynthesisVoice);
+    const first = renderHook(() => useNarration(() => '/audio', 'voice-test'));
+    act(() => first.result.current.selectVoice(id));
+    first.unmount();
+    const {result} = renderHook(() => useNarration(() => '/audio', 'voice-test'));
+    expect(result.current.voiceId).toBe(id);
+    await act(async () => { await result.current.play(prompt); });
+    expect(synthesis.speak.mock.calls.at(-1)?.[0]).toMatchObject({voice: {name: 'B'}});
+    voices.pop();
+    await act(async () => { await result.current.play(prompt); });
+    expect(synthesis.speak.mock.calls.at(-1)?.[0]).toMatchObject({voice: {name: 'A'}});
+    expect(result.current.voiceNotice).toContain('所选声音当前不可用，暂用普通话');
+    expect(localStorage.getItem('voice-test')).toBe(id);
+  });
+  it("applies a new voice on the next playback without interrupting the current one", async () => {
+    const voices = [{lang: 'zh-CN', name: 'A'}, {lang: 'zh-CN', name: 'B'}];
+    const synthesis = installSpeech(voices);
+    const {result} = renderHook(() => useNarration(() => '/audio'));
+    await act(async () => { await result.current.play(prompt); });
+    const cancellations = synthesis.cancel.mock.calls.length;
+    act(() => result.current.selectVoice(narrationVoiceId(voices[1] as SpeechSynthesisVoice)));
+    expect(synthesis.cancel.mock.calls.length).toBe(cancellations);
+    expect(result.current.status).toBe('speaking');
+    await act(async () => { await result.current.replay(); });
+    expect(synthesis.speak.mock.calls.at(-1)?.[0]).toMatchObject({voice: {name: 'B'}});
+  });
+  it("settles a cancelled request and ignores stale speech events", async () => {
+    const synthesis = installSpeech([{ lang: "zh-CN" }]);
+    const spoken: Array<{ onstart?: () => void }> = [];
+    synthesis.speak.mockImplementation((speech) => { spoken.push(speech); });
+    const { result } = renderHook(() => useNarration(() => "/audio"));
+    let old: Promise<boolean>;
+    let latest: Promise<boolean>;
+    act(() => { old = result.current.play(prompt); });
+    act(() => { latest = result.current.play({ ...prompt, id: "second", text: "下一段讲解" }); });
+    expect(await old!).toBe(false);
+    act(() => spoken[0].onstart?.());
+    expect(result.current.status).toBe("loading");
+    act(() => spoken[1].onstart?.());
+    expect(await latest!).toBe(true);
+    expect(result.current.prompt_id).toBe("second");
+    expect(result.current.subtitle).toBe("下一段讲解");
+  });
+
+  it("waits for asynchronously loaded Chinese voices", async () => {
+    const voices: Array<{ lang: string }> = [];
+    const synthesis = installSpeech(voices);
+    const events = new EventTarget();
+    Object.assign(synthesis, {
+      addEventListener: events.addEventListener.bind(events),
+      removeEventListener: events.removeEventListener.bind(events),
+    });
+    const { result } = renderHook(() => useNarration(() => "/audio"));
+    let request: Promise<boolean>;
+    act(() => { request = result.current.play(prompt); });
+    voices.push({ lang: "zh-CN" });
+    await act(async () => { events.dispatchEvent(new Event("voiceschanged")); expect(await request!).toBe(true); });
+    expect(result.current.status).toBe("speaking");
+  });
   it("keeps subtitles and reports unavailable when no Chinese voice exists", async () => {
     const synthesis = installSpeech([{ lang: "en-US" }]);
     const { result } = renderHook(() => useNarration(() => "/audio"));
@@ -70,10 +151,10 @@ describe("platform narration", () => {
       src: string;
       playbackRate = 1;
       ended = false;
-      onplay?: () => void;
+      onplaying?: () => void;
       onpause?: () => void;
       constructor(src: string) { this.src = src; }
-      async play() { this.onplay?.(); }
+      async play() { this.onplaying?.(); }
       pause() { this.onpause?.(); }
     }
     vi.stubGlobal("Audio", FakeAudio);
@@ -81,5 +162,33 @@ describe("platform narration", () => {
     await act(async () => { expect(await result.current.play({ ...prompt, audio: "audio/question-1.wav" })).toBe(true); });
     expect(result.current.status).toBe("speaking");
     expect(synthesis.speak).not.toHaveBeenCalled();
+  });
+
+  it("waits for actual audio playback and distinguishes ending from idle", async () => {
+    const elements: Array<FakeAudio> = [];
+    class FakeAudio {
+      src: string; playbackRate = 1; ended = false;
+      onplaying?: () => void; onpause?: () => void; onended?: () => void;
+      constructor(src: string) { this.src = src; elements.push(this); }
+      async play() {}
+      pause() { this.onpause?.(); }
+    }
+    vi.stubGlobal("Audio", FakeAudio);
+    const {result} = renderHook(() => useNarration(() => '/audio'));
+    await act(async () => { await result.current.play({...prompt, audio: 'audio/test.wav'}); });
+    expect(result.current.status).toBe('loading');
+    act(() => elements[0].onplaying?.());
+    expect(result.current.status).toBe('speaking');
+    act(() => result.current.pause());
+    expect(result.current.status).toBe('paused');
+    act(() => { elements[0].ended = true; elements[0].onended?.(); });
+    expect(result.current.status).toBe('ended');
+    await act(async () => { await result.current.play({...prompt, id: 'new', audio: 'audio/test.wav'}); });
+    act(() => elements[0].onplaying?.());
+    expect(result.current.status).toBe('loading');
+    expect(result.current.prompt_id).toBe('new');
+    act(() => result.current.stop());
+    act(() => elements[1].onplaying?.());
+    expect(result.current.status).toBe('idle');
   });
 });

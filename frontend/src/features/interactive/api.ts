@@ -30,10 +30,10 @@ export function listInteractive(purpose?: InteractivePurpose, q?: string, signal
   if (q?.trim()) params.set("q", q.trim());
   return request<LearningComponents["schemas"]["InteractiveCatalogDTO"]>(`/api/v1/interactive/resources?${params}`, { signal });
 }
-export const getInteractive = (id: string) => request<LearningComponents["schemas"]["InteractiveContentDTO"]>(`/api/v1/interactive/resources/${id}`);
+export const getInteractive = (id: string, signal?: AbortSignal) => request<LearningComponents["schemas"]["InteractiveContentDTO"]>(`/api/v1/interactive/resources/${id}`, { signal });
 export const startInteractive = (id: string, restart = false) => request<InteractiveSession>("/api/v1/interactive/sessions", { method: "POST", body: JSON.stringify({ resource_id: id, restart }) }, true);
-export const getInteractiveSession = (id: string) => request<InteractiveDetail>(`/api/v1/interactive/sessions/${id}`);
-export const getInteractiveDocument = (id: string) => request<LearningComponents["schemas"]["InteractiveDocumentDTO"]>(`/api/v1/interactive/sessions/${id}/document`);
+export const getInteractiveSession = (id: string, signal?: AbortSignal) => request<InteractiveDetail>(`/api/v1/interactive/sessions/${id}`, { signal });
+export const getInteractiveDocument = (id: string, signal?: AbortSignal) => request<LearningComponents["schemas"]["InteractiveDocumentDTO"]>(`/api/v1/interactive/sessions/${id}/document`, { signal });
 export const listInteractiveHistory = (signal?: AbortSignal) => request<LearningComponents["schemas"]["InteractiveHistoryDTO"]>("/api/v1/interactive/sessions", { signal });
 export const saveInteractive = (id: string, payload: { base_revision: number; event_id: string; scene_id?: string | null; game_state?: Record<string, unknown> | null }) => request<InteractiveSession>(`/api/v1/interactive/sessions/${id}/checkpoint`, { method: "PATCH", body: JSON.stringify(payload) }, true);
 export const completeInteractive = (id: string, payload: { base_revision: number; event_id: string; scene_id?: string | null; game_state?: Record<string, unknown> | null; game_result?: Record<string, unknown>; source?: "SDK_REPORTED" | "USER_CONFIRMED" }) => request<InteractiveSession>(`/api/v1/interactive/sessions/${id}/complete`, { method: "POST", body: JSON.stringify(payload) }, true);
@@ -43,5 +43,6 @@ export const adminListInteractiveOverview = () => request<AdminComponents["schem
 export const adminUploadInteractive = (id: string, file: File) => request<AdminComponents["schemas"]["InteractiveVersionDTO"]>(`/api/v1/admin/resources/${id}/interactive-revisions`, { method: "POST", body: file, headers: { "X-Filename": file.name, "Content-Type": file.type || "application/octet-stream" } }, true);
 export const adminSaveInteractiveManifest = (id: string, revision: string, manifest: InteractiveManifest) => request(`/api/v1/admin/resources/${id}/interactive-revisions/${revision}`, { method: "PATCH", body: JSON.stringify(manifest) }, true);
 export const adminActivateInteractive = (id: string, revision: string) => request(`/api/v1/admin/resources/${id}/interactive-revisions/${revision}/activate`, { method: "POST", body: "{}" }, true);
+export const adminCloneInteractive = (id: string, revision: string) => request<AdminComponents["schemas"]["InteractiveVersionDTO"]>(`/api/v1/admin/resources/${id}/interactive-revisions/${revision}/clone`, { method: "POST", body: "{}" }, true);
 export const adminPreviewInteractive = (id: string, revision: string) => request<AdminComponents["schemas"]["InteractivePreviewDTO"]>(`/api/v1/admin/resources/${id}/interactive-revisions/${revision}/preview`);
 export const adminUploadPromptAudio = (id: string, revision: string, prompt: string, file: File) => request(`/api/v1/admin/resources/${id}/interactive-revisions/${revision}/audio/${prompt}`, { method: "PUT", body: file, headers: { "X-Filename": file.name, "Content-Type": file.type || "application/octet-stream" } }, true);

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第4章 函数和递归"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第4章 函数和递归。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 函数\n\n函数封装可复用逻辑。Python 函数可返回多值（元组打包）。\n\n#### 递归三要素\n\n1. 基线条件（base case）：什么时候停止。\n2. 递归条件：如何把问题缩小。\n3. 返回值如何组合。\n\n斐波那契：\n\n```python\ndef fib(n):\n    if n < 2:\n        return n\n    return fib(n-1) + fib(n-2)\n```\n\n朴素递归 O(2ⁿ)，记忆化后 O(n)：\n\n```python\nfrom functools import lru_cache\n@lru_cache\ndef fib(n):\n    return n if n < 2 else fib(n-1) + fib(n-2)\n```\n\n汉诺塔：\n\n```python\ndef hanoi(n, a, b, c):\n    if n == 1:\n        print(a, '->', c)\n        return\n    hanoi(n-1, a, c, b)\n    print(a, '->', c)\n    hanoi(n-1, b, a, c)\n\nhanoi(3, 'A', 'B', 'C')\n```\n\n递归本质是栈：每次函数调用压栈，返回时弹栈。递归深度超过 `sys.setrecursionlimit(100000)` 会爆栈。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-04"
+  ]
+}

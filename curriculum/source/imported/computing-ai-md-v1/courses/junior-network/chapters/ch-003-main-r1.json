@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 3 章 Socket 与 TCP 连接"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 3 章 Socket 与 TCP 连接。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "拿到 IP 后，浏览器要和百度服务器建立连接。这个连接用的是 TCP 协议。\n\nTCP 的思路像打电话：先拨号（三次握手），对方接了才说话；说的时候每句话都确认对方收到了，没收到就重发；说完了双方挂断（四次挥手）。\n\n这样保证数据不丢、不乱序。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-network-topic-03"
+  ]
+}

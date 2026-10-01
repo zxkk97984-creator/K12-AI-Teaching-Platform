@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第6章 对象引用、可变性和垃圾回收"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第6章 对象引用、可变性和垃圾回收。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "Python 变量不是盒子，是标签。赋值 `b = a` 只是贴新标签到同一对象。\n\n```python\na = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)\n```\n\n`==` 比较值，`is` 比较身份（同一对象）。单例比较用 `is None` 而非 `== None`。\n\n浅拷贝 vs 深拷贝：`list(lst)`、`lst[:]`、`copy.copy()` 都是浅拷贝——外层新列表，但元素还是引用。嵌套结构要 `copy.deepcopy()`。\n\n**可变默认参数陷阱**：\n\n```python\nclass HauntedBus:\n    def __init__(self, passengers=[]):\n        self.passengers = passengers\n```\n\n每次不传 passengers 都用同一个列表对象——这是 bug。改用 `None` 作默认值，在 `__init__` 里新建。\n\n`del` 删除的是引用不是对象；对象被回收当引用计数归零。Python 用引用计数为主，辅以分代垃圾回收处理循环引用。\n\n---\n\n## 第二部分 函数即对象"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-06"
+  ]
+}

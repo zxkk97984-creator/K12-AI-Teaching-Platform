@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-010-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第10章 注意力机制"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第10章 注意力机制。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 为什么需要注意力\n\nseq2seq 把整句压成一个向量，长句信息丢失。注意力让解码器每步回头看输入的所有位置，动态加权。\n\n### Query、Key、Value\n\n注意力 = 学一个\"对齐\"权重。Query 是当前要找什么，Key 是每个位置有什么，相似度算出来权重，加权 Value。\n\n### 自注意力与 Transformer\n\n自注意力：序列内部每个词直接和所有词算注意力，不管距离多远。位置编码给词加位置信息。\n\nTransformer（2017，《Attention Is All You Need》）完全抛弃 RNN/CNN，只用自注意力 + 前馈网络，并行训练快、长距离依赖强。这是今天所有大语言模型的基础。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-10"
+  ]
+}

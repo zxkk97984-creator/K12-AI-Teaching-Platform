@@ -1,0 +1,641 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "senior-coding",
+  "title": "编码与计算机系统",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习编码与计算机系统，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "senior-coding-topic-01",
+      "name": "第1章 最好的朋友（电筒密谈）",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第1章 最好的朋友（电筒密谈）」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-02",
+      "name": "第2章 编码与组合",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第2章 编码与组合」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-03",
+      "name": "第3章 布莱叶盲文与二元编码",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第3章 布莱叶盲文与二元编码」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-04",
+      "name": "第4章 手电筒的剖析",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第4章 手电筒的剖析」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-05",
+      "name": "第5章 绕过拐角的通信",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第5章 绕过拐角的通信」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-06",
+      "name": "第6章 逻辑与开关",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第6章 逻辑与开关」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-07",
+      "name": "第7章 电报与继电器",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第7章 电报与继电器」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-08",
+      "name": "第8章 从十进制开始",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第8章 从十进制开始」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-09",
+      "name": "第9章 其他进位制",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第9章 其他进位制」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-10",
+      "name": "第10章 比特与比特",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第10章 比特与比特」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-11",
+      "name": "第11章 字节与十六进制",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第11章 字节与十六进制」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-12",
+      "name": "第12章 从ASCII到Unicode",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第12章 从ASCII到Unicode」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-13",
+      "name": "第13章 用逻辑门做加法",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第13章 用逻辑门做加法」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-14",
+      "name": "第14章 减法呢？",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第14章 减法呢？」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-15",
+      "name": "第15章 反馈与触发器",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第15章 反馈与触发器」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-16",
+      "name": "第16章 组装存储器",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第16章 组装存储器」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-17",
+      "name": "第17章 自动化",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第17章 自动化」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-18",
+      "name": "第18章 从算盘到芯片",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第18章 从算盘到芯片」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-19",
+      "name": "第19章 两个经典微处理器",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第19章 两个经典微处理器」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-20",
+      "name": "高中阶段补充：操作系统与组成原理深化",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「高中阶段补充：操作系统与组成原理深化」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-coding-topic-21",
+      "name": "练习",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「练习」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "第1章 最好的朋友（电筒密谈）",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第1章 最好的朋友（电筒密谈）」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "第2章 编码与组合",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第2章 编码与组合」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "第3章 布莱叶盲文与二元编码",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第3章 布莱叶盲文与二元编码」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "第4章 手电筒的剖析",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第4章 手电筒的剖析」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "第5章 绕过拐角的通信",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第5章 绕过拐角的通信」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "第6章 逻辑与开关",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第6章 逻辑与开关」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-main",
+      "revision": 1,
+      "order_index": 14,
+      "title": "第7章 电报与继电器",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第7章 电报与继电器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-008-main",
+      "revision": 1,
+      "order_index": 16,
+      "title": "第8章 从十进制开始",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第8章 从十进制开始」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-08"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-008-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-009-main",
+      "revision": 1,
+      "order_index": 18,
+      "title": "第9章 其他进位制",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第9章 其他进位制」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-09"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-009-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-010-main",
+      "revision": 1,
+      "order_index": 20,
+      "title": "第10章 比特与比特",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第10章 比特与比特」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-10"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-010-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-011-main",
+      "revision": 1,
+      "order_index": 22,
+      "title": "第11章 字节与十六进制",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第11章 字节与十六进制」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-11"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-011-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-012-main",
+      "revision": 1,
+      "order_index": 24,
+      "title": "第12章 从ASCII到Unicode",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第12章 从ASCII到Unicode」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-12"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-012-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-013-main",
+      "revision": 1,
+      "order_index": 26,
+      "title": "第13章 用逻辑门做加法",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第13章 用逻辑门做加法」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-13"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-013-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-014-main",
+      "revision": 1,
+      "order_index": 28,
+      "title": "第14章 减法呢？",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第14章 减法呢？」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-14"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-014-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-015-main",
+      "revision": 1,
+      "order_index": 30,
+      "title": "第15章 反馈与触发器",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第15章 反馈与触发器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-15"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-015-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-016-main",
+      "revision": 1,
+      "order_index": 32,
+      "title": "第16章 组装存储器",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第16章 组装存储器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-16"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-016-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-017-main",
+      "revision": 1,
+      "order_index": 34,
+      "title": "第17章 自动化",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第17章 自动化」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-17"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-017-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-018-main",
+      "revision": 1,
+      "order_index": 36,
+      "title": "第18章 从算盘到芯片",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第18章 从算盘到芯片」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-18"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-018-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-019-main",
+      "revision": 1,
+      "order_index": 38,
+      "title": "第19章 两个经典微处理器",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第19章 两个经典微处理器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-19"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-019-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-020-main",
+      "revision": 1,
+      "order_index": 40,
+      "title": "高中阶段补充：操作系统与组成原理深化",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「高中阶段补充：操作系统与组成原理深化」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-20"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-020-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-021-main",
+      "revision": 1,
+      "order_index": 42,
+      "title": "练习",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「练习」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-coding-topic-21"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/515db4e64643c360/07-编码.md",
+        "original_sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-021-main-r1.json"
+    }
+  ]
+}

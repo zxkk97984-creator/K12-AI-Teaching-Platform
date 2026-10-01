@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-011-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第11章 字节与十六进制"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第11章 字节与十六进制。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "一个字节 8 位，范围 0~255。十六进制每位对应 4 个二进制位，写起来紧凑。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-11"
+  ]
+}

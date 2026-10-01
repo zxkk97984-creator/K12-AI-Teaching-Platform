@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-010-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "高中阶段补充：数据库 SQL 入门"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：高中阶段补充：数据库 SQL 入门。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 表与查询\n\n关系型数据库用表存数据。`SELECT` 查询：\n\n```sql\nSELECT name, score FROM students WHERE score > 80 ORDER BY score DESC;\n```\n\n`JOIN` 多表连接：\n\n```sql\nSELECT s.name, c.course_name\nFROM students s\nJOIN enrollments e ON s.id = e.student_id\nJOIN courses c ON e.course_id = c.id;\n```\n\n`GROUP BY` 聚合：\n\n```sql\nSELECT course_id, AVG(score) FROM enrollments GROUP BY course_id;\n```\n\n### 索引\n\nB+ 树索引让查询从全表扫描 O(n) 变成 O(log n)。但索引占空间、拖慢写入。\n\n### 事务 ACID\n\n原子性、一致性、隔离性、持久性——数据库出故障也能保证数据不错。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-10"
+  ]
+}

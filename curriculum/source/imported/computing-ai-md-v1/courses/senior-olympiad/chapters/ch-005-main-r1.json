@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-005-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "2.28 再增五道经典 OJ 题"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：2.28 再增五道经典 OJ 题。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 题 8：无重复字符的最长子串\n\n题意：找不含重复字符的最长子串长度。思路：滑动窗口，用哈希表记字符最后出现位置，右指针右移，左指针跳到重复位置之后。O(n)。\n\n```python\ndef length_of_longest_substring(s):\n    last = {}\n    left = 0\n    ans = 0\n    for right, ch in enumerate(s):\n        if ch in last and last[ch] >= left:\n            left = last[ch] + 1\n        last[ch] = right\n        ans = max(ans, right - left + 1)\n    return ans\n```\n\n#### 题 9：合并两个有序链表\n\n题意：把两个升序链表合并成一个升序链表。思路：dummy 头节点，逐个比较两个链表头，接小的那个。\n\n```python\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef merge_two_lists(l1, l2):\n    dummy = ListNode()\n    cur = dummy\n    while l1 and l2:\n        if l1.val <= l2.val:\n            cur.next = l1\n            l1 = l1.next\n        else:\n            cur.next = l2\n            l2 = l2.next\n        cur = cur.next\n    cur.next = l1 if l1 else l2\n    return dummy.next\n```\n\n#### 题 10：买卖股票的最佳时机\n\n题意：每天给股价，只能买一次卖一次，最大利润。思路：遍历过程中维护\"历史最低价\"，每天算\"今天卖能赚多少\"。O(n)。\n\n```python\ndef max_profit(prices):\n    min_price = float('inf')\n    profit = 0\n    for p in prices:\n        if p < min_price:\n            min_price = p\n        elif p - min_price > profit:\n            profit = p - min_price\n    return profit\n```\n\n#### 题 11：岛屿数量\n\n题意：二维网格上 1 是陆地 0 是水，数有几个岛。思路：遍历每个格子，遇到 1 就 DFS/BFS 把整个岛淹成 0，计数 +1。O(mn)。\n\n```python\ndef num_islands(grid):\n    if not grid:\n        return 0\n    rows, cols = len(grid), len(grid[0])\n    count = 0\n    def sink(r, c):\n        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] == '0':\n            return\n        grid[r][c] = '0'\n        sink(r + 1, c); sink(r - 1, c)\n        sink(r, c + 1); sink(r, c - 1)\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == '1':\n                count += 1\n                sink(r, c)\n    return count\n```\n\n#### 题 12：反转链表\n\n题意：反转单链表。思路：三指针 prev/cur/next，逐个反向指。\n\n```python\ndef reverse_list(head):\n    prev = None\n    cur = head\n    while cur:\n        nxt = cur.next\n        cur.next = prev\n        prev = cur\n        cur = nxt\n    return prev\n```\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-olympiad-topic-05"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-015-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第15章 反馈与触发器"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第15章 反馈与触发器。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "把两个非门的输出交叉反馈，就做成了**锁存器（latch）**——能记住 1 bit。再加上时钟控制就是触发器（flip-flop），这是存储器的基本单元。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-15"
+  ]
+}

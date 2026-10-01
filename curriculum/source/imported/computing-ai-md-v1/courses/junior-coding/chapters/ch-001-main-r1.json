@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-001-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 1—2 章 编码与组合"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 1—2 章 编码与组合。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "- **原书**：Code: The Hidden Language of Computer Hardware and Software\n- **作者**：[美] Charles Petzold（查尔斯·佩措尔德）\n- **出版**：电子工业出版社\n- **真实目录来源**：豆瓣读书 https://book.douban.com/subject/38448758/ 、Pearson 出版社官网\n- **本文件说明**：基于该书真实章节结构整理，**非逐字原文**（原书受版权保护）。初中阶段只讲直觉，不画电路图。\n\n---\n\n\"编码\"就是用一种符号代表另一种东西。红绿灯：红=停、绿=行。摩尔斯电码：点和横代表字母。编码的本质是\"约定\"——双方提前说好什么符号代表什么意思。\n\n组合是编码的基础。2 个灯泡，每个有亮/灭两种状态，就能表示 4 种信号：灭灭、灭亮、亮灭、亮亮。灯泡越多，能表示的东西越多。3 个灯泡能表示 8 种，4 个灯泡能表示 16 种。这就是二进制的雏形。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-coding-topic-01"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "3.12 密码学深入"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：3.12 密码学深入。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 3.12.1 常见算法归类\n\n- **对称加密**：DES（已不安全）、AES（现在的标准，128/256 位密钥）、SM4（国密）。\n- **非对称加密**：RSA（基于大整数分解）、ECC（椭圆曲线，密钥更短）。\n- **哈希函数**：MD5（已被碰撞攻破，不能用于安全场景）、SHA-1（同上）、SHA-256（目前安全）、SM3（国密）。\n\n#### 3.12.2 数字签名完整流程\n\n假设 Alice 要给 Bob 发一份合同，证明\"这是我发的、没被改过\"：\n\n1. Alice 先把合同内容算 SHA-256，得到哈希 H；\n2. Alice 用自己的**私钥**加密 H，得到签名 S；\n3. Alice 把合同原文 + 签名 S 一起发给 Bob；\n4. Bob 用 Alice 的**公钥**解密 S，得到 H；\n5. Bob 自己对合同原文再算一次 SHA-256，得到 H'；\n6. 如果 H == H'，说明合同确实是 Alice 发的、没被改过。\n\n这里有个反直觉的点：**签名用私钥、加密用公钥**——别记反了。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-systems-topic-06"
+  ]
+}

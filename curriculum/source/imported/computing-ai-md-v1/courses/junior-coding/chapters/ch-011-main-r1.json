@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-011-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 22—23 章 寄存器与总线、CPU 控制信号"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 22—23 章 寄存器与总线、CPU 控制信号。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "CPU 内部有很多小存储叫寄存器（比内存快得多）。总线是连接 CPU、内存、硬盘的\"高速公路\"，数据在上面跑来跑去。CPU 控制信号就是指挥总线\"现在听谁的、读还是写\"。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-coding-topic-11"
+  ]
+}

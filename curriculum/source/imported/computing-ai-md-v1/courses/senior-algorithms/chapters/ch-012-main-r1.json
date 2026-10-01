@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-012-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "CSP-J/S 衔接建议"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：CSP-J/S 衔接建议。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "CSP-J（入门级）与 CSP-S（提高级）每年 9-10 月举行，是 NOIP 的前置认证。J 组考枚举、模拟、递归、简单 DP、基础数据结构；S 组在此基础上加图论、数论、高级 DP、字符串。建议高一先用本书过 J 组知识点，高二冲 S 组，高三视情况打 NOIP/省选。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-12"
+  ]
+}

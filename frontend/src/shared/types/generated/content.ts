@@ -255,7 +255,7 @@ export interface components {
          * BlockType
          * @enum {string}
          */
-        BlockType: "TITLE" | "SECTION" | "PARAGRAPH" | "KNOWLEDGE_CARD" | "CALLOUT" | "FIGURE";
+        BlockType: "TITLE" | "SECTION" | "PARAGRAPH" | "KNOWLEDGE_CARD" | "CALLOUT" | "FIGURE" | "MARKDOWN";
         /** BookmarkDTO */
         BookmarkDTO: {
             /**

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-007-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第7章 函数是一等对象"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第7章 函数是一等对象。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "在 Python 里函数是对象：可以赋值给变量、作参数传递、作返回值、放进列表字典。\n\n```python\ndef factorial(n):\n    return 1 if n < 2 else n * factorial(n-1)\n\nf = factorial\nprint(f(5))\nprint(list(map(f, range(5))))\n```\n\n高阶函数：`map`、`filter`、`sorted(key=...)`、`functools.reduce`。现在更推荐列表推导替代 map/filter：\n\n```python\nlist(map(factorial, range(6)))\n[factorial(n) for n in range(6)]\nlist(map(factorial, filter(lambda n: n % 2, range(6))))\n[factorial(n) for n in range(6) if n % 2]\n```\n\n`lambda` 只能是表达式，适合作一次性参数。9 种可调用对象包括：函数、内置函数、方法、类、实例（定义了 `__call__`）、生成器函数等。\n\n参数机制：`*args` 收集多余位置参数，`**kwargs` 收集多余关键字参数。仅限关键字参数（keyword-only）在 `*` 之后声明：\n\n```python\ndef f(a, *args, c, **kwargs):\n    pass\n```\n\n`operator` 模块把运算符变成函数（`itemgetter(1)`、`attrgetter('age')`、`methodcaller`），`functools.partial` 冻结部分参数。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-07"
+  ]
+}

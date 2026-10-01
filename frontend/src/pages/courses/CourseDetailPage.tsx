@@ -4,6 +4,8 @@ import { getCourse } from "../../features/content/api";
 import type { CourseSummaryDTO } from "../../features/content/types";
 import { ApiError } from "../../features/identity/api";
 import { ErrorState, LoadingState, StatePanel } from "../../shared/ui/state";
+import { InteractiveLearningLinks } from "../../features/interactive/InteractiveLearningLinks";
+import "../../features/content/reading.css";
 
 type State =
   | { kind: "loading" }
@@ -51,11 +53,12 @@ export function CourseDetailPage() {
 
   return (
     <ContentLayout
+      className="course-detail-page"
       title={state.kind === "ready" ? state.course.title : "课程详情"}
       subtitle={state.kind === "ready" ? state.course.description : undefined}
       toolbar={
-        <a className="content-link" href="/courses">
-          全部课程
+        <a className="content-link" href="/resources">
+          ← 返回资料库
         </a>
       }
     >
@@ -70,25 +73,35 @@ export function CourseDetailPage() {
       ) : null}
       {state.kind === "ready" ? (
         <>
-          <p className="content-note" data-testid="course-meta">
-            主题：{state.course.topic} · 可读章节 {state.course.chapters.length} 个
+          <div className="course-overview" data-testid="course-meta">
+            <div><strong>{state.course.chapters.length}</strong><span>当前可读章节</span></div>
+            <p>{state.course.topic}<br />按章节阅读，进度自动保存。</p>
+            {state.course.chapters[0] ? <a href={`/chapters/${state.course.chapters[0].chapter_id}`}>从第 1 章开始阅读 →</a> : null}
+          </div>
+          <p className="course-content-notice">
+            {state.course.chapters.some((chapter) => chapter.is_test_fixture)
+              ? "这是合成演示课程，按当前学段提供示例章节，用于体验学习流程。"
+              : "本地课程讲义。目录展示当前年级可读的章节，具体来源见章节说明。"}
           </p>
+          <InteractiveLearningLinks revisionIds={state.course.chapters.map((chapter) => chapter.revision_id)} />
+          <div className="course-directory-heading"><h2>章节目录</h2><span>{state.course.chapters.length} 个章节</span></div>
           <ul className="content-chapter-list" data-testid="chapter-list">
-            {state.course.chapters.map((chapter) => (
+            {state.course.chapters.map((chapter, index) => (
               <li key={chapter.chapter_id}>
                 <a
                   className="content-chapter-list__item"
                   href={`/chapters/${chapter.chapter_id}`}
                   data-testid="chapter-link"
                 >
-                  <span>{chapter.title}</span>
-                  <span className="content-chapter-list__meta">
-                    第 {chapter.order_index} 章 · r{chapter.revision}
+                  <span className="course-chapter-number">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="course-chapter-copy"><strong>{chapter.title}</strong><span className="content-chapter-list__meta">
+                    第 {index + 1} 章
                     {chapter.grade_min && chapter.grade_max
                       ? ` · ${chapter.grade_min}–${chapter.grade_max} 年级`
                       : ""}
-                    {chapter.is_test_fixture ? " · 测试内容" : ""}
-                  </span>
+                    {chapter.is_test_fixture ? " · 合成演示章节" : ""}
+                  </span></span>
+                  <span className="course-chapter-open" aria-hidden="true">阅读 →</span>
                 </a>
               </li>
             ))}

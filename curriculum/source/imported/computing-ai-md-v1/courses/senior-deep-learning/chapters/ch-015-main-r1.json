@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-015-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第15章 NLP 应用"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第15章 NLP 应用。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "情感分析（正面/负面）、自然语言推断、用 BERT 微调完成下游任务。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-15"
+  ]
+}

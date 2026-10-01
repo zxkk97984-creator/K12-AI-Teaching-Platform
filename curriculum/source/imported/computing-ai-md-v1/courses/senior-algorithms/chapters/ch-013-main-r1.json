@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-013-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "练习清单"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：练习清单。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "1. 实现冒泡/选择/插入/归并/快排各一遍，对拍验证。\n2. 用并查集做 Kruskal 最小生成树。\n3. 用 DFS 判图是否有环。\n4. 写 LCS 并输出具体子序列。\n5. 把 0-1 背包改成二维 dp 再优化到一维。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-13"
+  ]
+}

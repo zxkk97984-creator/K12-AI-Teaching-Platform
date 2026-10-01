@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import type { ChapterDetailDTO, RenderedBlock, UnknownBlockDTO } from "./types";
 import type { ReadingStateDTO } from "./types";
 import { isUnsupportedBlock } from "./types";
 import "./content.css";
+
+const ChapterMarkdown = lazy(() => import("./ChapterMarkdown").then((module) => ({ default: module.ChapterMarkdown })));
 
 function MarkedText({ text, mark }: { text: string; mark?: string | null }) {
   if (!mark || !text.includes(mark)) return <>{text}</>;
@@ -55,6 +57,8 @@ function FigureBlock({ block }: { block: RenderedBlock }) {
 
 function BlockBody({ block }: { block: RenderedBlock }) {
   switch (block.type) {
+    case "MARKDOWN":
+      return <Suspense fallback={<p role="status">正在排版讲义…</p>}><ChapterMarkdown text={block.text ?? ""} /></Suspense>;
     case "TITLE":
       return <h2 className="content-block__title">{block.text}</h2>;
     case "SECTION":
@@ -197,20 +201,19 @@ export function ChapterReader({
         <h1 className="content-reader__title">{chapter.title}</h1>
         <p className="content-reader__meta" data-testid="chapter-meta">
           版本 r{chapter.revision} ·{" "}
-          {chapter.is_test_fixture
-            ? "测试内容，未作人工教学审校"
-            : "正式发布内容"}
+          {chapter.content_notice ?? (chapter.publication_status === "PUBLISHED"
+            ? "正式发布内容" : "本地学习讲义")}
         </p>
       </header>
 
-      <section className="content-reader__objectives" aria-label="学习目标">
-        <p className="eyebrow">学习目标</p>
+      <details className="content-reader__objectives" aria-label="学习目标">
+        <summary>本章学习目标</summary>
         <ul>
           {chapter.objectives.map((objective) => (
             <li key={objective}>{objective}</li>
           ))}
         </ul>
-      </section>
+      </details>
 
       <div className="content-reader__blocks">
         {chapter.blocks.map((block) => (
@@ -220,7 +223,7 @@ export function ChapterReader({
             data-block-id={block.block_id}
             key={block.block_id}
           >
-            {isUnsupportedBlock(block) ? (
+            {block.type === "TITLE" && block.text === chapter.title ? null : isUnsupportedBlock(block) ? (
               <UnsupportedBlock block={block} />
             ) : (
               <BlockBody block={block} />
@@ -229,8 +232,8 @@ export function ChapterReader({
         ))}
       </div>
 
-      <footer className="content-reader__source">
-        <p className="eyebrow">来源</p>
+      <details className="content-reader__source">
+        <summary>内容来源与版本</summary>
         <p className="content-note">
           许可：{chapter.license_code} · 版本号：r{chapter.revision}
         </p>
@@ -242,7 +245,7 @@ export function ChapterReader({
           知识点：
           {chapter.knowledge_points.map((item) => item.name).join("、")}
         </p>
-      </footer>
+      </details>
     </article>
   );
 }

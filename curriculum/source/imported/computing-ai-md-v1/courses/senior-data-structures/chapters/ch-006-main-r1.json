@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "哈希表与堆"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：哈希表与堆。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "> 哈希表 O(1) 查找，堆是优先队列的底层。\n\n### 堆与堆排序\n\n### 2.19 堆与堆排序\n\n堆是一棵完全二叉树，分**大顶堆**（每个节点 ≥ 孩子）和**小顶堆**（每个节点 ≤ 孩子）。用数组存：下标 `i` 的左孩子是 `2i+1`，右孩子是 `2i+2`，父亲是 `(i-1)//2`。\n\n堆排序的思路：先把数组建成大顶堆，此时最大元素在堆顶；把堆顶和末尾交换，末尾就是已排好的最大值；把剩下的重新堆化，重复。\n\n```python\ndef heapify(arr, n, i):\n    largest = i\n    l = 2 * i + 1\n    r = 2 * i + 2\n    if l < n and arr[l] > arr[largest]:\n        largest = l\n    if r < n and arr[r] > arr[largest]:\n        largest = r\n    if largest != i:\n        arr[i], arr[largest] = arr[largest], arr[i]\n        heapify(arr, n, largest)\n\ndef heap_sort(arr):\n    n = len(arr)\n    for i in range(n // 2 - 1, -1, -1):\n        heapify(arr, n, i)\n    for i in range(n - 1, 0, -1):\n        arr[0], arr[i] = arr[i], arr[0]\n        heapify(arr, i, 0)\n    return arr\n```\n\n时间 O(n log n)，原地排序 O(1) 额外空间，不稳定。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-data-structures-topic-06"
+  ]
+}

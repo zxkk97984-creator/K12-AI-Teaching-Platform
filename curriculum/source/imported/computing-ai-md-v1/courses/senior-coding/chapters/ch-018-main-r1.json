@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-018-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第18章 从算盘到芯片"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第18章 从算盘到芯片。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "计算工具的历史：算盘→机械计算器→继电器计算机→电子管→晶体管→集成电路→微处理器。摩尔定律：晶体管数每 18-24 个月翻一番。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-18"
+  ]
+}

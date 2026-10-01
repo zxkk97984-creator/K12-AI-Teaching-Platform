@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-010-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第10章 数学概念与方法"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第10章 数学概念与方法。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 质数筛法\n\n埃氏筛：\n\n```python\ndef sieve(n):\n    is_prime = [True]*(n+1)\n    is_prime[0] = is_prime[1] = False\n    for i in range(2, int(n**0.5)+1):\n        if is_prime[i]:\n            for j in range(i*i, n+1, i):\n                is_prime[j] = False\n    return [i for i in range(2, n+1) if is_prime[i]]\n```\n\n欧拉筛（线性筛）：\n\n```python\ndef euler_sieve(n):\n    primes = []\n    is_prime = [True]*(n+1)\n    is_prime[0] = is_prime[1] = False\n    for i in range(2, n+1):\n        if is_prime[i]:\n            primes.append(i)\n        for p in primes:\n            if i*p > n: break\n            is_prime[i*p] = False\n            if i % p == 0: break\n    return primes\n```\n\n### GCD / LCM\n\n```python\ndef gcd(a, b):\n    while b:\n        a, b = b, a % b\n    return a\n\ndef lcm(a, b):\n    return a // gcd(a, b) * b\n```\n\n### 快速幂\n\n```python\ndef qpow(a, b, mod):\n    res = 1\n    a %= mod\n    while b:\n        if b & 1:\n            res = res * a % mod\n        a = a * a % mod\n        b >>= 1\n    return res\n```\n\n### KMP 直觉\n\nKMP 用前缀函数（pi 数组）避免重复匹配。pi[i] 是子串 s[0..i] 最长相等真前后缀长度。匹配失败时按 pi 回退，使总复杂度 O(n+m)。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-10"
+  ]
+}

@@ -375,7 +375,7 @@ async def _resolve_visible_target(
                         "测试内容，未作人工教学审校" if resource.is_test_fixture else None
                     ),
                     "route": _resource_route(resource.id, resource.kind),
-                    "has_available_content": available,
+                    "available": available,
                 }
             if require_file:
                 item = await resource_detail(
@@ -403,7 +403,7 @@ async def _resolve_visible_target(
                     if resource.is_test_fixture
                     else None,
                     "route": _resource_route(resource.id, resource.kind),
-                    "has_available_content": any(
+                    "available": any(
                         _resource_variant_available(variant, settings) for variant in variants
                     ),
                 }
@@ -423,7 +423,7 @@ async def _resolve_visible_target(
             "is_test_fixture": item.is_test_fixture,
             "content_notice": item.content_notice,
             "route": _resource_route(item.id, item.kind),
-            "has_available_content": any(variant.available for variant in item.variants),
+            "available": any(variant.available for variant in item.variants),
         }
 
     try:
@@ -543,6 +543,20 @@ async def _catalog_items(
                 "content_notice": resource.content_notice,
                 "route": _resource_route(resource.id, resource.kind),
             }
+            if resource.kind == "INTERACTIVE":
+                revision = await db.scalar(
+                    select(InteractiveRevision).where(
+                        InteractiveRevision.id == resource.active_interactive_revision_id,
+                        InteractiveRevision.resource_id == resource.id,
+                    )
+                )
+                available = bool(
+                    revision and store_for(settings).exists(revision.document_storage_key)
+                )
+            else:
+                available = any(variant.available for variant in resource.variants)
+            values["available"] = available
+            values["unavailable_reason"] = None if available else "RESOURCE_FILE_MISSING"
             items.append(_item_projection(values))
 
     if kind in (None, "ANIMATION"):
@@ -645,9 +659,7 @@ async def _bookmark_projection(
         target_id=row.target_id,
         settings=settings,
     )
-    if target is None or (
-        row.target_kind == "RESOURCE" and not target.get("has_available_content", False)
-    ):
+    if target is None or (row.target_kind == "RESOURCE" and not target.get("available", False)):
         return BookmarkDTO(
             kind=kind,  # type: ignore[arg-type]
             id=row.target_id,
@@ -825,7 +837,7 @@ async def record_open_event(
     )
     if target is None:
         raise _not_visible()
-    if payload.target_kind == "RESOURCE" and not target.get("has_available_content", False):
+    if payload.target_kind == "RESOURCE" and not target.get("available", False):
         # A missing file is not an explicit successful open. Keep any bookmark
         # so the student can remove it, but do not create misleading history.
         raise _not_visible()

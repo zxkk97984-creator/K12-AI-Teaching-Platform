@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-008-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第8章 函数中的类型提示"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第8章 函数中的类型提示。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "类型提示（type hints）是可选注解，运行时不检查。mypy 等工具静态检查。\n\n```python\ndef greet(name: str) -> str:\n    return 'Hello, ' + name\n\ndef show_count(count: int, word: str, plural: str = '') -> str:\n    if count == 1:\n        return f'1 {word}'\n    return f'{count} {plural or word + \"s\"}'\n```\n\n常用类型：`Optional[X]` 表示 X 或 None，`Union[X, Y]`，`List[int]`、`Dict[str, int]`、`Tuple[int, ...]`。高中阶段知道怎么读注解即可。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-08"
+  ]
+}

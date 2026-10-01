@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-013-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第13章 用逻辑门做加法"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第13章 用逻辑门做加法。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "半加器（half adder）：两个 bit 相加，和 = XOR，进位 = AND。全加器把进位也加进来。把 8 个全加器串起来就是 8 位加法器。\n\n```python\ndef half_adder(a, b):\n    s = a ^ b\n    c = a & b\n    return s, c\n\ndef full_adder(a, b, cin):\n    s1, c1 = half_adder(a, b)\n    s2, c2 = half_adder(s1, cin)\n    return s2, c1 | c2\n```"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-13"
+  ]
+}

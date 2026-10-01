@@ -97,6 +97,8 @@ CODELAB_E2E_BASE_URL=http://127.0.0.1:15174 E2E_CODELAB_STAGE=JUNIOR \
 
 ## 验证入口与结果范围
 
+资源文件浏览器验收 `frontend/src/e2e/resources.spec.ts` 默认跳过，只有设置 `K12_RESOURCE_E2E=1` 后才启用，并在登录和上传前核对 `/health/live` 的 `environment` 为 `test`。它不能再连接开发库创建测试资料。
+
 `./k12 check` 使用隔离数据库和 fixture 网关，不发起真实 Knodo 调用。浏览器合成回归使用拦截 API，验证实际页面交互；真实模型调用需单独执行：
 
 ```bash

@@ -39,6 +39,7 @@ from app.modules.interactive.service import (
     activate_version,
     add_prompt_audio,
     catalog,
+    clone_draft,
     list_versions,
     owned_session,
     save_event,
@@ -263,6 +264,30 @@ async def admin_activate(
             db,
             resource_id=resource_id,
             revision_id=revision_id,
+            settings=request.app.state.settings,
+        )
+    except InteractiveError as caught:
+        fail(caught)
+
+
+@admin_router.post(
+    "/admin/resources/{resource_id}/interactive-revisions/{revision_id}/clone",
+    response_model=InteractiveVersionDTO,
+    dependencies=[Depends(csrf_dependency)],
+)
+async def admin_clone(
+    resource_id: uuid.UUID,
+    revision_id: uuid.UUID,
+    request: Request,
+    context: SessionContext = Depends(require_admin),
+    db: AsyncSession = Depends(get_session),
+) -> dict[str, Any]:
+    try:
+        return await clone_draft(
+            db,
+            resource_id=resource_id,
+            revision_id=revision_id,
+            actor=context.user,
             settings=request.app.state.settings,
         )
     except InteractiveError as caught:
@@ -519,7 +544,11 @@ async def activity_history(
             and resource.active_interactive_revision_id
             and (
                 resource.publication_status == "PUBLISHED"
-                or (resource.is_test_fixture and request.app.state.settings.app_env != "production")
+                or (
+                    (resource.is_test_fixture or resource.local_demo_visible)
+                    and resource.publication_status != "WITHDRAWN"
+                    and request.app.state.settings.app_env != "production"
+                )
             )
         )
         items.append(item)

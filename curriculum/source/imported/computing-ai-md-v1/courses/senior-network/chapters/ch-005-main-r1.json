@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-005-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第5章 网络层：控制平面"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第5章 网络层：控制平面。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 路由算法\n\n链路状态（OSPF）：每台路由器泛洪自己的链路信息，全网有完整拓扑，各自跑 Dijkstra。距离矢量（RIP）：邻居间互传\"到各网络的距离\"， Bellman-Ford 迭代收敛。\n\n###  BGP\n\n边界网关协议，连接各个自治系统（AS），是互联网的\"交通部长\"。\n\n### SDN\n\n软件定义网络：把控制逻辑集中到中心控制器，路由器只负责转发。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-05"
+  ]
+}

@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * T20 browser chain: real FastAPI + real PostgreSQL (dev DB) + real Chrome
+ * T20 browser chain: real FastAPI + isolated test PostgreSQL + real Chrome
  * through the Vite same-origin proxy.
  *
  * It registers and uploads *real* files (a Word document, a PowerPoint deck
@@ -32,6 +32,7 @@ const RUN_ID = `t30-${Date.now()}`;
 const DOC_TITLE = `合成 Word 资源 ${RUN_ID}`;
 const SLIDES_TITLE = `合成 PPT 资源 ${RUN_ID}`;
 const VIDEO_TITLE = `合成教学视频 ${RUN_ID}`;
+test.skip(process.env.K12_RESOURCE_E2E !== "1", "Resource acceptance requires an explicit isolated test API");
 
 async function signIn(page: Page, account: { username: string; password: string }) {
   await page.goto("/login");
@@ -70,6 +71,9 @@ test("real docx/pptx/video open for a student, then withdrawal kills the old lin
   page,
 }) => {
   test.slow();
+  const health = await page.request.get("/health/live");
+  expect(health.ok()).toBe(true);
+  expect((await health.json()).environment, "Resource acceptance must never write to development data").toBe("test");
   await signIn(page, admin);
   await expect(page).toHaveURL(/\/$/);
 

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-009-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 9 章 类"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 9 章 类。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 9.1 创建和使用类\n\n类是图纸，对象是按图纸造出来的具体东西。比如\"学生\"是一个类，\"小红\"是这个类的一个具体对象。\n\n```python\nclass Dog:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\n    def sit(self):\n        print(f\"{self.name} 坐下了\")\n\nmy_dog = Dog(\"旺财\", 3)\nmy_dog.sit()\n```\n\n`__init__` 是构造方法，创建对象时自动调用；`self` 代表对象自己。\n\n#### 9.2 继承\n\n```python\nclass Car:\n    def __init__(self, make, model, year):\n        self.make = make\n        self.model = model\n        self.year = year\n\nclass ElectricCar(Car):\n    def __init__(self, make, model, year):\n        super().__init__(make, model, year)\n        self.battery = 75\n\ntesla = ElectricCar(\"tesla\", \"model 3\", 2024)\n```\n\n`ElectricCar(Car)` 表示继承 Car，自动拥有 Car 的所有方法。\n\n**练习**：定义一个 `Student` 类，有姓名和分数两个属性，有一个 `show` 方法打印信息。\n\n**常见误区**：`__init__` 前后是两个下划线，不是一个。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-09"
+  ]
+}

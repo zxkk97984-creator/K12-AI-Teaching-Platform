@@ -36,6 +36,7 @@ from app.config import Settings
 from app.core.database import get_engine
 from app.modules.content.importer import ContentImportError, import_package
 from app.modules.content.legacy import convert_course
+from app.modules.content.markdown_import import convert_markdown
 from app.modules.content.package import PackageValidationError, load_package
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -101,6 +102,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
+    markdown = sub.add_parser("convert-md", help="convert supplied Markdown lectures")
+    markdown.add_argument("--source-dir", type=Path, required=True)
+    markdown.add_argument("--output-dir", type=Path, required=True)
+
     convert = sub.add_parser("convert", help="convert legacy chapters into source files")
     convert.add_argument("--course-file", action="append", default=None)
     convert.add_argument("--release-dir", default=None)
@@ -120,6 +125,9 @@ def main(argv: list[str] | None = None) -> int:
     importer.set_defaults(handler=None)
 
     args = parser.parse_args(argv)
+    if args.command == "convert-md":
+        print(json.dumps(convert_markdown(args.source_dir, args.output_dir), ensure_ascii=False))
+        return 0
     if args.command == "convert":
         if not args.course_file and not args.release_dir:
             parser.error("convert needs --course-file or --release-dir")

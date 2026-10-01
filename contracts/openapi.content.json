@@ -1451,7 +1451,8 @@
           "PARAGRAPH",
           "KNOWLEDGE_CARD",
           "CALLOUT",
-          "FIGURE"
+          "FIGURE",
+          "MARKDOWN"
         ],
         "title": "BlockType"
       },

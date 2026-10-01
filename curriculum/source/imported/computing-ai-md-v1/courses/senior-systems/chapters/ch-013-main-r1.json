@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-013-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "3.14 计算思维与问题求解"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：3.14 计算思维与问题求解。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "最后回到方法论。计算机科学家解决问题的套路可以归纳为四点：\n\n1. **分解（decomposition）**：把大问题拆成小问题；\n2. **模式识别（pattern recognition）**：看看这个小问题像不像以前见过的；\n3. **抽象（abstraction）**：忽略不重要的细节，只保留关键变量；\n4. **算法（algorithm）**：设计一步步的解法。\n\n遇到一个陌生题，别急着写代码。先花 5 分钟想：这个问题本质是什么？输入是什么、输出是什么？最小例子怎么解？暴力解法是什么？暴力解法哪里慢？能不能用哈希表、排序、DP、图把它加速？这套思路比背任何模板都重要。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-systems-topic-13"
+  ]
+}

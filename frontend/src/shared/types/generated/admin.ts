@@ -372,6 +372,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/resources/{resource_id}/interactive-revisions/{revision_id}/clone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Clone */
+        post: operations["admin_clone_api_v1_admin_resources__resource_id__interactive_revisions__revision_id__clone_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/resources/{resource_id}/interactive-revisions/{revision_id}/preview": {
         parameters: {
             query?: never;
@@ -875,6 +892,11 @@ export interface components {
              * @default false
              */
             is_test_fixture: boolean;
+            /**
+             * Local Demo Visible
+             * @default false
+             */
+            local_demo_visible: boolean;
         };
         /**
          * ResourcePatchRequest
@@ -883,6 +905,8 @@ export interface components {
         ResourcePatchRequest: {
             /** Title */
             title?: string | null;
+            /** Local Demo Visible */
+            local_demo_visible?: boolean | null;
             /** Description */
             description?: string | null;
             /** Grade Min */
@@ -946,6 +970,11 @@ export interface components {
             publication_status: string;
             /** Is Test Fixture */
             is_test_fixture: boolean;
+            /**
+             * Local Demo Visible
+             * @default false
+             */
+            local_demo_visible: boolean;
             /** Content Notice */
             content_notice: string | null;
             /** Chapter Revision Ids */
@@ -2011,6 +2040,44 @@ export interface operations {
         };
     };
     admin_activate_api_v1_admin_resources__resource_id__interactive_revisions__revision_id__activate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                resource_id: string;
+                revision_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InteractiveVersionDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_clone_api_v1_admin_resources__resource_id__interactive_revisions__revision_id__clone_post: {
         parameters: {
             query?: never;
             header?: {

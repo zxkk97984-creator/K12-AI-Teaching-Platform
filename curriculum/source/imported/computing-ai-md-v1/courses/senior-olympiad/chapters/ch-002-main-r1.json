@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "2.27 CSP-J/S 考纲与题型分布"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：2.27 CSP-J/S 考纲与题型分布。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "CSP-J/S 笔试（机试）一般考 4 道题，限时 4 小时，满分 400。题型与知识点分布大致：\n\n| 题号 | 难度 | 常考知识点 |\n|---|---|---|\n| T1 | 水题 | 模拟、枚举、简单数学 |\n| T2 | 简单 | 排序、贪心、简单 DP、哈希 |\n| T3 | 中等 | DP、图论、搜索、数据结构 |\n| T4 | 较难 | 高级 DP、树/图、数论、字符串 |\n\nCSP-J 整体偏简单，CSP-S 接近 NOIP 难度。备考策略：T1/T2 必须拿到分，T3 尽量拿部分分（暴力），T4 先写暴力拿 20–40 分。**部分分思想**很重要——数据范围小的子任务先用暴力过，别死磕满分做法。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-olympiad-topic-02"
+  ]
+}

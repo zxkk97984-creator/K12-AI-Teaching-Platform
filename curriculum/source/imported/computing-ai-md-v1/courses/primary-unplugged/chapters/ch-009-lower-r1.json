@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-009-lower",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "写在最后"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：写在最后。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "这 13 个活动不需要电脑，但它们讲的就是计算机最核心的道理：二进制、一步步指令、比较排序、加密、网络寄信、计算思维。\n\n以后你坐在电脑前写 Scratch 的时候，会突然想起这些游戏——原来积木背后是这个道理。\n\n计算机科学不是一门要考试的课，它是一种新的思考方式。玩着玩着，你就学会了。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "primary-unplugged-topic-09"
+  ]
+}

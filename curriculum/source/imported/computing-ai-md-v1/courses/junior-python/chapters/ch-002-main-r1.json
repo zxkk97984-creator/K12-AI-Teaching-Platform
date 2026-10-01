@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 2 章 变量和简单数据类型"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 2 章 变量和简单数据类型。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 2.1 变量\n\n变量就是给一个数据起名字，方便以后使用。你可以把它想象成一个贴了标签的盒子，盒子里装着数据。\n\n```python\nmessage = \"Hello Python world!\"\nprint(message)\n```\n\n你随时可以改变盒子里装的东西：\n\n```python\nmessage = \"Hello Python world!\"\nprint(message)\nmessage = \"Python is fun.\"\nprint(message)\n```\n\n变量名只能用字母、数字、下划线，不能以数字开头，不能有空格。比如 `message_1` 合法，`1message` 和 `message-1` 不合法。Python 约定俗成用小写字母加下划线命名，比如 `user_name` 而不是 `UserName`。\n\n#### 2.2 字符串\n\n字符串就是文字，用单引号或双引号包起来：\n\n```python\nname = \"ada lovelace\"\nprint(name.title())\nprint(name.upper())\nprint(name.lower())\n```\n\n`.title()` 每个单词首字母大写，`.upper()` 全大写，`.lower()` 全小写。\n\n拼接字符串用 f-string（Python 3.6 以后推荐）：\n\n```python\nfirst = \"ada\"\nlast = \"lovelace\"\nfull = f\"{first} {last}\"\nprint(f\"Hello, {full.title()}!\")\n```\n\nf-string 在引号前加 `f`，里面用 `{}` 嵌变量，比用 `+` 拼接清楚得多。\n\n其他常用字符串操作：\n\n```python\nprint(\"  hello  \".strip())\nprint(\"hello\".replace(\"l\", \"L\"))\nprint(\"a,b,c\".split(\",\"))\nprint(\"hello\".count(\"l\"))\n```\n\n`.strip()` 去首尾空格；`.replace(旧, 新)` 替换；`.split(分隔符)` 把字符串切成列表；`.count(子串)` 数字串出现几次。\n\n#### 2.3 数字\n\n```python\nprint(2 + 3)\nprint(3 ** 2)\nprint(10 % 3)\nprint(10 // 3)\nprint(10 / 3)\n```\n\n`**` 是乘方；`%` 取余；`//` 整除；`/` 普通除法（结果一定是小数）。注意 `0.1 + 0.2` 不等于 `0.3`，这是浮点数近似存储的普遍现象，不是 bug。\n\n#### 2.4 注释与 Python 之禅\n\n注释用 `#`，给人看，Python 不执行。写代码时要写注释说明\"为什么这么做\"。在交互式环境输入 `import this` 会看到《Python 之禅》。\n\n**练习**：\n1. 建三个变量存你的姓名、年龄、身高，用 f-string 打印一句话。\n2. 输入圆的半径，输出面积（π 取 3.14159）。\n\n**常见误区**：字符串和数字不能直接相加，比如 `\"age\" + 13` 会报错，要先 `str(13)` 转字符串。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-02"
+  ]
+}

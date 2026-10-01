@@ -1,0 +1,191 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "senior-ml",
+  "title": "机器学习实战",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习机器学习实战，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "senior-ml-topic-01",
+      "name": "1.1 机器学习的数学直觉",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「1.1 机器学习的数学直觉」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-ml-topic-02",
+      "name": "1.11 机器学习工程流程深化",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「1.11 机器学习工程流程深化」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-ml-topic-03",
+      "name": "1.16 损失函数与评估指标再梳理",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「1.16 损失函数与评估指标再梳理」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-ml-topic-04",
+      "name": "1.2 常见算法速览",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「1.2 常见算法速览」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-ml-topic-05",
+      "name": "1.7 完整小项目：鸢尾花分类（scikit-learn）",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「1.7 完整小项目：鸢尾花分类（scikit-learn）」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-ml-topic-06",
+      "name": "1.13 第二个完整小项目：MNIST 手写数字识别",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「1.13 第二个完整小项目：MNIST 手写数字识别」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "1.1 机器学习的数学直觉",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「1.1 机器学习的数学直觉」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-ml-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/d37f0902f7eded64/05-机器学习实战.md",
+        "original_sha256": "d37f0902f7eded64ca407cbdb760262a049c63a4b0c40930f12d02d9d0a5bd24",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "1.11 机器学习工程流程深化",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「1.11 机器学习工程流程深化」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-ml-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/d37f0902f7eded64/05-机器学习实战.md",
+        "original_sha256": "d37f0902f7eded64ca407cbdb760262a049c63a4b0c40930f12d02d9d0a5bd24",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "1.16 损失函数与评估指标再梳理",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「1.16 损失函数与评估指标再梳理」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-ml-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/d37f0902f7eded64/05-机器学习实战.md",
+        "original_sha256": "d37f0902f7eded64ca407cbdb760262a049c63a4b0c40930f12d02d9d0a5bd24",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "1.2 常见算法速览",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「1.2 常见算法速览」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-ml-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/d37f0902f7eded64/05-机器学习实战.md",
+        "original_sha256": "d37f0902f7eded64ca407cbdb760262a049c63a4b0c40930f12d02d9d0a5bd24",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "1.7 完整小项目：鸢尾花分类（scikit-learn）",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「1.7 完整小项目：鸢尾花分类（scikit-learn）」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-ml-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/d37f0902f7eded64/05-机器学习实战.md",
+        "original_sha256": "d37f0902f7eded64ca407cbdb760262a049c63a4b0c40930f12d02d9d0a5bd24",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "1.13 第二个完整小项目：MNIST 手写数字识别",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「1.13 第二个完整小项目：MNIST 手写数字识别」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-ml-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/d37f0902f7eded64/05-机器学习实战.md",
+        "original_sha256": "d37f0902f7eded64ca407cbdb760262a049c63a4b0c40930f12d02d9d0a5bd24",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    }
+  ]
+}

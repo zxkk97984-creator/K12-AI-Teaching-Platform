@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-008-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第8章 循环神经网络"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第8章 循环神经网络。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 序列模型\n\n文本、语音、时间序列是有序的。RNN 有隐藏状态：`h_t = f(x_t, h_{t-1})`，一步步处理序列。\n\n### 文本预处理\n\n把文本切成词元（token），建词表，转成整数索引。\n\n### RNN 从零实现\n\n```python\ndef rnn_step(x, h, Wx, Wh, b):\n    return np.tanh(x @ Wx + h @ Wh + b)\n```\n\n### 通过时间反向传播（BPTT）\n\n把 RNN 按时间展开成深网络，再反向传播。容易梯度消失/爆炸——这就是后来 LSTM/GRU 要解决的问题。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-08"
+  ]
+}

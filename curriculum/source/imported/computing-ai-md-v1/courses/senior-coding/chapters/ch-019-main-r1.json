@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-019-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第19章 两个经典微处理器"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第19章 两个经典微处理器。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "8080 和 6502 是早期微处理器。它们都从内存取指令，指令分为数据传送、算术运算、跳转控制三类。理解了它们就理解了现代 CPU 的祖先。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-19"
+  ]
+}

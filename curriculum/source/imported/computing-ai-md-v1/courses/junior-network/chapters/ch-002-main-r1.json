@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 2 章 DNS：把域名翻译成 IP 地址"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 2 章 DNS：把域名翻译成 IP 地址。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "但电脑之间通信靠的是 IP 地址（比如 `180.101.50.242`），不是域名。所以浏览器得先问 DNS 服务器：\"www.baidu.com 的 IP 是多少？\"\n\nDNS 就像电话簿：你记着朋友的名字，要打电话得先查号码。DNS 服务器全球分布，一级一级查，最后拿到百度的 IP 地址。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-network-topic-02"
+  ]
+}

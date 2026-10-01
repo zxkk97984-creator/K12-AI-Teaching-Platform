@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-009-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第9章 装饰器和闭包"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第9章 装饰器和闭包。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "装饰器是语法糖：`@deco` 等价于 `func = deco(func)`。装饰器在模块导入时立即执行。\n\n```python\ndef decorate(func):\n    def inner():\n        print('before')\n        func()\n        print('after')\n    return inner\n\n@decorate\ndef say_hi():\n    print('hi')\n\nsay_hi()\n```\n\n**闭包**：内层函数记住了外层函数的变量，即使外层已返回。\n\n```python\ndef make_averager():\n    series = []\n    def averager(new_value):\n        series.append(new_value)\n        return sum(series) / len(series)\n    return averager\n\navg = make_averager()\nprint(avg(10))\nprint(avg(11))\n```\n\n`nonlocal` 声明把变量标记为自由变量（用于不可变类型需要重新赋值时）。\n\n标准库装饰器：`@functools.cache`（备忘/记忆化）、`@lru_cache`、`@functools.wraps`（保留原函数元数据）。\n\n```python\nfrom functools import lru_cache\n\n@lru_cache\ndef fib(n):\n    return n if n < 2 else fib(n-1) + fib(n-2)\n```\n\n参数化装饰器需要三层嵌套。**练习**：写一个计时装饰器 `@clock`，打印函数运行时间。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-09"
+  ]
+}

@@ -150,6 +150,8 @@ async def build_plan(db: AsyncSession, package: LoadedPackage) -> ImportPlan:
             problems.append("source_kind")
         if release.is_test_fixture != package.release.is_test_fixture:
             problems.append("is_test_fixture")
+        if release.local_demo_visible != package.release.local_demo_visible:
+            problems.append("local_demo_visible")
         if problems:
             raise ReleaseConflict(
                 f"release {package.release.release_key} already exists with different "
@@ -282,6 +284,7 @@ async def _apply_plan(db: AsyncSession, plan: ImportPlan) -> None:
             release_key=package.release.release_key,
             source_kind=package.release.source_kind.value,
             is_test_fixture=package.release.is_test_fixture,
+            local_demo_visible=package.release.local_demo_visible,
             description=package.release.description,
             manifest_hash=package.manifest_hash,
         )

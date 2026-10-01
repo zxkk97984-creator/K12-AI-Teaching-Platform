@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-017-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第17章 自动化"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第17章 自动化。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "把程序指令存在存储器里，CPU 自动一条接一条取指译码执行——这就是**冯·诺依曼结构**。指令周期：取指→译码→执行，循环往复。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-17"
+  ]
+}

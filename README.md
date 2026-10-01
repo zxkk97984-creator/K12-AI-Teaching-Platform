@@ -37,7 +37,7 @@
 | 模块 | 当前入口与能力 |
 | --- | --- |
 | 学习首页 | `/workbench`：四学段布局、学习入口、书架和继续学习 |
-| 资源与阅读 | `/resources`、`/study`：资料筛选、课程、书架、收藏和阅读历史；`/books/:bookSlug` 提供三本内置教材；`/picturebooks` 提供小学绘本续读 |
+| 资源与阅读 | `/resources` 区分专题教材、课程讲义、资料与讲解，默认收起合成演示课程；`/study` 提供书架和阅读历史；20 门导入课程可逐章阅读，正文支持章节目录、专注阅读和字号调整；`/books/:bookSlug` 提供三本内置教材；`/picturebooks` 提供小学绘本续读 |
 | AI 教师 | `/conversations`：按学段选择小学／初中／高中教师，无课程提问、历史会话、回复生成练习；桌宠支持页面提问；`/study/lesson` 提供课程课堂 |
 | 互动内容 | `/animations` 讲解、`/activities` 探索、`/practice` 小学小游戏；`/interactive/:resourceId` 支持场景、进度保存、恢复和重试 |
 | 学科练习 | `/practice`：按章节或教师回复生成、答题与提示、草稿、结果回顾、收藏；初高中提供错题入口 |
@@ -48,6 +48,13 @@
 
 内置教材源文件在 `frontend/src/features/books/content/`；绘本和学段知识点示例的唯一维护源为
 `curriculum/source/synthetic/k12-demo-v1/student-content.json`。它们是预置内容，不冒充实时 AI 生成。
+首批内置 HTML 讲解覆盖四学段：AI 认图片、二进制卡片、条件与循环、二分查找。学生操作后可保存和续学，桌宠朗读固定场景台词，字幕始终可看。
+新导入讲义保留 Markdown 代码块、表格、公式和来源说明；小学低段选取基础章节，高段可读完整小学内容。
+课程源在 `curriculum/source/imported/computing-ai-md-v1/`，互动源在 `curriculum/interactive/computing-ai-v1/`；
+`./k12 setup` 会幂等导入，已存在的学习记录与版本保留。本批内容标记为本地演示可见，审核状态如实保存。
+
+导入讲义是按主题整理的本地学习材料，不代表所参考出版书籍的全文。资料卡显示当前年级可读章节数，合成演示课可通过“显示演示内容”查看。新增小学、初中、高中原创教材的固定文件格式、章节与篇幅要求见[教材生成 Prompt](docs/operations/BOOK_CONTENT_PROMPT.md)，生成包交回项目后再转换并导入现有课程协议。
+
 互动内容支持 HTML 或 ZIP 包，制作与导入规则见[互动内容接入说明](docs/operations/INTERACTIVE_CONTENT.md)。
 [趣味答题小游戏](docs/competition/趣味答题小游戏.html) 保留为可独立打开的演示素材。
 

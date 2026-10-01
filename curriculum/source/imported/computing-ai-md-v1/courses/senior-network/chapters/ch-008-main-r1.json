@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-008-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第8章 网络安全"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第8章 网络安全。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 对称加密与非对称加密\n\n对称加密（AES）：加密解密用同一把密钥，快但密钥分发难。非对称加密（RSA）：公钥加密、私钥解密，解决分发问题但慢。\n\n### 哈希与数字签名\n\n哈希（SHA-256）把任意数据压成定长摘要，不可逆。数字签名：用私钥对摘要签名，任何人用公钥验证，证明内容没被篡改且来自本人。\n\n### HTTPS 握手\n\n浏览器先验证服务器证书（由 CA 签发）→协商会话密钥→之后用对称加密传数据。这就是小锁图标背后的过程。\n\n### 防火墙与入侵检测\n\n防火墙按规则过滤进出流量。入侵检测系统嗅探可疑行为。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-08"
+  ]
+}

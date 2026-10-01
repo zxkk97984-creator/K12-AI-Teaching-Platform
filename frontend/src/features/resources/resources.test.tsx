@@ -50,7 +50,7 @@ function resource(overrides: Partial<ResourceSummary> = {}): ResourceSummary {
     license_note: "",
     review_status: "HUMAN_APPROVED",
     publication_status: "PUBLISHED",
-    is_test_fixture: false,
+    is_test_fixture: false, local_demo_visible: false,
     content_notice: null,
     chapter_revision_ids: [],
     knowledge_point_slugs: [],

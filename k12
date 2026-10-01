@@ -219,6 +219,9 @@ run_setup() {
       uv run --locked python -m app.scripts.import_content import \
         --release-dir ../curriculum/source/synthetic/k12-demo-v1 --apply \
         --mirror-dir ../curriculum/releases
+      uv run --locked python -m app.scripts.import_content import \
+        --release-dir ../curriculum/source/imported/computing-ai-md-v1 --apply \
+        --mirror-dir ../curriculum/releases
     fi
     uv run --locked python -m app.modules.codelab.importer --catalog-root ../curriculum/code-tasks
     if [ "${APP_ENV:-development}" != production ] \
@@ -229,6 +232,9 @@ run_setup() {
       && [ -n "${T05_DEMO_ADMIN_USERNAME:-}" ] \
       && [ -n "${T05_DEMO_ADMIN_PASSWORD:-}" ]; then
       uv run --locked python -m app.modules.identity.demo
+    fi
+    if [ "${APP_ENV:-development}" != production ]; then
+      uv run --locked python -m app.scripts.import_learning_activities
     fi
   )
   printf '依赖、隔离数据库、迁移和课程已就绪；运行 ./k12 start --build 或 ./k12 dev。\n'

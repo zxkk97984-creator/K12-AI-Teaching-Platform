@@ -370,3 +370,17 @@
   gap: var(--sl-space-2);
   margin-top: var(--sl-space-3);
 }
+
+.chapter-markdown { line-height: 1.85; overflow-wrap: anywhere; }
+.chapter-markdown > :first-child { margin-top: 0; }
+.chapter-markdown h3, .chapter-markdown h4 { margin: 1.4em 0 .6em; }
+.chapter-markdown ul, .chapter-markdown ol { padding-inline-start: 1.6em; }
+.chapter-markdown blockquote { margin: 1em 0; padding: .6em 1em; border-left: 3px solid #92ada2; background: #f4f8f5; }
+.chapter-markdown pre { max-width: 100%; overflow: auto; padding: 1em; border-radius: 12px; background: #f2f4f3; line-height: 1.6; }
+.chapter-markdown pre code { white-space: pre; overflow-wrap: normal; }
+.chapter-markdown :not(pre) > code { background: #f0f3f1; padding: .1em .3em; border-radius: 4px; }
+.chapter-table-scroll { max-width: 100%; overflow-x: auto; margin: 1em 0; }
+.chapter-markdown table { width: 100%; border-collapse: collapse; font-size: .94em; }
+.chapter-markdown th, .chapter-markdown td { border: 1px solid #dce4df; padding: .6em .8em; text-align: left; min-width: 90px; }
+.chapter-markdown th { background: #eef4ef; }
+.chapter-markdown .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: .25em 0; }

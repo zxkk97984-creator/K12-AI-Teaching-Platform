@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第2章 编码与组合"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第2章 编码与组合。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "Morse 码用点和划的不同组合表示字母。短码给常用字母（E 是一个点），长码给生僻字母——这就是变长编码思想的萌芽。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-02"
+  ]
+}

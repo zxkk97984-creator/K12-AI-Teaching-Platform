@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "2.15 常用算法模板"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：2.15 常用算法模板。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 2.15.1 快速读入（竞赛向）\n\nPython 在竞赛里慢，输入大时用 `sys.stdin.read()` 一次性读完再切分，比 `input()` 快几倍：\n\n```python\nimport sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    n = int(next(it))\n    arr = [int(next(it)) for _ in range(n)]\n\nmain()\n```\n\n#### 2.15.2 并查集\n\n并查集用来回答\"两个元素是否在同一集合\"\"合并两个集合\"，是 Kruskal 最小生成树、连通块计数的核心数据结构：\n\n```python\nclass UnionFind:\n    def __init__(self, n):\n        self.parent = list(range(n))\n        self.rank = [0] * n\n    def find(self, x):\n        if self.parent[x] != x:\n            self.parent[x] = self.find(self.parent[x])\n        return self.parent[x]\n    def union(self, a, b):\n        ra, rb = self.find(a), self.find(b)\n        if ra == rb:\n            return False\n        if self.rank[ra] < self.rank[rb]:\n            ra, rb = rb, ra\n        self.parent[rb] = ra\n        if self.rank[ra] == self.rank[rb]:\n            self.rank[ra] += 1\n        return True\n```\n\n路径压缩 + 按秩合并后，单次操作几乎是 O(1)。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-olympiad-topic-06"
+  ]
+}

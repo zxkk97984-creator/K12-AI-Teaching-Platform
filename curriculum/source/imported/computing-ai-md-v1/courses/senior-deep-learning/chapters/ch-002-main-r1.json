@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第2章 预备知识"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第2章 预备知识。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 数据操作\n\n张量（tensor）是多维数组。NumPy ndarray 就是张量：\n\n```python\nimport numpy as np\nx = np.array([1, 2, 3, 4])\nprint(x.shape, x.dtype)\nA = np.arange(20).reshape(5, 4)\nprint(A)\n```\n\n### 线性代数直觉\n\n向量是一列数，矩阵是二维表。矩阵乘法 `np.dot(A, B)`。范数衡量向量大小，L2 范数是 `sqrt(sum(x_i²))`。\n\n### 自动微分\n\n求导是训练的核心。给定 y = f(x)，dy/dx 告诉我们 x 往哪个方向调能让 y 变大。反向传播就是自动求导。\n\n### 概率\n\n概率衡量不确定性。条件概率 P(A|B)、贝叶斯定理、期望、方差。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-02"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-005-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "图与邻接表"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：图与邻接表。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 2.11 图的基础\n\n#### 2.11.1 邻接表建图\n\n竞赛里最常用的图表示：一个字典/列表，key 是节点，value 是它的邻居列表。\n\n```python\ngraph = {\n    1: [2, 3],\n    2: [1, 4, 5],\n    3: [1, 5],\n    4: [2],\n    5: [2, 3]\n}\n```\n\n#### 2.11.2 BFS 与 DFS\n\n```python\nfrom collections import deque\n\ndef bfs(graph, start):\n    visited = set([start])\n    q = deque([start])\n    order = []\n    while q:\n        node = q.popleft()\n        order.append(node)\n        for nb in graph[node]:\n            if nb not in visited:\n                visited.add(nb)\n                q.append(nb)\n    return order\n\ndef dfs(graph, start, visited=None, order=None):\n    if visited is None:\n        visited = set()\n    if order is None:\n        order = []\n    visited.add(start)\n    order.append(start)\n    for nb in graph[start]:\n        if nb not in visited:\n            dfs(graph, nb, visited, order)\n    return order\n```\n\nBFS 用队列，一层一层扩散，适合\"最短步数\"类问题（无权图最短路）；DFS 用栈/递归，一条路走到黑，适合\"能不能走到\"\"所有路径\"类问题。\n\n#### 2.11.3 Dijkstra 最短路思想\n\n带权图上求单源最短路，Dijkstra 的核心是：维护一个\"已确定最短路\"的集合，每次从外面选距离源点最近的节点加进来，然后松弛它的所有边。用优先队列（堆）实现后复杂度 O((V+E) log V)。高中阶段理解思想即可，不必手写完整实现。\n\n### 2.21 Dijkstra 完整实现\n\n带权图求单源最短路，用优先队列：每次弹出距离源点最近的未确定节点，松弛它的所有出边。\n\n```python\nimport heapq\n\ndef dijkstra(graph, start, n):\n    dist = [float('inf')] * n\n    dist[start] = 0\n    pq = [(0, start)]\n    while pq:\n        d, u = heapq.heappop(pq)\n        if d > dist[u]:\n            continue\n        for v, w in graph[u]:\n            nd = d + w\n            if nd < dist[v]:\n                dist[v] = nd\n                heapq.heappush(pq, (nd, v))\n    return dist\n```\n\n其中 `graph[u]` 是 `(邻居, 权重)` 列表。复杂度 O((V+E) log V)。注意 Dijkstra 不能处理负权边，负权要用 Bellman-Ford/SPFA。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-data-structures-topic-05"
+  ]
+}

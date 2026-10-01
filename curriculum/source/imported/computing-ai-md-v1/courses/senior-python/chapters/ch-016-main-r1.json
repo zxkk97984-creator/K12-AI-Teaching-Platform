@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-016-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第17章 迭代器、生成器和经典协程"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第17章 迭代器、生成器和经典协程。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "可迭代对象（iterable）实现了 `__iter__`；迭代器（iterator）实现了 `__next__` 和 `__iter__`。`iter(x)` 从可迭代对象拿迭代器，`next(it)` 取下一个，抛 `StopIteration` 结束。\n\n生成器函数用 `yield`：\n\n```python\ndef gen_range(n):\n    i = 0\n    while i < n:\n        yield i\n        i += 1\n\nfor x in gen_range(5):\n    print(x)\n```\n\n生成器是惰性的：每次 `next` 才计算下一个值，不一次性占内存。标准库 `itertools` 提供 `chain`、`count`、`cycle`、`islice`、`product`、`combinations`、`permutations` 等。\n\n`yield from` 把子生成器的元素逐个产出：\n\n```python\ndef chain(*iters):\n    for it in iters:\n        yield from it\n```\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-16"
+  ]
+}

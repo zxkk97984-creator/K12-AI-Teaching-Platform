@@ -1,0 +1,308 @@
+# 信息学奥赛基础与实践
+
+## 2.5 信息学奥赛衔接：CSP-J/S 与 NOIP
+
+> 对应《信息学奥赛一本通》。本书讲 CSP-J/S 备考与真题题解。
+
+## 本书简介
+
+适合高一高二走竞赛路线的同学。从考纲到高频模板，刷题为王。
+
+## 章节列表
+
+- 01 CSP-JS 考纲与题型
+- 02 经典 OJ 题解一
+- 03 经典 OJ 题解二
+- 04 竞赛模板
+
+
+
+## 内容来源说明
+
+本文件知识点由 AI 基于《信息学奥赛一本通》的核心主题整理而成，**并非原书原文逐字复述**。
+
+- **原书依据**：主题框架与核心概念参考自《信息学奥赛一本通》（信息学奥赛组委会，版本待核实）
+- **AI 整理与补充**：具体讲解、示例、代码、练习题由 AI 生成，并结合公开资料补充
+- 如需深入学习，请阅读原书；细节以原书为准
+
+
+
+---
+
+- **CSP-J（入门级）/ CSP-S（提高级）**：中国计算机学会（CCF）主办的非专业级软件能力认证，是 NOIP 的前置体系，每年下半年举行。考纲以 C++ 为主，覆盖枚举、递归、分治、贪心、动态规划、数据结构（栈、队列、树、图）、搜索（DFS/BFS）、简单数论与字符串。
+- **NOIP（全国青少年信息学奥林匹克联赛）**：面向高中生的更高阶段，优胜者可进入省队，参加 **NOI（全国青少年信息学奥林匹克竞赛）**，再选拔进入国家队参加 IOI。
+- **衔接建议**：高一用 Python 把语法和算法直觉练熟（推荐《算法竞赛入门经典》或洛谷入门题单）；高二上系统学 C++（语法一个月即可上手），刷 CSP-S 真题；高二下到高三冲 NOIP。注意 CSP/NOIP 主流语言是 C++，Python 只在极少数组别可用，**冲竞赛必须尽早切 C++**。官方信息以 CCF 官网（www.ccf.org.cn）当年公告为准。
+
+## 2.27 CSP-J/S 考纲与题型分布
+
+CSP-J/S 笔试（机试）一般考 4 道题，限时 4 小时，满分 400。题型与知识点分布大致：
+
+| 题号 | 难度 | 常考知识点 |
+|---|---|---|
+| T1 | 水题 | 模拟、枚举、简单数学 |
+| T2 | 简单 | 排序、贪心、简单 DP、哈希 |
+| T3 | 中等 | DP、图论、搜索、数据结构 |
+| T4 | 较难 | 高级 DP、树/图、数论、字符串 |
+
+CSP-J 整体偏简单，CSP-S 接近 NOIP 难度。备考策略：T1/T2 必须拿到分，T3 尽量拿部分分（暴力），T4 先写暴力拿 20–40 分。**部分分思想**很重要——数据范围小的子任务先用暴力过，别死磕满分做法。
+
+
+
+
+---
+
+## 2.4 三道必刷 OJ 题
+
+#### 题 1：两数之和（LeetCode 1）
+
+给定一个数组和目标值，找出两个数的下标使其和为目标。暴力双重循环 O(n²)；用哈希表把"查另一半"变成 O(1)，整体 O(n)：
+
+```python
+def two_sum(nums, target):
+    seen = {}
+    for i, x in enumerate(nums):
+        if target - x in seen:
+            return [seen[target - x], i]
+        seen[x] = i
+    return []
+```
+
+#### 题 2：斐波那契数列
+
+`F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)`。直接递归会重复算大量子问题，指数级；用记忆化或迭代降到 O(n)：
+
+```python
+def fib(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+```
+
+#### 题 3：走楼梯（LeetCode 70 思路）
+
+每次可以走 1 阶或 2 阶，走到第 n 阶有多少种走法？最后一步要么从 n-1 上来，要么从 n-2 上来，于是 `dp[n] = dp[n-1] + dp[n-2]`——本质上就是斐波那契：
+
+```python
+def climb_stairs(n):
+    if n <= 2:
+        return n
+    prev, curr = 1, 2
+    for _ in range(3, n + 1):
+        prev, curr = curr, prev + curr
+    return curr
+```
+
+
+
+
+---
+
+## 2.14 再增四道经典 OJ 题
+
+#### 题 4：最长公共子序列（LCS）
+
+两个字符串 `text1` 和 `text2`，找最长公共子序列长度。经典二维 DP：`dp[i][j]` = `text1[:i]` 和 `text2[:j]` 的 LCS。
+
+```python
+def longest_common_subsequence(text1, text2):
+    m, n = len(text1), len(text2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if text1[i - 1] == text2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    return dp[m][n]
+```
+
+#### 题 5：合并区间
+
+给出一堆闭区间，合并所有重叠的。思路：按起点排序，逐个看当前区间能不能并入最后一个合并区间。
+
+```python
+def merge_intervals(intervals):
+    if not intervals:
+        return []
+    intervals.sort()
+    merged = [list(intervals[0])]
+    for start, end in intervals[1:]:
+        if start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return [tuple(x) for x in merged]
+```
+
+#### 题 6：二叉树层序遍历
+
+就是 2.10.2 节的代码，LeetCode 102 原题。重点是用队列一层一层展开。
+
+#### 题 7：括号匹配
+
+一个字符串只含 `()[]{}`，判断括号是否正确匹配。经典栈题：左括号入栈，右括号看栈顶是否匹配。
+
+```python
+def is_valid(s):
+    pair = {')': '(', ']': '[', '}': '{'}
+    stack = []
+    for ch in s:
+        if ch in '([{':
+            stack.append(ch)
+        else:
+            if not stack or stack[-1] != pair[ch]:
+                return False
+            stack.pop()
+    return not stack
+```
+
+## 2.28 再增五道经典 OJ 题
+
+#### 题 8：无重复字符的最长子串
+
+题意：找不含重复字符的最长子串长度。思路：滑动窗口，用哈希表记字符最后出现位置，右指针右移，左指针跳到重复位置之后。O(n)。
+
+```python
+def length_of_longest_substring(s):
+    last = {}
+    left = 0
+    ans = 0
+    for right, ch in enumerate(s):
+        if ch in last and last[ch] >= left:
+            left = last[ch] + 1
+        last[ch] = right
+        ans = max(ans, right - left + 1)
+    return ans
+```
+
+#### 题 9：合并两个有序链表
+
+题意：把两个升序链表合并成一个升序链表。思路：dummy 头节点，逐个比较两个链表头，接小的那个。
+
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def merge_two_lists(l1, l2):
+    dummy = ListNode()
+    cur = dummy
+    while l1 and l2:
+        if l1.val <= l2.val:
+            cur.next = l1
+            l1 = l1.next
+        else:
+            cur.next = l2
+            l2 = l2.next
+        cur = cur.next
+    cur.next = l1 if l1 else l2
+    return dummy.next
+```
+
+#### 题 10：买卖股票的最佳时机
+
+题意：每天给股价，只能买一次卖一次，最大利润。思路：遍历过程中维护"历史最低价"，每天算"今天卖能赚多少"。O(n)。
+
+```python
+def max_profit(prices):
+    min_price = float('inf')
+    profit = 0
+    for p in prices:
+        if p < min_price:
+            min_price = p
+        elif p - min_price > profit:
+            profit = p - min_price
+    return profit
+```
+
+#### 题 11：岛屿数量
+
+题意：二维网格上 1 是陆地 0 是水，数有几个岛。思路：遍历每个格子，遇到 1 就 DFS/BFS 把整个岛淹成 0，计数 +1。O(mn)。
+
+```python
+def num_islands(grid):
+    if not grid:
+        return 0
+    rows, cols = len(grid), len(grid[0])
+    count = 0
+    def sink(r, c):
+        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] == '0':
+            return
+        grid[r][c] = '0'
+        sink(r + 1, c); sink(r - 1, c)
+        sink(r, c + 1); sink(r, c - 1)
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == '1':
+                count += 1
+                sink(r, c)
+    return count
+```
+
+#### 题 12：反转链表
+
+题意：反转单链表。思路：三指针 prev/cur/next，逐个反向指。
+
+```python
+def reverse_list(head):
+    prev = None
+    cur = head
+    while cur:
+        nxt = cur.next
+        cur.next = prev
+        prev = cur
+        cur = nxt
+    return prev
+```
+
+
+
+
+---
+
+## 2.15 常用算法模板
+
+#### 2.15.1 快速读入（竞赛向）
+
+Python 在竞赛里慢，输入大时用 `sys.stdin.read()` 一次性读完再切分，比 `input()` 快几倍：
+
+```python
+import sys
+
+def main():
+    data = sys.stdin.buffer.read().split()
+    it = iter(data)
+    n = int(next(it))
+    arr = [int(next(it)) for _ in range(n)]
+
+main()
+```
+
+#### 2.15.2 并查集
+
+并查集用来回答"两个元素是否在同一集合""合并两个集合"，是 Kruskal 最小生成树、连通块计数的核心数据结构：
+
+```python
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+    def union(self, a, b):
+        ra, rb = self.find(a), self.find(b)
+        if ra == rb:
+            return False
+        if self.rank[ra] < self.rank[rb]:
+            ra, rb = rb, ra
+        self.parent[rb] = ra
+        if self.rank[ra] == self.rank[rb]:
+            self.rank[ra] += 1
+        return True
+```
+
+路径压缩 + 按秩合并后，单次操作几乎是 O(1)。

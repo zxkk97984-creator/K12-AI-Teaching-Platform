@@ -71,9 +71,8 @@ class ContentProfile(enum.StrEnum):
 
     ``FORMAL`` is the production contract: only human approved, published,
     non-fixture revisions inside the student's stage/grade range.
-    ``DEVELOPMENT`` additionally exposes explicitly marked synthetic fixtures so
-    the teaching flow can be built before human review exists. It never exposes
-    non-fixture drafts.
+    ``DEVELOPMENT`` additionally exposes synthetic fixtures and releases with
+    explicit local_demo_visible permission. Withdrawn content stays hidden.
     """
 
     FORMAL = "formal"
@@ -136,6 +135,9 @@ class Release(Base):
     release_key: Mapped[str] = mapped_column(String(160), unique=True, nullable=False, index=True)
     source_kind: Mapped[str] = mapped_column(String(32), nullable=False)
     is_test_fixture: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    local_demo_visible: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
     description: Mapped[str] = mapped_column(Text, nullable=False, default="")
     manifest_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第4章 Unicode文本和字节序列"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第4章 Unicode文本和字节序列。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "核心区分：`str` 是 Unicode 码点序列，`bytes` 是字节序列。文本读写必须显式指定编码。\n\n```python\ns = 'café'\nb = s.encode('utf-8')\nprint(b)\nprint(b.decode('utf-8'))\n```\n\n编码错误处理：`encode` 时 `UnicodeEncodeError`，`decode` 时 `UnicodeDecodeError`。用 `errors='replace'` 容错，但生产环境宁可失败。\n\n文本文件打开必须指定 `encoding='utf-8'`，否则用系统默认（Windows 上常是 gbk，Linux 上是 utf-8），跨平台必出 bug：\n\n```python\nwith open('file.txt', 'w', encoding='utf-8') as f:\n    f.write('hello')\n```\n\n规范化：Unicode 有等价表示（`é` 可以是单码点 U+00E9，也可以是 e + 组合重音符 U+0301）。比较前用 `unicodedata.normalize('NFC', s)`。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-04"
+  ]
+}

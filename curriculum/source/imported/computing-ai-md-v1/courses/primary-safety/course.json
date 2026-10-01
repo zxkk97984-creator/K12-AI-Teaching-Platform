@@ -1,0 +1,539 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "primary-safety",
+  "title": "儿童网络安全",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习儿童网络安全，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "primary-safety-topic-01",
+      "name": "第 1 课 网络安全入门",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 1 课 网络安全入门」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-02",
+      "name": "第 2 课 友谊和社交媒体",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 2 课 友谊和社交媒体」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-03",
+      "name": "第 3 课 在线礼仪",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 3 课 在线礼仪」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-04",
+      "name": "第 4 课 线上声誉",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 4 课 线上声誉」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-05",
+      "name": "第 5 课 网络霸凌",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 5 课 网络霸凌」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-06",
+      "name": "第 6 课 创意是谁的",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 6 课 创意是谁的」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-07",
+      "name": "第 7 课 网络消费",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 7 课 网络消费」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-08",
+      "name": "第 8 课 色情信息和淫秽物品",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 8 课 色情信息和淫秽物品」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-09",
+      "name": "第 9 课 警惕图谋不轨的成年人",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 9 课 警惕图谋不轨的成年人」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-10",
+      "name": "第 10 课 寻求帮助",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 10 课 寻求帮助」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-11",
+      "name": "第 11 课 戒除网瘾",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 11 课 戒除网瘾」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-safety-topic-12",
+      "name": "写在最后",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「写在最后」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-lower",
+      "revision": 1,
+      "order_index": 2,
+      "title": "第 1 课 网络安全入门",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「第 1 课 网络安全入门」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-001-upper",
+      "revision": 1,
+      "order_index": 3,
+      "title": "第 1 课 网络安全入门",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 1 课 网络安全入门」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-lower",
+      "revision": 1,
+      "order_index": 4,
+      "title": "第 2 课 友谊和社交媒体",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「第 2 课 友谊和社交媒体」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-upper",
+      "revision": 1,
+      "order_index": 5,
+      "title": "第 2 课 友谊和社交媒体",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 2 课 友谊和社交媒体」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-lower",
+      "revision": 1,
+      "order_index": 6,
+      "title": "第 3 课 在线礼仪",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「第 3 课 在线礼仪」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-upper",
+      "revision": 1,
+      "order_index": 7,
+      "title": "第 3 课 在线礼仪",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 3 课 在线礼仪」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-upper",
+      "revision": 1,
+      "order_index": 9,
+      "title": "第 4 课 线上声誉",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 4 课 线上声誉」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-lower",
+      "revision": 1,
+      "order_index": 10,
+      "title": "第 5 课 网络霸凌",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「第 5 课 网络霸凌」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-upper",
+      "revision": 1,
+      "order_index": 11,
+      "title": "第 5 课 网络霸凌",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 5 课 网络霸凌」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-upper",
+      "revision": 1,
+      "order_index": 13,
+      "title": "第 6 课 创意是谁的",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 6 课 创意是谁的」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-upper",
+      "revision": 1,
+      "order_index": 15,
+      "title": "第 7 课 网络消费",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 7 课 网络消费」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-008-upper",
+      "revision": 1,
+      "order_index": 17,
+      "title": "第 8 课 色情信息和淫秽物品",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 8 课 色情信息和淫秽物品」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-08"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-008-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-009-upper",
+      "revision": 1,
+      "order_index": 19,
+      "title": "第 9 课 警惕图谋不轨的成年人",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 9 课 警惕图谋不轨的成年人」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-09"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-009-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-010-lower",
+      "revision": 1,
+      "order_index": 20,
+      "title": "第 10 课 寻求帮助",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「第 10 课 寻求帮助」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-10"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-010-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-010-upper",
+      "revision": 1,
+      "order_index": 21,
+      "title": "第 10 课 寻求帮助",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 10 课 寻求帮助」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-10"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-010-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-011-lower",
+      "revision": 1,
+      "order_index": 22,
+      "title": "第 11 课 戒除网瘾",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「第 11 课 戒除网瘾」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-11"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-011-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-011-upper",
+      "revision": 1,
+      "order_index": 23,
+      "title": "第 11 课 戒除网瘾",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第 11 课 戒除网瘾」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-11"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-011-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-012-lower",
+      "revision": 1,
+      "order_index": 24,
+      "title": "写在最后",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「写在最后」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-12"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-012-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-012-upper",
+      "revision": 1,
+      "order_index": 25,
+      "title": "写在最后",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「写在最后」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-safety-topic-12"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md",
+        "original_sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-012-upper-r1.json"
+    }
+  ]
+}

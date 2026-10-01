@@ -362,7 +362,6 @@ body .companion-panel .conv-message { margin:0; padding:12px 16px; font-size:16p
 body .companion-panel .conv-message-user { background:var(--sl-primary-soft); border:1px solid #e7d493; align-self:flex-end; }
 body .companion-panel .conv-run { flex:none; padding:8px 16px; margin:0; font-size:12px; }
 body .companion-panel .conv-composer { flex:none; width:calc(100% - 32px); max-width:none; margin:12px 16px 0; padding:12px; border:1px solid var(--k12-composer-border); border-radius:12px; box-shadow:none; background:var(--k12-composer-surface); }
-body .companion-panel .conv-composer:focus-within { outline:2px solid var(--sl-focus); outline-offset:2px; }
 body .companion-panel .k12-composer-label { font-size:12px; line-height:1.5; }
 body .companion-panel .conv-composer textarea { min-height:48px; max-height:96px; padding:8px 0; font-size:16px; line-height:1.5; resize:vertical; }
 body .companion-panel .conv-composer textarea:focus-visible { outline:none; }
@@ -806,20 +805,30 @@ body .companion-extra-options {
   box-shadow:0 12px 24px #20212414;
 }
 body .companion-extra-options[hidden] { display:none; }
-body .companion-extra-options .companion-picker { padding:0 0 12px; border:0; font-size:13px; }
-body .companion-extra-options .conv-compact-options { display:grid; gap:12px; }
+body .companion-extra-options .companion-picker { display:grid; gap:8px; padding:12px 0 4px; border:0; font-size:13px; }
+body .companion-extra-options .companion-picker select { width:100%; }
+body .companion-extra-options .conv-compact-options { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; min-width:0; }
+body .companion-extra-options .conv-compact-options > [role="tabpanel"] { min-width:0; width:100%; }
+body .companion-extra-options .conv-options-tabs { display:flex; gap:4px; position:sticky; top:-12px; z-index:1; padding:0 0 8px; border-bottom:var(--sl-border); background:var(--sl-surface); }
+body .companion-extra-options .conv-options-tabs button { flex:1; min-width:0; min-height:36px; padding:6px 8px; border:0; border-radius:7px; background:transparent; color:var(--sl-text-muted); font-size:13px; font-weight:400; white-space:nowrap; }
+body .companion-extra-options .conv-options-tabs button[aria-selected="true"] { background:var(--k12-selected, #f0f0ee); color:var(--sl-text); font-weight:600; }
 body .companion-extra-options .conv-history,
 body .companion-extra-options .conv-mini-courses { max-height:none; overflow:visible; margin:0; padding:0; border:0; background:transparent; }
-body .companion-extra-options .conv-history-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+body .companion-extra-options .conv-history-heading { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+body .companion-extra-options .conv-history-heading input { min-width:0; width:100%; flex:1; min-height:36px; padding:7px 10px; border:var(--sl-border); border-radius:7px; font-size:13px; background:var(--sl-bg); }
 body .companion-extra-options .conv-history-heading > strong,
 body .companion-extra-options .conv-mini-courses > strong { font-size:13px; }
-body .companion-extra-options .conv-history-heading button { width:auto; min-height:36px; padding:6px 10px; font-size:12px; white-space:nowrap; }
-body .companion-extra-options :is(.conv-history,.conv-mini-courses) ul { max-height:156px; overflow-y:auto; margin:4px 0 0; padding:0; list-style:none; }
-body .companion-extra-options :is(.conv-history,.conv-mini-courses) li { margin:0 0 6px; }
-body .companion-extra-options :is(.conv-history,.conv-mini-courses) li > button { width:100%; min-height:40px; padding:8px 10px; border:var(--sl-border); border-radius:8px; background:#fff; color:var(--sl-text); text-align:left; font-size:13px; }
-body .companion-extra-options .conv-session-actions { display:flex; flex-wrap:wrap; gap:6px; padding:4px 0 8px; }
-body .companion-extra-options .conv-session-actions button { width:auto; min-height:32px; padding:5px 8px; border:0; border-radius:6px; background:transparent; color:var(--sl-text-muted); font-size:12px; }
-body .companion-extra-options .conv-session-actions button[aria-label^="删除"] { color:var(--k12-danger); }
+body .companion-extra-options .conv-history-heading button { display:flex; align-items:center; gap:4px; flex:none; width:auto; min-height:36px; padding:6px 8px; border:0; font-size:13px; white-space:nowrap; }
+body .companion-extra-options :is(.conv-history,.conv-mini-courses) ul { max-height:none; overflow:visible; margin:0; padding:0; list-style:none; }
+body .companion-extra-options :is(.conv-history,.conv-mini-courses) li { display:flex; align-items:center; min-width:0; margin:0 0 2px; border-radius:8px; }
+body .companion-extra-options :is(.conv-history,.conv-mini-courses) li > button { min-width:0; width:100%; flex:1; min-height:40px; padding:8px 10px; border:0; border-radius:8px; background:transparent; color:var(--sl-text); text-align:left; font-size:14px; font-weight:400; }
+body .companion-extra-options .conv-compact-history-row.is-active { background:var(--k12-selected, #f0f0ee); }
+body .companion-extra-options .conv-compact-title { display:block; min-width:0; width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+body .companion-extra-options .conv-compact-history-row > .conv-session-more { flex:none; display:grid; place-items:center; width:32px; min-height:32px; margin-right:4px; padding:0; color:var(--sl-text-muted); }
+@media (hover:hover) {
+  body .companion-extra-options :is(.conv-history,.conv-mini-courses) li:hover { background:var(--k12-selected, #f0f0ee); }
+  body .companion-extra-options .conv-compact-history-row:not(:hover):not(:focus-within):not(.is-active) > .conv-session-more { opacity:0; }
+}
 @media (hover:hover) {
   .conv-message-actions button:hover { background:var(--k12-selected); color:var(--sl-text); }
 }

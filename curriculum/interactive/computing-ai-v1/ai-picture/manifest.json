@@ -1,0 +1,67 @@
+{
+  "schema_version": "k12-interactive-v1",
+  "content_key": "learning-ai-picture",
+  "title": "AI 如何认图片",
+  "purpose": "LESSON",
+  "stage": "PRIMARY_LOWER",
+  "subject": "计算机与人工智能",
+  "entry": "index.html",
+  "cover": "assets/cover.svg",
+  "summary": "通过动态画面和动手操作理解AI 如何认图片，由霜铃朗读预设讲解。",
+  "knowledge_points": [
+    "AI 如何认图片"
+  ],
+  "capabilities": [
+    "SCENES",
+    "CHECKPOINTS",
+    "COMPLETION"
+  ],
+  "scenes": [
+    {
+      "id": "observe",
+      "title": "观察特征",
+      "summary": "先观察颜色和形状。苹果和香蕉有什么不同？这里的分类过程是帮助理解 AI 的教学模拟。"
+    },
+    {
+      "id": "examples",
+      "title": "给出样例",
+      "summary": "点击图片，把已知类别的样例交给模拟分类器。样例里只有红苹果时，绿色苹果可能会被认错。"
+    },
+    {
+      "id": "test",
+      "title": "检验新图片",
+      "summary": "用没有见过的绿色苹果检验规则。增加不同颜色的苹果样例，观察分类规则怎样变化。"
+    },
+    {
+      "id": "reflect",
+      "title": "说说发现",
+      "summary": "样例越有代表性，分类规则越容易适用于新情况。遇到错误，要检查数据和规则，也可以继续问老师。"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "observe-read",
+      "scene_id": "observe",
+      "text": "先观察颜色和形状。苹果和香蕉有什么不同？这里的分类过程是帮助理解 AI 的教学模拟。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "examples-read",
+      "scene_id": "examples",
+      "text": "点击图片，把已知类别的样例交给模拟分类器。样例里只有红苹果时，绿色苹果可能会被认错。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "test-read",
+      "scene_id": "test",
+      "text": "用没有见过的绿色苹果检验规则。增加不同颜色的苹果样例，观察分类规则怎样变化。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "reflect-read",
+      "scene_id": "reflect",
+      "text": "样例越有代表性，分类规则越容易适用于新情况。遇到错误，要检查数据和规则，也可以继续问老师。",
+      "trigger": "SCENE_ENTER"
+    }
+  ]
+}

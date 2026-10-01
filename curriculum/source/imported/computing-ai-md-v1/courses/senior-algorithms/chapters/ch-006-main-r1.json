@@ -1,0 +1,26 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第6章 数据结构基础"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第6章 数据结构基础。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 6.1 栈\n\n栈是后进先出（LIFO）。Python list 当栈：`append`/`pop` O(1)。\n\n括号匹配：\n\n```python\ndef is_valid(s):\n    pair = {')':'(', ']':'[', '}':'{'}\n    st = []\n    for ch in s:\n        if ch in '([{':\n            st.append(ch)\n        else:\n            if not st or st.pop() != pair[ch]:\n                return False\n    return not st\n\nprint(is_valid('({[]})'))\n```\n\n表达式求值（后缀/逆波兰）：\n\n```python\ndef eval_rpn(tokens):\n    st = []\n    for t in tokens:\n        if t in '+-*/':\n            b = st.pop(); a = st.pop()\n            if t == '+': st.append(a+b)\n            elif t == '-': st.append(a-b)\n            elif t == '*': st.append(a*b)\n            else: st.append(int(a/b))\n        else:\n            st.append(int(t))\n    return st[0]\n\nprint(eval_rpn(['2','1','+','3','*']))\n```\n\n### 6.2 队列与优先队列\n\n队列先进先出（FIFO）。list.pop(0) 是 O(n)，用 `collections.deque` 是 O(1)。\n\n```python\nfrom collections import deque\nq = deque()\nq.append(1); q.append(2)\nprint(q.popleft())\n```\n\n优先队列用 `heapq`（最小堆）：\n\n```python\nimport heapq\nheap = []\nheapq.heappush(heap, 3); heapq.heappush(heap, 1); heapq.heappush(heap, 2)\nprint(heapq.heappop(heap))\n```\n\n### 6.3 链表\n\n```python\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n    def push_front(self, val):\n        self.head = ListNode(val, self.head)\n    def push_back(self, val):\n        if not self.head:\n            self.head = ListNode(val); return\n        p = self.head\n        while p.next: p = p.next\n        p.next = ListNode(val)\n    def delete(self, target):\n        dummy = ListNode(0, self.head)\n        p = dummy\n        while p.next:\n            if p.next.val == target:\n                p.next = p.next.next\n                break\n            p = p.next\n        self.head = dummy.next\n    def to_list(self):\n        r = []\n        p = self.head\n        while p:\n            r.append(p.val); p = p.next\n        return r\n\nll = LinkedList()\nll.push_back(1); ll.push_back(2); ll.push_front(0)\nll.delete(1)\nprint(ll.to_list())\n```\n\n### 6.4 二叉树与遍历\n\n```python\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef preorder(root):\n    if not root: return []\n    return [root.val] + preorder(root.left) + preorder(root.right)\n\ndef inorder(root):\n    if not root: return []\n    return inorder(root.left) + [root.val] + inorder(root.right)\n\ndef postorder(root):\n    if not root: return []\n    return postorder(root.left) + postorder(root.right) + [root.val]\n\nfrom collections import deque\ndef levelorder(root):\n    if not root: return []\n    q = deque([root]); r = []\n    while q:\n        node = q.popleft()\n        r.append(node.val)\n        if node.left: q.append(node.left)\n        if node.right: q.append(node.right)\n    return r\n```\n\n二叉搜索树（BST）插入：\n\n```python\ndef bst_insert(root, val):\n    if not root:\n        return TreeNode(val)\n    if val < root.val:\n        root.left = bst_insert(root.left, val)\n    else:\n        root.right = bst_insert(root.right, val)\n    return root\n\ndef bst_search(root, val):\n    if not root or root.val == val:\n        return root\n    if val < root.val:\n        return bst_search(root.left, val)\n    return bst_search(root.right, val)\n```\n\n### 6.5 堆与堆排序\n\n```python\ndef heapify(arr, n, i):\n    largest = i\n    l, r = 2*i+1, 2*i+2\n    if l < n and arr[l] > arr[largest]:\n        largest = l\n    if r < n and arr[r] > arr[largest]:\n        largest = r\n    if largest != i:\n        arr[i], arr[largest] = arr[largest], arr[i]\n        heapify(arr, n, largest)\n\ndef heap_sort(arr):\n    a = arr[:]\n    n = len(a)\n    for i in range(n//2-1, -1, -1):\n        heapify(a, n, i)\n    for i in range(n-1, 0, -1):\n        a[0], a[i] = a[i], a[0]\n        heapify(a, i, 0)\n    return a\n\nprint(heap_sort([3,1,4,1,5,9,2,6]))\n```\n\n### 6.6 并查集"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "```python\nclass UnionFind:\n    def __init__(self, n):\n        self.parent = list(range(n))\n        self.rank = [0]*n\n    def find(self, x):\n        if self.parent[x] != x:\n            self.parent[x] = self.find(self.parent[x])\n        return self.parent[x]\n    def union(self, a, b):\n        ra, rb = self.find(a), self.find(b)\n        if ra == rb: return False\n        if self.rank[ra] < self.rank[rb]:\n            ra, rb = rb, ra\n        self.parent[rb] = ra\n        if self.rank[ra] == self.rank[rb]:\n            self.rank[ra] += 1\n        return True\n```\n\n路径压缩 + 按秩合并后近似 O(α(n))，α 是阿克曼反函数，增长极慢。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-06"
+  ]
+}

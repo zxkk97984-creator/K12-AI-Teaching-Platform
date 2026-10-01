@@ -126,13 +126,24 @@ async def bind_interactive_scene(
     if prompt_id and (prompt is None or prompt["scene_id"] != current_scene_id):
         raise ValueError("当前场景没有这个预设问题")
     summary = current.get("summary") or manifest.get("summary") or resource.description
+    # Owner-scoped persisted data, not client-supplied prose or executable evidence.
+    import json
+
+    operation = json.dumps(activity.game_state, ensure_ascii=False, separators=(",", ":"))
+    operation = operation[:1200] if len(operation) <= 1200 else operation[:1199] + "…"
     return {
         **scene,
         "page_type": "INTERACTIVE",
         "activity_type": resource.interactive_purpose,
         "visible_section": f"{resource.title} · {current['title']}",
         "selected_text": (
-            f"场景摘要：{summary}" + (f"\n预设问题：{prompt['text']}" if prompt else "")
+            f"场景摘要：{summary}"
+            + (f"\n预设问题：{prompt['text']}" if prompt else "")
+            + (
+                f"\n课件上报的已保存操作（非代码执行验证）：{operation}"
+                if activity.game_state
+                else ""
+            )
         ),
         "knowledge_points": manifest.get("knowledge_points", []),
         "content_id": str(resource.id),

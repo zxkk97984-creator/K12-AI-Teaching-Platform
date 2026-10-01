@@ -1,9 +1,212 @@
 import { expect, test, type Page } from "@playwright/test";
 import { fixture, session } from "./ui-reuse-fixtures";
+import { mkdir } from "node:fs/promises";
 
 async function fits(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 }
+
+test("companion history stays a simple list and practice settings open in a separate dialog", async ({ page }) => {
+  const state = await fixture(page);
+  const longTitle = "请用生活中的例子解释 Python 条件判断和循环有什么区别，并帮我整理学习顺序";
+  state.sessions = [{ ...session, title: longTitle, message_count: 2 }, ...["分数与披萨", "自动记忆合成验证", "认识身边的 AI", "一步一步读懂代码", "复习昨天的问题", "为什么会下雨"].map((title, index) => ({ ...session, id: `history-${index}`, title, message_count: 2 }))];
+  const markdown = "**条件判断**决定要不要执行一步；**循环**让同一步重复执行。";
+  state.messages = [{ id: "question-ui", role: "USER", content_markdown: "请解释条件与循环", card: null, created_at: session.created_at }, { id: "quiz-reply-ui", role: "ASSISTANT", content_markdown: markdown, created_at: session.created_at,
+    card: { message_markdown: markdown, followup_question: null, source_refs: [], evidence_refs: [], action: null, phase_suggestion: "EXPLAIN", warnings: [], fixture: true } }];
+  let job: { id: string; status: string; error_code: null; quiz_session_id: string | null; source_message_id: string } | null = null;
+  let submitted: Record<string, unknown> | null = null;
+  await page.route("**/api/v1/quiz-options/conversation", (route) => route.fulfill({ json: { stage: "JUNIOR", max_question_count: 3, allowed_difficulties: ["EASY", "MEDIUM"], allowed_question_types: ["CHOICE"] } }));
+  await page.route("**/api/v1/quiz-generation-jobs**", async (route) => {
+    if (route.request().method() === "POST") {
+      expect(route.request().headers()["x-csrf-token"]).toBe("synthetic-ui-csrf");
+      submitted = route.request().postDataJSON();
+      job = { id: "compact-quiz-ui", status: "QUEUED", error_code: null, quiz_session_id: null, source_message_id: "quiz-reply-ui" };
+      await route.fulfill({ json: { job, quiz: null } });
+    } else await route.fulfill({ json: { items: job ? [job] : [] } });
+  });
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => { if (message.type() === "error" || message.type() === "warning") errors.push(message.text()); });
+  await page.setViewportSize({ width: 1366, height: 900 });
+  await page.goto(`/conversations?session=${session.id}`);
+  await page.getByRole("button", { name: "打开霜铃学习助手" }).click();
+  const panel = page.locator("#companion-panel");
+  await panel.getByRole("button", { name: "置顶对话" }).click();
+  const more = panel.getByRole("button", { name: "更多选项" });
+  await more.click();
+  await expect(panel.getByRole("tab", { name: "对话记录" })).toHaveAttribute("aria-selected", "true");
+  await expect(panel.getByLabel("选择学习伙伴")).toHaveCount(0);
+  await expect(panel.getByTestId("history-item")).toHaveCount(7);
+  const title = panel.getByTestId("history-item").first().locator(".conv-compact-title");
+  expect(await title.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  await page.screenshot({ path: "test-results/companion-history-list-desktop.png", animations: "disabled" });
+  await panel.getByRole("button", { name: `更多操作：${longTitle}`, exact: true }).click();
+  const menu = page.getByRole("menu", { name: `对话操作：${longTitle}`, exact: true });
+  await expect(menu).toBeVisible();
+  await page.screenshot({ path: "test-results/companion-history-actions-desktop.png", animations: "disabled" });
+  await menu.getByRole("menuitem", { name: "重命名" }).press("ArrowDown");
+  await expect(menu.getByRole("menuitem", { name: "归档", exact: true })).toBeFocused();
+  await menu.getByRole("menuitem", { name: "归档", exact: true }).press("Escape");
+  await expect(menu).toHaveCount(0);
+  await expect(more).toHaveAttribute("aria-expanded", "true");
+  await expect(panel).toBeVisible();
+  await panel.getByRole("searchbox", { name: "搜索宠物对话记录" }).fill("分数");
+  await expect(panel.getByTestId("history-item")).toHaveText("分数与披萨");
+  await panel.getByRole("searchbox", { name: "搜索宠物对话记录" }).fill("");
+  await panel.getByRole("tab", { name: "结合课程" }).click();
+  await expect(panel.getByTestId("start-session").first()).toBeVisible();
+  await panel.getByRole("tab", { name: "学习伙伴" }).click();
+  await expect(panel.getByLabel("选择学习伙伴")).toBeVisible();
+  await panel.getByRole("tab", { name: "学习伙伴" }).press("Home");
+  await expect(panel.getByRole("tab", { name: "对话记录" })).toHaveAttribute("aria-selected", "true");
+  await more.click();
+
+  const entry = panel.getByRole("region", { name: "从当前讲解生成练习" });
+  await expect(entry.locator("input,select")).toHaveCount(0);
+  expect((await entry.boundingBox())!.height).toBeLessThanOrEqual(48);
+  const trigger = entry.getByRole("button", { name: "生成小练习", exact: true });
+  await page.screenshot({ path: "test-results/companion-practice-entry-desktop.png", animations: "disabled" });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "生成小练习", exact: true });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByLabel("练习知识点")).toBeFocused();
+  await dialog.getByLabel("练习知识点").fill("Python 条件判断");
+  await dialog.getByLabel("题目数量").selectOption("3");
+  await dialog.getByLabel("练习难度").selectOption("MEDIUM");
+  await page.screenshot({ path: "test-results/companion-practice-settings-desktop.png", animations: "disabled" });
+  await dialog.getByRole("button", { name: "关闭练习设置" }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  await expect(panel).toBeVisible();
+
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await more.click();
+    await expect(panel.getByTestId("history-item")).toHaveCount(7);
+    await fits(page);
+    await page.screenshot({ path: `test-results/companion-history-list-${width}.png`, animations: "disabled" });
+    await more.click();
+    await trigger.click();
+    await expect(dialog.getByLabel("题目数量")).toHaveValue("3");
+    await expect(dialog.getByLabel("练习难度")).toHaveValue("MEDIUM");
+    const bounds = (await dialog.boundingBox())!;
+    expect(bounds.x).toBeGreaterThanOrEqual(0);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+    await expect(dialog.getByRole("button", { name: "开始生成" })).toBeInViewport();
+    await page.screenshot({ path: `test-results/companion-practice-settings-${width}.png`, animations: "disabled" });
+    await dialog.getByLabel("练习知识点").press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(panel).toBeVisible();
+  }
+  await trigger.click();
+  await dialog.getByRole("button", { name: "开始生成" }).click();
+  await expect(dialog).toHaveCount(0);
+  expect(submitted).toMatchObject({ conversation_id: session.id, message_id: "quiz-reply-ui", knowledge_point: "Python 条件判断", ordinary_question_count: 3, difficulty: "MEDIUM" });
+  await expect(entry.getByRole("button", { name: "正在生成练习…" })).toBeDisabled();
+  job!.status = "SUCCEEDED";
+  job!.quiz_session_id = "generated-practice-ui";
+  await expect(entry.getByRole("link", { name: "打开小练习" })).toHaveAttribute("href", "/practice/sessions/generated-practice-ui", { timeout: 7000 });
+  expect(errors).toEqual([]);
+});
+
+test("companion formats Markdown and supports pinning, moving and resizing within the viewport", async ({ page }) => {
+  const state = await fixture(page);
+  await page.route("**/api/v1/quiz-generation-jobs?conversation_id=*", (route) => route.fulfill({ json: { items: [] } }));
+  await page.route("**/api/v1/quiz-options/conversation", (route) => route.fulfill({ json: { stage: "JUNIOR", max_question_count: 3, allowed_difficulties: ["MEDIUM"], allowed_question_types: ["CHOICE"] } }));
+  state.messages = [{ id: "companion-markdown", role: "ASSISTANT", card: null, created_at: session.created_at,
+    content_markdown: '## 这一章的学习路线\n\n1. **为什么学 Python**：语法像英语，读起来很自然。\n2. 使用 `print("你好")` 看看第一行代码的结果。\n\n```python\nprint("你好")\n```\n\n| 步骤 | 内容 |\n| --- | --- |\n| 1 | 搭建环境 |\n\n[Python 官网](https://www.python.org)\n\n下面可以继续提问。',
+  }];
+  const errors: string[] = [];
+  const failedResponses: string[] = [];
+  page.on("response", (response) => { if (response.status() >= 400) failedResponses.push(`${response.status()} ${response.url()}`); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => { if (message.type() === "error" || message.type() === "warning") errors.push(message.text()); });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`/conversations?session=${session.id}`);
+  await expect(page).toHaveTitle("对话学习 · K12学习平台");
+  await page.getByRole("button", { name: "打开霜铃学习助手" }).click();
+  const panel = page.locator("#companion-panel");
+  await expect(panel.getByRole("heading", { name: "这一章的学习路线" })).toBeVisible();
+  await expect(panel.locator(".conv-card-text strong")).toHaveText("为什么学 Python");
+  await expect(panel.locator(".conv-card-text ol > li")).toHaveCount(2);
+  await expect(panel.locator("pre code")).toHaveText('print("你好")');
+  await expect(panel.getByRole("table")).toBeVisible();
+  await expect(panel.locator(".conv-card-text")).not.toContainText("**");
+  await expect(page.locator("vite-error-overlay")).toHaveCount(0);
+
+  await panel.getByRole("button", { name: "置顶对话" }).click();
+  await expect(panel).toHaveAttribute("data-pinned", "true");
+  expect(await panel.evaluate((element) => element.matches(":popover-open"))).toBe(true);
+  await page.evaluate(() => {
+    const overlay = document.createElement("div");
+    overlay.id = "companion-test-overlay";
+    Object.assign(overlay.style, { position: "fixed", inset: "0", zIndex: "2147483647", background: "#ffffff88" });
+    document.body.append(overlay);
+  });
+  const pinBox = await panel.getByRole("button", { name: "取消置顶" }).boundingBox();
+  expect(await page.evaluate(({ x, y }) => Boolean(document.elementFromPoint(x, y)?.closest("#companion-panel")), { x: pinBox!.x + 20, y: pinBox!.y + 20 })).toBe(true);
+  await page.evaluate(() => document.querySelector("#companion-test-overlay")!.remove());
+
+  const beforeMove = (await panel.boundingBox())!;
+  const header = (await panel.locator("header").boundingBox())!;
+  await page.mouse.move(header.x + 30, header.y + 30);
+  await page.mouse.down();
+  await page.mouse.move(header.x - 120, header.y - 170, { steps: 12 });
+  await page.mouse.up();
+  const moved = (await panel.boundingBox())!;
+  expect(moved.x).toBeLessThan(beforeMove.x - 100);
+  expect(moved.y).toBeLessThan(beforeMove.y - 100);
+
+  const grip = (await panel.getByRole("button", { name: "调整对话窗口大小" }).boundingBox())!;
+  await page.mouse.move(grip.x + 12, grip.y + 12);
+  await page.mouse.down();
+  await page.mouse.move(grip.x + 172, grip.y + 152, { steps: 12 });
+  await page.mouse.up();
+  const resized = (await panel.boundingBox())!;
+  expect(resized.width).toBeGreaterThan(moved.width + 100);
+  expect(resized.height).toBeGreaterThan(moved.height + 100);
+  await expect(panel.getByTestId("send-turn")).toBeVisible();
+  await page.screenshot({ path: "test-results/companion-pinned-resized-desktop.png", animations: "disabled" });
+
+  await page.locator('.app-sidebar-nav a[href="/resources"]').click();
+  await expect(page).toHaveURL(/\/resources$/);
+  await expect(panel).toBeVisible();
+  expect((await panel.boundingBox())!.width).toBe(resized.width);
+  await panel.getByRole("button", { name: "取消置顶" }).click();
+  await expect(panel).toHaveAttribute("data-pinned", "false");
+  await expect(panel).toBeVisible();
+  await panel.getByRole("button", { name: "置顶对话" }).click();
+
+  for (const width of [768, 390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect.poll(async () => (await panel.boundingBox())!.x + (await panel.boundingBox())!.width).toBeLessThanOrEqual(width - 16);
+    const bounds = (await panel.boundingBox())!;
+    expect(bounds.y).toBeGreaterThanOrEqual(16);
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(width <= 720 ? 768 : 828);
+    const tools = (await panel.locator(".companion-panel-tools").boundingBox())!;
+    expect(tools.x + tools.width).toBeLessThanOrEqual(bounds.x + bounds.width);
+    await expect(panel.getByRole("button", { name: "取消置顶" })).toBeVisible();
+    await expect(panel.getByTestId("send-turn")).toBeVisible();
+    if (width <= 390) await expect(panel.getByLabel("想对老师说什么")).toHaveCSS("min-height", "68px");
+    await fits(page);
+    await page.screenshot({ path: `test-results/companion-pinned-${width}.png`, animations: "disabled" });
+  }
+  const resize = panel.getByRole("button", { name: "调整对话窗口大小" });
+  const priorHeight = (await panel.boundingBox())!.height;
+  await resize.press("ArrowUp");
+  expect((await panel.boundingBox())!.height).toBe(priorHeight - 24);
+  await page.locator('.k12-mobile-nav a[href="/conversations"]').click();
+  await expect(panel).toBeVisible();
+  await panel.getByLabel("想对老师说什么").fill("这是保留的草稿");
+  await panel.getByRole("button", { name: "收起对话" }).click();
+  await expect(panel).toHaveCount(0);
+  await page.getByRole("button", { name: "打开霜铃学习助手" }).click();
+  await expect(panel.getByLabel("想对老师说什么")).toHaveValue("这是保留的草稿");
+  await resize.press("Escape");
+  await expect(panel).toHaveCount(0);
+  expect(failedResponses).toEqual([]);
+  expect(errors).toEqual([]);
+});
 
 test("four stages keep their own home, navigation and content after refresh", async ({ page }) => {
   const state = await fixture(page);
@@ -128,7 +331,7 @@ test("SDK iframe merges rapid checkpoints and restores only confirmed state", as
   expect(state.interactiveWrites).toBe(1);
   expect(state.interactiveState).toEqual({ level: 3 });
   await page.reload();
-  await page.getByRole("button", { name: "开始学习" }).click();
+  await page.getByRole("button", { name: "继续学习" }).click();
   await expect(frame.locator("#level")).toHaveText("恢复关卡：3");
   await frame.locator("#finish").click();
   await expect(page.getByText(/游戏上报得分 8/)).toBeVisible();
@@ -153,7 +356,7 @@ test("interactive save failure keeps the activity and retry gets a server receip
   await expect(page.locator(".interactive-player-header")).toContainText("已保存");
   expect(state.interactiveState).toEqual({ level: 3 });
   await page.reload();
-  await page.getByRole("button", { name: "开始学习" }).click();
+  await page.getByRole("button", { name: "继续学习" }).click();
   await expect(frame.locator("#level")).toHaveText("恢复关卡：3");
 });
 
@@ -170,6 +373,61 @@ test("stale checkpoint shows a conflict without replacing a newer tab", async ({
   await expect(page.getByRole("alert").last()).toContainText("版本冲突");
   expect(state.interactiveState).toEqual({ level: 9 });
   expect(state.interactiveWrites).toBe(0);
+});
+
+test("learning teacher drags freely, follows the pet and keeps its draft", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await fixture(page, { stage: "PRIMARY_LOWER", interactive: true });
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto("/interactive/interactive-ui");
+  await expect(page.getByRole("button", { name: "开始学习", exact: true })).toBeVisible();
+  expect(await page.locator(".interactive-start").evaluate(el => getComputedStyle(el).backgroundColor)).toBe("rgb(250, 250, 248)");
+  await page.getByRole("button", { name: "开始学习", exact: true }).click();
+  const frame = page.frameLocator("iframe");
+  await expect(frame.locator("#level")).toHaveText("恢复关卡：1");
+  const dock = page.getByTestId("companion-dock");
+  const pet = dock.getByRole("button", { name: /打开.*学习助手/ });
+  async function dragTo(x: number, y: number) {
+    const box = await pet.boundingBox();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(x + box!.width / 2, y + box!.height / 2, { steps: 12 });
+    await page.mouse.up();
+    await expect.poll(async () => Math.abs((await dock.boundingBox())!.x - x)).toBeLessThan(2);
+  }
+  await dragTo(320, 180);
+  await pet.click();
+  const panel = page.getByRole("dialog", { name: /对话面板/ });
+  await expect(panel).toBeVisible();
+  const first = await panel.boundingBox();
+  await dragTo(820, 360);
+  await expect.poll(async () => Math.abs((await panel.boundingBox())!.x - first!.x)).toBeGreaterThan(40);
+  const input = panel.getByLabel("想对老师说什么", { exact: true });
+  await input.fill("移动教师后保留这个问题草稿");
+  await panel.getByRole("button", { name: "收起对话", exact: true }).click();
+  await page.getByRole("button", { name: "问老师", exact: true }).click();
+  await expect(input).toHaveValue("移动教师后保留这个问题草稿");
+  await expect(page.locator(".interactive-guide textarea")).toHaveCount(0);
+  await page.screenshot({ path: "frontend/test-results/learning-teacher-floating.png" });
+  await page.keyboard.press("Escape");
+  await expect(panel).toHaveCount(0);
+  await page.getByRole("button", { name: "专注模式", exact: true }).click();
+  await page.getByRole("button", { name: "问老师", exact: true }).click();
+  await page.keyboard.press("Escape");
+  await expect(panel).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "退出专注", exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "专注模式", exact: true })).toBeVisible();
+  await page.reload();
+  await expect(pet).toBeVisible();
+  await expect.poll(async () => Math.abs((await dock.boundingBox())!.x - 820)).toBeLessThan(2);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "问老师", exact: true }).click();
+  await expect(panel.getByTestId("send-turn")).toBeInViewport();
+  expect(await panel.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+  await page.screenshot({ path: "frontend/test-results/learning-teacher-mobile.png" });
+  expect(errors).toEqual([]);
 });
 
 for (const width of [320, 390, 768, 1440]) {
@@ -242,6 +500,7 @@ test("selected pet persists on account and appears beside teacher replies", asyn
   await page.getByRole("button", { name: "打开霜铃学习助手" }).click();
   const panel = page.getByRole("dialog", { name: "霜铃对话面板" });
   await panel.getByRole("button", { name: "更多选项" }).click();
+  await panel.getByRole("tab", { name: "学习伙伴" }).click();
   await panel.getByLabel("选择学习伙伴").selectOption("anya");
   await expect.poll(() => state.account.preferences.companion_pet_id).toBe("anya");
   await expect(page.locator(".conv-main .conv-pet-head").first()).toHaveAttribute("aria-label", "阿尼亚头像");
@@ -297,6 +556,7 @@ test("settings saves teacher style and memory stays a Markdown document", async 
   await expect(page.getByText("学习观察")).toHaveCount(0);
   await expect(page.getByRole("combobox", { name: "学习阶段" })).toHaveCount(0);
   await expect(page.getByRole("combobox", { name: "教师风格" })).toHaveCount(0);
+  await page.getByRole("tab", { name: "我写的内容" }).click();
   await page.getByRole("button", { name: "创建个人记忆文档" }).click();
   await expect.poll(() => state.memory?.ai_enabled).toBe(true);
   await page.getByRole("button", { name: "编辑 Markdown" }).click();
@@ -316,6 +576,7 @@ test("settings saves teacher style and memory stays a Markdown document", async 
   await page.getByRole("button", { name: "恢复此版本" }).click();
   await expect(page.getByText("账号已保存 · 版本 4")).toBeVisible();
   await page.reload();
+  await page.getByRole("tab", { name: "我写的内容" }).click();
   await expect(page.getByRole("heading", { name: "我的发现" })).toBeVisible();
   expect(state.memory?.content_markdown).toContain("乌鸦喝水");
 });
@@ -397,6 +658,7 @@ test("switching accounts clears the companion draft and private memory view", as
   await expect(page.getByRole("dialog").getByLabel("想对老师说什么")).toHaveValue("");
   await page.keyboard.press("Escape");
   await page.goto("/growth");
+  await page.getByRole("tab", { name: "我写的内容" }).click();
   await expect(page.getByRole("button", { name: "创建个人记忆文档" })).toBeVisible();
   expect(state.turns).toBe(0);
 });
@@ -434,4 +696,77 @@ test("all six selected pets render their own portrait crop", async ({ page }) =>
     positions.add(crop.position);
   }
   expect(positions.size).toBeGreaterThan(2);
+});
+
+test("library separates textbooks from lectures and only reveals demo data on request", async ({ page }) => {
+  await fixture(page, { stage: "SENIOR" });
+  await mkdir("test-results/library-redesign", { recursive: true });
+  await page.setViewportSize({ width: 1542, height: 718 });
+  await page.goto("/resources");
+  await expect(page.getByRole("region", { name: "专题教材" })).toBeVisible();
+  expect(await page.locator(".od-library-intro").evaluate((el) => getComputedStyle(el).display)).toBe("flex");
+  expect(await page.locator(".library-book-grid").first().evaluate((el) => getComputedStyle(el).display)).toBe("grid");
+  expect((await page.locator(".library-cover").first().boundingBox())!.height).toBeGreaterThan(100);
+  await expect(page.getByRole("region", { name: "演示内容", exact: true })).toHaveCount(0);
+  const book = page.getByRole("article").filter({ hasText: "Python 3：从基础到项目" });
+  await expect(book).toContainText("16 章");
+  await page.screenshot({ path: "test-results/library-redesign/library-desktop.png" });
+  await page.getByRole("checkbox", { name: "显示演示内容" }).check();
+  await expect(page.getByRole("region", { name: "演示内容", exact: true })).toBeVisible();
+  await page.getByRole("checkbox", { name: "显示演示内容" }).uncheck();
+  await page.getByRole("button", { name: "专题教材", exact: true }).click();
+  await expect(page.getByRole("article")).toHaveCount(3);
+  await book.getByRole("link", { name: "开始阅读" }).click();
+  await expect(page).toHaveURL(/\/books\/python3$/);
+  await expect(page.getByTestId("book-reader")).toBeVisible();
+  await page.goto("/resources");
+  for (const width of [768, 390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await fits(page);
+    await expect(page.getByRole("searchbox", { name: "搜索学习内容" })).toBeVisible();
+    if (width === 390) await page.screenshot({ path: "test-results/library-redesign/library-mobile.png" });
+  }
+});
+
+test("chapter reading gives the article most space and supports focus, font size and a mobile directory", async ({ page }) => {
+  await fixture(page, { stage: "SENIOR" });
+  await mkdir("test-results/library-redesign", { recursive: true });
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.setViewportSize({ width: 1542, height: 718 });
+  await page.goto("/chapters/chapter-ui");
+  await expect(page.getByTestId("chapter-reader")).toBeVisible();
+  await expect(page.locator("h1")).toHaveCount(1);
+  await expect(page.getByRole("link", { name: "进入本章课堂" })).toHaveAttribute("href", "/study/lesson?chapter=chapter-ui");
+  await expect(page.locator(".reader-navigation li")).toHaveCount(1);
+  const before = await page.getByTestId("chapter-reader").boundingBox();
+  expect(before!.width).toBeGreaterThan(750);
+  await page.getByRole("button", { name: "增大正文字号" }).click();
+  expect(await page.getByTestId("chapter-reader").evaluate((el) => getComputedStyle(el).fontSize)).toBe("19px");
+  await page.getByRole("button", { name: "专注阅读", exact: true }).click();
+  await expect(page.locator(".content-page__rail")).toBeHidden();
+  const focused = await page.getByTestId("chapter-reader").boundingBox();
+  expect(focused!.width).toBeGreaterThan(before!.width + 100);
+  await page.screenshot({ path: "test-results/library-redesign/reader-focus.png" });
+  await page.getByRole("button", { name: "退出专注", exact: true }).click();
+  await page.getByRole("button", { name: "问问老师", exact: true }).click();
+  await expect(page.locator(".companion-panel")).toBeVisible();
+  await page.goto("/courses/course-ui");
+  await expect(page.getByTestId("course-meta")).toContainText("当前可读章节");
+  await expect(page.getByRole("heading", { name: "章节目录", exact: true })).toBeVisible();
+  await page.goto("/chapters/chapter-ui");
+  await expect(page.getByTestId("chapter-reader")).toBeVisible();
+  for (const width of [1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await fits(page);
+    if (width <= 1100) {
+      const directory = page.getByRole("button", { name: /章节目录/ });
+      await expect(directory).toHaveAttribute("aria-expanded", "false");
+      await directory.click();
+      await expect(page.locator(".reader-navigation li")).toBeVisible();
+      await directory.click();
+    }
+    if (width === 390) await page.screenshot({ path: "test-results/library-redesign/reader-mobile.png" });
+  }
+  expect(errors).toEqual([]);
 });

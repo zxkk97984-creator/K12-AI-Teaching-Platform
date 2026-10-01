@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-011-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 11 章 接下来往哪走"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 11 章 接下来往哪走。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "算法是学不完的。初中阶段建立这几个直觉就够了：\n- 查找：二分查找比顺序快。\n- 排序：Python 内置 sort 够用，了解选择排序原理即可。\n- 数据结构：列表、字典（散列表）是日常最常用的。\n- 问题求解：遇到问题先想\"能不能拆成小问题\"，再想\"能不能用表格存中间结果\"。\n\n以后高中会学：树、图、动态规划深入、各种竞赛模板。\n\n---\n\n> 本文件基于《算法图解》真实章节结构整理，知识点为初中生重新组织，代码示例简化为教学版本。原书为受版权保护作品，深入学习请购买正版。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-algorithms-topic-11"
+  ]
+}

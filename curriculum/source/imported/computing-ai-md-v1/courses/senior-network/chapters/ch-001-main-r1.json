@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-001-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第1章 计算机网络和因特网"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第1章 计算机网络和因特网。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "> **书名**：计算机网络：自顶向下方法（Computer Networking: A Top-Down Approach）\n> **作者**：James F. Kurose、Keith W. Ross\n> **出版社**：机械工业出版社（原书第7版，Pearson）\n> **真实目录来源**：https://www.pearson.com/us/higher-education/product/Kurose-Computer-Networking-A-Top-Down-Approach-7th-Edition/9780133594140.html\n> **说明**：本文件基于该书真实章节结构整理高中段知识点，非逐字原文（受版权保护），细节以原书为准。\n\n原书第7版共9章：计算机网络和因特网、应用层、运输层、网络层数据平面、网络层控制平面、链路层、无线网络和移动网络、网络安全、多媒体网络。高中重点掌握第1、2、3、4、6、8章。\n\n---\n\n### 什么是因特网\n\n从硬件看：数以亿计的主机（end systems）通过通信链路和分组交换机连在一起。从服务看：它提供一套编程接口，让分布式应用互相通信。\n\n### 协议\n\n协议定义了收发报文的格式和顺序规则。没有协议，发送方和接收方就无法理解彼此。\n\n### 分组交换\n\n主机把数据切成**分组（packet）**，每个分组带源地址和目的地址，独立转发。交换机收到分组后查转发表，从合适链路发出。这叫**存储转发**。\n\n### 协议分层\n\n| 层 | 功能 | 代表协议 |\n|----|------|----------|\n| 应用层 | 面向应用 | HTTP、DNS、FTP |\n| 运输层 | 端到端传输 | TCP、UDP |\n| 网络层 | 路由转发 | IP、ICMP |\n| 链路层 | 相邻节点帧 | 以太网、Wi-Fi、ARP |\n\n发送方从上到下层层加头（封装），接收方从下到上层层剥头（解封装）。\n\n### 时延与丢包\n\n分组经过路由器要排队，拥塞时丢包。吞吐率、时延、丢包率是网络三大指标。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-01"
+  ]
+}

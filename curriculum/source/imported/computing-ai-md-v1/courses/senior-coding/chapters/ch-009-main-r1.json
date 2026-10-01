@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-009-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第9章 其他进位制"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第9章 其他进位制。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "二进制只有 0 和 1，正好对应电路的通和断。八进制、十六进制是二进制的简写。\n\n| 十进制 | 二进制 | 十六进制 |\n|--------|--------|----------|\n| 0 | 0000 | 0 |\n| 1 | 0001 | 1 |\n| 9 | 1001 | 9 |\n| 10 | 1010 | A |\n| 15 | 1111 | F |\n| 16 | 10000 | 10 |"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-09"
+  ]
+}

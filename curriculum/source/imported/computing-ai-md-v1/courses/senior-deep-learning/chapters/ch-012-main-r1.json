@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-012-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第12章 计算性能"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第12章 计算性能。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "编译器优化、异步计算、GPU/多 GPU 训练、参数服务器。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-12"
+  ]
+}

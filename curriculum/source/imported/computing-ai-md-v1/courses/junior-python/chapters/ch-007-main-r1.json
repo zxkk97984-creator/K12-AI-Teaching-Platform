@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-007-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 7 章 用户输入和 while 循环"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 7 章 用户输入和 while 循环。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 7.1 input\n\n```python\nname = input(\"你叫什么？\")\nprint(f\"你好 {name}\")\n\nage = int(input(\"你几岁？\"))\nprint(f\"明年 {age+1} 岁\")\n```\n\n`input()` 拿到的永远是字符串。哪怕你输入 `13`，它拿到的也是 `\"13\"`，要做数学必须先 `int()` 转。这是新手最常踩的坑。\n\n#### 7.2 while 循环\n\n```python\ncurrent = 1\nwhile current <= 5:\n    print(current)\n    current += 1\n```\n\n`while` 后面的条件为真就一直循环。记得在循环体里改变量，否则会死循环。\n\n#### 7.3 break 与 continue\n\n```python\nwhile True:\n    line = input(\"> \")\n    if line == \"q\":\n        break\n    if line.startswith(\"#\"):\n        continue\n    print(line)\n```\n\n`break` 立刻跳出整个循环；`continue` 跳过本次剩下的语句。\n\n**练习**：用 while 不断让用户输入数字，直到输入 0 结束，输出平均值。\n\n**常见误区**：`input` 不转类型直接做加法会报 TypeError。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-07"
+  ]
+}

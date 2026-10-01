@@ -1,0 +1,191 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "senior-olympiad",
+  "title": "信息学奥赛基础与实践",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习信息学奥赛基础与实践，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "senior-olympiad-topic-01",
+      "name": "2.5 信息学奥赛衔接：CSP-J/S 与 NOIP",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「2.5 信息学奥赛衔接：CSP-J/S 与 NOIP」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-olympiad-topic-02",
+      "name": "2.27 CSP-J/S 考纲与题型分布",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「2.27 CSP-J/S 考纲与题型分布」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-olympiad-topic-03",
+      "name": "2.4 三道必刷 OJ 题",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「2.4 三道必刷 OJ 题」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-olympiad-topic-04",
+      "name": "2.14 再增四道经典 OJ 题",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「2.14 再增四道经典 OJ 题」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-olympiad-topic-05",
+      "name": "2.28 再增五道经典 OJ 题",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「2.28 再增五道经典 OJ 题」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-olympiad-topic-06",
+      "name": "2.15 常用算法模板",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「2.15 常用算法模板」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "2.5 信息学奥赛衔接：CSP-J/S 与 NOIP",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「2.5 信息学奥赛衔接：CSP-J/S 与 NOIP」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-olympiad-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/42be9639b8b9e842/04-信息学奥赛一本通.md",
+        "original_sha256": "42be9639b8b9e8425525f59849c10345c31805c6a47a8f22260939dde1712b2d",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "2.27 CSP-J/S 考纲与题型分布",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「2.27 CSP-J/S 考纲与题型分布」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-olympiad-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/42be9639b8b9e842/04-信息学奥赛一本通.md",
+        "original_sha256": "42be9639b8b9e8425525f59849c10345c31805c6a47a8f22260939dde1712b2d",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "2.4 三道必刷 OJ 题",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「2.4 三道必刷 OJ 题」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-olympiad-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/42be9639b8b9e842/04-信息学奥赛一本通.md",
+        "original_sha256": "42be9639b8b9e8425525f59849c10345c31805c6a47a8f22260939dde1712b2d",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "2.14 再增四道经典 OJ 题",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「2.14 再增四道经典 OJ 题」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-olympiad-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/42be9639b8b9e842/04-信息学奥赛一本通.md",
+        "original_sha256": "42be9639b8b9e8425525f59849c10345c31805c6a47a8f22260939dde1712b2d",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "2.28 再增五道经典 OJ 题",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「2.28 再增五道经典 OJ 题」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-olympiad-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/42be9639b8b9e842/04-信息学奥赛一本通.md",
+        "original_sha256": "42be9639b8b9e8425525f59849c10345c31805c6a47a8f22260939dde1712b2d",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "2.15 常用算法模板",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「2.15 常用算法模板」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-olympiad-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/42be9639b8b9e842/04-信息学奥赛一本通.md",
+        "original_sha256": "42be9639b8b9e8425525f59849c10345c31805c6a47a8f22260939dde1712b2d",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    }
+  ]
+}

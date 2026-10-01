@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-008-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第8章 从十进制开始"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第8章 从十进制开始。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "我们用十进制是因为有十个手指。但任何进制都能表示同一个数。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-08"
+  ]
+}

@@ -1,4 +1,6 @@
-import { useState, type ReactNode } from "react";
+import { memo, useState, type ReactNode } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { CardDTO, MessageDTO } from "./types";
 import { CompanionHeadAvatar, useCompanionName } from "../companion/CompanionAvatar";
 function FixtureBadge() {
@@ -59,23 +61,23 @@ function CardView({ card }: { card: CardDTO }) {
   );
 }
 
-function SafeMarkdown({ text }: { text: string }) {
-  // Keep rendering deliberately small and safe: React escapes text, while
-  // fenced code gets a readable block without injecting HTML or Markdown
-  // generated links into the learning surface.
-  const parts = text.split(/```([^\n]*)\n([\s\S]*?)```/g);
+const markdownPlugins = [remarkGfm];
+
+const SafeMarkdown = memo(function SafeMarkdown({ text }: { text: string }) {
   return (
     <div className="conv-card-text">
-      {parts.map((part, index) => {
-        if (index % 3 === 2) {
-          return <pre className="conv-code-block" key={`code-${index}`}><code>{part}</code></pre>;
-        }
-        if (index % 3 === 1) return null;
-        return <p key={`text-${index}`}>{part}</p>;
-      })}
+      <ReactMarkdown remarkPlugins={markdownPlugins} skipHtml components={{
+        h1: ({ children }) => <h3>{children}</h3>,
+        h2: ({ children }) => <h3>{children}</h3>,
+        pre: ({ children }) => <pre className="conv-code-block">{children}</pre>,
+        table: ({ children }) => <div className="conv-table-scroll"><table>{children}</table></div>,
+        a: ({ href, children }) => href ? <a href={href} target={/^https?:/.test(href) ? "_blank" : undefined} rel="noopener noreferrer">{children}</a> : <span>{children}</span>,
+        // AI replies must not load arbitrary remote images or execute raw HTML.
+        img: ({ alt }) => <span>{alt}</span>,
+      }}>{text}</ReactMarkdown>
     </div>
   );
-}
+});
 
 export function MessageView({ message, extra }: { message: MessageDTO; extra?: ReactNode }) {
   const companionName = useCompanionName();

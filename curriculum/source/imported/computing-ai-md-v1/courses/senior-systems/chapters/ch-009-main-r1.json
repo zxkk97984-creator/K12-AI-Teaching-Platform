@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-009-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "3.13 Git 分支模型"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：3.13 Git 分支模型。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "真实团队不会直接在 `main` 上干活。常见做法：\n\n- `main`：永远可发布的稳定代码；\n- `develop`：集成开发分支；\n- `feature/xxx`：每个新功能开一个短期分支，做完合并回 develop；\n- `hotfix/xxx`：线上出 bug 时从 main 拉一个紧急修复分支。\n\n常用补充命令：\n\n```bash\ngit status\ngit diff\ngit log --oneline --graph\ngit stash\ngit rebase main\ngit reset --hard HEAD~1\ngit reflog\n```\n\n`git stash` 把当前没提交的改动暂时藏起来，切分支干完活再 `git stash pop` 拿回来；`git reflog` 能找回\"误删分支\"——只要你 commit 过，几乎都能救回来。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-systems-topic-09"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第3章 线性神经网络"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第3章 线性神经网络。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 线性回归\n\n模型：`y = w·x + b`。损失函数用均方误差 MSE：\n\nL = (1/n) Σ (y_pred - y_true)²\n\n梯度下降：沿梯度反方向调 w、b，步长叫学习率 lr。\n\n```python\nimport numpy as np\n\ndef linear_regression(X, y, lr=0.01, epochs=1000):\n    n, d = X.shape\n    w = np.zeros(d)\n    b = 0.0\n    for _ in range(epochs):\n        y_pred = X @ w + b\n        dw = (2/n) * X.T @ (y_pred - y)\n        db = (2/n) * np.mean(y_pred - y)\n        w -= lr * dw\n        b -= lr * db\n    return w, b\n\nX = np.array([[1.0],[2.0],[3.0],[4.0]])\ny = np.array([2.0, 4.0, 6.0, 8.0])\nw, b = linear_regression(X, y)\nprint(w, b)\n```\n\n### softmax 回归（多分类）\n\n把输出变成概率分布：`softmax(o)_i = exp(o_i) / Σ exp(o_j)`。损失用交叉熵：`L = -log(y_pred[true])`。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-03"
+  ]
+}

@@ -1,0 +1,401 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "senior-algorithms",
+  "title": "算法竞赛入门",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习算法竞赛入门，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "senior-algorithms-topic-01",
+      "name": "第1章 程序设计入门",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第1章 程序设计入门」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-02",
+      "name": "第2章 循环结构程序设计",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第2章 循环结构程序设计」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-03",
+      "name": "第3章 数组和字符串",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第3章 数组和字符串」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-04",
+      "name": "第4章 函数和递归",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第4章 函数和递归」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-05",
+      "name": "第5章 基础题目选解",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第5章 基础题目选解」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-06",
+      "name": "第6章 数据结构基础",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第6章 数据结构基础」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-07",
+      "name": "第7章 暴力求解法",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第7章 暴力求解法」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-08",
+      "name": "第8章 高效算法设计",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第8章 高效算法设计」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-09",
+      "name": "第9章 动态规划初步",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第9章 动态规划初步」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-10",
+      "name": "第10章 数学概念与方法",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第10章 数学概念与方法」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-11",
+      "name": "第11章 图论模型与算法",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第11章 图论模型与算法」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-12",
+      "name": "CSP-J/S 衔接建议",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「CSP-J/S 衔接建议」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-algorithms-topic-13",
+      "name": "练习清单",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「练习清单」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "第1章 程序设计入门",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第1章 程序设计入门」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "第2章 循环结构程序设计",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第2章 循环结构程序设计」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "第3章 数组和字符串",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第3章 数组和字符串」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "第4章 函数和递归",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第4章 函数和递归」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "第5章 基础题目选解",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第5章 基础题目选解」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "第6章 数据结构基础",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第6章 数据结构基础」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-main",
+      "revision": 1,
+      "order_index": 14,
+      "title": "第7章 暴力求解法",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第7章 暴力求解法」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-008-main",
+      "revision": 1,
+      "order_index": 16,
+      "title": "第8章 高效算法设计",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第8章 高效算法设计」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-08"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-008-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-009-main",
+      "revision": 1,
+      "order_index": 18,
+      "title": "第9章 动态规划初步",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第9章 动态规划初步」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-09"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-009-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-010-main",
+      "revision": 1,
+      "order_index": 20,
+      "title": "第10章 数学概念与方法",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第10章 数学概念与方法」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-10"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-010-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-011-main",
+      "revision": 1,
+      "order_index": 22,
+      "title": "第11章 图论模型与算法",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第11章 图论模型与算法」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-11"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-011-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-012-main",
+      "revision": 1,
+      "order_index": 24,
+      "title": "CSP-J/S 衔接建议",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「CSP-J/S 衔接建议」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-12"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-012-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-013-main",
+      "revision": 1,
+      "order_index": 26,
+      "title": "练习清单",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「练习清单」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-algorithms-topic-13"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md",
+        "original_sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-013-main-r1.json"
+    }
+  ]
+}

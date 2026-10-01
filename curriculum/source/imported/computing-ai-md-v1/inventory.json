@@ -1,0 +1,98 @@
+{
+  "originals": {
+    "README.md": {
+      "sha256": "710db3402f0e4f425f9b283c0ba85cd2e56a2173d22910ee50e3f647abc9efaa",
+      "archive": "sources/710db3402f0e4f42/README.md"
+    },
+    "初中/01-Python编程从入门到实践.md": {
+      "sha256": "7b3c2dba6011439bf5b189d2212361d91cb2cd234b25edb669a7c85a301d3603",
+      "archive": "sources/7b3c2dba6011439b/01-Python编程从入门到实践.md"
+    },
+    "初中/02-算法图解.md": {
+      "sha256": "09e83bcf6259f4f82e3e416e41e9a578ee64da7b91682842ca2e11c11c4be4d9",
+      "archive": "sources/09e83bcf6259f4f8/02-算法图解.md"
+    },
+    "初中/03-编码.md": {
+      "sha256": "e9b1b1dae93b57edb0388d5587ff330e2998ed1a860e5274e486de5bdd808016",
+      "archive": "sources/e9b1b1dae93b57ed/03-编码.md"
+    },
+    "初中/04-图解机器学习.md": {
+      "sha256": "e02e40ca9bcea270f02146eb298417e06f96b73be013325caa4a2c8b633bd5c3",
+      "archive": "sources/e02e40ca9bcea270/04-图解机器学习.md"
+    },
+    "初中/04-编码.md": {
+      "sha256": "cc84fd1b429c662df3e0540ee796d0cb00c8dffa44aa2f5fb52affc8202d1fb4",
+      "archive": "sources/cc84fd1b429c662d/04-编码.md"
+    },
+    "初中/05-网络是怎样连接的.md": {
+      "sha256": "545eacd59d2c9c3bf855640453fbf6d151aab390001ddcdee8b233dc01bddeaf",
+      "archive": "sources/545eacd59d2c9c3b/05-网络是怎样连接的.md"
+    },
+    "小学/01-人工智能启蒙.md": {
+      "sha256": "ecab555624f343720cf4ed3dd735aa7f2837bba25f68d76ac03f6170e97a8059",
+      "archive": "sources/ecab555624f34372/01-人工智能启蒙.md"
+    },
+    "小学/02-Scratch少儿趣味编程.md": {
+      "sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+      "archive": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md"
+    },
+    "小学/03-中小学生电脑入门.md": {
+      "sha256": "9f0eddb21aceaeca9ed78aee1b9997ab4df68824c483729107d015729ee37c01",
+      "archive": "sources/9f0eddb21aceaeca/03-中小学生电脑入门.md"
+    },
+    "小学/04-网络安全自助指南.md": {
+      "sha256": "fc2ac6b6aa1155c8f642a09130bc82f249ebf3666a8d83acb152dff844ed3373",
+      "archive": "sources/fc2ac6b6aa1155c8/04-网络安全自助指南.md"
+    },
+    "小学/05-不插电的计算机科学.md": {
+      "sha256": "6de19a2592a23d9257857f76aafef11f5d3ed503bb0f4c91fa9e4af8b4016676",
+      "archive": "sources/6de19a2592a23d92/05-不插电的计算机科学.md"
+    },
+    "高中/00-学段总览与补充板块.md": {
+      "sha256": "cedbba5a678020b230e89470e1ff0543b6103b332cc612a10c655e9c254654a0",
+      "archive": "sources/cedbba5a678020b2/00-学段总览与补充板块.md"
+    },
+    "高中/01-流畅的Python.md": {
+      "sha256": "c829500fe97ce5ec92a79e9d54cd35b5789560e85ec6687864398a1763aab2f0",
+      "archive": "sources/c829500fe97ce5ec/01-流畅的Python.md"
+    },
+    "高中/02-大话数据结构.md": {
+      "sha256": "f2beec43ac7dd895e69c1d28cee9990cd3c7671652b8a1fdd6a1f810ba0f9bfa",
+      "archive": "sources/f2beec43ac7dd895/02-大话数据结构.md"
+    },
+    "高中/02-算法竞赛入门经典.md": {
+      "sha256": "634922d6d45d9e0e67e245a5927a1777795206cc061df7dc56091c479deaa83b",
+      "archive": "sources/634922d6d45d9e0e/02-算法竞赛入门经典.md"
+    },
+    "高中/03-动手学深度学习.md": {
+      "sha256": "060459597f7d47343ad7b47c43e2f7c165bbe51aaaf981165b34d373d765b74f",
+      "archive": "sources/060459597f7d4734/03-动手学深度学习.md"
+    },
+    "高中/04-信息学奥赛一本通.md": {
+      "sha256": "42be9639b8b9e8425525f59849c10345c31805c6a47a8f22260939dde1712b2d",
+      "archive": "sources/42be9639b8b9e842/04-信息学奥赛一本通.md"
+    },
+    "高中/05-机器学习实战.md": {
+      "sha256": "d37f0902f7eded64ca407cbdb760262a049c63a4b0c40930f12d02d9d0a5bd24",
+      "archive": "sources/d37f0902f7eded64/05-机器学习实战.md"
+    },
+    "高中/07-编码.md": {
+      "sha256": "515db4e64643c3600e27b843640814df894f10549ca7fb6dc0e66aca13683ed6",
+      "archive": "sources/515db4e64643c360/07-编码.md"
+    },
+    "高中/08-计算机网络自顶向下方法.md": {
+      "sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+      "archive": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md"
+    },
+    "高中/09-深入理解计算机系统.md": {
+      "sha256": "7df43368d819334ea162b7a98cec002e8529a97726e81433a95214540e58ecde",
+      "archive": "sources/7df43368d819334e/09-深入理解计算机系统.md"
+    },
+    "初中/编码合并来源.md": {
+      "sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+      "archive": "sources/f6b1dda2ec6b8885/编码合并来源.md"
+    }
+  },
+  "courses": 20,
+  "chapter_versions": 250
+}

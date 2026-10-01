@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第3章 布莱叶盲文与二元编码"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第3章 布莱叶盲文与二元编码。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "盲文用 6 个位置的凸点有无来编码，每个位置两种状态（有/无），2⁶=64 种组合足够表示字母数字。这是纯二元编码的直观例子。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-03"
+  ]
+}

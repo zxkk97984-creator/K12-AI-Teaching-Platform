@@ -22,9 +22,10 @@ function clampCompact(x: number, y: number): Point {
   };
 }
 
-export function useCompanionPosition(userId: string, parkingTarget?: string) {
+export function useCompanionPosition(userId: string, parkingTarget?: string, avoidSelectors?: string) {
   const key = `k12:companion:${userId}:position:v1`;
   const manuallyPlaced = useRef(false);
+  const repark = useRef<() => void>(() => {});
   const [position, setPosition] = useState<Point>(() => {
     try {
       const p = JSON.parse(localStorage.getItem(key) ?? "null");
@@ -41,6 +42,7 @@ export function useCompanionPosition(userId: string, parkingTarget?: string) {
     return defaultDockPosition();
   });
   const [movement, setMovement] = useState<CompanionAiState | null>(null);
+  const [dragging, setDragging] = useState(false);
   const current = useRef(position);
   const [parkingPosition, setParkingPosition] = useState<Point | null>(null);
   const [parked, setParked] = useState(false);
@@ -67,26 +69,30 @@ export function useCompanionPosition(userId: string, parkingTarget?: string) {
     }
   };
   useEffect(() => {
-    if (!parkingTarget) { setParked(false); return; }
-    const slot = document.querySelector(parkingTarget);
-    if (!slot) return;
+    if (!parkingTarget) { setParked(false); move(clampDock(current.current.x, current.current.y)); return; }
     const update = () => {
+      const slot = document.querySelector(parkingTarget);
+      if (!slot) return;
       const bounds = slot.getBoundingClientRect();
       if (!bounds.width) return;
-      setParkingPosition({ x: bounds.left, y: bounds.top });
+      setParkingPosition(previous => previous?.x === bounds.left && previous.y === bounds.top ? previous : { x: bounds.left, y: bounds.top });
       const p = current.current;
-      const intersectsControls = [...document.querySelectorAll(".codelab-workspace-toolbar, .codelab-editor, .codelab-result-panel, .codelab-workspace-actions, .codelab-filters, .codelab-bank-heading, .codelab-task-list")].some((element) => {
+      const intersectsControls = [...document.querySelectorAll(avoidSelectors ?? ".codelab-workspace-toolbar, .codelab-editor, .codelab-result-panel, .codelab-workspace-actions, .codelab-filters, .codelab-bank-heading, .codelab-task-list")].some((element) => {
         const r = element.getBoundingClientRect();
-        return r.width > 0 && r.height > 0 && p.x < r.right && p.x + 44 > r.left && p.y < r.bottom && p.y + 44 > r.top;
+        return r.width > 0 && r.height > 0 && p.x < r.right && p.x + (avoidSelectors ? 64 : 44) > r.left && p.y < r.bottom && p.y + (avoidSelectors ? 64 : 44) > r.top;
       });
       setParked(!manuallyPlaced.current || intersectsControls);
     };
+    repark.current = update;
     update();
     const observer = new ResizeObserver(update);
-    observer.observe(slot);
+    const slot = document.querySelector(parkingTarget);
+    if (slot) observer.observe(slot);
+    const mutations = new MutationObserver(update);
+    if (avoidSelectors) mutations.observe(document.body, {childList: true, subtree: true, attributes: true, attributeFilter: ["class", "data-panel-open", "data-interactive-focused"]});
     window.addEventListener("resize", update);
-    return () => { observer.disconnect(); window.removeEventListener("resize", update); };
-  }, [parkingTarget, key]);
+    return () => { observer.disconnect(); mutations.disconnect(); repark.current = () => {}; window.removeEventListener("resize", update); };
+  }, [parkingTarget, key, avoidSelectors]);
   useEffect(() => {
     const resize = () => {
       move(parkingTarget ? clampCompact(current.current.x, current.current.y) : remapDockPosition(current.current, previousViewport.current), manuallyPlaced.current);
@@ -104,6 +110,7 @@ export function useCompanionPosition(userId: string, parkingTarget?: string) {
       moved: false,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
+    setDragging(true);
   };
   const pointerMove = (event: PointerEvent<HTMLButtonElement>) => {
     const d = drag.current;
@@ -118,12 +125,14 @@ export function useCompanionPosition(userId: string, parkingTarget?: string) {
     move(clampPosition(d.origin.x + dx, d.origin.y + dy));
   };
   const pointerUp = () => {
-    if (drag.current?.moved) move(current.current, true);
+    if (drag.current?.moved) { move(current.current, true); repark.current(); }
     setMovement(null);
+    setDragging(false);
   };
   const pointerCancel = () => {
     drag.current = null;
     setMovement(null);
+    setDragging(false);
   };
   const wasDragged = () => {
     const moved = drag.current?.moved;
@@ -144,10 +153,12 @@ export function useCompanionPosition(userId: string, parkingTarget?: string) {
     manuallyPlaced.current = true;
     setParked(false);
     move(clampPosition(effectivePosition.x + d.x, effectivePosition.y + d.y), true);
+    repark.current();
   };
   return {
     position: effectivePosition,
     movement,
+    dragging,
     pointerDown,
     pointerMove,
     pointerUp,

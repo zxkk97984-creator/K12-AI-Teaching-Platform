@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "3.11 数据库深化"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：3.11 数据库深化。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 3.11.1 GROUP BY 与聚合\n\n```sql\nSELECT class_id, AVG(score) AS avg_score, COUNT(*) AS n\nFROM students\nGROUP BY class_id\nHAVING AVG(score) > 80;\n```\n\n`GROUP BY` 把行按某列分组，`COUNT/AVG/SUM/MAX/MIN` 是聚合函数，`HAVING` 对分组后的结果再筛选（区别于 WHERE 是分组前筛选）。\n\n#### 3.11.2 索引是什么\n\n索引就像书的目录：没有目录你要翻完整本书找一个词（全表扫描 O(n)），有目录直接翻到页码（B+ 树查找 O(log n)）。代价是索引占额外空间、写数据时要同步更新索引。所以索引不是越多越好，一般只给\"经常出现在 WHERE/JOIN/ORDER BY 里的列\"建索引。\n\n#### 3.11.3 关系型 vs NoSQL\n\n| 维度 | 关系型（MySQL/PG） | NoSQL（MongoDB/Redis） |\n|---|---|---|\n| 数据结构 | 严格表结构，schema 固定 | 文档/键值/图，schema 灵活 |\n| 事务 | 强 ACID | 大多弱化事务 |\n| 扩展 | 纵向为主（升配置） | 天然分布式横向扩展 |\n| 场景 | 银行、订单、强一致 | 缓存、日志、社交动态 |"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-systems-topic-02"
+  ]
+}

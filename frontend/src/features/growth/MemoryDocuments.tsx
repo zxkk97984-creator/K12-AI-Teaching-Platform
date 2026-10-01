@@ -52,6 +52,8 @@ export function MarkdownContent({ content }: { content: string }) {
         <ReactMarkdown
           skipHtml
           components={{
+            h1: ({ children }) => <h2>{children}</h2>,
+            h2: ({ children }) => <h3>{children}</h3>,
             a: ({ href, children }) => (
               <a href={href && /^(https?:|mailto:)/i.test(href) ? href : undefined} rel="noreferrer">
                 {children}
@@ -70,6 +72,7 @@ export function MarkdownContent({ content }: { content: string }) {
 }
 
 export function MemoryDocuments() {
+  const [retry, setRetry] = useState(0);
   const historyRef = useRef<HTMLDetailsElement>(null);
   const [current, setCurrent] = useState<DocumentDetail | null>(null);
   const [content, setContent] = useState("");
@@ -103,6 +106,8 @@ export function MemoryDocuments() {
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
+    setError(null);
     void (async () => {
       try {
         const result = await request<{ items: DocumentSummary[] }>("/api/v1/growth/documents");
@@ -116,7 +121,7 @@ export function MemoryDocuments() {
       }
     })();
     return () => { active = false; };
-  }, []);
+  }, [retry]);
 
   const discardAllowed = () => !dirty || window.confirm("还有未保存的修改，确认放弃吗？");
 
@@ -231,11 +236,11 @@ export function MemoryDocuments() {
               </>
             ) : (
               <>
-                <button type="button" className="secondary" onClick={() => setMode(mode === "preview" ? "edit" : "preview")}>
+                <button type="button" className="secondary" disabled={busy} onClick={() => setMode(mode === "preview" ? "edit" : "preview")}>
                   {mode === "preview" ? "继续编辑" : "预览"}
                 </button>
-                <button type="button" onClick={() => void save()} disabled={busy}>保存文档</button>
-                <button type="button" className="secondary" onClick={() => {
+                <button type="button" onClick={() => void save()} disabled={busy}>{busy ? "正在保存…" : "保存文档"}</button>
+                <button type="button" className="secondary" disabled={busy} onClick={() => {
                   if (discardAllowed()) {
                     setContent(current.content_markdown);
                     setMode("read");
@@ -247,7 +252,8 @@ export function MemoryDocuments() {
         ) : null}
       </div>
 
-      {loading ? <p role="status">正在读取个人记忆…</p> : current ? (
+      {dirty && <p className="growth-notice" role="status">有未保存的修改 · 切换标签页后草稿仍会保留，请点击保存。</p>}
+      {loading ? <p role="status">正在读取个人记忆…</p> : !current && error ? <button type="button" className="secondary" onClick={() => setRetry((value) => value + 1)}>重新读取文档</button> : current ? (
         <>
           {mode === "edit" ? (
             <div className="growth-document-edit">
@@ -255,6 +261,7 @@ export function MemoryDocuments() {
               <textarea
                 id="memory-markdown-editor"
                 value={content}
+                disabled={busy}
                 rows={18}
                 maxLength={20000}
                 onChange={(event) => setContent(event.target.value)}
@@ -294,7 +301,7 @@ export function MemoryDocuments() {
         </>
       ) : (
         <div className="growth-document-empty">
-          <p>当前账号还没有个人记忆文档。创建后即可阅读、编辑和查看版本。</p>
+          <h2>写下你希望被记住的内容</h2><p>记录兴趣、目标或喜欢的讲解方式。创建后可随时编辑和查看版本。</p>
           <button type="button" disabled={busy} onClick={() => void create()}>创建个人记忆文档</button>
         </div>
       )}

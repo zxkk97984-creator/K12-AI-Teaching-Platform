@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-012-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 27 章 编码：汇编语言"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 27 章 编码：汇编语言。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "最早的程序就是一堆 0 和 1（机器语言），人根本读不懂。后来发明了汇编语言：用 `MOV`、`ADD` 这种英文单词代替二进制指令，再由一个程序翻译成机器语言。这就是编程语言演化的起点。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-coding-topic-12"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "七、数据库 SQL 进阶"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：七、数据库 SQL 进阶。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "3.4 和 3.11 已经讲了基础 SELECT/JOIN/索引，这里再补几个高频进阶点。\n\n### 7.1 子查询\n\n把一个查询的结果当临时表用：\n\n```sql\nSELECT name, score\nFROM students\nWHERE score > (SELECT AVG(score) FROM students);\n```\n\n查出\"分数高于全班平均分的学生\"。\n\n### 7.2 GROUP BY 与 HAVING\n\n```sql\nSELECT class_id, COUNT(*) AS n, AVG(score) AS avg_score\nFROM scores\nGROUP BY class_id\nHAVING AVG(score) > 80;\n```\n\nWHERE 在分组前筛行，HAVING 在分组后筛组。\n\n### 7.3 JOIN 类型实战\n\n```sql\nSELECT s.name, c.course_name, sc.score\nFROM students s\nINNER JOIN scores sc ON s.id = sc.student_id\nLEFT JOIN courses c ON c.id = sc.course_id;\n```\n\nINNER JOIN 只保留两边都匹配的；LEFT JOIN 保留左表全部，右表没匹配补 NULL。\n\n### 7.4 窗口函数概念\n\n窗口函数可以在\"不合并行\"的前提下做聚合，比如给每个学生在班级内排名：\n\n```sql\nSELECT name, class_id, score,\n       RANK() OVER (PARTITION BY class_id ORDER BY score DESC) AS rk\nFROM scores;\n```\n\n这是高级 SQL 的分水岭，高中阶段了解概念即可。\n\n### 7.5 索引为什么快\n\n没索引时，查一个值要全表扫描 O(n)。建了 B+ 树索引后，树高通常只有 3–4 层，找一个值只需 3–4 次磁盘 IO，接近 O(log n)。但索引不是越多越好——每个索引都会拖慢 INSERT/UPDATE，因为索引也要同步更新。经验法则：给高频 WHERE/JOIN/ORDER BY 的列建索引。\n\n### 7.6 事务 ACID\n\n转账要从 A 扣 100、给 B 加 100，两步必须同时成功或同时失败。事务的四个性质：\n\n- **A 原子性**：事务里的操作要么全做、要么全不做；\n- **C 一致性**：事务前后数据库约束不被破坏（总分不能变负）；\n- **I 隔离性**：并发事务互不干扰；\n- **D 持久性**：提交后即使断电也不丢。\n\n```sql\nBEGIN;\nUPDATE accounts SET balance = balance - 100 WHERE id = 1;\nUPDATE accounts SET balance = balance + 100 WHERE id = 2;\nCOMMIT;\n```\n\n中间任何一步出错就 `ROLLBACK`，回滚到事务开始前。\n\n---\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-systems-topic-04"
+  ]
+}

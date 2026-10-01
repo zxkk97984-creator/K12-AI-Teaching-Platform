@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-017-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第18章 with、match和else块"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第18章 with、match和else块。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "`with` 上下文管理器：`__enter__` 和 `__exit__` 保证资源释放（文件、锁、连接）。\n\n```python\nwith open('a.txt', 'w', encoding='utf-8') as f:\n    f.write('hello')\n```\n\n`@contextlib.contextmanager` 用生成器实现上下文管理器。`try/except/else`：`else` 块在没有异常时执行。`match/case` 是 Python 3.10+ 的结构模式匹配。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-17"
+  ]
+}

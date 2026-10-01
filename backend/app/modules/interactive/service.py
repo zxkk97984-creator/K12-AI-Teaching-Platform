@@ -7,6 +7,7 @@ import io
 import json
 import mimetypes
 import uuid
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -31,7 +32,7 @@ from app.modules.interactive.package import (
     file_digest,
     read_package,
 )
-from app.modules.resources.models import Resource
+from app.modules.resources.models import Resource, ResourceChapterLink
 from app.modules.resources.service import (
     ResourceError,
     load_visible_resource,
@@ -272,10 +273,59 @@ async def update_draft(
     return _version_public(row)
 
 
-async def activate_version(
-    db: AsyncSession, *, resource_id: uuid.UUID, revision_id: uuid.UUID, settings: Settings
+async def clone_draft(
+    db: AsyncSession,
+    *,
+    resource_id: uuid.UUID,
+    revision_id: uuid.UUID,
+    actor: User,
+    settings: Settings,
 ) -> dict[str, Any]:
-    resource = await db.scalar(select(Resource).where(Resource.id == resource_id).with_for_update())
+    """Create an editable copy without changing any active or historical version."""
+    revision = await db.scalar(
+        select(InteractiveRevision).where(
+            InteractiveRevision.id == revision_id,
+            InteractiveRevision.resource_id == resource_id,
+        )
+    )
+    if revision is None:
+        raise InteractiveError("INTERACTIVE_NOT_FOUND", "版本不存在", 404)
+    files = list(
+        await db.scalars(select(InteractiveFile).where(InteractiveFile.revision_id == revision_id))
+    )
+    store = store_for(settings)
+    if any(not store.exists(file.storage_key) for file in files):
+        raise InteractiveError("INTERACTIVE_FILE_MISSING", "版本素材缺失，无法复制", 503)
+    output = io.BytesIO()
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for file in files:
+            if file.relative_path != "manifest.json":
+                archive.writestr(file.relative_path, store.resolve(file.storage_key).read_bytes())
+        archive.writestr("manifest.json", json.dumps(revision.manifest, ensure_ascii=False))
+    return await upload_revision(
+        db,
+        resource_id=resource_id,
+        actor=actor,
+        raw=output.getvalue(),
+        filename="editable-copy.zip",
+        settings=settings,
+    )
+
+
+async def activate_version(
+    db: AsyncSession,
+    *,
+    resource_id: uuid.UUID,
+    revision_id: uuid.UUID,
+    settings: Settings,
+    expected_current_id: uuid.UUID | None = None,
+) -> dict[str, Any]:
+    resource = await db.scalar(
+        select(Resource)
+        .where(Resource.id == resource_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
     row = await db.scalar(
         select(InteractiveRevision).where(
             InteractiveRevision.id == revision_id, InteractiveRevision.resource_id == resource_id
@@ -283,6 +333,13 @@ async def activate_version(
     )
     if resource is None or row is None or resource.kind != "INTERACTIVE":
         raise InteractiveError("INTERACTIVE_NOT_FOUND", "版本不存在", 404)
+    if (
+        expected_current_id is not None
+        and resource.active_interactive_revision_id != expected_current_id
+    ):
+        raise InteractiveError(
+            "INTERACTIVE_REVISION_CONFLICT", "当前版本已变化，升级包保留为草稿，请重新检查", 409
+        )
     if not store_for(settings).exists(row.document_storage_key):
         raise InteractiveError("INTERACTIVE_FILE_MISSING", "播放文档缺失", 409)
     row.locked_at = row.locked_at or datetime.now(UTC)
@@ -413,6 +470,14 @@ async def catalog(
     for session in sessions:
         latest.setdefault(session.resource_id, session)
     items = []
+    links: dict[uuid.UUID, list[str]] = {}
+    if rows:
+        for link in await db.scalars(
+            select(ResourceChapterLink).where(
+                ResourceChapterLink.resource_id.in_([row.id for row in rows])
+            )
+        ):
+            links.setdefault(link.resource_id, []).append(str(link.chapter_revision_id))
     for resource in rows:
         if purpose and resource.interactive_purpose != purpose:
             continue
@@ -448,6 +513,8 @@ async def catalog(
                 "revision": version.revision,
                 "capabilities": version.capabilities,
                 "is_test_fixture": resource.is_test_fixture,
+                "local_demo_visible": resource.local_demo_visible,
+                "chapter_revision_ids": links.get(resource.id, []),
                 "activity_status": activity.status if activity else "NOT_STARTED",
                 "can_resume": bool(
                     activity

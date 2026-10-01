@@ -11,6 +11,7 @@ def test_live_uses_valid_request_id() -> None:
     assert response.status_code == 200
     assert response.headers["X-Request-ID"] == "test-request-1"
     assert response.json()["status"] == "ok"
+    assert response.json()["environment"] == "test"
 
 
 def test_live_replaces_invalid_request_id() -> None:

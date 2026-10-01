@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第4章 多层感知机"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第4章 多层感知机。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### MLP\n\n在线性层间加非线性激活函数，才能拟合复杂关系。\n\n### 激活函数\n\n| 函数 | 公式 | 优点 | 缺点 |\n|------|------|------|------|\n| Sigmoid | 1/(1+e^-x) | 输出 0-1 | 梯度消失、非零中心 |\n| Tanh | (e^x-e^-x)/(e^x+e^-x) | 零中心 | 仍梯度消失 |\n| ReLU | max(0,x) | 计算快、缓解梯度消失 | 负区死亡 |\n| Softmax | 归一化指数 | 多分类输出概率 | 只用于输出层 |\n\n```python\ndef relu(x):\n    return np.maximum(0, x)\n```\n\n### 欠拟合与过拟合\n\n- 欠拟合：训练集都没学好（模型太简单）。\n- 过拟合：训练集好、测试集差（模型太复杂、记住了噪声）。\n\n解决过拟合：更多数据、正则化、Dropout、早停、数据增强。\n\n### 权重衰减（L2 正则化）\n\n损失加一项 `λ/2 · ||w||²`，惩罚大权重，让模型更简单。\n\n### Dropout\n\n训练时随机把一些神经元输出置零，强迫网络不依赖特定神经元。\n\n### 前向传播、反向传播和计算图\n\n前向传播从输入算到输出，记录中间值。反向传播从输出损失往回，用链式法则算每个参数的梯度。\n\n链式法则：`dz/dx = dz/dy · dy/dx`。多层网络就是把这个连乘起来。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-04"
+  ]
+}

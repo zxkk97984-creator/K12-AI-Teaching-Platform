@@ -8,6 +8,9 @@ export type LearningItem = {
   description: string;
   route: string;
   resource_type?: string | null;
+  stage?: string | null;
+  chapter_count?: number | null;
+  content_notice?: string | null;
   is_test_fixture?: boolean;
   available?: boolean;
   unavailable_reason?: string | null;

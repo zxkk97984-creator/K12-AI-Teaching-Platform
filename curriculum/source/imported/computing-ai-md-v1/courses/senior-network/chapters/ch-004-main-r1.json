@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第4章 网络层：数据平面"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第4章 网络层：数据平面。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 转发与路由\n\n转发（data plane）：把分组从输入端口搬到输出端口。路由（control plane）：全网计算转发表。\n\n### IP 协议\n\nIPv4 地址 32 位，点分十进制如 `192.168.1.1`。IP 数据报格式：版本、长度、TTL、协议号、源 IP、目的 IP。\n\n### IPv6\n\nIPv6 128 位，解决 IPv4 地址耗尽问题，去掉校验和加速转发，内置 IPsec。\n\n### 路由器工作原理\n\n路由器有输入端口、交换结构、输出端口。查转发表匹配最长前缀。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-04"
+  ]
+}

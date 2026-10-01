@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-011-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第11章 优化算法"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第11章 优化算法。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "- **SGD**：随机梯度下降，每次一个小批量。\n- **动量法**：积累历史梯度，冲过局部坑。\n- **AdaGrad/RMSProp**：自适应学习率。\n- **Adam**：动量 + RMSProp，最常用。\n- **学习率调度**：训练中途调小学习率。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-11"
+  ]
+}

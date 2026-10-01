@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-011-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 11 章 测试代码"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 11 章 测试代码。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "测试就是写一段代码，自动检查你写的函数对不对。改了代码后难道要每次都手动测一遍？测试就是自动化这个过程。\n\n```python\nimport unittest\n\ndef add(a, b):\n    return a + b\n\nclass TestAdd(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(2, 3), 5)\n        self.assertEqual(add(-1, 1), 0)\n\nif __name__ == \"__main__\":\n    unittest.main()\n```\n\n`assertEqual(实际值, 期望值)` 判断两者是否相等。\n\n**练习**：给第8章写的 `bmi` 函数配一个测试。\n\n**常见误区**：测试要测正常情况和边界情况（比如 0、负数）。\n\n---\n\n## 第二部分 项目（思路版）"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-11"
+  ]
+}

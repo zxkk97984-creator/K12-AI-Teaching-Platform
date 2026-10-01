@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-010-upper",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "写在最后"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：写在最后。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "Scratch 不是玩具，它是你学编程的第一步。你今天学会的\"顺序、循环、条件判断、变量、克隆\"，以后学任何编程语言都会用到。只不过以后不用拖积木了，改成打字而已——思路是一模一样的。\n\n多做项目，多改一改，多玩一玩。编程就是试出来的，错了改，改了再试。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "primary-scratch-topic-10"
+  ]
+}

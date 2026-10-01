@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-007-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第7章 电报与继电器"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第7章 电报与继电器。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "电报网用继电器自动转发信号。继电器本身就是个电磁开关，可以被电控制来控制其他电路——这是**逻辑门**的硬件基础。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-07"
+  ]
+}

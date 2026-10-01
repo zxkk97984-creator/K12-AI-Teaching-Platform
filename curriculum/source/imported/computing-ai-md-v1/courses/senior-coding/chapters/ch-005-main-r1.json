@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-005-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第5章 绕过拐角的通信"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第5章 绕过拐角的通信。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "用电报把信号传得更远。继电器（relay）用小电流控制大电流开关，让信号可以中继放大。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-05"
+  ]
+}

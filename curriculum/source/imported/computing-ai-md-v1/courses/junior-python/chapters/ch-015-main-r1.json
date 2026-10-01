@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-015-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "附录：14 个完整小项目"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：附录：14 个完整小项目。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 项目 1：猜数字\n\n```python\nimport random\nanswer = random.randint(1, 100)\ntries = 0\nwhile True:\n    g = int(input(\"猜 1-100：\"))\n    tries += 1\n    if g == answer:\n        print(f\"对了！用了{tries}次\")\n        break\n    elif g < answer:\n        print(\"太小\")\n    else:\n        print(\"太大\")\n```\n\n### 项目 2：石头剪刀布\n\n```python\nimport random\nc = random.choice([\"石头\", \"剪刀\", \"布\"])\np = input(\"出：\")\nprint(f\"你{p} 电脑{c}\")\nif p == c: print(\"平\")\nelif (p==\"石头\" and c==\"剪刀\") or (p==\"剪刀\" and c==\"布\") or (p==\"布\" and c==\"石头\"):\n    print(\"你赢\")\nelse:\n    print(\"你输\")\n```\n\n### 项目 3：计算器\n\n```python\na = float(input(\"数1：\"))\nop = input(\"+-*/：\")\nb = float(input(\"数2：\"))\nif op == \"+\": print(a+b)\nelif op == \"-\": print(a-b)\nelif op == \"*\": print(a*b)\nelif op == \"/\":\n    print(\"不能除0\" if b==0 else a/b)\n```\n\n### 项目 4：词频统计\n\n```python\ntext = \"the cat sat on the mat\"\nwords = text.split()\ncounter = {}\nfor w in words:\n    counter[w] = counter.get(w, 0) + 1\nfor k, v in counter.items():\n    print(k, v)\n```\n\n### 项目 5：凯撒密码\n\n```python\nplain = input(\"英文：\")\ns = 3\nout = \"\"\nfor ch in plain:\n    if \"a\" <= ch <= \"z\":\n        out += chr((ord(ch)-ord(\"a\")+s)%26+ord(\"a\"))\n    else:\n        out += ch\nprint(out)\n```\n\n### 项目 6：温度转换\n\n```python\nc = float(input(\"摄氏：\"))\nprint(\"华氏\", c*9/5+32)\n```\n\n### 项目 7：记账本\n\n```python\nrecords = []\nwhile True:\n    op = input(\"1记账2账单3退：\")\n    if op == \"1\":\n        records.append((input(\"花哪：\"), float(input(\"金额：\"))))\n    elif op == \"2\":\n        for i, v in records: print(i, v)\n        print(\"合计\", sum(v for _, v in records))\n    elif op == \"3\": break\n```\n\n### 项目 8：通讯录\n\n```python\ncontacts = {}\nwhile True:\n    op = input(\"1加2查3全部4退：\")\n    if op == \"1\":\n        contacts[input(\"名：\")] = input(\"电话：\")\n    elif op == \"2\":\n        print(contacts.get(input(\"查：\"), \"没这人\"))\n    elif op == \"3\":\n        for k, v in contacts.items(): print(k, v)\n    elif op == \"4\": break\n```\n\n### 项目 9：成绩管理\n\n```python\nstudents = []\nwhile True:\n    op = input(\"1录2看3平均4退：\")\n    if op == \"1\":\n        students.append((input(\"名：\"), float(input(\"分：\"))))\n    elif op == \"2\":\n        for n, s in students: print(n, s)\n    elif op == \"3\":\n        if students: print(sum(s for _, s in students)/len(students))\n    elif op == \"4\": break\n```\n\n### 项目 10：单词本\n\n```python\nwords = {}\nwhile True:\n    op = input(\"1加2查3默写4退：\")\n    if op == \"1\":\n        words[input(\"英：\")] = input(\"中：\")\n    elif op == \"2\":\n        print(words.get(input(\"查：\"), \"无\"))\n    elif op == \"3\":\n        for en, cn in words.items():\n            a = input(en+\"=\")\n            print(\"对\" if a==cn else \"错，是\"+cn)\n    elif op == \"4\": break\n```\n\n### 项目 11：BMI 计算器\n\n```python\nh = float(input(\"身高米：\"))\nw = float(input(\"体重kg：\"))\nbmi = w/(h*h)\nprint(f\"BMI={bmi:.1f}\")\nprint(\"偏瘦\" if bmi<18.5 else \"正常\" if bmi<24 else \"偏胖\")\n```\n\n### 项目 12：掷骰子\n\n```python\nimport random\nn = int(input(\"掷几次：\"))\ncounts = [0]*6\nfor _ in range(n):\n    counts[random.randint(1,6)-1] += 1\nfor i in range(6): print(f\"{i+1}:{counts[i]}次\")\n```\n\n### 项目 13：九九乘法表\n\n```python\nfor i in range(1, 10):\n    for j in range(1, i+1):\n        print(f\"{j}×{i}={i*j}\", end=\"\\t\")\n    print()\n```\n\n### 项目 14：猜成语\n\n```python\nimport random\nidioms = {\"画蛇添足\":\"多此一举\", \"守株待兔\":\"抱侥幸心理\"}\nans = random.choice(list(idioms))\nprint(\"提示：\", idioms[ans])\ng = input(\"猜：\")\nprint(\"对\" if g==ans else \"是\"+ans)\n```\n\n---\n\n> 本文件基于《Python 编程：从入门到实践》第3版真实章节结构整理，代码示例为教学改写。原书受版权保护，深入学习请购买正版。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-15"
+  ]
+}

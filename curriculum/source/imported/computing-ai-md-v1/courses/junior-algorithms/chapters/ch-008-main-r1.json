@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-008-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 8 章 贪婪算法"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 8 章 贪婪算法。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "贪婪算法的思路：每一步都选当前看起来最好的，不后悔。比如找零钱：能拿大面额就拿大面额。\n\n例子：你要凑 36 元零钱，贪婪算法会先拿 20，再拿 10，再拿 5，再拿 1——共 4 张。对人民币面额来说这就是最优解。\n\n但贪婪不一定总是最优，只是简单好用。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-algorithms-topic-08"
+  ]
+}

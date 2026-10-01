@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-005-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 5 章 if 语句"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 5 章 if 语句。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "程序不是一条路走到黑，它需要根据情况做选择。这就是 if 语句：\n\n```python\nage = 12\nif age < 4:\n    print(\"免费\")\nelif age < 18:\n    print(\"5 元\")\nelse:\n    print(\"10 元\")\n```\n\n判断相等用 `==`（两个等号），不等于用 `!=`，包含用 `in`。`elif` 是\"否则如果\"，可以写多个；`else` 是兜底。\n\n```python\nbanned = [\"andrew\", \"carolina\"]\nuser = \"marie\"\nif user in banned:\n    print(\"禁止入内\")\nelse:\n    print(\"欢迎\")\n```\n\n**练习**：输入成绩，90以上输出\"优秀\"，80以上\"良好\"，60以上\"及格\"，否则\"要加油\"。\n\n**常见误区**：`if age = 18` 是错的（单等号是赋值），要用 `==`。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-05"
+  ]
+}

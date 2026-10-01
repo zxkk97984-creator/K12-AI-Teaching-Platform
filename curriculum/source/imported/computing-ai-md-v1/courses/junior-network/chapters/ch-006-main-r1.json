@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 6 章 浏览器显示网页"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 6 章 浏览器显示网页。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "浏览器收到 HTML 文本后，把它\"画\"成你看到的网页：先解析文字，再下载图片、CSS、JS，最后排版渲染。\n\n这就是你从输入网址到看到百度首页的全过程——前后大概 0.1 秒。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-network-topic-06"
+  ]
+}

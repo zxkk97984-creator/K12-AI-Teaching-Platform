@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第2章 循环结构程序设计"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第2章 循环结构程序设计。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### for 循环与范围\n\n```python\ns = 0\nfor i in range(1, 101):\n    s += i\nprint(s)\n```\n\n嵌套循环：\n\n```python\nfor i in range(1, 10):\n    for j in range(1, i+1):\n        print(f'{j}*{i}={i*j}', end='\\t')\n    print()\n```\n\n#### 浮点数陷阱与 64 位整数\n\nPython 整数任意精度，不用怕溢出；但浮点有精度。循环中累加浮点数会有误差，必要时用 `decimal` 模块。\n\n#### 文件操作\n\n竞赛中常用重定向 `python program.py < input.txt > output.txt`，或在代码里 `open()`。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-02"
+  ]
+}

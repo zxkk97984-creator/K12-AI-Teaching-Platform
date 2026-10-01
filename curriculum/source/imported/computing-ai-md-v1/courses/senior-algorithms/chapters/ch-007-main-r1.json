@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-007-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第7章 暴力求解法"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第7章 暴力求解法。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "枚举所有可能。DFS 回溯：\n\n### 全排列\n\n```python\ndef permute(nums):\n    res = []\n    def backtrack(path, used):\n        if len(path) == len(nums):\n            res.append(path[:])\n            return\n        for i in range(len(nums)):\n            if used[i]: continue\n            used[i] = True\n            path.append(nums[i])\n            backtrack(path, used)\n            path.pop()\n            used[i] = False\n    backtrack([], [False]*len(nums))\n    return res\n\nprint(permute([1,2,3]))\n```\n\n### 子集\n\n```python\ndef subsets(nums):\n    res = []\n    def backtrack(start, path):\n        res.append(path[:])\n        for i in range(start, len(nums)):\n            path.append(nums[i])\n            backtrack(i+1, path)\n            path.pop()\n    backtrack(0, [])\n    return res\n```\n\n### 八皇后\n\n```python\ndef solve_n_queens(n):\n    res = []\n    def backtrack(row, cols, diag1, diag2, board):\n        if row == n:\n            res.append([''.join(r) for r in board])\n            return\n        for col in range(n):\n            if col in cols or (row-col) in diag1 or (row+col) in diag2:\n                continue\n            board[row][col] = 'Q'\n            backtrack(row+1, cols|{col}, diag1|{row-col}, diag2|{row+col}, board)\n            board[row][col] = '.'\n    backtrack(0, set(), set(), set(), [['.']*n for _ in range(n)])\n    return res\n\nprint(len(solve_n_queens(8)))\n```\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-07"
+  ]
+}

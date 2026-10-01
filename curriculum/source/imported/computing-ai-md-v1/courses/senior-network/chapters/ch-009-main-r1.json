@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-009-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第9章 多媒体网络"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第9章 多媒体网络。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "视频流、实时通话（VoIP）需要低时延。DASH 按用户带宽自适应切换视频清晰度。CDN 分发视频。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-09"
+  ]
+}

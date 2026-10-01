@@ -1,0 +1,67 @@
+{
+  "schema_version": "k12-interactive-v1",
+  "content_key": "learning-binary-cards",
+  "title": "二进制卡片",
+  "purpose": "LESSON",
+  "stage": "PRIMARY_UPPER",
+  "subject": "计算机与人工智能",
+  "entry": "index.html",
+  "cover": "assets/cover.svg",
+  "summary": "通过动态画面和动手操作理解二进制卡片，由霜铃朗读预设讲解。",
+  "knowledge_points": [
+    "二进制卡片"
+  ],
+  "capabilities": [
+    "SCENES",
+    "CHECKPOINTS",
+    "COMPLETION"
+  ],
+  "scenes": [
+    {
+      "id": "observe",
+      "title": "认识开关",
+      "summary": "每张卡片只有开和关两种状态。我们用一表示开，用零表示关。"
+    },
+    {
+      "id": "compose",
+      "title": "组合数字",
+      "summary": "从右向左，每张卡片的数值翻一倍。把开启的卡片相加，试着表示十三。"
+    },
+    {
+      "id": "challenge",
+      "title": "换个数字",
+      "summary": "现在试着表示二十一。观察二进制数字与卡片上的开关状态怎样一一对应。"
+    },
+    {
+      "id": "reflect",
+      "title": "总结规律",
+      "summary": "五张卡片能表示从零到三十一的数。增加一张卡片，可表示的状态数量就会翻倍。"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "observe-read",
+      "scene_id": "observe",
+      "text": "每张卡片只有开和关两种状态。我们用一表示开，用零表示关。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "compose-read",
+      "scene_id": "compose",
+      "text": "从右向左，每张卡片的数值翻一倍。把开启的卡片相加，试着表示十三。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "challenge-read",
+      "scene_id": "challenge",
+      "text": "现在试着表示二十一。观察二进制数字与卡片上的开关状态怎样一一对应。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "reflect-read",
+      "scene_id": "reflect",
+      "text": "五张卡片能表示从零到三十一的数。增加一张卡片，可表示的状态数量就会翻倍。",
+      "trigger": "SCENE_ENTER"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-001-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第1章 最好的朋友（电筒密谈）"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第1章 最好的朋友（电筒密谈）。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "> **书名**：编码：隐匿在计算机软硬件背后的语言（Code: The Hidden Language of Computer Hardware and Software）\n> **作者**：Charles Petzold\n> **出版社**：电子工业出版社（中译本）\n> **真实目录来源**：https://book.douban.com/subject/38448758/\n> **说明**：本文件基于该书真实章节结构整理高中段知识点，非逐字原文（受版权保护），细节以原书为准。\n\n本书从手电筒、电报讲起，一路推导出二进制、逻辑门、加法器、触发器、存储器、CPU，最后到微处理器和操作系统。是计算机启蒙第一书，适合高一高二。\n\n---\n\n两个小孩在夜里用电筒闪烁传递消息。闪烁本身就是一种\"编码\"：长亮、短灭代表不同含义。这一章奠定全书基调——**编码就是用两种状态的组合来表示信息**。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-01"
+  ]
+}

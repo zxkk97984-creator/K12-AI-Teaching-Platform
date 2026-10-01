@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第2章 应用层"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第2章 应用层。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 网络应用原理\n\n客户-服务器模式：服务器一直在线，客户主动连接。P2P 模式：每个节点既是客户又是服务器。\n\n### Web 与 HTTP\n\nHTTP 是无状态文本协议。请求方法：GET（取资源）、POST（提交）、PUT、DELETE。\n\n```\nGET /index.html HTTP/1.1\nHost: www.example.com\nUser-Agent: Mozilla/5.0\nAccept: text/html\n```\n\n状态码：200 成功、301/302 重定向、304 用缓存、404 未找到、500 服务器错。\n\nCookie 让 HTTP 有状态：服务器在响应头 `Set-Cookie` 下发标识，浏览器以后每次请求都带上。\n\n### 万维网与文档\n\nHTML 用标签描述结构，CSS 描述样式，JavaScript 提供交互。浏览器渲染引擎把三者画成屏幕上的像素。\n\n### DNS\n\nDNS 是分布式数据库，把域名翻译成 IP。递归查询：浏览器→本地 DNS→根→顶级域→权威，逐级向下。\n\n### CDN\n\n内容分发网把缓存放到离用户近的边缘节点，DNS 根据用户地理位置返回最近节点 IP。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-02"
+  ]
+}

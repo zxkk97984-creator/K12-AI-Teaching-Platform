@@ -43,7 +43,7 @@ const resource: ResourceSummary = {
   license_note: "",
   review_status: "UNREVIEWED",
   publication_status: "DRAFT",
-  is_test_fixture: false,
+  is_test_fixture: false, local_demo_visible: false,
   content_notice: null,
   chapter_revision_ids: [],
   knowledge_point_slugs: [],

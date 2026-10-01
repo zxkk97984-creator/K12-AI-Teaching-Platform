@@ -70,7 +70,7 @@ class ContentReviewError(Exception):
 
 
 def content_profile_for(settings: Settings) -> ContentProfile:
-    """Production serves formal content only; dev/test may load fixtures."""
+    """Production serves formal content; dev/test also allow explicit local demos."""
 
     return ContentProfile.FORMAL if settings.app_env == "production" else ContentProfile.DEVELOPMENT
 
@@ -83,8 +83,10 @@ def viewer_scope_from_profile(profile: LearnerProfile | None, settings: Settings
     )
 
 
-def _notice(is_test_fixture: bool) -> str | None:
-    return FIXTURE_NOTICE if is_test_fixture else None
+def _notice(is_test_fixture: bool, local_demo_visible: bool = False) -> str | None:
+    if is_test_fixture:
+        return FIXTURE_NOTICE
+    return "本地学习讲义 · 来源与审核状态见章节说明" if local_demo_visible else None
 
 
 def _summary(
@@ -111,7 +113,7 @@ def _summary(
         publication_status=PublicationStatus(review_state.publication_status),
         review_status=ReviewStatus(review_state.review_status),
         is_test_fixture=release.is_test_fixture,
-        content_notice=_notice(release.is_test_fixture),
+        content_notice=_notice(release.is_test_fixture, release.local_demo_visible),
     )
 
 
@@ -135,7 +137,7 @@ def visibility_conditions(viewer: ViewerScope):
         alternatives.append(
             and_(
                 ChapterRevision.stage == stage,
-                Release.is_test_fixture.is_(True),
+                or_(Release.is_test_fixture.is_(True), Release.local_demo_visible.is_(True)),
                 ChapterReviewState.publication_status != PublicationStatus.WITHDRAWN.value,
             )
         )

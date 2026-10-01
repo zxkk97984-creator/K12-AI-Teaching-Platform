@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-008-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "3.5 软件工程初步"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：3.5 软件工程初步。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "一个软件项目不是写完代码就结束。**需求分析**搞清楚\"到底要做什么\"；**设计**决定模块怎么分、接口怎么定；**编码**实现；**测试**找 bug；**部署**上线；**维护**修复和迭代。常见模型有瀑布模型（按阶段线性推进）和敏捷开发（小步快跑、每周迭代）。\n\n**Git** 是现代版本控制的事实标准。核心概念：仓库（repository）、提交（commit，一次快照）、分支（branch，平行开发线）、合并（merge）、远程仓库（GitHub/GitLab/Gitee）。常用命令：\n\n```bash\ngit init\ngit add .\ngit commit -m \"first commit\"\ngit branch dev\ngit checkout dev\ngit merge main\ngit push origin main\n```\n\n学会用 Git 管理自己的作业和项目，是从\"写脚本\"走向\"做工程\"的分水岭。\n\nGit 最反直觉的一点是：它记录的是**快照**而不是差异。每次 commit 都是当时整个项目的一个完整快照（没改的文件只存一个指针）。这让分支操作极其廉价——建分支只是写一个指向某个 commit 的指针，切换分支就是把指针挪一下。所以鼓励大家\"大胆开分支\"：想试新想法就建一个 `experiment` 分支，搞砸了直接删掉，主分支永远干净。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-systems-topic-08"
+  ]
+}

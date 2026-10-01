@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "folder": "ai-picture",
+      "course_slug": "primary-ai",
+      "chapter_slug": "ch-003-lower",
+      "stage": "PRIMARY_LOWER"
+    },
+    {
+      "folder": "binary-cards",
+      "course_slug": "primary-unplugged",
+      "chapter_slug": "ch-001-upper",
+      "stage": "PRIMARY_UPPER"
+    },
+    {
+      "folder": "conditions-loops",
+      "course_slug": "junior-python",
+      "chapter_slug": "ch-005-main",
+      "stage": "JUNIOR"
+    },
+    {
+      "folder": "binary-search",
+      "course_slug": "senior-algorithms",
+      "chapter_slug": "ch-008-main",
+      "stage": "SENIOR"
+    }
+  ]
+}

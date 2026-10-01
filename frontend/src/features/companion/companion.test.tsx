@@ -5,11 +5,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 vi.mock("../conversation/ConversationProvider", () => ({ useConversation: vi.fn() }));
 
 import { useConversation } from "../conversation/ConversationProvider";
-import { clampDock, defaultDockPosition, placePanel, remapDockPosition } from "./lib/geometry";
+import { clampDock, clampPanel, defaultDockPosition, placePanel, remapDockPosition } from "./lib/geometry";
 import { COMPANION_PETS, getSpriteStyle } from "./lib/sprite";
 import { spriteFrames } from "./types";
 import { CompanionSprite } from "./components/CompanionSprite";
 import { Companion } from "./components/Companion";
+import { LearningTeacherProvider } from "./LearningTeacherContext";
 
 function LeaveChat() {
   const navigate = useNavigate();
@@ -72,6 +73,17 @@ describe("reused companion assets and bounds", () => {
     expect(desktop.x).toBeGreaterThan(1200);
     expect(desktop.y).toBeGreaterThan(600);
   });
+  it("clamps a resized panel to small screens and preserves usable minimum dimensions", () => {
+    vi.stubGlobal("innerWidth", 1440);
+    vi.stubGlobal("innerHeight", 900);
+    expect(clampPanel({ left: 100, top: 100, width: 1, height: 1 })).toEqual({ left: 100, top: 100, width: 320, height: 320 });
+    vi.stubGlobal("innerWidth", 320);
+    vi.stubGlobal("innerHeight", 568);
+    const panel = clampPanel({ left: 1000, top: 900, width: 800, height: 900 });
+    expect(panel.width).toBe(288);
+    expect(panel.left + panel.width).toBeLessThanOrEqual(304);
+    expect(panel.top + panel.height).toBeLessThanOrEqual(568 - 76);
+  });
   it("keeps all quick prompts clear and opens history, courses, and roles from the mobile panel menu", async () => {
     vi.stubGlobal("innerWidth", 390);
     vi.stubGlobal("innerHeight", 844);
@@ -96,7 +108,7 @@ describe("reused companion assets and bounds", () => {
       sending: false,
     } as never);
 
-    render(<MemoryRouter initialEntries={["/conversations"]}><Companion userId="panel-options-test" /><LeaveChat /></MemoryRouter>);
+    render(<MemoryRouter initialEntries={["/conversations"]}><LearningTeacherProvider><Companion userId="panel-options-test" /></LearningTeacherProvider><LeaveChat /></MemoryRouter>);
     const dock = screen.getByTestId("companion-dock");
     await waitFor(() => expect(dock.getAttribute("data-minimized")).toBe("true"));
     fireEvent.click(screen.getByRole("button", { name: /打开.*学习助手/ }));
@@ -106,12 +118,41 @@ describe("reused companion assets and bounds", () => {
     expect(screen.queryByText("选择学习伙伴")).toBeNull();
     expect(screen.queryByTestId("history-item")).toBeNull();
 
+    const panel = screen.getByRole("dialog", { name: /对话面板/ });
+    const resize = screen.getByRole("button", { name: "调整对话窗口大小" });
+    const originalHeight = Number.parseFloat(panel.style.height);
+    fireEvent.keyDown(resize, { key: "ArrowUp" });
+    expect(Number.parseFloat(panel.style.height)).toBe(originalHeight - 24);
+    fireEvent.keyDown(resize, { key: "ArrowDown" });
+    expect(Number.parseFloat(panel.style.height)).toBe(originalHeight);
+    fireEvent.click(screen.getByRole("button", { name: "置顶对话" }));
+    expect(screen.getByRole("button", { name: "取消置顶" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "离开聊天" }));
+    expect(screen.getByRole("dialog", { name: /对话面板/ })).toBe(panel);
+    fireEvent.click(screen.getByRole("button", { name: "取消置顶" }));
+    expect(screen.getByRole("dialog", { name: /对话面板/ })).toBe(panel);
+
     const more = screen.getByRole("button", { name: "更多选项" });
     fireEvent.click(more);
     expect(more.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("tab", { name: "对话记录" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.queryByLabelText("选择学习伙伴")).toBeNull();
+    expect(screen.getByTestId("history-item").textContent).toBe("之前的问题");
+    expect(screen.queryByRole("menuitem", { name: "重命名" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "更多操作：之前的问题" }));
+    expect(screen.getByRole("menuitem", { name: "重命名" })).toBeTruthy();
+    fireEvent.keyDown(screen.getByRole("menuitem", { name: "重命名" }), { key: "Escape" });
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(more.getAttribute("aria-expanded")).toBe("true");
+    fireEvent.click(screen.getByRole("tab", { name: "学习伙伴" }));
     expect(screen.getByLabelText("选择学习伙伴")).toBeTruthy();
-    expect(screen.getByTestId("history-item")).toBeTruthy();
+    expect(screen.queryByTestId("history-item")).toBeNull();
+    fireEvent.click(screen.getByRole("tab", { name: "结合课程" }));
     expect(screen.getByTestId("start-session").textContent).toContain("有权访问的章节");
+    fireEvent.click(screen.getByRole("tab", { name: "对话记录" }));
+    fireEvent.change(screen.getByRole("searchbox", { name: "搜索宠物对话记录" }), { target: { value: "没有这个对话" } });
+    expect(screen.getByText("没有找到这个对话。")).toBeTruthy();
+    fireEvent.change(screen.getByRole("searchbox", { name: "搜索宠物对话记录" }), { target: { value: "" } });
     fireEvent.click(screen.getByTestId("history-item"));
     expect(controller.select).toHaveBeenCalledWith("saved-session");
     expect(more.getAttribute("aria-expanded")).toBe("false");

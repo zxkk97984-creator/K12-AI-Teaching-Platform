@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第4章 手电筒的剖析"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第4章 手电筒的剖析。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "拆开手电筒，看到电池、灯泡、开关、导线。电路通断就是最基本的开关模型。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-04"
+  ]
+}

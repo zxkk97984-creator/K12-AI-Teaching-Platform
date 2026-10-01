@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-018-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "练习"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：练习。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "1. 用 NumPy 手写一个两层 MLP 解决 MNIST 手写数字分类。\n2. 对比 SGD 和 Adam 在同一任务上的收敛速度。\n3. 画一个 3×3 卷积核对 5×5 输入的输出，手算验证。\n4. 解释为什么 ResNet 的残差连接能训练 100 层网络。\n5. 用 Hugging Face 跑一个情感分析 pipeline，观察输出。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-18"
+  ]
+}

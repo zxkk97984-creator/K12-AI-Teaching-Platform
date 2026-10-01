@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-021-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "练习"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：练习。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "1. 手算 5+3 的二进制加法，验证半加器全加器逻辑。\n2. 把你的生日转成二进制再转回十进制。\n3. 解释为什么 n 个触发器能存 2ⁿ 种状态。\n4. 用 Python 实现 8 位加法器，算 20+30。\n5. 解释缓存命中为什么让数组比链表快。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-21"
+  ]
+}

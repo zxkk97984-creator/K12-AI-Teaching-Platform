@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-012-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 12—14 章 外星人入侵"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 12—14 章 外星人入侵。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "```python\nimport sys\nimport pygame\n\npygame.init()\nscreen = pygame.display.set_mode((800, 600))\n\nwhile True:\n    for event in pygame.event.get():\n        if event.type == pygame.QUIT:\n            sys.exit()\n    screen.fill((230, 230, 230))\n    pygame.display.flip()\n```"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-12"
+  ]
+}

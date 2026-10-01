@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-001-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "学段总览"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：学段总览。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "> 本卷是高中段计算机知识学习平台的总入口，包含学段导览、学习路径，以及四个跨学科补充板块：网页前端开发、智能硬件与物联网、Python 数据分析、课标主线对照。\n\n适用对象：高中学段（10–12 年级，约 15–18 岁）。本学段不再满足于\"会用 Python 写脚本\"，而是要建立**可迁移的计算机科学思维**：理解数据如何变成模型、程序如何在机器上跑起来、信息如何在网络中流动，并初步具备工程化与伦理判断能力。默认读者已学过 Python 基础语法（变量、循环、函数），在此之上做进阶。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-pathways-topic-01"
+  ]
+}

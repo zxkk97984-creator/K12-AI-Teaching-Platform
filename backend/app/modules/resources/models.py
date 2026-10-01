@@ -96,6 +96,9 @@ class Resource(Base):
     )
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_test_fixture: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    local_demo_visible: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
     uploaded_by_user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("identity_users.id", ondelete="RESTRICT"),

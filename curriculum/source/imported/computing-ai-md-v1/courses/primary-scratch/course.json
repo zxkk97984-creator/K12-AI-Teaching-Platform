@@ -1,0 +1,383 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "primary-scratch",
+  "title": "Scratch 少儿趣味编程",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习Scratch 少儿趣味编程，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "primary-scratch-topic-01",
+      "name": "欢迎来到编程的世界",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「欢迎来到编程的世界」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-02",
+      "name": "初次编程：让小猫动起来",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「初次编程：让小猫动起来」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-03",
+      "name": "语文：故事机器",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「语文：故事机器」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-04",
+      "name": "数学：FizzBuzz 游戏",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「数学：FizzBuzz 游戏」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-05",
+      "name": "科学：蚂蚁模拟器",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「科学：蚂蚁模拟器」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-06",
+      "name": "社会：百科测验",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「社会：百科测验」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-07",
+      "name": "音乐：小青蛙之歌（轮唱）",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「音乐：小青蛙之歌（轮唱）」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-08",
+      "name": "体育：百米跨栏",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「体育：百米跨栏」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-09",
+      "name": "更多精彩功能",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「更多精彩功能」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-scratch-topic-10",
+      "name": "写在最后",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「写在最后」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-lower",
+      "revision": 1,
+      "order_index": 2,
+      "title": "欢迎来到编程的世界",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「欢迎来到编程的世界」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-001-upper",
+      "revision": 1,
+      "order_index": 3,
+      "title": "欢迎来到编程的世界",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「欢迎来到编程的世界」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-lower",
+      "revision": 1,
+      "order_index": 4,
+      "title": "初次编程：让小猫动起来",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「初次编程：让小猫动起来」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-upper",
+      "revision": 1,
+      "order_index": 5,
+      "title": "初次编程：让小猫动起来",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「初次编程：让小猫动起来」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-lower",
+      "revision": 1,
+      "order_index": 6,
+      "title": "语文：故事机器",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「语文：故事机器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-upper",
+      "revision": 1,
+      "order_index": 7,
+      "title": "语文：故事机器",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「语文：故事机器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-upper",
+      "revision": 1,
+      "order_index": 9,
+      "title": "数学：FizzBuzz 游戏",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「数学：FizzBuzz 游戏」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-upper",
+      "revision": 1,
+      "order_index": 11,
+      "title": "科学：蚂蚁模拟器",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「科学：蚂蚁模拟器」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-upper",
+      "revision": 1,
+      "order_index": 13,
+      "title": "社会：百科测验",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「社会：百科测验」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-upper",
+      "revision": 1,
+      "order_index": 15,
+      "title": "音乐：小青蛙之歌（轮唱）",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「音乐：小青蛙之歌（轮唱）」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-008-upper",
+      "revision": 1,
+      "order_index": 17,
+      "title": "体育：百米跨栏",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「体育：百米跨栏」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-08"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-008-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-009-upper",
+      "revision": 1,
+      "order_index": 19,
+      "title": "更多精彩功能",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「更多精彩功能」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-09"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-009-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-010-upper",
+      "revision": 1,
+      "order_index": 21,
+      "title": "写在最后",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「写在最后」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-scratch-topic-10"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/fc54c57f5d656144/02-Scratch少儿趣味编程.md",
+        "original_sha256": "fc54c57f5d65614458ad1151fbdafcffeef6d07b7a3af2cfe4407750f878f757",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-010-upper-r1.json"
+    }
+  ]
+}

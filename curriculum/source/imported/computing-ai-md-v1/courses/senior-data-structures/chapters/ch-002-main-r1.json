@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "数组与链表"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：数组与链表。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "> 数组是连续存储，链表是节点串联。\n#### 2.9.3 单链表\n\n```python\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n    def prepend(self, val):\n        self.head = ListNode(val, self.head)\n    def delete(self, target):\n        dummy = ListNode(0, self.head)\n        cur = dummy\n        while cur.next:\n            if cur.next.val == target:\n                cur.next = cur.next.next\n                break\n            cur = cur.next\n        self.head = dummy.next\n    def to_list(self):\n        result, cur = [], self.head\n        while cur:\n            result.append(cur.val)\n            cur = cur.next\n        return result\n```\n\n用 dummy 哑节点是链表题常用技巧，省掉\"删头节点要特判\"的麻烦。\n\n### 2.16 双向链表\n\n单链表只能往后走，双向链表每个节点还多一个 `prev` 指向前驱，于是能双向遍历、删除已知节点真正 O(1)：\n\n```python\nclass DListNode:\n    def __init__(self, val=0):\n        self.val = val\n        self.prev = None\n        self.next = None\n\nclass DoublyLinkedList:\n    def __init__(self):\n        self.head = None\n        self.tail = None\n    def push_back(self, val):\n        node = DListNode(val)\n        if not self.tail:\n            self.head = self.tail = node\n        else:\n            node.prev = self.tail\n            self.tail.next = node\n            self.tail = node\n    def erase(self, node):\n        if node.prev:\n            node.prev.next = node.next\n        else:\n            self.head = node.next\n        if node.next:\n            node.next.prev = node.prev\n        else:\n            self.tail = node.prev\n    def to_list(self):\n        result, cur = [], self.head\n        while cur:\n            result.append(cur.val)\n            cur = cur.next\n        return result\n```\n\n双向链表是 LRU 缓存（最近最少使用淘汰）的核心结构：哈希表负责 O(1) 查找，双向链表负责 O(1) 把刚访问过的节点移到头部、把尾部节点淘汰。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-data-structures-topic-02"
+  ]
+}

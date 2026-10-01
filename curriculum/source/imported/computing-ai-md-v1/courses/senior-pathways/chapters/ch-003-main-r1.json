@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "四、网页与前端开发"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：四、网页与前端开发。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "你每天刷的网页、用的 Web 应用，前端技术栈就是三件套：HTML 管结构、CSS 管样式、JavaScript 管行为。高中阶段不需要成为前端工程师，但要能看懂一个网页是怎么搭起来的、能写一个简单的交互页面。\n\n### 4.1 HTML 基础\n\nHTML（超文本标记语言）用标签描述页面结构。一个 HTML 文档形如：\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <title>我的主页</title>\n</head>\n<body>\n  <h1>你好</h1>\n  <p>这是一个段落。</p>\n</body>\n</html>\n```\n\n常用标签速查：\n\n| 标签 | 作用 |\n|---|---|\n| `<h1>`–`<h6>` | 一到六级标题 |\n| `<p>` | 段落 |\n| `<div>` | 通用块容器 |\n| `<span>` | 通用行内容器 |\n| `<a href=\"...\">` | 超链接 |\n| `<img src=\"...\" alt=\"...\">` | 图片 |\n| `<ul><li>` | 无序列表 |\n| `<table><tr><td>` | 表格 |\n| `<input>` `<form>` | 表单输入 |\n| `<button>` | 按钮 |\n\n标签可以嵌套，形成 DOM 树。浏览器把 HTML 解析成一棵节点树，JavaScript 再去操作这棵树。\n\n### 4.2 CSS 基础\n\nCSS（层叠样式表）选择页面元素并给它们加样式。选择器有三种最常用：标签选择器、类选择器（`.`开头）、ID 选择器（`#`开头）。\n\n```css\nbody {\n  font-family: system-ui, sans-serif;\n  background: #f5f5f5;\n  color: #222;\n}\n\n.card {\n  padding: 16px;\n  border-radius: 8px;\n  background: white;\n  box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n}\n```\n\n**盒模型**是 CSS 最重要的概念：每个元素都是一个盒子，从内到外是内容（content）、内边距（padding）、边框（border）、外边距（margin）。布局时调这四个值就像调相框。\n\n**Flex 布局**是现代网页排列元素的首选：父元素设 `display: flex`，子元素就会水平排列，配合 `justify-content`、`align-items` 控制对齐方式，比老的 float 布局好懂得多。\n\n### 4.3 JavaScript 入门\n\nJavaScript 是浏览器里唯一的编程语言，负责让页面\"动起来\"。基础语法和 Python 有相似之处（变量、函数、条件、循环），但有自己的生态：\n\n```javascript\nlet name = \"同学\";\nfunction greet(user) {\n  return \"你好，\" + user;\n}\nconsole.log(greet(name));\n```\n\n**DOM 操作**是 JS 最核心的能力：用 `document.querySelector('#title')` 选中页面元素，改它的文本、样式、属性：\n\n```javascript\nconst title = document.querySelector('h1');\ntitle.textContent = '新标题';\ntitle.style.color = 'red';\n```\n\n**事件监听**让页面响应用户操作：\n\n```javascript\nconst btn = document.querySelector('#btn');\nbtn.addEventListener('click', () => {\n  alert('你点了按钮');\n});\n```\n\n### 4.4 完整小页面：待办事项\n\n下面是一个单文件、可直接保存为 `.html` 双击打开运行的待办事项应用，HTML/CSS/JS 合在一起：\n\n```html\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n<meta charset=\"utf-8\">\n<title>我的待办</title>\n<style>\n  body { font-family: system-ui; max-width: 480px; margin: 40px auto; }\n  input { width: 70%; padding: 8px; font-size: 16px; }\n  button { padding: 8px 16px; font-size: 16px; cursor: pointer; }\n  ul { list-style: none; padding: 0; }\n  li { padding: 8px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; }\n  .done span { text-decoration: line-through; color: #999; }\n</style>\n</head>\n<body>\n  <h1>待办事项</h1>\n  <input id=\"taskInput\" placeholder=\"输入新任务\">\n  <button id=\"addBtn\">添加</button>\n  <ul id=\"taskList\"></ul>\n  <script>\n    const input = document.getElementById('taskInput');\n    const list = document.getElementById('taskList');\n    document.getElementById('addBtn').addEventListener('click', addTask);\n    input.addEventListener('keydown', e => {\n      if (e.key === 'Enter') addTask();\n    });\n    function addTask() {\n      const text = input.value.trim();\n      if (!text) return;\n      const li = document.createElement('li');\n      const span = document.createElement('span');\n      span.textContent = text;\n      const del = document.createElement('button');\n      del.textContent = '删除';\n      del.addEventListener('click', () => li.remove());\n      span.addEventListener('click', () => li.classList.toggle('done'));\n      li.appendChild(span);\n      li.appendChild(del);\n      list.appendChild(li);\n      input.value = '';\n    }\n  </script>\n</body>\n</html>\n```\n\n把它存成 `todo.html` 双击打开，就能输入任务、回车添加、点文字划掉、点删除移除。这个小例子串起了 HTML 结构、CSS 样式、JS 事件、DOM 操作所有核心概念。\n\n### 4.5 前端框架概念\n\n原生三件套写复杂应用会很啰嗦。**React**（Meta 出品）和 **Vue**（尤雨溪出品）是当今两大前端框架，核心思想是\"数据变了界面自动变\"——你不再手动操作 DOM，而是描述界面长什么样，框架帮你更新。高中阶段知道它们是什么、为什么出现即可，不必现在学。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-pathways-topic-03"
+  ]
+}

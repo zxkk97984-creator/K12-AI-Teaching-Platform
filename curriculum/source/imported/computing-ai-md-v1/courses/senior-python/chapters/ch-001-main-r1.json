@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-001-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第1章 Python数据模型"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第1章 Python数据模型。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "> **书名**：流畅的Python（第2版）（Fluent Python, 2nd Edition）\n> **作者**：Luciano Ramalho\n> **出版社**：人民邮电出版社（上下两册）\n> **真实目录来源**：https://www.ptpress.com.cn/publishing/book/8dc8205c-08fb-48cd-a11f-22ef520cb2fc\n> **说明**：本文件基于该书真实章节结构整理高中段知识点，非逐字原文（受版权保护），细节与示例以原书为准。代码为教学重写，可直接运行。\n\n本书面向已经掌握 Python 基础语法、想进一步写出\"Python 风格\"代码的高中生。全书 20 章分四部分：数据结构、函数即对象、类和协议、控制流。高中阶段重点掌握第 1、2、3、6、7、9、11、14、17、19 章。\n\n---\n\n## 第一部分 数据结构\n\nPython 数据模型是一套由解释器约定的特殊方法协议。当你写 `len(x)`、`x[i]`、`for i in x`、`str(x)` 时，解释器底层分别调用 `x.__len__()`、`x.__getitem__(i)`、`iter(x)`、`x.__str__()`。这叫\"鸭子类型\"：不需要继承某个特定类，只要实现了这些特殊方法，你的对象就能融入 Python 的语法糖。\n\n经典例子是一摞扑克牌。用 `__getitem__` 和 `__len__` 后，一副牌立刻支持索引、切片、迭代、`in` 运算，完全不需要额外代码。\n\n```python\nimport collections\n\nCard = collections.namedtuple('Card', ['rank', 'suit'])\n\nclass FrenchDeck:\n    ranks = [str(n) for n in range(2, 11)] + list('JQKA')\n    suits = 'spades diamonds clubs hearts'.split()\n\n    def __init__(self):\n        self._cards = [Card(r, s) for s in self.suits for r in self.ranks]\n\n    def __len__(self):\n        return len(self._cards)\n\n    def __getitem__(self, position):\n        return self._cards[position]\n\ndeck = FrenchDeck()\nprint(len(deck))\nprint(deck[0])\nprint(deck[-1])\nfor c in deck:\n    pass\nprint(Card('Q', 'hearts') in deck)\n```\n\n为什么 `len(x)` 不是 `x.len()`？因为 Python 对内置类型做了优化：CPython 直接从对象头读长度字段，避免一次方法调用。特殊名字 `__len__` 让用户自定义类型也能走这条快路。\n\n**常见误区**：把 `__repr__` 和 `__str__` 搞混。`__repr__` 是给开发者看的官方表示（在交互环境、调试器里显示），`__str__` 是给终端用户看的（`print` 时）。如果只实现一个，实现 `__repr__`，因为 `str()` 找不到时会回退到 `repr()`。\n\n**练习**：给上面的 `FrenchDeck` 加 `__repr__`，让 `print(deck)` 输出可读内容。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-01"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "2.4 三道必刷 OJ 题"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：2.4 三道必刷 OJ 题。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 题 1：两数之和（LeetCode 1）\n\n给定一个数组和目标值，找出两个数的下标使其和为目标。暴力双重循环 O(n²)；用哈希表把\"查另一半\"变成 O(1)，整体 O(n)：\n\n```python\ndef two_sum(nums, target):\n    seen = {}\n    for i, x in enumerate(nums):\n        if target - x in seen:\n            return [seen[target - x], i]\n        seen[x] = i\n    return []\n```\n\n#### 题 2：斐波那契数列\n\n`F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)`。直接递归会重复算大量子问题，指数级；用记忆化或迭代降到 O(n)：\n\n```python\ndef fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a\n```\n\n#### 题 3：走楼梯（LeetCode 70 思路）\n\n每次可以走 1 阶或 2 阶，走到第 n 阶有多少种走法？最后一步要么从 n-1 上来，要么从 n-2 上来，于是 `dp[n] = dp[n-1] + dp[n-2]`——本质上就是斐波那契：\n\n```python\ndef climb_stairs(n):\n    if n <= 2:\n        return n\n    prev, curr = 1, 2\n    for _ in range(3, n + 1):\n        prev, curr = curr, prev + curr\n    return curr\n```\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-olympiad-topic-03"
+  ]
+}

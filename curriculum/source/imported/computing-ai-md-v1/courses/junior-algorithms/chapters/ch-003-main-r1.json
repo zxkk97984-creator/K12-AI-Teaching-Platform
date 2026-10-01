@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 3 章 递归"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 3 章 递归。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "递归就是函数自己调用自己。写递归必须有两个东西：\n\n- **基线条件**：什么时候不再调用自己（出口）。\n- **递归条件**：什么时候继续调用自己。\n\n```python\ndef factorial(n):\n    if n == 1:\n        return 1\n    return n * factorial(n - 1)\n\nprint(factorial(5))\n```\n\n5! = 5 × 4! = 5 × 4 × 3! = ... = 120。像剥洋葱，一层一层往里剥，剥到最里面再一层一层往外算。\n\n电脑底层用**调用栈**来管理递归：每调用一次就压一层，返回时弹出。递归太深会\"栈溢出\"。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-algorithms-topic-03"
+  ]
+}

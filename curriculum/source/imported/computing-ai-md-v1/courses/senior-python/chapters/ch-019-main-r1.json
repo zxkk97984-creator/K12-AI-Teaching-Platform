@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-019-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第20章 并发执行器"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第20章 并发执行器。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "`concurrent.futures.ThreadPoolExecutor` / `ProcessPoolExecutor` 封装了线程/进程池：\n\n```python\nfrom concurrent.futures import ThreadPoolExecutor\nimport time\n\ndef download(url):\n    time.sleep(1)\n    return url\n\nurls = ['a', 'b', 'c']\nwith ThreadPoolExecutor(max_workers=3) as ex:\n    results = list(ex.map(download, urls))\nprint(results)\n```\n\n`as_completed` 哪个先完成先处理。高中阶段理解\"并发 vs 并行\"、GIL 影响即可。\n\n---\n\n## 高中阶段重点练习建议\n\n1. 用 `@dataclass` 重写一个学生成绩记录类，支持排序和统计。\n2. 写一个 `@lru_cache` 装饰的斐波那契函数，对比递归版和记忆化版性能。\n3. 实现一个可迭代的 `Range` 类（自己的 range）。\n4. 用 `ThreadPoolExecutor` 并发下载多个网页 URL。\n5. 用 `__slots__` 写一个 100 万元素的点类，观察内存差异。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-19"
+  ]
+}

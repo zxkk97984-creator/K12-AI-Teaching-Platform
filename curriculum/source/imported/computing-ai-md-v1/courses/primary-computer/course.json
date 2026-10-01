@@ -1,0 +1,179 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "primary-computer",
+  "title": "电脑入门",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习电脑入门，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "primary-computer-topic-01",
+      "name": "第一周 结识一位新朋友——电脑",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第一周 结识一位新朋友——电脑」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-computer-topic-02",
+      "name": "第二周 怎样指挥电脑——电脑的基本操作",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第二周 怎样指挥电脑——电脑的基本操作」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-computer-topic-03",
+      "name": "第三周 教会电脑做事——什么是程序设计",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第三周 教会电脑做事——什么是程序设计」中的核心概念与示例。"
+    },
+    {
+      "slug": "primary-computer-topic-04",
+      "name": "第四周 驾上电脑展翅飞翔——应用与展望",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第四周 驾上电脑展翅飞翔——应用与展望」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-lower",
+      "revision": 1,
+      "order_index": 2,
+      "title": "第一周 结识一位新朋友——电脑",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「第一周 结识一位新朋友——电脑」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-computer-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/9f0eddb21aceaeca/03-中小学生电脑入门.md",
+        "original_sha256": "9f0eddb21aceaeca9ed78aee1b9997ab4df68824c483729107d015729ee37c01",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-001-upper",
+      "revision": 1,
+      "order_index": 3,
+      "title": "第一周 结识一位新朋友——电脑",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第一周 结识一位新朋友——电脑」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-computer-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/9f0eddb21aceaeca/03-中小学生电脑入门.md",
+        "original_sha256": "9f0eddb21aceaeca9ed78aee1b9997ab4df68824c483729107d015729ee37c01",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-lower",
+      "revision": 1,
+      "order_index": 4,
+      "title": "第二周 怎样指挥电脑——电脑的基本操作",
+      "stage": "PRIMARY_LOWER",
+      "grade_min": 1,
+      "grade_max": 3,
+      "objectives": [
+        "解释「第二周 怎样指挥电脑——电脑的基本操作」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-computer-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/9f0eddb21aceaeca/03-中小学生电脑入门.md",
+        "original_sha256": "9f0eddb21aceaeca9ed78aee1b9997ab4df68824c483729107d015729ee37c01",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-lower-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-upper",
+      "revision": 1,
+      "order_index": 5,
+      "title": "第二周 怎样指挥电脑——电脑的基本操作",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第二周 怎样指挥电脑——电脑的基本操作」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-computer-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/9f0eddb21aceaeca/03-中小学生电脑入门.md",
+        "original_sha256": "9f0eddb21aceaeca9ed78aee1b9997ab4df68824c483729107d015729ee37c01",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-upper",
+      "revision": 1,
+      "order_index": 7,
+      "title": "第三周 教会电脑做事——什么是程序设计",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第三周 教会电脑做事——什么是程序设计」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-computer-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/9f0eddb21aceaeca/03-中小学生电脑入门.md",
+        "original_sha256": "9f0eddb21aceaeca9ed78aee1b9997ab4df68824c483729107d015729ee37c01",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-upper-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-upper",
+      "revision": 1,
+      "order_index": 9,
+      "title": "第四周 驾上电脑展翅飞翔——应用与展望",
+      "stage": "PRIMARY_UPPER",
+      "grade_min": 4,
+      "grade_max": 6,
+      "objectives": [
+        "解释「第四周 驾上电脑展翅飞翔——应用与展望」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "primary-computer-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/9f0eddb21aceaeca/03-中小学生电脑入门.md",
+        "original_sha256": "9f0eddb21aceaeca9ed78aee1b9997ab4df68824c483729107d015729ee37c01",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-upper-r1.json"
+    }
+  ]
+}

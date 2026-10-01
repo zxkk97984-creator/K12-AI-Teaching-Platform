@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import "../growth/automatic-memory.css";
-import { useEffect, useId, useRef, useState, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
 import { useConversation } from "./ConversationProvider";
 import { isTerminal, STATUS_TEXT } from "./controller";
 import { MessageView, StreamingMessageView } from "./MessageView";
@@ -130,33 +130,60 @@ function BrowserVoiceButton({ onTranscript, disabled }: {
   </span>;
 }
 
-export function ConversationCompactOptions({ chapterId, onSelect }: { chapterId?: string; onSelect?: () => void }) {
+export function ConversationCompactOptions({ chapterId, onSelect, partnerSettings }: { chapterId?: string; onSelect?: () => void; partnerSettings?: ReactNode }) {
   const { controller, sessions, chapters, detail, run, selecting, sending } = useConversation();
+  const [view, setView] = useState("history");
+  const [query, setQuery] = useState("");
+  const id = useId();
   const busy = sending || selecting || Boolean(run && !isTerminal(run));
   const availableChapters = chapterId ? chapters.filter((chapter) => chapter.chapter_id === chapterId) : chapters;
+  const filtered = sessions.filter((session) => (session.title ?? session.chapter_title ?? "新对话").toLowerCase().includes(query.trim().toLowerCase()));
+  const tabs = [{ id: "history", label: "对话记录" }, ...(availableChapters.length ? [{ id: "courses", label: "结合课程" }] : []), ...(partnerSettings ? [{ id: "partner", label: "学习伙伴" }] : [])];
   return <div className="conv-compact-options">
-    <section className="conv-history" aria-label="对话记录">
-      <div className="conv-history-heading od-row"><strong>对话记录</strong><button type="button" className="secondary" data-testid="start-free-session" onClick={() => { void controller.start().then((id) => { if (id) onSelect?.(); }); }} disabled={busy}>开启新对话</button></div>
-      {sessions.length === 0 ? <p className="conv-muted" data-testid="history-empty">还没有对话记录，先问一个问题吧。</p> :
-        <ul>{sessions.map((session) => <li key={session.id}><button type="button" disabled={selecting}
-          className={detail?.id === session.id ? "conv-history-active" : ""} data-testid="history-item" onClick={() => { void controller.select(session.id); onSelect?.(); }}>
-          {session.title ?? session.chapter_title ?? "新对话"} · {session.message_count} 条消息</button><SessionActions sessionId={session.id} controller={controller} /></li>)}</ul>}
-    </section>
-    {availableChapters.length > 0 ? <section className="conv-mini-courses" aria-label="结合课程提问"><strong>结合课程提问</strong><ul>{availableChapters.map((chapter) => <li key={chapter.chapter_id}><button type="button" data-testid="start-session" onClick={() => { void controller.start(chapter.chapter_id).then((id) => { if (id) onSelect?.(); }); }} disabled={busy}>{chapter.title}</button></li>)}</ul></section> : null}
+    <div className="conv-options-tabs" role="tablist" aria-label="对话选项">{tabs.map((tab) => <button key={tab.id} id={`${id}-${tab.id}`} type="button" role="tab" aria-selected={view === tab.id} aria-controls={`${id}-panel`} tabIndex={view === tab.id ? 0 : -1}
+      onClick={() => setView(tab.id)} onKeyDown={(event) => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        const index = tabs.findIndex((item) => item.id === view);
+        const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+        setView(tabs[next].id);
+        event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+      }}>{tab.label}</button>)}</div>
+    <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-${view}`}>
+      {view === "history" ? <section className="conv-history" aria-label="对话记录">
+        <div className="conv-history-heading"><input type="search" placeholder="搜索对话" aria-label="搜索宠物对话记录" value={query} onChange={(event) => setQuery(event.target.value)} /><button type="button" className="secondary" data-testid="start-free-session" onClick={() => { void controller.start().then((sessionId) => { if (sessionId) onSelect?.(); }); }} disabled={busy}><span aria-hidden="true">＋</span>新对话</button></div>
+        {filtered.length === 0 ? <p className="conv-muted" data-testid="history-empty">{query.trim() ? "没有找到这个对话。" : "还没有对话记录，先问一个问题吧。"}</p> :
+          <ul>{filtered.map((session) => {
+            const title = session.title ?? session.chapter_title ?? "新对话";
+            return <li key={session.id} className={`conv-compact-history-row${detail?.id === session.id ? " is-active" : ""}`}><button type="button" disabled={selecting} aria-current={detail?.id === session.id ? "true" : undefined} title={`${title} · ${session.message_count} 条消息`}
+              data-testid="history-item" onClick={() => { void controller.select(session.id); onSelect?.(); }}><span className="conv-compact-title">{title}</span></button><SessionActions sessionId={session.id} title={title} controller={controller} /></li>;
+          })}</ul>}
+      </section> : view === "courses" ? <section className="conv-mini-courses" aria-label="结合课程提问"><p className="conv-muted">选择一章，让老师结合课程回答。</p><ul>{availableChapters.map((chapter) => <li key={chapter.chapter_id}><button type="button" data-testid="start-session" title={chapter.title} onClick={() => { void controller.start(chapter.chapter_id).then((sessionId) => { if (sessionId) onSelect?.(); }); }} disabled={busy}><span className="conv-compact-title">{chapter.title}</span></button></li>)}</ul></section> : partnerSettings}
+    </div>
   </div>;
 }
 
-export function ConversationContent({ chapterId, compact = false, showCompatibilityHistory = false, requestedSessionId }: { chapterId?: string; compact?: boolean; showCompatibilityHistory?: boolean; requestedSessionId?: string | null }) {
+export function ConversationContent({ chapterId, compact = false, showCompatibilityHistory = false, requestedSessionId, beforeSend, learningWorkspace = false }: { chapterId?: string; compact?: boolean; showCompatibilityHistory?: boolean; requestedSessionId?: string | null; beforeSend?: () => Promise<void>; learningWorkspace?: boolean }) {
   const stage = useAccount()?.profile?.stage;
   const welcomePrompts = stage === "PRIMARY_LOWER" ? YOUNG_PROMPTS : stage === "PRIMARY_UPPER" ? UPPER_PROMPTS : WELCOME_PROMPTS;
   const miniPrompts = stage === "PRIMARY_LOWER" ? YOUNG_PROMPTS : stage === "PRIMARY_UPPER" ? UPPER_PROMPTS : MINI_PROMPTS;
   const { controller, sessions, chapters, detail, draft, run, transport, error, loading, selecting, sending } = useConversation();
   const inputId = useId();
+  const [preparingSend, setPreparingSend] = useState(false);
+  const preparingRef = useRef(false);
+  const [prepareError, setPrepareError] = useState("");
+  const send = async () => {
+    if (preparingRef.current) return;
+    preparingRef.current = true; setPreparingSend(true); setPrepareError("");
+    try { await beforeSend?.(); await controller.send(); }
+    catch (caught) { setPrepareError(caught instanceof Error ? caught.message : "当前操作未保存，请重试。问题草稿已保留。"); }
+    finally { preparingRef.current = false; setPreparingSend(false); }
+  };
   const [historyQuery, setHistoryQuery] = useState("");
   const [draftNotice, setDraftNotice] = useState("");
   const input = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { void controller.initialize(); }, [controller]);
-  const busy = sending || selecting || Boolean(run && !isTerminal(run));
+  const busy = preparingSend || sending || selecting || Boolean(run && !isTerminal(run));
   const availableChapters = chapterId ? chapters.filter((chapter) => chapter.chapter_id === chapterId) : chapters;
   const featuredChapter = availableChapters[0];
   const otherChapters = availableChapters.slice(1);
@@ -188,12 +215,13 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
   const waitingForRequestedSession = Boolean(requestedSessionId && detail?.id !== requestedSessionId);
 
   if (compact) return <div className="conversation-content conversation-content--compact">
+    {prepareError ? <p className="conv-error" role="alert">{prepareError} 问题草稿已保留。</p> : null}
     {error ? <div className="conv-error" role="alert">{error}<button className="secondary" onClick={() => void controller.reconnect()}>重试</button></div> : null}
     {loading ? <p role="status" className="conv-mini-loading">正在读取对话…</p> : null}
-    {detail ? <ConversationThread detail={detail} run={run} transport={transport} draft={draft} inputId={inputId} inputRef={input} busy={busy} sending={sending}
-      onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void controller.send()} onCancel={() => void controller.cancel()} /> : <>
+    {detail ? <ConversationThread learningWorkspace={learningWorkspace} detail={detail} run={run} transport={transport} draft={draft} inputId={inputId} inputRef={input} busy={busy} sending={sending}
+      onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void send()} onCancel={() => void controller.cancel()} /> : <>
       <section className="conv-mini-welcome"><h2>今天想聊点什么？</h2><p>{stage === "PRIMARY_LOWER" ? "一个故事、一个发现，都可以。" : "一个知识点、一段思路，都可以。"}</p><div className="conv-mini-prompts od-stack" aria-label="快捷提问">{miniPrompts.map((prompt) => <button type="button" key={prompt.title} className="conv-mini-prompt od-row" onClick={() => applySuggestion(prompt.value)}><span className="conv-mini-prompt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={prompt.path} /></svg></span><span className="od-field od-fill"><strong>{prompt.title}</strong><span>{prompt.value}</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg></button>)}</div>{draftNotice ? <p className="conv-draft-notice" role="status">{draftNotice}</p> : null}</section>
-      <ConversationComposer inputId={inputId} inputRef={input} draft={draft} busy={busy} sending={sending} onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void controller.send()} />
+      <ConversationComposer inputId={inputId} inputRef={input} draft={draft} busy={busy} sending={sending} onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void send()} />
     </>}
   </div>;
 
@@ -213,7 +241,7 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
 
         {selecting && !waitingForRequestedSession ? <p role="status" className="conv-loading">正在读取对话…</p> : null}
         {waitingForRequestedSession ? <p role="status" className="conv-route-loading">{error ? "无法打开这段对话，请重试。" : "正在打开对话…"}</p> : detail ? <ConversationThread detail={detail} run={run} transport={transport} draft={draft} inputId={inputId} inputRef={input} busy={busy} sending={sending}
-          onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void controller.send()} onCancel={() => void controller.cancel()} /> :
+          onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void send()} onCancel={() => void controller.cancel()} /> :
           <>
             <div className="conv-welcome-scroll">
             <section className="conv-welcome" data-testid="conversation-welcome">
@@ -241,14 +269,15 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
                 <button key={chapter.chapter_id} type="button" className="secondary" data-testid="start-session" onClick={() => { void controller.start(chapter.chapter_id).then((id) => id && navigate(`/conversations?session=${id}`)); }} disabled={busy}>{chapter.title}</button>)}</div></details> : null}
             </section> : null}
             </div>
-            <ConversationComposer inputId={inputId} inputRef={input} draft={draft} busy={busy} sending={sending} onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void controller.send()} />
+            <ConversationComposer inputId={inputId} inputRef={input} draft={draft} busy={busy} sending={sending} onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void send()} />
           </>}
       </section>
     </div>
   </div>;
 }
 
-function ConversationThread({ detail, run, transport, draft, inputId, inputRef, busy, sending, onDraft, onVoice, onSend, onCancel }: {
+function ConversationThread({ detail, run, transport, draft, inputId, inputRef, busy, sending, onDraft, onVoice, onSend, onCancel, learningWorkspace = false }: {
+  learningWorkspace?: boolean;
   detail: { teacher?: { name: string } | null; id: string; chapter_id?: string | null; chapter_title: string | null; title?: string | null; conversation_type?: string; type?: string; messages: Parameters<typeof MessageView>[0]["message"][] };
   run: ReturnType<typeof useConversation>["run"];
   transport: ReturnType<typeof useConversation>["transport"];
@@ -303,8 +332,14 @@ function ConversationThread({ detail, run, transport, draft, inputId, inputRef, 
   const questionInDraft = Boolean(failedQuestion && draft.trim() === failedQuestion.trim());
   useEffect(() => {
     const messages = messagesRef.current;
-    if (messages && followBottom.current) messages.scrollTop = messages.scrollHeight;
-  }, [detail.messages.length, run?.draft_markdown, run?.status]);
+    if (messages && followBottom.current) {
+      messages.scrollTop = messages.scrollHeight;
+      if (learningWorkspace && run?.status === "SUCCEEDED") {
+        const latest = messages.querySelector<HTMLElement>('.conv-message-assistant:last-child');
+        if (latest) messages.scrollTop += latest.getBoundingClientRect().top - messages.getBoundingClientRect().top;
+      }
+    }
+  }, [detail.messages.length, learningWorkspace, run?.draft_markdown, run?.status]);
   return <div className="conv-thread"><ol ref={messagesRef} className="conv-messages" aria-live="polite" aria-label="对话消息" onScroll={(event) => {
     const element = event.currentTarget;
     followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 80;
@@ -383,12 +418,40 @@ function ConversationComposer({ inputId, inputRef, draft, busy, sending, context
   </form>;
 }
 
-function SessionActions({ sessionId, controller }: { sessionId: string; controller: ReturnType<typeof useConversation>["controller"] }) {
+function SessionActions({ sessionId, title, controller }: { sessionId: string; title: string; controller: ReturnType<typeof useConversation>["controller"] }) {
   // R30: renaming and archiving are not idempotent from the UI's point of view,
   // so a second click while one is in flight must be refused rather than
   // firing a duplicate request.
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{ left: number; top: number } | null>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const menuId = useId();
+  useEffect(() => {
+    const element = menu.current;
+    if (!menuPosition || !element) return;
+    element.showPopover?.();
+    element.querySelector<HTMLButtonElement>("button")?.focus();
+    const closeOnScroll = () => setMenuPosition(null);
+    window.addEventListener("scroll", closeOnScroll, true);
+    window.addEventListener("resize", closeOnScroll);
+    return () => {
+      window.removeEventListener("scroll", closeOnScroll, true);
+      window.removeEventListener("resize", closeOnScroll);
+      if (element.hidePopover && element.matches(":popover-open")) element.hidePopover();
+      if (trigger.current?.isConnected) trigger.current.focus();
+    };
+  }, [menuPosition]);
+  const menuKeys = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); setMenuPosition(null); return; }
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const items = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'));
+    const index = items.indexOf(document.activeElement as HTMLButtonElement);
+    const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+    items[next]?.focus();
+  };
   const run = async (action: () => Promise<void>) => {
     if (busyAction) return;
     setBusyAction("pending");
@@ -396,16 +459,21 @@ function SessionActions({ sessionId, controller }: { sessionId: string; controll
     catch (error) { window.alert(error instanceof Error ? error.message : "操作失败，请重试"); }
     finally { setBusyAction(null); }
   };
-  return <><span className="conv-session-actions" onClick={(event) => event.stopPropagation()}>
-    <button type="button" aria-label="重命名对话" title="重命名" disabled={busyAction !== null} onClick={() => {
-      const title = window.prompt("给这段对话取个名字");
-      if (title?.trim()) void run(() => controller.rename(sessionId, title.trim()));
-    }}>改名</button>
-    <button type="button" aria-label="归档对话" title="归档" disabled={busyAction !== null} onClick={() => void run(() => controller.archive(sessionId))}>归档</button>
-    <button type="button" aria-label="删除对话" title="删除" onClick={() => {
-      setDeleteOpen(true);
-    }}>删除</button>
-  </span>{deleteOpen && <DeleteConversationDialog busy={busyAction !== null} onClose={() => setDeleteOpen(false)} onDelete={(forget) => void run(async () => { await controller.remove(sessionId, forget); setDeleteOpen(false); })} />}</>;
+  return <><button ref={trigger} type="button" className="secondary conv-session-more" aria-label={`更多操作：${title}`} title="更多操作" aria-haspopup="menu" aria-expanded={Boolean(menuPosition)} aria-controls={menuPosition ? menuId : undefined} disabled={busyAction !== null} onClick={() => {
+    if (menuPosition) { setMenuPosition(null); return; }
+    const bounds = trigger.current!.getBoundingClientRect();
+    setMenuPosition({ left: Math.max(12, Math.min(bounds.right - 172, window.innerWidth - 184)), top: Math.max(12, Math.min(bounds.bottom + 4, window.innerHeight - 144)) });
+  }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01" /></svg></button>
+    {menuPosition ? createPortal(<div ref={menu} id={menuId} popover="auto" className="conv-session-menu" role="menu" aria-label={`对话操作：${title}`} style={menuPosition} onKeyDown={menuKeys} onToggle={(event) => { if ((event.nativeEvent as ToggleEvent).newState === "closed") setMenuPosition(null); }}>
+      <button type="button" role="menuitem" className="secondary" disabled={busyAction !== null} onClick={() => {
+        setMenuPosition(null);
+        const next = window.prompt("给这段对话取个名字", title);
+        if (next?.trim()) void run(() => controller.rename(sessionId, next.trim()));
+      }}>重命名</button>
+      <button type="button" role="menuitem" className="secondary" disabled={busyAction !== null} onClick={() => { setMenuPosition(null); void run(() => controller.archive(sessionId)); }}>归档</button>
+      <button type="button" role="menuitem" className="secondary" disabled={busyAction !== null} onClick={() => { setMenuPosition(null); setDeleteOpen(true); }}>删除</button>
+    </div>, document.body) : null}
+    {deleteOpen && <DeleteConversationDialog busy={busyAction !== null} onClose={() => setDeleteOpen(false)} onDelete={(forget) => void run(async () => { await controller.remove(sessionId, forget); setDeleteOpen(false); })} />}</>;
 }
 
 function DeleteConversationDialog({ busy, onClose, onDelete }: { busy: boolean; onClose: () => void; onDelete: (forget: boolean) => void }) {

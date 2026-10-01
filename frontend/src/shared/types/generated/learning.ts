@@ -1502,6 +1502,13 @@ export interface components {
             /** Is Test Fixture */
             is_test_fixture: boolean;
             /**
+             * Local Demo Visible
+             * @default false
+             */
+            local_demo_visible: boolean;
+            /** Chapter Revision Ids */
+            chapter_revision_ids?: string[];
+            /**
              * Activity Status
              * @enum {string}
              */

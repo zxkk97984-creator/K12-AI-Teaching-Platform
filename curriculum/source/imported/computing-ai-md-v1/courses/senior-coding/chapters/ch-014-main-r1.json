@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-014-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第14章 减法呢？"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第14章 减法呢？。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "用补码（two's complement）把减法变成加法。负数 = 正数取反加一。这样加法器电路就能同时做加减。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-14"
+  ]
+}

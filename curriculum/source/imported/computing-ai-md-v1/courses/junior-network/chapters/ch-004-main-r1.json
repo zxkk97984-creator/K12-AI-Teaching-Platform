@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 4 章 发送 HTTP 请求"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 4 章 发送 HTTP 请求。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "连接建好后，浏览器把刚才生成的 HTTP 请求通过 TCP 连接发出去。数据被切成一个一个小数据包，每个包都编好号，沿着网络一站一站传到百度服务器。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-network-topic-04"
+  ]
+}

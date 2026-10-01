@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-012-lower",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "写在最后"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：写在最后。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "网络是一个很棒的地方——你可以学到知识、找到朋友、看到全世界。但它也是一个需要小心的地方。记住这五句话：\n\n1. 不把隐私告诉陌生人。\n2. 网上说话也要有礼貌。\n3. 不点奇怪的链接。\n4. 遇到奇怪的事告诉大人。\n5. 控制好时间，多出门玩。\n\n做一个聪明、安全、有礼貌的小网友。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "primary-safety-topic-12"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-001-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 1 章 算法简介"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 1 章 算法简介。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "- **原书**：Grokking Algorithms: An Illustrated Guide for Programmers and Other Curious People\n- **作者**：[美] Aditya Y. Bhargava（阿迪蒂亚·亚尔加瓦）\n- **译者/出版**：袁国忠 译，人民邮电出版社（图灵丛书）\n- **真实目录来源**：\n  - 豆瓣读书：https://book.douban.com/subject/26979890/\n  - 南开大学图书馆 OPAC\n  - 平顶山学院图书馆 OPAC\n- **本文件说明**：基于该书真实章节结构（共11章）整理知识点，**非逐字原文**（原书受版权保护），配图以原书为准。初中阶段只讲直觉和简单代码，不背竞赛模板。\n\n---\n\n#### 1.1 二分查找\n\n想象你在一本英汉词典里找\"apple\"。最笨的办法是从第一页一页一页翻，这叫**顺序查找**。聪明的办法是翻到中间：如果中间那个词比\"apple\"大，就往后半本找；如果小，就往前半本找。每次都把范围砍一半，这就是**二分查找**。\n\n```python\ndef binary_search(arr, target):\n    low = 0\n    high = len(arr) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        guess = arr[mid]\n        if guess == target:\n            return mid\n        elif guess < target:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1\n\nnums = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]\nprint(binary_search(nums, 7))\nprint(binary_search(nums, 8))\n```\n\n注意：二分查找要求列表**已经排好序**。100 万个数字，顺序查找最坏要 100 万次，二分查找只要 20 次。\n\n#### 1.2 大 O 表示法\n\n大 O 是用来估算法速度的记号。常见的几种：\n\n- `O(1)`：一步到位，比如字典按键取值。\n- `O(log n)`：二分查找。每次砍一半。\n- `O(n)`：顺序查找。要看一遍全部数据。\n- `O(n log n)`：快速排序。\n- `O(n²)`：选择排序、冒泡排序。两层循环。\n\nn 是数据量。n=100 万时，O(log n) 只要 20 步，O(n²) 要 1 万亿步——差距巨大。\n\n**练习**：在 1 到 1000 的数字里找一个数，二分查找最多猜几次？（答案：10 次，因为 2¹⁰=1024）"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-algorithms-topic-01"
+  ]
+}

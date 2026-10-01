@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-002-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第2章 丰富的序列"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第2章 丰富的序列。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "Python 序列分两类：容器序列（list、tuple、collections.deque，存任意类型引用）和扁平序列（str、bytes、array.array，存连续内存中的原始值）。可变序列（list、bytearray、array）和不可变序列（tuple、str、bytes）。\n\n#### 列表推导式\n\n列表推导式（listcomp）是构造列表最 Pythonic 的方式。它比 `map/filter` 更可读。\n\n```python\nsymbols = '$¢£¥€¤'\nbeyond_ascii = [ord(s) for s in symbols if ord(s) > 127]\nprint(beyond_ascii)\n\ncolors = ['black', 'white']\nsizes = ['S', 'M', 'L']\ntshirts = [(c, s) for c in colors for s in sizes]\nprint(tshirts)\n```\n\n笛卡儿积用两层 for 即可。生成器表达式（genexp）用圆括号，逐个产出元素，不一次性建列表，适合大数据或喂给函数：\n\n```python\ntuple(ord(s) for s in symbols)\nsum(ord(s) for s in symbols)\n```\n\n#### 元组不仅是不可变列表\n\n元组有两个用途：作为记录（每个位置有固定含义）和作为不可变列表。\n\n```python\nlax_coordinates = (33.9425, -118.408056)\ncity, year, pop, chg, area = ('Tokyo', 2003, 32450, 0.66, 8014)\ntraveler_ids = [('USA', '31195855'), ('BRA', 'CE342567')]\nfor passport in sorted(traveler_ids):\n    print('%s/%s' % passport)\nfor country, _ in traveler_ids:\n    print(country)\n```\n\n元组拆包是核心技巧：平行赋值、`*` 捕获多余项、函数调用传 `*args`。\n\n```python\na, b, *rest = range(5)\nprint(a, b, rest)\na, *body, c, d = range(5)\nprint(a, body, c, d)\n```\n\n#### 切片\n\n`s[a:b:c]` 表示从 a 到 b 步长 c。负数步长倒序。切片区间\"含头不含尾\"是为了方便切分（`s[:x]` 和 `s[x:]` 拼接等于 `s`）。\n\n```python\ns = 'bicycle'\nprint(s[::3])\nprint(s[::-1])\nprint(s[::-2])\n```\n\n切片对象 `slice(None, 10, 2)` 可以复用。给切片赋值会就地修改原列表。\n\n#### `+` 和 `*`\n\n`[[]] * 3` 得到三个引用同一列表的元素——这是经典陷阱。要建嵌套列表用列表推导。\n\n```python\nboard = [['_'] * 3 for _ in range(3)]\nboard[0][0] = 'X'\nprint(board)\n```\n\n`+=` 的谜题：`a += b` 对可变列表就地修改，但如果 `a` 是元组里的列表，元组本身不可变却能修改其中元素。`list.sort()` 就地排序返回 None，内置 `sorted()` 返回新列表——这是\"就地还是新建\"的设计惯例。\n\n#### 当列表不适用时\n\n需要纯数值数组用 `array.array`（紧凑 C 数组）；需要两端操作用 `collections.deque`（O(1) 头尾增删）；做科学计算直接用 NumPy。\n\n**复杂度表**：\n\n| 结构 | 索引 | 尾部追加 | 头部插入/删除 | 查找值 |\n|------|------|----------|---------------|--------|\n| list | O(1) | 均摊 O(1) | O(n) | O(n) |\n| deque | O(n) | O(1) | O(1) | O(n) |\n| array.array | O(1) | O(1) | O(n) | O(n) |\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-02"
+  ]
+}

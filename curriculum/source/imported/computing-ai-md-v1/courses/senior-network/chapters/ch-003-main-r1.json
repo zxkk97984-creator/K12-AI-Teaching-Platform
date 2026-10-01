@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第3章 运输层"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第3章 运输层。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 复用与分用\n\n运输层用端口号把数据交给正确的应用。一台主机同时跑浏览器和微信，靠端口区分。\n\n### 无连接的 UDP\n\nUDP 只加源端口、目的端口、长度、校验和，不握手、不重传、不拥塞控制。快但不可靠，适合视频、直播、DNS 查询。\n\n### 可靠的 TCP\n\nTCP 面向连接、字节流、可靠、拥塞控制。\n\n**三次握手**建立连接：客户端 SYN → 服务器 SYN+ACK → 客户端 ACK。\n\n**四次挥手**关闭连接：主动方 FIN → 被动方 ACK → 被动方 FIN → 主动方 ACK。\n\n**序列号与确认**：每个字节编号，接收方确认收到的最高序列号。丢包超时重传。\n\n**流量控制**：接收方告诉发送方自己还能收多少（滑动窗口）。\n\n**拥塞控制**：慢启动（cwnd 指数涨）→拥塞避免（线性涨）→丢包砍半。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-03"
+  ]
+}

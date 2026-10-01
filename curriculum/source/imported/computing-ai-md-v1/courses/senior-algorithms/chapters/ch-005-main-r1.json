@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-005-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第5章 基础题目选解"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第5章 基础题目选解。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### OJ 经典题 1：两数之和\n\n给定 nums 和 target，返回两个下标使和为 target。\n\n```python\ndef two_sum(nums, target):\n    seen = {}\n    for i, x in enumerate(nums):\n        if target - x in seen:\n            return [seen[target-x], i]\n        seen[x] = i\n\nprint(two_sum([2,7,11,15], 9))\n```\n\n思路：用哈希表存已遍历值→下标，一次扫描 O(n)。暴力 O(n²)。\n\n### OJ 经典题 2：斐波那契\n\n```python\ndef fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a+b\n    return a\n```\n\n迭代 O(n) O(1) 空间。\n\n### OJ 经典题 3：走楼梯\n\n每次走 1 或 2 阶，到 n 阶有几种走法？答案即斐波那契。`dp[i] = dp[i-1] + dp[i-2]`。\n\n```python\ndef climb(n):\n    if n <= 2:\n        return n\n    a, b = 1, 2\n    for _ in range(3, n+1):\n        a, b = b, a+b\n    return b\n```\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-05"
+  ]
+}

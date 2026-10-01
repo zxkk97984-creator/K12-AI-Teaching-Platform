@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-007-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 7 章 狄克斯特拉算法"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 7 章 狄克斯特拉算法。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "狄克斯特拉算法用来在**带权图**（每条边有\"距离\"或\"代价\"）里找最短路径。比如地图上从家到学校有好几条路，每条路距离不同，找最近的那条。\n\n直觉：从起点出发，先算出到所有邻居的距离；然后选距离最短的那个点，更新它邻居的距离；反复这个过程，直到到达终点。\n\n初中阶段理解\"地图找最短路径\"这个场景即可。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-algorithms-topic-07"
+  ]
+}

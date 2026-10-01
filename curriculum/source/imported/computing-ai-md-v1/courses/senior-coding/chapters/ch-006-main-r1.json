@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第6章 逻辑与开关"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第6章 逻辑与开关。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "把开关串联就是 AND（两个都按灯才亮），并联就是 OR（按任一个灯就亮）。**布尔代数**和电路开关从此等价。\n\n```python\ndef AND(a, b):\n    return a and b\ndef OR(a, b):\n    return a or b\ndef NOT(a):\n    return not a\n```"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-06"
+  ]
+}

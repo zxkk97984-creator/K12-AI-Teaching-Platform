@@ -1,0 +1,32 @@
+{
+  "schema_version": "k12.content.release.v1",
+  "release_key": "computing-ai-md-v1-db6ffb6b663b",
+  "source_kind": "NEW_SOURCE",
+  "is_test_fixture": false,
+  "local_demo_visible": true,
+  "description": "用户提供的计算机与人工智能 Markdown 学习讲义，按四学段章节整理。",
+  "license_code": "UNKNOWN",
+  "license_notes": "参考书整理内容；来源说明和原文件哈希随课程保存。",
+  "course_files": [
+    "courses/primary-ai/course.json",
+    "courses/primary-scratch/course.json",
+    "courses/primary-computer/course.json",
+    "courses/primary-safety/course.json",
+    "courses/primary-unplugged/course.json",
+    "courses/junior-python/course.json",
+    "courses/junior-algorithms/course.json",
+    "courses/junior-coding/course.json",
+    "courses/junior-ml/course.json",
+    "courses/junior-network/course.json",
+    "courses/senior-pathways/course.json",
+    "courses/senior-python/course.json",
+    "courses/senior-data-structures/course.json",
+    "courses/senior-algorithms/course.json",
+    "courses/senior-deep-learning/course.json",
+    "courses/senior-olympiad/course.json",
+    "courses/senior-ml/course.json",
+    "courses/senior-coding/course.json",
+    "courses/senior-network/course.json",
+    "courses/senior-systems/course.json"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-005-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第5章 数据类构建器"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第5章 数据类构建器。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "`collections.namedtuple` 和 `@dataclass` 用来构建轻量记录类。\n\n```python\nfrom collections import namedtuple\nCity = namedtuple('City', 'name country population coordinates')\ntokyo = City('Tokyo', 'JP', 36.933, (35.689722, 139.691667))\nprint(tokyo.name)\n```\n\n```python\nfrom dataclasses import dataclass, field\n\n@dataclass\nclass ClubMember:\n    name: str\n    guests: list = field(default_factory=list)\n    age: int = 0\n```\n\n`@dataclass` 自动生成 `__init__`、`__repr__`、`__eq__`。类型提示在运行时不强制（只是注解），由 mypy 等工具静态检查。`field(default_factory=list)` 避免\"可变默认参数\"陷阱。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-05"
+  ]
+}

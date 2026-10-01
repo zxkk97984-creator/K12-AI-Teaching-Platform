@@ -74,6 +74,7 @@ class BlockType(enum.StrEnum):
     KNOWLEDGE_CARD = "KNOWLEDGE_CARD"
     CALLOUT = "CALLOUT"
     FIGURE = "FIGURE"
+    MARKDOWN = "MARKDOWN"
 
 
 class ExampleSpec(StrictModel):
@@ -110,6 +111,7 @@ class BlockSpec(StrictModel):
             BlockType.KNOWLEDGE_CARD: {"title", "text", "example"},
             BlockType.CALLOUT: {"title", "text"},
             BlockType.FIGURE: {"alt", "caption", "src"},
+            BlockType.MARKDOWN: {"text"},
         }
         extra = used - allowed[self.type]
         if extra:
@@ -121,6 +123,7 @@ class BlockSpec(StrictModel):
             BlockType.KNOWLEDGE_CARD: {"title", "text"},
             BlockType.CALLOUT: {"title", "text"},
             BlockType.FIGURE: {"alt", "caption"},
+            BlockType.MARKDOWN: {"text"},
         }
         missing = required[self.type] - used
         if missing:
@@ -138,7 +141,7 @@ class KnowledgePointSpec(StrictModel):
 
 
 class ChapterSourceSpec(StrictModel):
-    source_commit: Commit
+    source_commit: Commit | None = None
     source_path: FilePath
     original_sha256: Sha256
     conversion: ShortText
@@ -222,6 +225,7 @@ class ReleaseSpec(StrictModel):
     release_key: Slug
     source_kind: SourceKind
     is_test_fixture: bool
+    local_demo_visible: bool = False
     description: Annotated[
         str, StringConstraints(strip_whitespace=True, min_length=5, max_length=2000)
     ]

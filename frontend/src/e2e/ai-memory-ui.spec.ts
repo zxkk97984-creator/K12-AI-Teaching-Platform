@@ -59,7 +59,7 @@ test("personal memory can be corrected, forgotten and disabled on desktop and na
   });
   await page.goto("/growth");
   await expect(
-    page.getByRole("heading", { name: "在对话中，慢慢了解你" }),
+    page.getByRole("tab", { name: "自动记忆" }),
   ).toBeVisible();
   await page.screenshot({
     path: new URL("../../test-results/ai-memory-desktop.png", import.meta.url)
@@ -73,11 +73,13 @@ test("personal memory can be corrected, forgotten and disabled on desktop and na
   await expect(page.getByText("由你维护")).toBeVisible();
   page.on("dialog", (dialog) => void dialog.accept());
   await page.getByRole("button", { name: "遗忘", exact: true }).click();
-  await expect(page.getByText("暂无符合条件的记忆。")).toBeVisible();
+  await expect(page.getByText("暂时没有正在使用的记忆")).toBeVisible();
   await page.getByLabel("显示已遗忘的条目").check();
   await expect(page.getByRole("button", { name: "重新记住" })).toBeVisible();
-  await page.getByLabel("允许教师使用个人记忆").uncheck();
+  await page.getByRole("button", { name: "记忆设置", exact: true }).click();
+  await page.getByRole("switch", { name: "用于 AI 辅导" }).uncheck();
   await expect.poll(() => data.settings.use_enabled).toBe(false);
+  await page.getByRole("button", { name: "关闭", exact: true }).click();
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     await expect
@@ -188,5 +190,79 @@ test("administrators configure agents and routes without claiming remote skill a
     fullPage: true,
     animations: "disabled",
   });
+  expect(errors).toEqual([]);
+});
+
+test("memory management empty states, dialogs, draft retention and failed saves", async ({ page }) => {
+  await fixture(page);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("console", (e) => { if (e.type() === "error" && !e.text().includes("503")) errors.push(e.text()); });
+  let backfills: unknown[] = [];
+  await page.route("**/api/v1/growth/personal-memory/backfill", async (route) => {
+    backfills = route.request().postDataJSON().session_ids;
+    await route.fulfill({ json: {} });
+  });
+  await page.goto("/growth");
+  await expect(page.getByText("还没有自动记忆")).toBeVisible();
+  await expect(page.getByLabel("记忆分页")).toHaveCount(0);
+  for (const viewport of [{ width: 1366, height: 768 }, { width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 320, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await expect(page.getByText("还没有自动记忆")).toBeVisible();
+    const emptyHeading = await page.getByText("还没有自动记忆").boundingBox();
+    expect(emptyHeading!.y + emptyHeading!.height).toBeLessThan(viewport.height - 70);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: `test-results/memory-empty-${viewport.width}.png`, fullPage: true });
+  }
+  await page.getByRole("button", { name: "搜索与筛选" }).click();
+  await expect(page.getByRole("searchbox", { name: "搜索记忆" })).toBeVisible();
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.getByRole("searchbox", { name: "搜索记忆" }).fill("不存在");
+  await expect(page.getByText("没有找到匹配的记忆")).toBeVisible();
+  await page.getByRole("button", { name: "清除筛选" }).click();
+  await expect(page.getByText("还没有自动记忆")).toBeVisible();
+  await page.getByRole("button", { name: "整理记录", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "整理记录" })).toContainText("暂无记录");
+  await page.getByRole("button", { name: "关闭", exact: true }).press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByRole("button", { name: "整理历史聊天", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "整理历史聊天" })).toBeVisible();
+  expect(backfills).toHaveLength(0);
+  const choices = page.getByRole("dialog").getByRole("checkbox");
+  await choices.first().check();
+  await page.getByRole("button", { name: "开始整理所选聊天" }).click();
+  await expect(page.getByText("所选聊天已加入整理队列")).toBeVisible();
+  expect(backfills).toHaveLength(1);
+  await page.getByRole("tab", { name: "我写的内容" }).click();
+  await expect(page.getByText("写下你希望被记住的内容")).toBeVisible();
+  await page.screenshot({ path: "test-results/memory-document-empty.png", fullPage: true });
+  await page.getByRole("button", { name: "创建个人记忆文档" }).click();
+  await page.getByRole("button", { name: "编辑 Markdown" }).click();
+  await page.getByRole("textbox", { name: "Markdown 内容" }).fill("# 我的目标\n我希望学会二分查找。");
+  await page.getByRole("tab", { name: "自动记忆" }).click();
+  await page.getByRole("tab", { name: "我写的内容" }).click();
+  await expect(page.getByRole("textbox", { name: "Markdown 内容" })).toHaveValue("# 我的目标\n我希望学会二分查找。");
+  await expect(page.getByText(/有未保存的修改/)).toBeVisible();
+  await page.route("**/api/v1/growth/documents/doc-ui", async (route) => {
+    if (route.request().method() === "PATCH") await route.fulfill({ status: 503, json: { detail: "模拟保存失败，请重试" } });
+    else await route.fallback();
+  });
+  await page.getByRole("button", { name: "保存文档" }).click();
+  await expect(page.getByText("模拟保存失败，请重试")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Markdown 内容" })).toHaveValue("# 我的目标\n我希望学会二分查找。");
+  await page.screenshot({ path: "test-results/memory-save-failure.png", fullPage: true });
+  await page.unroute("**/api/v1/growth/documents/doc-ui");
+  await page.getByRole("button", { name: "保存文档" }).click();
+  await expect(page.getByText("账号已保存 · 版本 2")).toBeVisible();
+  await page.screenshot({ path: "test-results/memory-document-saved.png", fullPage: true });
+  await page.getByRole("button", { name: "记忆设置", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "记忆设置" })).toBeVisible();
+  await page.screenshot({ path: "test-results/memory-settings.png", fullPage: true });
+  await page.getByRole("switch", { name: "用于 AI 辅导" }).press("Tab");
+  expect(await page.getByRole("dialog").evaluate(el => el.contains(document.activeElement))).toBe(true);
+  await page.getByRole("button", { name: "关闭", exact: true }).press("Escape");
+  await expect(page.getByRole("button", { name: "记忆设置", exact: true })).toBeFocused();
+  await page.getByRole("tab", { name: "我写的内容" }).press("ArrowLeft");
+  await expect(page.getByRole("tab", { name: "自动记忆" })).toHaveAttribute("aria-selected", "true");
   expect(errors).toEqual([]);
 });

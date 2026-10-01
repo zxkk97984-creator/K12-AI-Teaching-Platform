@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-015-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第15-16章 类型提示进阶与运算符重载"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第15-16章 类型提示进阶与运算符重载。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "运算符重载实现 `__add__`、`__mul__`、`__lt__` 等特殊方法，让自定义对象支持 `+`、`*`、`<`。\n\n```python\nclass Vector:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n    def __add__(self, other):\n        return Vector(self.x + other.x, self.y + other.y)\n    def __repr__(self):\n        return f'Vector({self.x}, {self.y})'\n```\n\n---\n\n## 第四部分 控制流"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-15"
+  ]
+}

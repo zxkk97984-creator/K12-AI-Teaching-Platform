@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-008-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 8 章 函数"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 8 章 函数。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 8.1 定义与参数\n\n函数就是把一段代码打包好，起个名字，以后反复调用。\n\n```python\ndef greet(username):\n    print(f\"Hello, {username}!\")\n\ngreet(\"xiaoming\")\n```\n\n#### 8.2 默认参数与返回值\n\n```python\ndef describe_pet(name, animal=\"狗\"):\n    print(f\"{name} 是一只{animal}\")\n    return name\n\ndescribe_pet(\"旺财\")\ndescribe_pet(\"咪咪\", \"猫\")\n```\n\n`animal=\"狗\"` 是默认参数。`return` 把结果送回去；没有 `return` 的函数返回 `None`。\n\n#### 8.3 任意数量参数\n\n```python\ndef make_pizza(*toppings):\n    for t in toppings:\n        print(t)\n```\n\n`*toppings` 把多个参数打包成元组。\n\n**练习**：写一个函数 `bmi(weight, height)` 返回 BMI 值。\n\n**常见误区**：函数里的变量是局部变量，函数外面用不了。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-08"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-010-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "3.15 Git 工作流深化"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：3.15 Git 工作流深化。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 3.15.1 merge vs rebase\n\n把 `feature` 分支合回 `main` 有两种方式：\n\n- `git merge main`：保留完整历史，生成一个\"合并提交\"，历史像树枝分叉。\n- `git rebase main`：把 feature 分支的每个提交\"摘下来\"，重新接到 main 最新提交后面，历史变成一条直线。\n\nrebase 历史干净，但**不要在已经推到远程的公共分支上 rebase**——因为它改写了提交历史，别人基于旧提交干活会冲突。黄金法则：**只 rebase 自己的私人分支，merge 公共分支**。\n\n#### 3.15.2 解决冲突\n\n两个人改了同一文件同一行，Git 不知道听谁的，会在文件里留下：\n\n```\n<<<<<<< HEAD\n你的修改\n=======\n对方的修改\n>>>>>>> branch-name\n```\n\n手动选择保留哪部分（或两者合并），删掉这些标记，再 `git add` + `git commit`。冲突不可怕，怕的是看见冲突就瞎选一边。\n\n#### 3.15.3 .gitignore\n\n有些文件不该进 Git：编译产物、`node_modules`、本地配置、密钥。在项目根目录建一个 `.gitignore` 文件，每行一个 glob 模式：\n\n```\n__pycache__/\n*.pyc\n.env\n.idea/\ndist/\n```\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-systems-topic-10"
+  ]
+}

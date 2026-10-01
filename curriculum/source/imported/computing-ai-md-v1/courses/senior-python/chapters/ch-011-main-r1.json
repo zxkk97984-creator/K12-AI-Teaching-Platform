@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-011-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第11章 符合Python风格的对象"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第11章 符合Python风格的对象。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "实现 `__repr__`、`__eq__`、`__hash__`、`__slots__`。\n\n`@classmethod` 定义备选构造函数（常用 `frombytes` 等），`@staticmethod` 是普通函数放在类命名空间。\n\n`__slots__`：在类里声明 `__slots__ = ('x', 'y')`，实例不再有 `__dict__`，省内存（大量实例时显著），但不能动态加属性、不能多继承。\n\n```python\nclass Vector2d:\n    __slots__ = ('__x', '__y')\n    def __init__(self, x, y):\n        self.__x = x\n        self.__y = y\n```\n\n私有属性约定：单前缀下划线 `_x` 是\"受保护\"提示，双前缀 `__x` 触发名称改写（`_Class__x`），不是真私有。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-11"
+  ]
+}

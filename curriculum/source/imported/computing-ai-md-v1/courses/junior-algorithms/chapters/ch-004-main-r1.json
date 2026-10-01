@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 4 章 快速排序"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 4 章 快速排序。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "快速排序用**分治**思想：选一个基准数，比它小的放左边，比它大的放右边，再对左右两边递归排序。\n\n```python\ndef quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[0]\n    left = [x for x in arr[1:] if x <= pivot]\n    right = [x for x in arr[1:] if x > pivot]\n    return quicksort(left) + [pivot] + quicksort(right)\n\nprint(quicksort([5, 2, 9, 1, 7, 3]))\n```\n\n平均复杂度 O(n log n)，比选择排序快得多。Python 内置 `sort()` 内部用的就是类似思路。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-algorithms-topic-04"
+  ]
+}

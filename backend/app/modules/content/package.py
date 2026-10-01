@@ -119,6 +119,8 @@ def manifest_hash_for(release: ReleaseSpec, chapters: tuple[LoadedChapter, ...])
             for chapter in chapters
         ],
     }
+    if release.local_demo_visible:
+        payload["local_demo_visible"] = True
     return sha256_text(canonical_json(payload))
 
 
@@ -150,7 +152,7 @@ def _load_blocks(path: Path, *, where: str) -> tuple[tuple[BlockSpec, ...], dict
         raise PackageValidationError("the first block must be a TITLE block", where=where)
     if len(blocks) < 3:
         raise PackageValidationError("a chapter needs at least three blocks", where=where)
-    if not any(block.type is BlockType.PARAGRAPH for block in blocks):
+    if not any(block.type in {BlockType.PARAGRAPH, BlockType.MARKDOWN} for block in blocks):
         raise PackageValidationError("a chapter needs at least one PARAGRAPH block", where=where)
     previous: str | None = None
     for block in blocks:
@@ -188,6 +190,10 @@ def load_package(release_dir: Path, *, legacy_root: Path | None = None) -> Loade
             )
         kp_by_slug = {item.slug: item for item in course.knowledge_points}
         for spec in course.chapters:
+            if release.source_kind.value != "NEW_SOURCE" and spec.source.source_commit is None:
+                raise PackageValidationError(
+                    "non-local sources require a source commit", where=course_relative
+                )
             content_path = resolve_within(
                 course_path.parent, spec.content_file, where=f"{course_relative}:{spec.stable_slug}"
             )
@@ -221,9 +227,10 @@ def load_package(release_dir: Path, *, legacy_root: Path | None = None) -> Loade
                             f"figure asset is missing: {block.src}",
                             where=f"{course_relative}:{spec.stable_slug}",
                         )
-            if legacy_root is not None and spec.source.source_path:
+            source_root = legacy_root or (root if spec.source.source_commit is None else None)
+            if source_root is not None and spec.source.source_path:
                 source_file = resolve_within(
-                    legacy_root,
+                    source_root,
                     spec.source.source_path,
                     where=f"{course_relative}:{spec.stable_slug}",
                 )

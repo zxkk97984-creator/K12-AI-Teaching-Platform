@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "栈与队列"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：栈与队列。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 2.9 线性数据结构完整实现\n\n#### 2.9.1 用类实现栈\n\n```python\nclass Stack:\n    def __init__(self):\n        self.items = []\n    def push(self, x):\n        self.items.append(x)\n    def pop(self):\n        return self.items.pop()\n    def peek(self):\n        return self.items[-1]\n    def is_empty(self):\n        return len(self.items) == 0\n    def size(self):\n        return len(self.items)\n```\n\n#### 2.9.2 用类实现队列\n\n```python\nfrom collections import deque\n\nclass Queue:\n    def __init__(self):\n        self.items = deque()\n    def enqueue(self, x):\n        self.items.append(x)\n    def dequeue(self):\n        return self.items.popleft()\n    def is_empty(self):\n        return len(self.items) == 0\n```\n\n注意不能用 list 做队列——`pop(0)` 是 O(n)，用 `deque.popleft()` 才是 O(1)。\n\n### 2.17 栈的应用：表达式求值\n\n中缀表达式（如 `3 + 4 * 2`）计算机不好直接算，经典做法是用两个栈：一个存数字，一个存运算符。遇到数字压栈；遇到运算符，把栈顶所有优先级大于等于它的运算符弹出计算后再压当前运算符。完整实现稍长，高中阶段理解\"为什么括号匹配、表达式求值都靠栈\"即可——因为它们都有\"最近开的括号最先关\"这种嵌套结构。\n\n### 2.18 循环队列与优先队列\n\n普通队列用数组实现时，`dequeue` 后前面空出来的位置没法用，于是有了**循环队列**：把数组想象成环，头指针和尾指针绕着圈走，用 `(tail+1) % capacity` 算下一个位置。\n\n**优先队列**不是\"先进先出\"而是\"优先级最高的先出\"，底层用堆实现。Python 标准库 `heapq` 就是最小堆：\n\n```python\nimport heapq\n\nheap = []\nheapq.heappush(heap, (3, 'task3'))\nheapq.heappush(heap, (1, 'task1'))\nheapq.heappush(heap, (2, 'task2'))\n\nwhile heap:\n    priority, task = heapq.heappop(heap)\n    print(priority, task)\n```\n\n输出顺序是 1、2、3——按优先级最小先出。任务调度、Dijkstra、Top-K 问题都靠它。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-data-structures-topic-03"
+  ]
+}

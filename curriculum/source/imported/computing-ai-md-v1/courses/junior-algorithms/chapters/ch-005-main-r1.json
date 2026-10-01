@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-005-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 5 章 散列表"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 5 章 散列表。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "散列表就是 Python 里的**字典 dict**。它为什么查找那么快？\n\n原理：你存一个键值对时，散列表用一个**哈希函数**把键（比如\"小红\"）算出一个数字，当作\"抽屉编号\"，把值直接放那个抽屉里。查的时候再算一次哈希，直接定位到抽屉，O(1) 时间拿到值。\n\n```python\ndic = {\"小红\": 90, \"小明\": 85, \"小刚\": 95}\nprint(dic[\"小红\"])\n```\n\n不管字典里有 100 个还是 100 万个键，查一个键都是一瞬间。\n\n**练习**：用词频统计例子，体验字典 O(1) 的查找速度。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-algorithms-topic-05"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第6章 卷积神经网络"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第6章 卷积神经网络。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 为什么用卷积\n\n全连接层处理图像参数太多（224×224 彩色图 = 15 万输入，第一层 1000 神经元就有 1.5 亿参数）。卷积利用**局部性**和**平移不变性**：小卷积核在图像上滑动，共享参数。\n\n### 卷积操作\n\n卷积核（filter）是个小矩阵（如 3×3），在输入上滑动，对应位置相乘求和，输出特征图。填充（padding）控制输出大小，步幅（stride）控制滑动间隔。\n\n### 汇聚层（池化）\n\n最大池化取 2×2 窗口最大值，缩小尺寸、增强鲁棒性。\n\n### LeNet\n\nLeNet-5（1998）是第一个成功 CNN：卷积→池化→卷积→池化→全连接，用于手写数字识别。\n\n```python\ndef conv2d(X, K):\n    h, w = K.shape\n    Y = np.zeros((X.shape[0]-h+1, X.shape[1]-w+1))\n    for i in range(Y.shape[0]):\n        for j in range(Y.shape[1]):\n            Y[i, j] = (X[i:i+h, j:j+w] * K).sum()\n    return Y\n```\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-06"
+  ]
+}

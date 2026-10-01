@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-010-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 10 章 文件和异常"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 10 章 文件和异常。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "```python\nwith open(\"note.txt\", encoding=\"utf-8\") as f:\n    content = f.read()\n\nwith open(\"note.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(\"Hello\\n\")\n\ntry:\n    result = 10 / int(input(\"除数：\"))\nexcept ZeroDivisionError:\n    print(\"不能除 0\")\nelse:\n    print(result)\n\nimport json\nwith open(\"data.json\", \"w\") as f:\n    json.dump([1, 2, 3], f)\n```"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-10"
+  ]
+}

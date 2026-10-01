@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-020-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "高中阶段补充：操作系统与组成原理深化"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：高中阶段补充：操作系统与组成原理深化。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 指令周期\n\nCPU 每秒重复几十亿次：PC（程序计数器）指向指令地址→取指→译码→执行→PC+1。\n\n### 缓存与多核\n\nCPU 比内存快几百倍，中间放 L1/L2/L3 缓存。数组连续存储命中缓存，链表散乱分布频繁不命中——这就是数组遍历比链表快一个数量级的硬件原因。\n\n### 进程与线程\n\n进程是运行中的程序，独立内存；线程是进程内执行单元，共享内存。GIL 让 Python 多线程不能真正并行 CPU 任务。\n\n### 虚拟内存与分页\n\n每个进程有私有虚拟地址空间，MMU 翻译成物理地址。内存不够时把页换到磁盘（swap）。\n\n### 文件系统\n\ninode 存文件元数据和数据块位置，文件名存在目录里。删除文件只是标记块可用，数据还在直到被覆盖。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-20"
+  ]
+}

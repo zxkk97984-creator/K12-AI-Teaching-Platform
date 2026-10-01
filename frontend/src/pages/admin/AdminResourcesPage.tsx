@@ -187,7 +187,7 @@ function ResourceDetail({
         <p>资源 ID：{item.id}</p>
         <p>来源类型：{item.source_kind}</p>
         <p>审校状态：{item.review_status} · 发布状态：{item.publication_status}</p>
-        <p>测试资源：{item.is_test_fixture ? "是" : "否"}</p>
+        <p>测试资源：{item.is_test_fixture ? "是" : "否"}</p><p>本地演示可见：{item.local_demo_visible ? "是" : "否"}</p>
       </details>
     </section>
   );
@@ -373,6 +373,7 @@ export function AdminResourcesPage() {
                     {item.kind === "INTERACTIVE" ? <a href={`/admin/resources/interactive?resource=${item.id}`}>互动内容管理</a> : <button type="button" className="admin-button-quiet" onClick={() => { setSelected(item); setRetryFile(null); }}>详情 / 编辑</button>}
                     <button type="button" className="admin-button-quiet" disabled={busy || item.review_status === "HUMAN_APPROVED"} onClick={() => void updateResource(item.id, { review_status: "HUMAN_APPROVED" })}>人工审校通过</button>
                     <button type="button" className="admin-button-quiet" title="需先上传可用文件并完成人工审校" disabled={busy || item.kind === "INTERACTIVE" || item.publication_status === "PUBLISHED" || item.review_status !== "HUMAN_APPROVED" || !item.variants.some((entry) => entry.available) || item.is_test_fixture || item.source_kind === "SYNTHETIC_FIXTURE"} onClick={() => void updateResource(item.id, { publication_status: "PUBLISHED" })}>发布</button>
+                    <button type="button" className="admin-button-quiet" disabled={busy} onClick={() => void updateResource(item.id, { local_demo_visible: !item.local_demo_visible })}>{item.local_demo_visible ? "关闭本地演示" : "设为本地演示可见"}</button>
                     <button type="button" className="admin-button-quiet" disabled={busy || item.publication_status === "WITHDRAWN"} onClick={() => void updateResource(item.id, { publication_status: "WITHDRAWN" })}>撤回</button>
                   </div></td>
                 </tr>

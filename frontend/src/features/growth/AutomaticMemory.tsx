@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { MarkdownContent } from "./MemoryDocuments";
+import { MemoryDialog } from "./MemoryDialog";
+import { useEditingRegistration } from "../../app/editing/EditingGuard";
 import {
   CATEGORY_LABELS,
   memoryRequest,
@@ -37,6 +38,7 @@ function MemoryEntry({
     { revision: number; action: string; statement: string }[] | null
   >(null);
   const [error, setError] = useState("");
+  useEditingRegistration("automatic-memory:" + item.id, editing && text !== item.statement);
   return (
     <article className="memory-entry">
       <div className="memory-entry-meta">
@@ -84,6 +86,7 @@ function MemoryEntry({
       ) : (
         <p>{item.statement}</p>
       )}
+      <small className="memory-updated">更新于 {new Date(item.updated_at).toLocaleDateString()}</small>
       {item.valid_until && (
         <small>有效至 {new Date(item.valid_until).toLocaleDateString()}</small>
       )}
@@ -109,7 +112,7 @@ function MemoryEntry({
               onClick={() => {
                 if (
                   window.confirm(
-                    "遗忘后，旧聊天和后台任务不会重新写入这条记忆。继续？",
+                    "遗忘后，这条内容不再作为个人记忆使用，原始聊天仍会保留。确认遗忘？",
                   )
                 )
                   void onAction(item, "FORGET").catch(() => undefined);
@@ -192,11 +195,16 @@ function MemoryEntry({
   );
 }
 
-export function AutomaticMemory() {
+export function AutomaticMemory({ settingsOpen = false, onSettingsClose = () => undefined }: { settingsOpen?: boolean; onSettingsClose?: () => void }) {
+  const [panel, setPanel] = useState<"history" | "records" | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [historyError, setHistoryError] = useState("");
   const [data, setData] = useState<MemoryOverview | null>(null);
+  const [loadError, setLoadError] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [offset, setOffset] = useState(0);
   const [category, setCategory] = useState("");
@@ -205,6 +213,16 @@ export function AutomaticMemory() {
     { id: string; title: string; message_count: number }[] | null
   >(null);
   const [selected, setSelected] = useState<string[]>([]);
+  const loadHistory = async () => {
+    setHistory(null);
+    setSelected([]);
+    setHistoryError("");
+    try {
+      setHistory(await memoryRequest<{ id: string; title: string; message_count: number }[]>("/api/v1/conversations?limit=100&include_archived=true"));
+    } catch (caught) {
+      setHistoryError(caught instanceof Error ? caught.message : "历史聊天暂时无法读取");
+    }
+  };
   const endpoint =
     BASE +
     "?" +
@@ -215,18 +233,23 @@ export function AutomaticMemory() {
     });
   const refresh = useCallback(async () => {
     setData(await memoryRequest<MemoryOverview>(endpoint));
+    setLoadError("");
+    setLoading(false);
   }, [endpoint]);
   useEffect(() => {
     let active = true;
+    setLoading(true);
     const load = async () => {
       try {
         const result = await memoryRequest<MemoryOverview>(endpoint);
         if (active) {
           setData(result);
-          setError("");
+          setLoadError("");
         }
       } catch (e) {
-        if (active) setError(e instanceof Error ? e.message : "记忆暂时不可用");
+        if (active) setLoadError(e instanceof Error ? e.message : "记忆暂时不可用");
+      } finally {
+        if (active) setLoading(false);
       }
     };
     void load();
@@ -265,12 +288,13 @@ export function AutomaticMemory() {
   if (!data)
     return (
       <section className="automatic-memory growth-card">
-        <h2>自动记忆</h2>
-        <p role={error ? "alert" : "status"}>{error || "正在读取个人记忆…"}</p>
-        {error && (
+        {settingsOpen && <MemoryDialog title="记忆设置" onClose={onSettingsClose}><p role={loadError ? "alert" : "status"}>{loadError || "正在读取记忆设置…"}</p></MemoryDialog>}
+        {!loadError && <div className="memory-loading" aria-hidden="true"><span /><span /><span /></div>}
+        <p role={loadError ? "alert" : "status"}>{loadError || "正在读取个人记忆…"}</p>
+        {loadError && (
           <button
             onClick={() =>
-              void refresh().catch((e: Error) => setError(e.message))
+              void refresh().catch((e: Error) => setLoadError(e.message))
             }
           >
             重新读取
@@ -282,25 +306,31 @@ export function AutomaticMemory() {
     (i) =>
       (showRemoved || i.status !== "REMOVED") &&
       (!category || i.category === category) &&
-      i.statement.includes(query),
+      i.statement.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
   );
+  const compactEmpty = !query && !category && !showRemoved && data.items.length === 0 && !data.has_more && offset === 0 && !loading && !loadError;
   const pending = data.tasks.filter(
     (t) => t.status === "QUEUED" || t.status === "RUNNING",
   ).length;
   return (
     <section className="automatic-memory" aria-label="自动个人记忆">
-      <div className="growth-card memory-controls">
-        <div>
-          <h2>在对话中，慢慢了解你</h2>
-          <p className="growth-muted">
-            有价值的信息会在回复后自动整理，你随时可以更正或遗忘。
-          </p>
+      <div className="memory-status-bar">
+        <div className="memory-status-text"><span>自动整理：{data.settings.auto_enabled ? "已开启" : "已关闭"}</span><span>用于 AI 辅导：{data.settings.use_enabled ? "已开启" : "已关闭"}</span>
+        {pending > 0 && <span role="status">{pending} 段对话等待或正在整理</span>}</div>
+        <div className="memory-actions">
+          <button type="button" className="secondary" onClick={() => { setPanel("history"); void loadHistory(); }}>整理历史聊天</button>
+          <button type="button" className="secondary" onClick={() => setPanel("records")}>整理记录</button>
         </div>
+      </div>
+      {settingsOpen && <MemoryDialog title="记忆设置" onClose={onSettingsClose}>
+        <p className="growth-muted">两个开关独立生效。关闭自动整理不会删除已保存的内容。</p>
         <div className="memory-toggle-row">
           {(["auto_enabled", "use_enabled"] as const).map((key) => (
             <label key={key}>
               <input
                 type="checkbox"
+                role="switch"
+                aria-label={key === "auto_enabled" ? "从聊天中自动整理" : "用于 AI 辅导"}
                 checked={data.settings[key]}
                 disabled={busy}
                 onChange={(e) => {
@@ -320,18 +350,15 @@ export function AutomaticMemory() {
               />
               {key === "auto_enabled"
                 ? "从聊天中自动整理"
-                : "允许教师使用个人记忆"}
+                : "用于 AI 辅导"}
+              <small aria-hidden="true">{data.settings[key] ? "已开启" : "已关闭"}</small>
             </label>
           ))}
         </div>
-        <small>
-          {pending ? `${pending} 段对话等待或正在整理` : "当前没有待处理对话"} ·{" "}
-          {data.last_updated_at
-            ? "最近更新 " + new Date(data.last_updated_at).toLocaleString()
-            : "尚未生成自动记忆"}
-        </small>
-      </div>
-      {error && (
+        <p className="growth-muted">用于 AI 辅导：允许 AI 教师参考个人记忆与已保存的个人文档。</p>
+        {error && <p className="growth-error" role="alert">{error}</p>}
+      </MemoryDialog>}
+      {error && !settingsOpen && !panel && (
         <p className="growth-error" role="alert">
           {error}
         </p>
@@ -341,21 +368,12 @@ export function AutomaticMemory() {
           {message}
         </p>
       )}
-      <div className="growth-card">
-        <h2>自动整理总览</h2>
-        {data.summary_markdown ? (
-          <MarkdownContent content={data.summary_markdown} />
-        ) : (
-          <p className="growth-muted">
-            聊聊你的兴趣、目标或偏好。后台会整理明确的信息，普通问答不会被当作个人事实。
-          </p>
-        )}
-      </div>
-      <div className="growth-card">
+      <div className="memory-list-surface" data-compact-empty={compactEmpty && !filtersOpen}>
         <div className="memory-section-heading">
           <h2>记忆条目</h2>
-          <span>{items.length} 条</span>
+          <span>{loading ? "读取中…" : `${items.length} 条${data.has_more ? " · 本页" : ""}`}</span>
         </div>
+        {compactEmpty && <button type="button" className="secondary memory-mobile-filters" aria-expanded={filtersOpen} onClick={() => setFiltersOpen((value) => !value)}>{filtersOpen ? "收起筛选" : "搜索与筛选"}</button>}
         <div className="memory-filters">
           <label>
             搜索记忆
@@ -387,7 +405,7 @@ export function AutomaticMemory() {
             </select>
           </label>
         </div>
-        <label>
+        <label className="memory-removed-filter">
           <input
             type="checkbox"
             checked={showRemoved}
@@ -395,7 +413,7 @@ export function AutomaticMemory() {
           />{" "}
           显示已遗忘的条目
         </label>
-        {items.length ? (
+        {loading ? <div className="memory-loading" role="status" aria-label="正在读取记忆"><span /><span /><span /></div> : loadError ? <div className="memory-empty"><h3>暂时无法读取记忆</h3><p role="alert" className="growth-error">{loadError}</p><button className="secondary" onClick={() => void refresh().catch((e: Error) => setLoadError(e.message))}>重新读取</button></div> : items.length ? (
           items.map((item) => (
             <MemoryEntry
               key={item.id}
@@ -405,10 +423,14 @@ export function AutomaticMemory() {
             />
           ))
         ) : (
-          <p className="growth-muted">暂无符合条件的记忆。</p>
+          <div className="memory-empty">
+            <h3>{query || category || showRemoved ? "没有找到匹配的记忆" : data.items.some((item) => item.status === "REMOVED") ? "暂时没有正在使用的记忆" : "还没有自动记忆"}</h3>
+            <p className="growth-muted">{query || category || showRemoved ? "试试其他关键词或分类，也可以清除筛选。" : "和 AI 教师聊聊你的兴趣、目标或讲解偏好；开启自动整理后，明确的信息会出现在这里。"}</p>
+            {query || category || showRemoved ? <button type="button" className="secondary" onClick={() => { setQuery(""); setCategory(""); setShowRemoved(false); setOffset(0); }}>清除筛选</button> : <a className="memory-chat-link" href="/conversations">去和 AI 教师聊聊</a>}
+          </div>
         )}
       </div>
-      <div className="memory-actions" aria-label="记忆分页">
+      {(offset > 0 || data.has_more) && <div className="memory-actions" aria-label="记忆分页">
         <button
           className="secondary"
           disabled={offset === 0 || busy}
@@ -427,65 +449,8 @@ export function AutomaticMemory() {
         >
           下一页
         </button>
-      </div>
-      <div className="growth-card">
-        <h2>整理已有聊天</h2>
-        <p className="growth-muted">
-          只有你主动选择的历史聊天才会加入整理。已经处理过的内容会跳过。
-        </p>
-        <button
-          className="secondary"
-          onClick={() =>
-            void memoryRequest<
-              { id: string; title: string; message_count: number }[]
-            >("/api/v1/conversations?limit=100&include_archived=true")
-              .then(setHistory)
-              .catch((e: Error) => setError(e.message))
-          }
-        >
-          选择历史聊天
-        </button>
-        {history && (
-          <div className="memory-history">
-            {history.length === 0 && <p>还没有历史聊天。</p>}
-            {history.map((s) => (
-              <label key={s.id}>
-                <input
-                  type="checkbox"
-                  checked={selected.includes(s.id)}
-                  onChange={(e) =>
-                    setSelected((prev) =>
-                      e.target.checked
-                        ? [...prev, s.id]
-                        : prev.filter((id) => id !== s.id),
-                    )
-                  }
-                />
-                {s.title || "未命名对话"}{" "}
-                <small>{s.message_count} 条消息</small>
-              </label>
-            ))}
-            <button
-              disabled={busy || !selected.length || !data.settings.auto_enabled}
-              onClick={() =>
-                void mutate(BASE + "/backfill", "POST", {
-                  session_ids: selected,
-                })
-                  .then(() => {
-                    setMessage("所选聊天已加入整理队列");
-                    setHistory(null);
-                    setSelected([]);
-                  })
-                  .catch(() => undefined)
-              }
-            >
-              开始整理所选聊天
-            </button>
-          </div>
-        )}
-        <details>
-          <summary>整理记录</summary>
-          {data.tasks.length === 0 && <p>暂无记录。</p>}
+      </div>}
+      {panel === "records" && <MemoryDialog title="整理记录" onClose={() => setPanel(null)}>          {data.tasks.length === 0 && <p>暂无记录。</p>}
           {data.tasks.map((task) => (
             <div key={task.id} className="memory-task">
               <span>
@@ -496,7 +461,7 @@ export function AutomaticMemory() {
                     ·{" "}
                     {task.reason === "MEMORY_AGENT_NOT_CONFIGURED"
                       ? "记忆助手尚未配置，请联系管理员"
-                      : task.reason}
+                      : task.reason === "BACKFILL" ? "由你选择的历史聊天" : task.reason === "SOURCE_DELETED" ? "来源聊天已删除" : task.reason === "MEMORY_CONTEXT_CHANGED" ? "记忆或设置已更新" : "整理暂未完成，可稍后重试"}
                   </small>
                 )}
               </span>
@@ -536,9 +501,57 @@ export function AutomaticMemory() {
               )}
             </div>
           ))}
-        </details>
-      </div>
-      <p className="growth-muted">{data.notice}</p>
+        {error && <p className="growth-error" role="alert">{error}</p>}
+      </MemoryDialog>}
+      {panel === "history" && <MemoryDialog title="整理历史聊天" onClose={() => setPanel(null)}>
+        <p className="growth-muted">
+          只有你主动选择的历史聊天才会加入整理。已经处理过的内容会跳过。
+        </p>
+        {historyError && <><p role="alert" className="growth-error">{historyError}</p><button type="button" className="secondary" onClick={() => void loadHistory()}>重新读取历史聊天</button></>}
+        {!history && !historyError && <p role="status">正在读取历史聊天…</p>}
+        {!data.settings.auto_enabled && <p className="growth-muted">请先在记忆设置中开启自动整理，再选择聊天。</p>}
+        {history && (
+          <div className="memory-history">
+            {history.length === 0 && <p>还没有历史聊天。</p>}
+            {history.map((s) => (
+              <label key={s.id}>
+                <input
+                  type="checkbox"
+                  checked={selected.includes(s.id)}
+                  onChange={(e) =>
+                    setSelected((prev) =>
+                      e.target.checked
+                        ? [...prev, s.id]
+                        : prev.filter((id) => id !== s.id),
+                    )
+                  }
+                />
+                {s.title || "未命名对话"}{" "}
+                <small>{s.message_count} 条消息</small>
+              </label>
+            ))}
+            <button
+              disabled={busy || !selected.length || !data.settings.auto_enabled}
+              onClick={() =>
+                void mutate(BASE + "/backfill", "POST", {
+                  session_ids: selected,
+                })
+                  .then(() => {
+                    setMessage("所选聊天已加入整理队列");
+                    setHistory(null);
+                    setPanel(null);
+                    setSelected([]);
+                  })
+                  .catch(() => undefined)
+              }
+            >
+              开始整理所选聊天
+            </button>
+          </div>
+        )}
+        {error && <p className="growth-error" role="alert">{error}</p>}
+      </MemoryDialog>}
+
     </section>
   );
 }

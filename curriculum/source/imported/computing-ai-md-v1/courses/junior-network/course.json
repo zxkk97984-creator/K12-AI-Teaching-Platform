@@ -1,0 +1,221 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "junior-network",
+  "title": "网络是怎样连接的",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习网络是怎样连接的，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "junior-network-topic-01",
+      "name": "第 1 章 浏览器生成消息",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 1 章 浏览器生成消息」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-network-topic-02",
+      "name": "第 2 章 DNS：把域名翻译成 IP 地址",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 2 章 DNS：把域名翻译成 IP 地址」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-network-topic-03",
+      "name": "第 3 章 Socket 与 TCP 连接",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 3 章 Socket 与 TCP 连接」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-network-topic-04",
+      "name": "第 4 章 发送 HTTP 请求",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 4 章 发送 HTTP 请求」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-network-topic-05",
+      "name": "第 5 章 服务器返回响应",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 5 章 服务器返回响应」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-network-topic-06",
+      "name": "第 6 章 浏览器显示网页",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 6 章 浏览器显示网页」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-network-topic-07",
+      "name": "补充概念",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「补充概念」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "第 1 章 浏览器生成消息",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 1 章 浏览器生成消息」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-network-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/545eacd59d2c9c3b/05-网络是怎样连接的.md",
+        "original_sha256": "545eacd59d2c9c3bf855640453fbf6d151aab390001ddcdee8b233dc01bddeaf",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "第 2 章 DNS：把域名翻译成 IP 地址",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 2 章 DNS：把域名翻译成 IP 地址」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-network-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/545eacd59d2c9c3b/05-网络是怎样连接的.md",
+        "original_sha256": "545eacd59d2c9c3bf855640453fbf6d151aab390001ddcdee8b233dc01bddeaf",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "第 3 章 Socket 与 TCP 连接",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 3 章 Socket 与 TCP 连接」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-network-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/545eacd59d2c9c3b/05-网络是怎样连接的.md",
+        "original_sha256": "545eacd59d2c9c3bf855640453fbf6d151aab390001ddcdee8b233dc01bddeaf",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "第 4 章 发送 HTTP 请求",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 4 章 发送 HTTP 请求」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-network-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/545eacd59d2c9c3b/05-网络是怎样连接的.md",
+        "original_sha256": "545eacd59d2c9c3bf855640453fbf6d151aab390001ddcdee8b233dc01bddeaf",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "第 5 章 服务器返回响应",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 5 章 服务器返回响应」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-network-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/545eacd59d2c9c3b/05-网络是怎样连接的.md",
+        "original_sha256": "545eacd59d2c9c3bf855640453fbf6d151aab390001ddcdee8b233dc01bddeaf",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "第 6 章 浏览器显示网页",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 6 章 浏览器显示网页」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-network-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/545eacd59d2c9c3b/05-网络是怎样连接的.md",
+        "original_sha256": "545eacd59d2c9c3bf855640453fbf6d151aab390001ddcdee8b233dc01bddeaf",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-main",
+      "revision": 1,
+      "order_index": 14,
+      "title": "补充概念",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「补充概念」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-network-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/545eacd59d2c9c3b/05-网络是怎样连接的.md",
+        "original_sha256": "545eacd59d2c9c3bf855640453fbf6d151aab390001ddcdee8b233dc01bddeaf",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-main-r1.json"
+    }
+  ]
+}

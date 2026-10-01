@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-008-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 17—18 章 触发器与时钟"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 17—18 章 触发器与时钟。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "用逻辑门能搭出\"触发器\"——一种能记住一个比特的电路。有了触发器，电脑就能\"存东西\"了。把几十亿个触发器排在一起，就是内存。\n\n时钟就是一个不断 0101 振荡的电路，它指挥电脑\"下一步、下一步\"地走。CPU 的主频（比如 3 GHz）就是每秒振荡 30 亿次。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-coding-topic-08"
+  ]
+}

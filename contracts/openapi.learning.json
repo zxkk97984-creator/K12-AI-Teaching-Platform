@@ -7745,6 +7745,19 @@
             "type": "boolean",
             "title": "Is Test Fixture"
           },
+          "local_demo_visible": {
+            "type": "boolean",
+            "title": "Local Demo Visible",
+            "default": false
+          },
+          "chapter_revision_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Chapter Revision Ids"
+          },
           "activity_status": {
             "type": "string",
             "enum": [

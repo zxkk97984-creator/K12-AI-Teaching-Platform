@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-013-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 15—17 章 数据可视化"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 15—17 章 数据可视化。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "```python\nimport matplotlib.pyplot as plt\nx = [1, 2, 3, 4, 5]\ny = [1, 4, 9, 16, 25]\nplt.plot(x, y, marker=\"o\")\nplt.show()\n```"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-13"
+  ]
+}

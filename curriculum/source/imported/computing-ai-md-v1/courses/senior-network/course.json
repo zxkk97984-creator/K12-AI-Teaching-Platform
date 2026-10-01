@@ -1,0 +1,341 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "senior-network",
+  "title": "计算机网络",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习计算机网络，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "senior-network-topic-01",
+      "name": "第1章 计算机网络和因特网",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第1章 计算机网络和因特网」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-02",
+      "name": "第2章 应用层",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第2章 应用层」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-03",
+      "name": "第3章 运输层",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第3章 运输层」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-04",
+      "name": "第4章 网络层：数据平面",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第4章 网络层：数据平面」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-05",
+      "name": "第5章 网络层：控制平面",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第5章 网络层：控制平面」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-06",
+      "name": "第6章 链路层",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第6章 链路层」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-07",
+      "name": "第7章 无线网络和移动网络",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第7章 无线网络和移动网络」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-08",
+      "name": "第8章 网络安全",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第8章 网络安全」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-09",
+      "name": "第9章 多媒体网络",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第9章 多媒体网络」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-10",
+      "name": "高中阶段补充：数据库 SQL 入门",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「高中阶段补充：数据库 SQL 入门」中的核心概念与示例。"
+    },
+    {
+      "slug": "senior-network-topic-11",
+      "name": "练习",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「练习」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "第1章 计算机网络和因特网",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第1章 计算机网络和因特网」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "第2章 应用层",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第2章 应用层」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "第3章 运输层",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第3章 运输层」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "第4章 网络层：数据平面",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第4章 网络层：数据平面」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "第5章 网络层：控制平面",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第5章 网络层：控制平面」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "第6章 链路层",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第6章 链路层」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-main",
+      "revision": 1,
+      "order_index": 14,
+      "title": "第7章 无线网络和移动网络",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第7章 无线网络和移动网络」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-008-main",
+      "revision": 1,
+      "order_index": 16,
+      "title": "第8章 网络安全",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第8章 网络安全」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-08"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-008-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-009-main",
+      "revision": 1,
+      "order_index": 18,
+      "title": "第9章 多媒体网络",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「第9章 多媒体网络」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-09"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-009-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-010-main",
+      "revision": 1,
+      "order_index": 20,
+      "title": "高中阶段补充：数据库 SQL 入门",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「高中阶段补充：数据库 SQL 入门」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-10"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-010-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-011-main",
+      "revision": 1,
+      "order_index": 22,
+      "title": "练习",
+      "stage": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "objectives": [
+        "解释「练习」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "senior-network-topic-11"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/5415993d7c45ae22/08-计算机网络自顶向下方法.md",
+        "original_sha256": "5415993d7c45ae22ee787bfc1e5407080a497cb48da44988aef9f44dee144ef2",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-011-main-r1.json"
+    }
+  ]
+}

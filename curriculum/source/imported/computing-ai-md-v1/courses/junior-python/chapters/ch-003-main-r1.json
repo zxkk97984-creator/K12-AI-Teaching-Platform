@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 3 章 列表"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 3 章 列表。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 3.1 列表是什么\n\n列表用方括号 `[]`，里面按顺序放数据：\n\n```python\nbicycles = [\"trek\", \"cannondale\", \"redline\", \"specialized\"]\nprint(bicycles[0])\nprint(bicycles[-1])\n```\n\n下标从 0 开始，所以第一个元素是 `[0]`；`-1` 取最后一个，`-2` 取倒数第二个。列表里可以放任何类型的数据，甚至不同类型混着放：`mixed = [\"小明\", 13, 1.65, True]`。\n\n#### 3.2 修改、添加、删除\n\n```python\nmotorcycles = [\"honda\", \"yamaha\", \"suzuki\"]\nmotorcycles[0] = \"ducati\"\nmotorcycles.append(\"bmw\")\nmotorcycles.insert(0, \"harley\")\ndel motorcycles[0]\npopped = motorcycles.pop()\nmotorcycles.remove(\"yamaha\")\n```\n\n`.append()` 加末尾；`.insert(下标, 值)` 在指定位置插入；`del` 按下标删；`.pop()` 弹出末尾并返回它；`.remove(值)` 按值删（只删第一个匹配）。\n\n#### 3.3 组织列表\n\n```python\ncars = [\"bmw\", \"audi\", \"toyota\", \"subaru\"]\ncars.sort()\ncars.sort(reverse=True)\nprint(sorted(cars))\ncars.reverse()\nprint(len(cars))\n```\n\n`.sort()` 永久排序（改变原列表）；`sorted()` 临时排序（返回新列表）；`.reverse()` 反转；`len()` 长度。\n\n**练习**：建一个列表存 5 个同学的名字，排序后打印。\n\n**常见误区**：`sort()` 是永久的，排完就回不去了；要保留原顺序用 `sorted()`。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-python-topic-03"
+  ]
+}

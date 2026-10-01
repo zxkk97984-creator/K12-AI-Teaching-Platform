@@ -39,6 +39,7 @@ export type ResourceSummary = {
   review_status: string;
   publication_status: string;
   is_test_fixture: boolean;
+  local_demo_visible: boolean;
   content_notice: string | null;
   chapter_revision_ids: string[];
   knowledge_point_slugs: string[];

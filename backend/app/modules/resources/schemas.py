@@ -48,6 +48,7 @@ class ResourceSummaryDTO(BaseModel):
     review_status: str
     publication_status: str
     is_test_fixture: bool
+    local_demo_visible: bool = False
     content_notice: str | None
     chapter_revision_ids: list[uuid.UUID]
     knowledge_point_slugs: list[str]
@@ -95,6 +96,7 @@ class ResourceCreateRequest(BaseModel):
     chapter_revision_ids: list[uuid.UUID] = Field(default_factory=list, max_length=16)
     knowledge_point_slugs: list[str] = Field(default_factory=list, max_length=16)
     is_test_fixture: bool = False
+    local_demo_visible: bool = False
 
 
 class ResourcePatchRequest(BaseModel):
@@ -103,6 +105,7 @@ class ResourcePatchRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     title: str | None = Field(default=None, min_length=1, max_length=200)
+    local_demo_visible: bool | None = None
     description: str | None = Field(default=None, max_length=4000)
     grade_min: int | None = Field(default=None, ge=1, le=12)
     grade_max: int | None = Field(default=None, ge=1, le=12)

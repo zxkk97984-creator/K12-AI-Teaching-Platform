@@ -223,6 +223,43 @@ async def make_published(rctx, token: str, *, slug: str, kind: str, revision_id,
 
 # --------------------------------------------------------------------------- admin catalogue
 @pytest.mark.asyncio
+async def test_learning_catalogue_tracks_actual_resource_bytes(rctx, content_session) -> None:
+    token = await as_admin(rctx)
+    resource_id = await make_published(
+        rctx, token, slug="catalogue-file-check", kind="WORD", revision_id=None, path=DOCX
+    )
+    await as_student(rctx, username="catalogue.file.student")
+    url = "/api/v1/learning/catalog?kind=RESOURCE&q=catalogue-file-check"
+    available = await rctx.client.get(url)
+    assert available.status_code == 200, available.text
+    assert available.json()["items"][0]["available"] is True
+    saved = await rctx.client.put(
+        f"/api/v1/learning/bookshelf/RESOURCE/{resource_id}",
+        headers=auth_headers(await csrf(rctx.client)),
+    )
+    assert saved.status_code == 201, saved.text
+    shelf = await rctx.client.get("/api/v1/learning/bookshelf")
+    assert shelf.status_code == 200, shelf.text
+    assert shelf.json()["items"][0]["available"] is True
+    variant = await content_session.scalar(
+        select(ResourceVariant).where(ResourceVariant.resource_id == uuid.UUID(resource_id))
+    )
+    assert variant is not None
+    (Path(rctx.settings.resource_storage_root) / variant.storage_key).unlink()
+    missing = await rctx.client.get(url)
+    assert missing.status_code == 200, missing.text
+    item = missing.json()["items"][0]
+    assert item["available"] is False
+    assert item["unavailable_reason"] == "RESOURCE_FILE_MISSING"
+    shelf = await rctx.client.get("/api/v1/learning/bookshelf")
+    assert shelf.status_code == 200, shelf.text
+    assert shelf.json()["items"][0]["available"] is False
+    token = await sign_in(rctx, ADMIN_USER, ADMIN_PASSWORD)
+    republished = await publish(rctx, token, resource_id)
+    assert republished.status_code == 409, republished.text
+
+
+@pytest.mark.asyncio
 async def test_admin_resource_list_filters_and_paginates_without_storage_keys(rctx) -> None:
     assert (await rctx.client.get("/api/v1/admin/resources")).status_code == 401
     token = await as_admin(rctx)

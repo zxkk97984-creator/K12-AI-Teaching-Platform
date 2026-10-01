@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-012-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第12章 从ASCII到Unicode"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第12章 从ASCII到Unicode。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "ASCII 用 7 位表示 128 个字符（英文字母数字标点）。Unicode 覆盖全世界文字，UTF-8 变长编码兼容 ASCII。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-coding-topic-12"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-007-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "补充概念"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：补充概念。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### IP 地址\n\nIP 地址像门牌号：每台联网的设备都有一个唯一编号。IPv4 是四段数字（如 `192.168.1.1`），IPv6 更长能给所有设备分配。\n\n### 域名\n\n域名是 IP 的\"好记版\"。`www.baidu.com` 比 `180.101.50.242` 好记多了。\n\n### HTTP 与 HTTPS\n\nHTTP 是网页传输的规则。HTTPS 就是加密版的 HTTP——数据在传输过程中被加密，别人偷看也看不懂。地址栏小锁头就是 HTTPS 的标志。\n\n### Wi-Fi 与宽带\n\n家里的路由器把宽带信号分成 Wi-Fi 无线信号，手机、电脑连 Wi-Fi 就等于连进了同一个小网络。\n\n### 路由器\n\n路由器是家里网络的\"门房\"：你家设备要上网，数据包先到路由器，路由器再转发给运营商，最后到互联网。\n\n---\n\n> 本文件基于《网络是怎样连接的》真实章节结构整理，协议细节全部简化为生活化比喻。原书受版权保护，深入学习请购买正版。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-network-topic-07"
+  ]
+}

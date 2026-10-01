@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.modules.interactive.package import Manifest, PromptSpec, SceneSpec
 
@@ -70,6 +70,8 @@ class InteractiveCatalogItemDTO(BaseModel):
     revision: int
     capabilities: list[str]
     is_test_fixture: bool
+    local_demo_visible: bool = False
+    chapter_revision_ids: list[uuid.UUID] = Field(default_factory=list)
     activity_status: Literal["NOT_STARTED", "ACTIVE", "COMPLETED", "ABANDONED"]
     can_resume: bool
     session_id: uuid.UUID | None

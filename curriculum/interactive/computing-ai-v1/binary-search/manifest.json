@@ -1,0 +1,67 @@
+{
+  "schema_version": "k12-interactive-v1",
+  "content_key": "learning-binary-search",
+  "title": "二分查找",
+  "purpose": "EXPERIMENT",
+  "stage": "SENIOR",
+  "subject": "计算机与人工智能",
+  "entry": "index.html",
+  "cover": "assets/cover.svg",
+  "summary": "通过动态画面和动手操作理解二分查找，由霜铃朗读预设讲解。",
+  "knowledge_points": [
+    "二分查找"
+  ],
+  "capabilities": [
+    "SCENES",
+    "CHECKPOINTS",
+    "COMPLETION"
+  ],
+  "scenes": [
+    {
+      "id": "observe",
+      "title": "检查前提",
+      "summary": "二分查找要求数据有序。设置严格递增的数组和查找目标，先检查这个前提。"
+    },
+    {
+      "id": "middle",
+      "title": "比较中点",
+      "summary": "每一步先计算中间位置，再比较目标与中间元素。黄色卡片标出本次比较的位置。"
+    },
+    {
+      "id": "shrink",
+      "title": "缩小区间",
+      "summary": "目标较大时保留右半部分，目标较小时保留左半部分。被排除的元素将变淡。"
+    },
+    {
+      "id": "reflect",
+      "title": "比较次数",
+      "summary": "候选范围每次约减半，所以比较次数随数组长度的增长较慢。目标不存在时，区间最终会变为空。"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "observe-read",
+      "scene_id": "observe",
+      "text": "二分查找要求数据有序。设置严格递增的数组和查找目标，先检查这个前提。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "middle-read",
+      "scene_id": "middle",
+      "text": "每一步先计算中间位置，再比较目标与中间元素。黄色卡片标出本次比较的位置。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "shrink-read",
+      "scene_id": "shrink",
+      "text": "目标较大时保留右半部分，目标较小时保留左半部分。被排除的元素将变淡。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "reflect-read",
+      "scene_id": "reflect",
+      "text": "候选范围每次约减半，所以比较次数随数组长度的增长较慢。目标不存在时，区间最终会变为空。",
+      "trigger": "SCENE_ENTER"
+    }
+  ]
+}

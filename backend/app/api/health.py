@@ -43,7 +43,12 @@ def _storage_status(settings) -> str:
 
 @router.get("/health/live")
 async def live(request: Request) -> dict[str, str]:
-    return {"status": "ok", "service": "shuangling-k12", "request_id": request_id(request)}
+    return {
+        "status": "ok",
+        "service": "shuangling-k12",
+        "environment": request.app.state.settings.app_env,
+        "request_id": request_id(request),
+    }
 
 
 @router.get("/health/ready")

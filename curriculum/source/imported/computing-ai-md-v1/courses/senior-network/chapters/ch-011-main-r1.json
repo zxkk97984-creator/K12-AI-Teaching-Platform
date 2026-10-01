@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-011-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "练习"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：练习。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "1. 用 `tracert` 命令观察到一个网站经过几跳。\n2. 解释为什么 TCP 三次握手不能改成两次。\n3. 写出访问 `www.baidu.com` 时从 DNS 查询到 TCP 连接建立的完整步骤。\n4. 用 Python socket 写一个最简单的 TCP 客户端和服务器。\n5. 解释 HTTPS 比 HTTP 多做了哪三件事。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-11"
+  ]
+}

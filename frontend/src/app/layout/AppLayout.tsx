@@ -8,6 +8,7 @@ import { gradeLabel, type MeResponse, type Stage } from "../../features/identity
 import { ConversationProvider, useConversation } from "../../features/conversation/ConversationProvider";
 import { listSessions, updateSession } from "../../features/conversation/api";
 import { Companion } from "../../features/companion/components/Companion";
+import { LearningTeacherProvider } from "../../features/companion/LearningTeacherContext";
 import { CompanionAvatarProvider } from "../../features/companion/CompanionAvatar";
 import { EditingGuardProvider } from "../editing/EditingGuard";
 
@@ -84,7 +85,7 @@ function Icon({ name }: { name: string }) {
   if (name === "practice") return <svg {...common}><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M8 8h8M8 12h8M8 16h5" /><path d="m16.5 15.5 1.5 1.5-3 3-1.5.2.2-1.5z" /></svg>;
   if (name === "resource") return <svg {...common}><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z" /><path d="M4 5.5v15M8 7h8M8 11h8M8 15h5" /></svg>;
   if (name === "memory") return <svg {...common}><path d="M12 3.5 14 5l2.5-.1.9 2.3 2.1 1.3-.8 2.4.8 2.4-2.1 1.3-.9 2.3L14 17l-2 1.5L10 17l-2.5.1-.9-2.3-2.1-1.3.8-2.4-.8-2.4 2.1-1.3.9-2.3L10 5z" /><path d="m8.5 11.5 2.2 2.2 4.8-5" /></svg>;
-  if (name === "settings") return <svg {...common}><path d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5Z" /><path d="m19 13 .1-2 1.7-1.4-1.8-3-2.1.6-1.6-1.2L15 3.9h-3.5l-.4 2.1-1.7 1.2-2.1-.6-1.8 3L7.2 11l.1 2-1.7 1.4 1.8 3 2.1-.6 1.6 1.2.4 2.1H15l.4-2.1 1.7-1.2 2.1.6 1.8-3z" /></svg>;
+  if (name === "settings") return <svg {...common}><path d="M10.25 4.97L10.75 3.09L13.25 3.09L13.75 4.97L15.73 5.79L17.42 4.81L19.19 6.58L18.21 8.27L19.03 10.25L20.91 10.75L20.91 13.25L19.03 13.75L18.21 15.73L19.19 17.42L17.42 19.19L15.73 18.21L13.75 19.03L13.25 20.91L10.75 20.91L10.25 19.03L8.27 18.21L6.58 19.19L4.81 17.42L5.79 15.73L4.97 13.75L3.09 13.25L3.09 10.75L4.97 10.25L5.79 8.27L4.81 6.58L6.58 4.81L8.27 5.79Z" /><circle cx="12" cy="12" r="3" /></svg>;
   return <svg {...common}><path d="M4 5h16v12H7l-3 3z" /><path d="M8 9h8M8 13h5" /></svg>;
 }
 
@@ -172,7 +173,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 }
 
 function AccountLayout({ me, children }: { me: MeResponse; children: ReactNode }) {
-  return <AccountProvider me={me}><CompanionAvatarProvider userId={me.user.id}><ConversationProvider key={me.user.id}><EditingGuardProvider><AccountFrame me={me}>{children}</AccountFrame></EditingGuardProvider></ConversationProvider></CompanionAvatarProvider></AccountProvider>;
+  return <AccountProvider me={me}><CompanionAvatarProvider userId={me.user.id}><ConversationProvider key={me.user.id}><LearningTeacherProvider><EditingGuardProvider><AccountFrame me={me}>{children}</AccountFrame></EditingGuardProvider></LearningTeacherProvider></ConversationProvider></CompanionAvatarProvider></AccountProvider>;
 }
 
 function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode }) {
@@ -200,10 +201,18 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
     : pathname.startsWith("/activities") || pathname.startsWith("/interactive") ? "互动内容"
     : pathname.startsWith("/code") ? "在线编程"
     : pathname.startsWith("/more") ? "更多入口"
-    : pathname.startsWith("/growth") ? "学习记忆"
+    : pathname.startsWith("/growth") ? "个人记忆"
     : pathname.startsWith("/settings") ? "学习设置"
     : items.find((item) => item.path === currentSection)?.label ?? "学习平台";
   const conversationPage = pathname.startsWith("/conversations");
+  const interactiveSurface = pathname.startsWith("/interactive/");
+  const [interactiveFocused, setInteractiveFocused] = useState(false);
+  useEffect(() => {
+    const update = (event: Event) => setInteractiveFocused(Boolean((event as CustomEvent).detail?.focused));
+    window.addEventListener("interactive:layout", update);
+    return () => window.removeEventListener("interactive:layout", update);
+  }, []);
+  useEffect(() => { setInteractiveFocused(false); }, [pathname]);
   const codeParams = new URLSearchParams(search);
   const codeSurface = pathname === "/code"
     ? Boolean(codeParams.get("task")) && !(codeParams.get("tab") === "history" && codeParams.get("view") === "record" && Boolean(codeParams.get("run")))
@@ -219,7 +228,7 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
   const startConversation = () => { void controller.start().then((id) => { if (id) navigateTo(`/conversations?session=${id}`); }); };
 
   const readingSurface = pathname === "/resources" || pathname.startsWith("/books/");
-  return <div className="app-shell" data-stage={stage ?? ""} data-admin={adminPage} data-reading-surface={readingSurface} data-code-surface={codeSurface}>
+  return <div className="app-shell" data-stage={stage ?? ""} data-admin={adminPage} data-interactive-surface={interactiveSurface} data-interactive-focused={interactiveSurface && interactiveFocused} data-reading-surface={readingSurface} data-code-surface={codeSurface}>
     <a href="#page-content" className="skip-link">跳到主要内容</a>
     {adminPage ? <button type="button" className="app-mobile-toggle" aria-label={mobileNavOpen ? "关闭导航" : "打开导航"} aria-expanded={mobileNavOpen} onClick={() => setMobileNavOpen((value) => !value)}><Icon name="book" /></button> : <NavLink to="/settings" className="k12-mobile-settings" aria-label="打开学习设置"><Icon name="settings" /></NavLink>}
     {mobileNavOpen ? <button type="button" className="app-sidebar-backdrop" aria-label="关闭导航" onClick={closeMobile} /> : null}

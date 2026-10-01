@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-010-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 10 章 K 近邻"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 10 章 K 近邻。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "K 近邻（KNN）思路超简单：要预测一个新东西属于哪类，就看离它最近的 K 个邻居大多数是哪类，它就是哪类。\n\n例子：你要判断一个新同学是不是好学生，就看和他玩得最近的 3 个同学里有几个是好学生——2 个以上就是。\n\nKNN 也能做回归：预测一个人的身高，就看离他最近的 5 个人的平均身高。\n\n**练习**：用 KNN 思路，给一组已标好\"喜欢/不喜欢\"的电影打分，预测一个新电影你会不会喜欢。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-algorithms-topic-10"
+  ]
+}

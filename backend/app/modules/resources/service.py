@@ -118,7 +118,7 @@ def visibility_condition(viewer: ViewerScope):
         alternatives.append(
             and_(
                 Resource.stage == stage,
-                Resource.is_test_fixture.is_(True),
+                or_(Resource.is_test_fixture.is_(True), Resource.local_demo_visible.is_(True)),
                 Resource.publication_status != PublicationStatus.WITHDRAWN.value,
             )
         )
@@ -206,7 +206,10 @@ async def _summary(
         review_status=resource.review_status,
         publication_status=resource.publication_status,
         is_test_fixture=resource.is_test_fixture,
-        content_notice=FIXTURE_NOTICE if resource.is_test_fixture else None,
+        local_demo_visible=resource.local_demo_visible,
+        content_notice=FIXTURE_NOTICE
+        if resource.is_test_fixture
+        else ("本地互动讲解 · 教学演示" if resource.local_demo_visible else None),
         chapter_revision_ids=await _linked_revision_ids(db, resource.id),
         knowledge_point_slugs=await _linked_knowledge_slugs(db, resource.id),
         variants=[
@@ -446,6 +449,7 @@ async def create_resource(
         review_status="UNREVIEWED",
         publication_status="DRAFT",
         is_test_fixture=payload.is_test_fixture,
+        local_demo_visible=payload.local_demo_visible,
         uploaded_by_user_id=actor.id,
     )
     db.add(resource)
@@ -477,7 +481,14 @@ async def patch_resource(
         resource.grade_min = grade_min
         resource.grade_max = grade_max
 
-    for field in ("title", "description", "source_note", "license_code", "license_note"):
+    for field in (
+        "title",
+        "description",
+        "source_note",
+        "license_code",
+        "license_note",
+        "local_demo_visible",
+    ):
         if field in data and data[field] is not None:
             setattr(resource, field, data[field])
 
@@ -517,8 +528,13 @@ async def patch_resource(
                 ):
                     raise ResourceStateError("INTERACTIVE_FILE_MISSING", "播放文档缺失，不能发布")
                 revision.locked_at = revision.locked_at or datetime.now(UTC)
-            elif not await _variants(db, resource.id):
-                raise ResourceStateError("RESOURCE_FILE_MISSING", "资源还没有真实文件，不能发布")
+            else:
+                variants = await _variants(db, resource.id)
+                if not variants or (
+                    settings is not None
+                    and not any(_variant_available(variant, settings) for variant in variants)
+                ):
+                    raise ResourceStateError("RESOURCE_FILE_MISSING", "资源文件缺失，不能发布")
         resource.publication_status = publication
 
     if chapter_revision_ids is not None:

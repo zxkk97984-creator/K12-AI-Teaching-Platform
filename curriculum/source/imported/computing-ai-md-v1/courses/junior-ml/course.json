@@ -1,0 +1,221 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "junior-ml",
+  "title": "图解机器学习",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习图解机器学习，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "junior-ml-topic-01",
+      "name": "AI发展简史",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「AI发展简史」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-ml-topic-02",
+      "name": "机器学习全流程",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「机器学习全流程」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-ml-topic-03",
+      "name": "常见AI应用细分",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「常见AI应用细分」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-ml-topic-04",
+      "name": "神经网络直觉",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「神经网络直觉」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-ml-topic-05",
+      "name": "生成式AI与大模型",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「生成式AI与大模型」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-ml-topic-06",
+      "name": "AI伦理与幻觉",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「AI伦理与幻觉」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-ml-topic-07",
+      "name": "AI动手体验项目",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「AI动手体验项目」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "AI发展简史",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「AI发展简史」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-ml-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/e02e40ca9bcea270/04-图解机器学习.md",
+        "original_sha256": "e02e40ca9bcea270f02146eb298417e06f96b73be013325caa4a2c8b633bd5c3",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "机器学习全流程",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「机器学习全流程」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-ml-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/e02e40ca9bcea270/04-图解机器学习.md",
+        "original_sha256": "e02e40ca9bcea270f02146eb298417e06f96b73be013325caa4a2c8b633bd5c3",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "常见AI应用细分",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「常见AI应用细分」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-ml-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/e02e40ca9bcea270/04-图解机器学习.md",
+        "original_sha256": "e02e40ca9bcea270f02146eb298417e06f96b73be013325caa4a2c8b633bd5c3",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "神经网络直觉",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「神经网络直觉」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-ml-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/e02e40ca9bcea270/04-图解机器学习.md",
+        "original_sha256": "e02e40ca9bcea270f02146eb298417e06f96b73be013325caa4a2c8b633bd5c3",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "生成式AI与大模型",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「生成式AI与大模型」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-ml-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/e02e40ca9bcea270/04-图解机器学习.md",
+        "original_sha256": "e02e40ca9bcea270f02146eb298417e06f96b73be013325caa4a2c8b633bd5c3",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "AI伦理与幻觉",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「AI伦理与幻觉」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-ml-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/e02e40ca9bcea270/04-图解机器学习.md",
+        "original_sha256": "e02e40ca9bcea270f02146eb298417e06f96b73be013325caa4a2c8b633bd5c3",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-main",
+      "revision": 1,
+      "order_index": 14,
+      "title": "AI动手体验项目",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「AI动手体验项目」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-ml-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/e02e40ca9bcea270/04-图解机器学习.md",
+        "original_sha256": "e02e40ca9bcea270f02146eb298417e06f96b73be013325caa4a2c8b633bd5c3",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-main-r1.json"
+    }
+  ]
+}

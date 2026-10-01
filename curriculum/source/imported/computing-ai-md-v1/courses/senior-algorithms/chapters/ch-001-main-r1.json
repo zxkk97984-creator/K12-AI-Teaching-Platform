@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-001-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第1章 程序设计入门"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第1章 程序设计入门。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "> **书名**：算法竞赛入门经典\n> **作者**：刘汝佳\n> **出版社**：清华大学出版社，2009（ISBN 9787302206088）\n> **真实目录来源**：https://www.tup.com.cn/booksCenter/book_03224201.html\n> **说明**：本文件基于该书真实章节结构整理高中段知识点，非逐字原文（受版权保护），原书代码为 C/C++，本讲义用 Python 重写以适配高中 Python 基础。细节与习题以原书为准。\n\n全书 11 章：程序设计入门、循环结构、数组和字符串、函数和递归、基础题目选解、数据结构基础、暴力求解法、高效算法设计、动态规划初步、数学概念与方法、图论模型与算法。高中参加 CSP-J/S、NOIP 必看。\n\n---\n\n程序设计的本质是把一个问题拆成顺序执行的步骤。三个基本结构：顺序、分支、循环。\n\n#### 算术表达式与变量\n\nPython 中变量无需声明类型。注意整数除法 `/` 得浮点数，`//` 整除，`%` 取模，`**` 幂。\n\n```python\na, b = 7, 3\nprint(a + b, a - b, a * b, a / b, a // b, a % b, a ** b)\n```\n\n输入输出：`input()` 读一行字符串，需 `int()`/`float()` 转换。竞赛中多组数据用 `sys.stdin` 加速。\n\n```python\nimport sys\ndef main():\n    data = sys.stdin.read().split()\n    i = 0\n    while i < len(data):\n        a = int(data[i]); b = int(data[i+1])\n        print(a + b)\n        i += 2\nmain()\n```\n\n#### 分支结构\n\n```python\nscore = int(input())\nif score >= 90:\n    print('A')\nelif score >= 80:\n    print('B')\nelse:\n    print('C')\n```\n\n**常见误区**：浮点数相等判断。`0.1 + 0.2 == 0.3` 在 Python 里是 False（浮点精度）。比较浮点数用 `abs(a-b) < 1e-9`。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-algorithms-topic-01"
+  ]
+}

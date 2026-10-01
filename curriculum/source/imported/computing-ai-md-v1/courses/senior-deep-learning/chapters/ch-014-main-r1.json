@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-014-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第14章 自然语言处理：预训练"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第14章 自然语言处理：预训练。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "- **word2vec**：把词变成稠密向量，语义相近的词向量相近。\n- **GloVe**：结合全局统计。\n- **子词嵌入**：BPE，处理未登录词。\n- **BERT**：双向 Transformer 编码器，预训练后微调，刷新 NLP 纪录。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-deep-learning-topic-14"
+  ]
+}

@@ -28,6 +28,20 @@ export interface PanelRect {
   height: number;
 }
 
+/** Keep a manually moved/resized chat usable when the viewport changes. */
+export function clampPanel(rect: PanelRect): PanelRect {
+  const maxWidth = Math.max(1, window.innerWidth - 32);
+  const maxHeight = Math.max(1, window.innerHeight - (window.innerWidth <= PANEL_MOBILE_BREAKPOINT ? 92 : 32));
+  const width = Math.min(maxWidth, Math.max(Math.min(320, maxWidth), rect.width));
+  const height = Math.min(maxHeight, Math.max(Math.min(320, maxHeight), rect.height));
+  return {
+    left: Math.max(16, Math.min(rect.left, window.innerWidth - width - 16)),
+    top: Math.max(16, Math.min(rect.top, maxHeight + 16 - height)),
+    width,
+    height,
+  };
+}
+
 /**
  * Keep the full dock inside the viewport, above the mobile navigation.
  *

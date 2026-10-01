@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-004-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "2.14 再增四道经典 OJ 题"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：2.14 再增四道经典 OJ 题。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "#### 题 4：最长公共子序列（LCS）\n\n两个字符串 `text1` 和 `text2`，找最长公共子序列长度。经典二维 DP：`dp[i][j]` = `text1[:i]` 和 `text2[:j]` 的 LCS。\n\n```python\ndef longest_common_subsequence(text1, text2):\n    m, n = len(text1), len(text2)\n    dp = [[0] * (n + 1) for _ in range(m + 1)]\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            if text1[i - 1] == text2[j - 1]:\n                dp[i][j] = dp[i - 1][j - 1] + 1\n            else:\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])\n    return dp[m][n]\n```\n\n#### 题 5：合并区间\n\n给出一堆闭区间，合并所有重叠的。思路：按起点排序，逐个看当前区间能不能并入最后一个合并区间。\n\n```python\ndef merge_intervals(intervals):\n    if not intervals:\n        return []\n    intervals.sort()\n    merged = [list(intervals[0])]\n    for start, end in intervals[1:]:\n        if start <= merged[-1][1]:\n            merged[-1][1] = max(merged[-1][1], end)\n        else:\n            merged.append([start, end])\n    return [tuple(x) for x in merged]\n```\n\n#### 题 6：二叉树层序遍历\n\n就是 2.10.2 节的代码，LeetCode 102 原题。重点是用队列一层一层展开。\n\n#### 题 7：括号匹配\n\n一个字符串只含 `()[]{}`，判断括号是否正确匹配。经典栈题：左括号入栈，右括号看栈顶是否匹配。\n\n```python\ndef is_valid(s):\n    pair = {')': '(', ']': '[', '}': '{'}\n    stack = []\n    for ch in s:\n        if ch in '([{':\n            stack.append(ch)\n        else:\n            if not stack or stack[-1] != pair[ch]:\n                return False\n            stack.pop()\n    return not stack\n```"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-olympiad-topic-04"
+  ]
+}

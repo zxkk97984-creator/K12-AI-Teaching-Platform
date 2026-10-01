@@ -1,0 +1,431 @@
+{
+  "schema_version": "k12.content.course.v1",
+  "stable_slug": "junior-coding",
+  "title": "编码与计算机原理",
+  "topic": "计算机与人工智能",
+  "description": "按章节学习编码与计算机原理，保留参考讲义的讲解、示例和练习，支持阅读续学与教师提问。",
+  "knowledge_points": [
+    {
+      "slug": "junior-coding-topic-01",
+      "name": "第 1—2 章 编码与组合",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 1—2 章 编码与组合」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-02",
+      "name": "第 3 章 布莱叶盲文与二元编码",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 3 章 布莱叶盲文与二元编码」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-03",
+      "name": "第 4—5 章 手电筒与绕过拐角的通信",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 4—5 章 手电筒与绕过拐角的通信」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-04",
+      "name": "第 6—8 章 逻辑与开关、继电器与门电路",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 6—8 章 逻辑与开关、继电器与门电路」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-05",
+      "name": "第 9—11 章 我们的十进制、其他进制、一位一位",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 9—11 章 我们的十进制、其他进制、一位一位」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-06",
+      "name": "第 12 章 字节与十六进制",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 12 章 字节与十六进制」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-07",
+      "name": "第 13 章 从 ASCII 到 Unicode",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 13 章 从 ASCII 到 Unicode」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-08",
+      "name": "第 17—18 章 触发器与时钟",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 17—18 章 触发器与时钟」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-09",
+      "name": "第 19 章 存储器组织",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 19 章 存储器组织」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-10",
+      "name": "第 21 章 算术逻辑单元（ALU）",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 21 章 算术逻辑单元（ALU）」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-11",
+      "name": "第 22—23 章 寄存器与总线、CPU 控制信号",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 22—23 章 寄存器与总线、CPU 控制信号」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-12",
+      "name": "第 27 章 编码：汇编语言",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 27 章 编码：汇编语言」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-13",
+      "name": "第 28 章 操作系统",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「第 28 章 操作系统」中的核心概念与示例。"
+    },
+    {
+      "slug": "junior-coding-topic-14",
+      "name": "计算机发展史",
+      "topic": "计算机与人工智能",
+      "description": "学习并解释「计算机发展史」中的核心概念与示例。"
+    }
+  ],
+  "chapters": [
+    {
+      "stable_slug": "ch-001-main",
+      "revision": 1,
+      "order_index": 2,
+      "title": "第 1—2 章 编码与组合",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 1—2 章 编码与组合」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-01"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-001-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-002-main",
+      "revision": 1,
+      "order_index": 4,
+      "title": "第 3 章 布莱叶盲文与二元编码",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 3 章 布莱叶盲文与二元编码」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-02"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-002-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-003-main",
+      "revision": 1,
+      "order_index": 6,
+      "title": "第 4—5 章 手电筒与绕过拐角的通信",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 4—5 章 手电筒与绕过拐角的通信」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-03"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-003-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-004-main",
+      "revision": 1,
+      "order_index": 8,
+      "title": "第 6—8 章 逻辑与开关、继电器与门电路",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 6—8 章 逻辑与开关、继电器与门电路」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-04"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-004-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-005-main",
+      "revision": 1,
+      "order_index": 10,
+      "title": "第 9—11 章 我们的十进制、其他进制、一位一位",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 9—11 章 我们的十进制、其他进制、一位一位」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-05"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-005-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-006-main",
+      "revision": 1,
+      "order_index": 12,
+      "title": "第 12 章 字节与十六进制",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 12 章 字节与十六进制」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-06"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-006-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-007-main",
+      "revision": 1,
+      "order_index": 14,
+      "title": "第 13 章 从 ASCII 到 Unicode",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 13 章 从 ASCII 到 Unicode」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-07"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-007-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-008-main",
+      "revision": 1,
+      "order_index": 16,
+      "title": "第 17—18 章 触发器与时钟",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 17—18 章 触发器与时钟」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-08"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-008-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-009-main",
+      "revision": 1,
+      "order_index": 18,
+      "title": "第 19 章 存储器组织",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 19 章 存储器组织」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-09"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-009-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-010-main",
+      "revision": 1,
+      "order_index": 20,
+      "title": "第 21 章 算术逻辑单元（ALU）",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 21 章 算术逻辑单元（ALU）」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-10"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-010-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-011-main",
+      "revision": 1,
+      "order_index": 22,
+      "title": "第 22—23 章 寄存器与总线、CPU 控制信号",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 22—23 章 寄存器与总线、CPU 控制信号」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-11"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-011-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-012-main",
+      "revision": 1,
+      "order_index": 24,
+      "title": "第 27 章 编码：汇编语言",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 27 章 编码：汇编语言」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-12"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-012-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-013-main",
+      "revision": 1,
+      "order_index": 26,
+      "title": "第 28 章 操作系统",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「第 28 章 操作系统」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-13"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-013-main-r1.json"
+    },
+    {
+      "stable_slug": "ch-014-main",
+      "revision": 1,
+      "order_index": 28,
+      "title": "计算机发展史",
+      "stage": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "objectives": [
+        "解释「计算机发展史」的主要概念，并结合示例完成文中练习。"
+      ],
+      "knowledge_points": [
+        "junior-coding-topic-14"
+      ],
+      "license_code": "UNKNOWN",
+      "license_notes": "用户提供的参考书整理讲义；原书信息见正文。",
+      "source": {
+        "source_commit": null,
+        "source_path": "sources/f6b1dda2ec6b8885/编码合并来源.md",
+        "original_sha256": "f6b1dda2ec6b8885fa0e8c02f93af4f5916aa630990c4dfd2a832649dab22d56",
+        "conversion": "supplied-markdown-v1"
+      },
+      "content_file": "chapters/ch-014-main-r1.json"
+    }
+  ]
+}

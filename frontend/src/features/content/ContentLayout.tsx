@@ -8,6 +8,8 @@ export function ContentLayout({
   rail,
   aside,
   children,
+  variant = "default",
+  className = "",
 }: {
   title: string;
   subtitle?: string;
@@ -15,20 +17,22 @@ export function ContentLayout({
   rail?: ReactNode;
   aside?: ReactNode;
   children: ReactNode;
+  variant?: "default" | "reading";
+  className?: string;
 }) {
   return (
-    <main className="content-page">
+    <main className={`content-page content-page--${variant} ${className}`}>
       <header className="content-page__header">
         <div className="content-page__heading">
-          <p className="eyebrow">霜铃 · 课程</p>
-          <h1 className="content-page__title">{title}</h1>
+          {variant === "reading" ? <a className="reader-library-back" href="/resources">← 返回资料库</a> : <p className="eyebrow">霜铃 · 课程</p>}
+          {variant === "reading" ? <p className="reader-course-name">{title}</p> : <h1 className="content-page__title">{title}</h1>}
           {subtitle ? <p className="content-page__subtitle">{subtitle}</p> : null}
         </div>
         <div className="content-page__actions">
           {toolbar}
-          <a className="content-link" href="/workbench">
+          {variant !== "reading" ? <a className="content-link" href="/workbench">
             返回工作台
-          </a>
+          </a> : null}
         </div>
       </header>
       <div

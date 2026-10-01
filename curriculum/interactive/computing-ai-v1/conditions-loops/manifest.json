@@ -1,0 +1,67 @@
+{
+  "schema_version": "k12-interactive-v1",
+  "content_key": "learning-conditions-loops",
+  "title": "条件与循环",
+  "purpose": "EXPERIMENT",
+  "stage": "JUNIOR",
+  "subject": "计算机与人工智能",
+  "entry": "index.html",
+  "cover": "assets/cover.svg",
+  "summary": "通过动态画面和动手操作理解条件与循环，由霜铃朗读预设讲解。",
+  "knowledge_points": [
+    "条件与循环"
+  ],
+  "capabilities": [
+    "SCENES",
+    "CHECKPOINTS",
+    "COMPLETION"
+  ],
+  "scenes": [
+    {
+      "id": "observe",
+      "title": "读懂程序",
+      "summary": "这段程序从一开始逐个检查数字。条件判断选择偶数，循环让同样的检查重复执行。"
+    },
+    {
+      "id": "condition",
+      "title": "观察判断",
+      "summary": "一个数除以二的余数为零，就满足偶数条件。逐步执行，观察哪些数字进入求和分支。"
+    },
+    {
+      "id": "loop",
+      "title": "跟踪变量",
+      "summary": "每次循环都会改变当前数字。满足条件时，累计结果也会变化。调整范围，再逐步验证。"
+    },
+    {
+      "id": "reflect",
+      "title": "解释结果",
+      "summary": "这里按程序规则演示执行步骤。请说出条件和循环各自的作用，再结合课堂中的真实编程题练习。"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "observe-read",
+      "scene_id": "observe",
+      "text": "这段程序从一开始逐个检查数字。条件判断选择偶数，循环让同样的检查重复执行。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "condition-read",
+      "scene_id": "condition",
+      "text": "一个数除以二的余数为零，就满足偶数条件。逐步执行，观察哪些数字进入求和分支。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "loop-read",
+      "scene_id": "loop",
+      "text": "每次循环都会改变当前数字。满足条件时，累计结果也会变化。调整范围，再逐步验证。",
+      "trigger": "SCENE_ENTER"
+    },
+    {
+      "id": "reflect-read",
+      "scene_id": "reflect",
+      "text": "这里按程序规则演示执行步骤。请说出条件和循环各自的作用，再结合课堂中的真实编程题练习。",
+      "trigger": "SCENE_ENTER"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-007-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第7章 无线网络和移动网络"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第7章 无线网络和移动网络。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "802.11 Wi-Fi 用 CSMA/CA 争用信道。4G/5G 蜂窝网络让设备移动时不断线：家乡网络和访问网络配合做移动管理。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-07"
+  ]
+}

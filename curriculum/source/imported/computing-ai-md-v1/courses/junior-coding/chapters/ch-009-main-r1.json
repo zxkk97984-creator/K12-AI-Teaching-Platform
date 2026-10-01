@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-009-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 19 章 存储器组织"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 19 章 存储器组织。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "内存就是一排触发器，每个存一个 0 或 1。为了找到某个数据，给每个位置编号（地址）。CPU 要数据时，报地址，内存就把那个位置的数据送过来。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-coding-topic-09"
+  ]
+}

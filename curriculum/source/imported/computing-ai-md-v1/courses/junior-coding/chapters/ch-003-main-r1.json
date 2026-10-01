@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 4—5 章 手电筒与绕过拐角的通信"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 4—5 章 手电筒与绕过拐角的通信。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "两个人隔院子打手势：手电筒亮一下=A，亮两下=B。这就是最原始的通信。问题是拐弯了看不见怎么办？答案是\"中继\"——派第三个人站在拐角处，看到信号就转给下一个人。这就是网络里\"路由器\"的雏形。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-coding-topic-03"
+  ]
+}

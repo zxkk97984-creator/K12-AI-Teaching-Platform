@@ -1,0 +1,419 @@
+# 数据结构
+
+## 数据结构复杂度总表
+
+> 对应原书《大话数据结构》。本书讲常用数据结构：从数组到图。
+
+## 本书简介
+
+适合高一读完 Python 基础后开始。用图解和直觉讲清楚每种结构长什么样、怎么操作、复杂度多少。
+
+## 章节列表
+
+- 01 数组与链表
+- 02 栈与队列
+- 03 树与二叉树
+- 04 图与邻接表
+- 05 哈希表与堆
+
+### 2.2 常见数据结构
+
+数据结构关心两件事：**怎么存**和**怎么取**。没有万能结构，只有"在这个操作上谁更快"。
+
+| 结构 | 访问 | 查找 | 插入 | 删除 | 典型用途 |
+|---|---|---|---|---|---|
+| 数组/列表 | O(1) | O(n) | 尾部 O(1)，中间 O(n) | O(n) | 顺序数据、栈、队列 |
+| 栈 Stack | 顶 O(1) | — | 压栈 O(1) | 弹栈 O(1) | 函数调用、括号匹配、DFS |
+| 队列 Queue | 队首 O(1) | — | 入队 O(1) | 出队 O(1) | BFS、任务排队 |
+| 链表 | O(n) | O(n) | 已知位置 O(1) | 已知位置 O(1) | 频繁中间增删 |
+| 哈希表 | — | 平均 O(1) | 平均 O(1) | 平均 O(1) | 字典、计数、去重 |
+| 二叉搜索树 | — | 平均 O(log n) | 平均 O(log n) | 平均 O(log n) | 有序数据、排行榜 |
+| 图 | — | 取决于表示 | 取决于表示 | 取决于表示 | 社交网络、地图 |
+
+**栈**是后进先出（LIFO），浏览器的"后退"、编辑器的"撤销"都是栈。**队列**是先进先出（FIFO），打印机任务、消息队列都是队列。Python 里 `collections.deque` 两端操作都是 O(1)，是实现栈和队列的首选。
+
+**哈希表（dict/set）**靠哈希函数把 key 映射到数组下标，理想情况下增删查都是 O(1)。代价是无序（Python 3.7 起，dict 保留插入顺序是语言保证；set 不保证插入顺序）、需要内存。
+
+**树**是分层结构。**二叉树**每个节点最多两个孩子；**二叉搜索树（BST）**要求左子树都小于根、右子树都大于根，于是查找像二分查找一样每次砍一半。BST 退化成链表时性能崩塌，于是工程上有了平衡树（AVL、红黑树）和跳表。
+
+**图**由顶点和边组成，可以用邻接矩阵（空间 O(V²)，适合稠密图）或邻接表（空间 O(V+E)，适合稀疏图）表示。最短路径、社交关系、地图导航都是图问题。
+
+
+
+
+## 内容来源说明
+
+本文件知识点由 AI 基于《大话数据结构》的核心主题整理而成，**并非原书原文逐字复述**。
+
+- **原书依据**：主题框架与核心概念参考自《大话数据结构》（程杰，清华大学出版社）
+- **AI 整理与补充**：具体讲解、示例、代码、练习题由 AI 生成，并结合公开资料补充
+- 如需深入学习，请阅读原书；细节以原书为准
+
+
+
+---
+
+## 数组与链表
+
+> 数组是连续存储，链表是节点串联。
+#### 2.9.3 单链表
+
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+    def prepend(self, val):
+        self.head = ListNode(val, self.head)
+    def delete(self, target):
+        dummy = ListNode(0, self.head)
+        cur = dummy
+        while cur.next:
+            if cur.next.val == target:
+                cur.next = cur.next.next
+                break
+            cur = cur.next
+        self.head = dummy.next
+    def to_list(self):
+        result, cur = [], self.head
+        while cur:
+            result.append(cur.val)
+            cur = cur.next
+        return result
+```
+
+用 dummy 哑节点是链表题常用技巧，省掉"删头节点要特判"的麻烦。
+
+
+### 2.16 双向链表
+
+单链表只能往后走，双向链表每个节点还多一个 `prev` 指向前驱，于是能双向遍历、删除已知节点真正 O(1)：
+
+```python
+class DListNode:
+    def __init__(self, val=0):
+        self.val = val
+        self.prev = None
+        self.next = None
+
+class DoublyLinkedList:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+    def push_back(self, val):
+        node = DListNode(val)
+        if not self.tail:
+            self.head = self.tail = node
+        else:
+            node.prev = self.tail
+            self.tail.next = node
+            self.tail = node
+    def erase(self, node):
+        if node.prev:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+        if node.next:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+    def to_list(self):
+        result, cur = [], self.head
+        while cur:
+            result.append(cur.val)
+            cur = cur.next
+        return result
+```
+
+双向链表是 LRU 缓存（最近最少使用淘汰）的核心结构：哈希表负责 O(1) 查找，双向链表负责 O(1) 把刚访问过的节点移到头部、把尾部节点淘汰。
+
+
+
+
+---
+
+## 栈与队列
+
+### 2.9 线性数据结构完整实现
+
+#### 2.9.1 用类实现栈
+
+```python
+class Stack:
+    def __init__(self):
+        self.items = []
+    def push(self, x):
+        self.items.append(x)
+    def pop(self):
+        return self.items.pop()
+    def peek(self):
+        return self.items[-1]
+    def is_empty(self):
+        return len(self.items) == 0
+    def size(self):
+        return len(self.items)
+```
+
+#### 2.9.2 用类实现队列
+
+```python
+from collections import deque
+
+class Queue:
+    def __init__(self):
+        self.items = deque()
+    def enqueue(self, x):
+        self.items.append(x)
+    def dequeue(self):
+        return self.items.popleft()
+    def is_empty(self):
+        return len(self.items) == 0
+```
+
+注意不能用 list 做队列——`pop(0)` 是 O(n)，用 `deque.popleft()` 才是 O(1)。
+
+
+### 2.17 栈的应用：表达式求值
+
+中缀表达式（如 `3 + 4 * 2`）计算机不好直接算，经典做法是用两个栈：一个存数字，一个存运算符。遇到数字压栈；遇到运算符，把栈顶所有优先级大于等于它的运算符弹出计算后再压当前运算符。完整实现稍长，高中阶段理解"为什么括号匹配、表达式求值都靠栈"即可——因为它们都有"最近开的括号最先关"这种嵌套结构。
+
+### 2.18 循环队列与优先队列
+
+普通队列用数组实现时，`dequeue` 后前面空出来的位置没法用，于是有了**循环队列**：把数组想象成环，头指针和尾指针绕着圈走，用 `(tail+1) % capacity` 算下一个位置。
+
+**优先队列**不是"先进先出"而是"优先级最高的先出"，底层用堆实现。Python 标准库 `heapq` 就是最小堆：
+
+```python
+import heapq
+
+heap = []
+heapq.heappush(heap, (3, 'task3'))
+heapq.heappush(heap, (1, 'task1'))
+heapq.heappush(heap, (2, 'task2'))
+
+while heap:
+    priority, task = heapq.heappop(heap)
+    print(priority, task)
+```
+
+输出顺序是 1、2、3——按优先级最小先出。任务调度、Dijkstra、Top-K 问题都靠它。
+
+
+
+
+---
+
+## 树与二叉树
+
+### 2.10 树与二叉树
+
+#### 2.10.1 二叉树节点与遍历
+
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def preorder(root):
+    if not root:
+        return []
+    return [root.val] + preorder(root.left) + preorder(root.right)
+
+def inorder(root):
+    if not root:
+        return []
+    return inorder(root.left) + [root.val] + inorder(root.right)
+
+def postorder(root):
+    if not root:
+        return []
+    return postorder(root.left) + postorder(root.right) + [root.val]
+```
+
+前序（根左右）、中序（左根右）、后序（左右根）的"前/中/后"指的是根节点在什么时候被访问。BST 的中序遍历恰好是升序——这是一个非常有用的性质。
+
+#### 2.10.2 层序遍历（BFS）
+
+```python
+from collections import deque
+
+def level_order(root):
+    if not root:
+        return []
+    result, q = [], deque([root])
+    while q:
+        level = []
+        for _ in range(len(q)):
+            node = q.popleft()
+            level.append(node.val)
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+        result.append(level)
+    return result
+```
+
+层序遍历就是把二叉树按"一层一层"读出来，靠队列实现。
+
+#### 2.10.3 二叉搜索树插入与查找
+
+```python
+def bst_search(root, val):
+    if not root:
+        return None
+    if val == root.val:
+        return root
+    elif val < root.val:
+        return bst_search(root.left, val)
+    else:
+        return bst_search(root.right, val)
+
+def bst_insert(root, val):
+    if not root:
+        return TreeNode(val)
+    if val < root.val:
+        root.left = bst_insert(root.left, val)
+    elif val > root.val:
+        root.right = bst_insert(root.right, val)
+    return root
+```
+
+
+### 2.20 AVL 树直觉
+
+二叉搜索树最坏会退化成一条链（按顺序插入 1,2,3,4...），查找从 O(log n) 退化成 O(n)。**AVL 树**给每个节点记一个"平衡因子"（左右子树高度差），一旦绝对值超过 1 就通过旋转把它扳回来。常见四种旋转：左旋、右旋、左右旋、右左旋。高中阶段理解"为什么需要平衡"和"旋转是干嘛的"即可，手写完整 AVL 删除比较复杂，竞赛里用得更多的是 Treap 和替罪羊树。
+
+
+
+
+---
+
+## 图与邻接表
+
+### 2.11 图的基础
+
+#### 2.11.1 邻接表建图
+
+竞赛里最常用的图表示：一个字典/列表，key 是节点，value 是它的邻居列表。
+
+```python
+graph = {
+    1: [2, 3],
+    2: [1, 4, 5],
+    3: [1, 5],
+    4: [2],
+    5: [2, 3]
+}
+```
+
+#### 2.11.2 BFS 与 DFS
+
+```python
+from collections import deque
+
+def bfs(graph, start):
+    visited = set([start])
+    q = deque([start])
+    order = []
+    while q:
+        node = q.popleft()
+        order.append(node)
+        for nb in graph[node]:
+            if nb not in visited:
+                visited.add(nb)
+                q.append(nb)
+    return order
+
+def dfs(graph, start, visited=None, order=None):
+    if visited is None:
+        visited = set()
+    if order is None:
+        order = []
+    visited.add(start)
+    order.append(start)
+    for nb in graph[start]:
+        if nb not in visited:
+            dfs(graph, nb, visited, order)
+    return order
+```
+
+BFS 用队列，一层一层扩散，适合"最短步数"类问题（无权图最短路）；DFS 用栈/递归，一条路走到黑，适合"能不能走到""所有路径"类问题。
+
+#### 2.11.3 Dijkstra 最短路思想
+
+带权图上求单源最短路，Dijkstra 的核心是：维护一个"已确定最短路"的集合，每次从外面选距离源点最近的节点加进来，然后松弛它的所有边。用优先队列（堆）实现后复杂度 O((V+E) log V)。高中阶段理解思想即可，不必手写完整实现。
+
+
+### 2.21 Dijkstra 完整实现
+
+带权图求单源最短路，用优先队列：每次弹出距离源点最近的未确定节点，松弛它的所有出边。
+
+```python
+import heapq
+
+def dijkstra(graph, start, n):
+    dist = [float('inf')] * n
+    dist[start] = 0
+    pq = [(0, start)]
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist[u]:
+            continue
+        for v, w in graph[u]:
+            nd = d + w
+            if nd < dist[v]:
+                dist[v] = nd
+                heapq.heappush(pq, (nd, v))
+    return dist
+```
+
+其中 `graph[u]` 是 `(邻居, 权重)` 列表。复杂度 O((V+E) log V)。注意 Dijkstra 不能处理负权边，负权要用 Bellman-Ford/SPFA。
+
+
+
+
+---
+
+## 哈希表与堆
+
+> 哈希表 O(1) 查找，堆是优先队列的底层。
+
+### 堆与堆排序
+
+### 2.19 堆与堆排序
+
+堆是一棵完全二叉树，分**大顶堆**（每个节点 ≥ 孩子）和**小顶堆**（每个节点 ≤ 孩子）。用数组存：下标 `i` 的左孩子是 `2i+1`，右孩子是 `2i+2`，父亲是 `(i-1)//2`。
+
+堆排序的思路：先把数组建成大顶堆，此时最大元素在堆顶；把堆顶和末尾交换，末尾就是已排好的最大值；把剩下的重新堆化，重复。
+
+```python
+def heapify(arr, n, i):
+    largest = i
+    l = 2 * i + 1
+    r = 2 * i + 2
+    if l < n and arr[l] > arr[largest]:
+        largest = l
+    if r < n and arr[r] > arr[largest]:
+        largest = r
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        heapify(arr, n, largest)
+
+def heap_sort(arr):
+    n = len(arr)
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+    for i in range(n - 1, 0, -1):
+        arr[0], arr[i] = arr[i], arr[0]
+        heapify(arr, i, 0)
+    return arr
+```
+
+时间 O(n log n)，原地排序 O(1) 额外空间，不稳定。

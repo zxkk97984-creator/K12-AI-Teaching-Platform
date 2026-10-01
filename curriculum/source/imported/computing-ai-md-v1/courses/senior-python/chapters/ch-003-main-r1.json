@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-003-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第3章 字典和集合"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第3章 字典和集合。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "dict 是 Python 的核心。3.9+ 支持字典推导、合并 `|`、解包 `**`。\n\n```python\nd1 = {'a': 1, 'b': 2}\nd2 = {'b': 3, 'c': 4}\nprint(d1 | d2)\nmerged = {**d1, **d2}\nprint(merged)\n```\n\n\"可哈希\"（hashable）：一个对象在生命周期内哈希值不变，且支持 `__eq__`。原子不可变类型（str、bytes、int、float、tuple）默认可哈希；tuple 只有所含元素都可哈希才可哈希。dict 的键必须可哈希。\n\n`defaultdict` 自动处理缺失键：\n\n```python\nfrom collections import defaultdict\ndd = defaultdict(list)\ndd['a'].append(1)\ndd['b'].append(2)\nprint(dd)\n```\n\n`dict.__missing__` 是另一种处理缺失键的机制。dict 变体：`OrderedDict`（保持插入顺序，Python 3.7+ 普通 dict 也保序了）、`ChainMap`（串联多个映射查）、`Counter`（计数）、`UserDict`（子类化用它而不是 dict）。\n\n```python\nfrom collections import Counter\nct = Counter('abracadabra')\nprint(ct.most_common(2))\n```\n\nset 是集合数学运算的实现：交并差。`set` 字面量 `{1,2,3}` 比 `set([1,2,3])` 快。空集合必须写 `set()`（`{}` 是空字典）。\n\ndict/set 底层是散列表：平均 O(1) 查找，但最坏情况 O(n)（哈希碰撞）。这就是为什么键必须可哈希。Python 3.7+ dict 保持插入顺序，是 CPython 的实现细节被纳入语言规范。\n\n**常见误区**：在遍历 dict 时增删键会报错或漏项。要遍历就先 `list(d.items())` 拷贝。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-03"
+  ]
+}

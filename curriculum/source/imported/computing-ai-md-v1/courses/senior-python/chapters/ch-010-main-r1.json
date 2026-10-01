@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-010-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第10章 使用一等函数实现设计模式"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第10章 使用一等函数实现设计模式。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "策略模式：经典 OOP 是定义抽象策略类再写子类；Python 里函数是对象，直接传不同函数即可。命令模式同理，把函数当作命令对象。\n\n---\n\n## 第三部分 类和协议"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-python-topic-10"
+  ]
+}

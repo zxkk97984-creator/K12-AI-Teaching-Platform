@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-001-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第 1 章 浏览器生成消息"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第 1 章 浏览器生成消息。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "- **原书**：ネットワークはなぜつながるのか\n- **作者**：[日] 户根勤\n- **译者/出版**：周自恒 译，人民邮电出版社（图灵丛书）\n- **真实目录来源**：豆瓣读书 https://book.douban.com/subject/26941639/\n- **本文件说明**：基于该书真实章节结构整理，**非逐字原文**。初中阶段只讲直觉，不深入协议栈细节。\n\n---\n\n你在浏览器输入 `www.baidu.com` 按回车，浏览器第一件事不是直接去找百度，而是先把这个网址拆解：\n\n- 协议：`http` 或 `https`\n- 服务器名：`www.baidu.com`\n- 文件路径：`/`（省略时默认主页）\n\n然后浏览器生成一个 HTTP 请求消息，大概长这样：\n\n```\nGET / HTTP/1.1\nHost: www.baidu.com\n```\n\n这个消息会被发送出去。"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "junior-network-topic-01"
+  ]
+}

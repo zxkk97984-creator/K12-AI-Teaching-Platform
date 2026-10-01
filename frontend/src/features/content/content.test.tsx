@@ -115,9 +115,7 @@ describe("ChapterReader", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: chapter.title }),
     ).toBeTruthy();
-    expect(
-      screen.getByRole("heading", { level: 2, name: chapter.title }),
-    ).toBeTruthy();
+    expect(screen.queryByRole("heading", { level: 2, name: chapter.title })).toBeNull();
     expect(screen.getByText("看图想一想")).toBeTruthy();
     expect(screen.getByText("合成测试课文").tagName).toBe("MARK");
     expect(screen.getByRole("img", { name: /两个方框/ })).toBeTruthy();
@@ -151,6 +149,13 @@ describe("ChapterReader", () => {
     expect(screen.getByText("内容块未通过服务端校验。")).toBeTruthy();
     expect(container.querySelector("img")).toBeNull();
     expect(screen.getByText(/<img src=x onerror/)).toBeTruthy();
+  });
+
+  it("labels imported local lectures without claiming formal publication", () => {
+    render(<ChapterReader chapter={{ ...chapter, is_test_fixture: false,
+      source_kind: "NEW_SOURCE", content_notice: "本地学习讲义 · 来源与审核状态见章节说明" }} />);
+    expect(screen.getByTestId("chapter-meta").textContent).toContain("本地学习讲义 · 来源与审核状态见章节说明");
+    expect(screen.queryByText("正式发布内容")).toBeNull();
   });
 
   it("does not request unverified figure assets", () => {

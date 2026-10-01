@@ -1,0 +1,22 @@
+{
+  "schema_version": "k12.content.chapter-blocks.v1",
+  "chapter": "ch-006-main",
+  "revision": 1,
+  "blocks": [
+    {
+      "type": "TITLE",
+      "text": "第6章 链路层"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "本节学习：第6章 链路层。讲义保留原有示例与练习，可结合正文向教师提问。"
+    },
+    {
+      "type": "MARKDOWN",
+      "text": "### 链路层服务\n\n成帧、差错检测（CRC）、接入链路、MAC 寻址。\n\n### 以太网\n\nMAC 地址 48 位，烧在网卡上。交换机根据 MAC 表转发帧。\n\n### ARP\n\n同一局域网内，把 IP 翻译成 MAC：广播问\"谁是 192.168.1.5\"，那人单播回答自己的 MAC。\n\n### VLAN\n\n虚拟局域网把一个物理交换机逻辑切成多个隔离网络。\n\n---"
+    }
+  ],
+  "observed_knowledge_point_marks": [
+    "senior-network-topic-06"
+  ]
+}

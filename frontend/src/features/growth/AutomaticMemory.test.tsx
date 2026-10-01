@@ -11,6 +11,7 @@ import type { MemoryOverview } from "./memory-api";
 let data: MemoryOverview;
 let writes: { path: string; body: Record<string, unknown> }[];
 beforeEach(() => {
+  HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
   writes = [];
   data = {
     total: 1,
@@ -102,8 +103,8 @@ it("edits and forgets an automatic item while keeping a visible control", async 
   expect(await screen.findByRole("button", { name: "重新记住" })).toBeTruthy();
 });
 it("can stop recall without disabling automatic collection", async () => {
-  render(<AutomaticMemory />);
-  fireEvent.click(await screen.findByLabelText("允许教师使用个人记忆"));
+  render(<AutomaticMemory settingsOpen />);
+  fireEvent.click(await screen.findByLabelText("用于 AI 辅导"));
   await waitFor(() =>
     expect(writes[0].body).toMatchObject({
       auto_enabled: true,
@@ -111,4 +112,43 @@ it("can stop recall without disabling automatic collection", async () => {
       base_revision: 1,
     }),
   );
+});
+
+it("distinguishes empty memory from filter misses and hides unnecessary pagination", async () => {
+  data.items = [];
+  data.total = 0;
+  render(<AutomaticMemory />);
+  expect(await screen.findByText("还没有自动记忆")).toBeTruthy();
+  expect(screen.queryByLabelText("记忆分页")).toBeNull();
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "不存在" } });
+  expect(await screen.findByText("没有找到匹配的记忆")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "清除筛选" }));
+  expect(await screen.findByText("还没有自动记忆")).toBeTruthy();
+});
+it("restores the real setting after a rejected update", async () => {
+  const fetchBefore = globalThis.fetch;
+  vi.stubGlobal("fetch", vi.fn((input: string, init?: RequestInit) => {
+    if (String(input).endsWith("/settings")) return Promise.resolve(new Response(JSON.stringify({ detail: "更新失败" }), { status: 503 }));
+    return fetchBefore(input, init);
+  }));
+  render(<AutomaticMemory settingsOpen />);
+  fireEvent.click(await screen.findByLabelText("用于 AI 辅导"));
+  await waitFor(() => expect((screen.getByLabelText("用于 AI 辅导") as HTMLInputElement).checked).toBe(true));
+  expect(screen.getAllByText("更新失败").length).toBeGreaterThan(0);
+  expect(writes).toHaveLength(0);
+});
+
+it("shows loading failure with retry instead of claiming there is no memory", async () => {
+  const fetchBefore = globalThis.fetch;
+  let fail = true;
+  vi.stubGlobal("fetch", vi.fn((input: string, init?: RequestInit) => fail
+    ? Promise.resolve(new Response(JSON.stringify({ detail: "读取失败" }), { status: 503 }))
+    : fetchBefore(input, init)));
+  render(<AutomaticMemory />);
+  expect(await screen.findByText("读取失败")).toBeTruthy();
+  expect(screen.queryByText("还没有自动记忆")).toBeNull();
+  fail = false;
+  fireEvent.click(screen.getByRole("button", { name: "重新读取" }));
+  expect(await screen.findByText("喜欢天文")).toBeTruthy();
+  expect(screen.queryByText("读取失败")).toBeNull();
 });
