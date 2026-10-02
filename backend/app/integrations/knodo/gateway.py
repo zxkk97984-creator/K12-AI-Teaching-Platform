@@ -193,6 +193,9 @@ class AgentGateway:
         if input_bytes is None:
             return fail(GatewayError(GatewayErrorCategory.VALIDATION, "REQUEST_NOT_SERIALIZABLE"))
         request_problems = self.registry.validate_request(parsed, payload)
+        if parsed is not Operation.TEACH_TURN and isinstance(payload, dict):
+            if "lookup_context" in payload:
+                request_problems.append("LOOKUP_OPERATION_NOT_ALLOWED")
         if request_problems:
             return fail(GatewayError(GatewayErrorCategory.VALIDATION, "REQUEST_SCHEMA_MISMATCH"))
 

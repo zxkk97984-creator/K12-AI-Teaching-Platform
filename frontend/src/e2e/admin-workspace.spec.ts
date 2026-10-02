@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fixture } from "./ui-reuse-fixtures";
+import { expectCompactChoices } from "./choice-input-assertions";
 const EVIDENCE = "test-results/admin-workspace";
 const manifest = {
   schema_version: "k12-interactive-v1",
@@ -388,6 +389,26 @@ async function snap(page: Page, name: string) {
   });
 }
 
+test("native choices in admin editors remain compact across desktop and narrow screens", async ({ page }) => {
+  await workspace(page);
+  for (const width of [1440, 320]) {
+    await page.setViewportSize({ width, height: 820 });
+    await page.goto("/admin/ai");
+    await page.getByRole("button", { name: "编辑 霜铃·小学教师", exact: true }).click();
+    await expectCompactChoices(page);
+    await page.getByRole("button", { name: "关闭编辑面板", exact: true }).click();
+    await page.getByRole("button", { name: "Skill 与能力", exact: true }).click();
+    await page.getByRole("button", { name: "编辑 课程知识检索", exact: true }).click();
+    await expectCompactChoices(page);
+    await page.getByRole("button", { name: "关闭编辑面板", exact: true }).click();
+    await page.goto("/admin/resources/interactive");
+    await page.getByRole("button", { name: "详情与预览 分数互动课 101", exact: true }).click();
+    await expect(page.getByRole("checkbox")).toBeVisible();
+    await expectCompactChoices(page);
+    await page.getByRole("button", { name: "关闭编辑面板", exact: true }).click();
+  }
+});
+
 test("desktop and narrow workspaces have one active nav and no overflow or runtime errors", async ({
   page,
 }) => {
@@ -406,10 +427,11 @@ test("desktop and narrow workspaces have one active nav and no overflow or runti
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(path);
     await expect(page.locator("main h1")).toBeVisible();
+    const activeCount = path === "/admin/authoring" ? 0 : 1;
     await expect(
       page.locator('.app-sidebar-nav a[aria-current="page"]'),
-    ).toHaveCount(1);
-    await expect(page.locator(".app-sidebar-nav a.active")).toHaveCount(1);
+    ).toHaveCount(activeCount);
+    await expect(page.locator(".app-sidebar-nav a.active")).toHaveCount(activeCount);
     await expect(page.locator("vite-error-overlay")).toHaveCount(0);
     await fits(page);
     await snap(page, `${name}-1440`);
@@ -431,6 +453,7 @@ test("AI keeps a unified draft across tabs and failed saves, invalidates old bin
   await page.getByRole("button", { name: "编辑 霜铃·小学教师" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("显示名称")).toBeFocused();
+  await expectCompactChoices(page);
   const alignment = await dialog
     .getByLabel("启用此教师 / 助手")
     .evaluate((input) => {
@@ -605,7 +628,7 @@ test("interactive import failures identify a file, retry its record and preserve
   await snap(page, "interactive-preview-390");
 });
 
-test("authoring restores task selection, separates generation and review, paginates and cascades revisions", async ({
+test("authoring history restores selection and paginates without generation controls", async ({
   page,
 }) => {
   await workspace(page);
@@ -630,26 +653,14 @@ test("authoring restores task selection, separates generation and review, pagina
   await page.getByRole("searchbox", { name: "搜索本页任务" }).fill("");
   await page.getByRole("button", { name: "下一页" }).click();
   await expect(page.locator(".admin-job-list li")).toHaveCount(1);
-  await page.getByRole("button", { name: "新建草稿任务", exact: true }).click();
-  const dialog = page.getByRole("dialog");
-  await expect(
-    dialog.getByRole("combobox", { name: "章节", exact: true }),
-  ).toBeDisabled();
-  await dialog
-    .getByRole("combobox", { name: "课程", exact: true })
-    .selectOption("course-1");
-  await dialog
-    .getByRole("combobox", { name: "章节", exact: true })
-    .selectOption("chapter-1");
-  await dialog
-    .getByRole("combobox", { name: "版本", exact: true })
-    .selectOption("revision-001");
-  await expect(dialog).toContainText("当前选中：认识条件判断 · 第 2 版");
-  await snap(page, "authoring-create-1440");
-  await dialog
-    .getByRole("combobox", { name: "课程", exact: true })
-    .selectOption("");
-  await expect(dialog.getByTestId("authoring-create-job")).toBeDisabled();
+  await expect(page.getByRole("button", { name: "新建草稿任务", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "重试任务", exact: true })).toHaveCount(0);
+  await expect(page.locator('.app-sidebar a[href="/admin/authoring"]')).toHaveCount(0);
+  await expect(page.locator('.app-sidebar-nav a[href^="/admin/"]')).toHaveCount(3);
+  await page.goto("/admin");
+  await expect(page).toHaveURL(/\/admin\/resources$/);
+  await expect(page.getByTestId("admin-resources")).toBeVisible();
+  await snap(page, "admin-navigation-without-authoring-1440");
 });
 
 test("a slow resource search cannot overwrite a newer filter result", async ({

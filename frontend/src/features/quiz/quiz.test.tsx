@@ -51,7 +51,7 @@ function me(userId: string): MeResponse {
       companion_pet_id: "shuangling",
       interests: [],
       proactive_guidance_enabled: true,
-      voice_preference: "DISABLED",
+      voice_preference: "DISABLED", auto_read_replies: false,
       profile_revision: 1,
     },
   };

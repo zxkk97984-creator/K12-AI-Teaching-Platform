@@ -30,13 +30,30 @@ async def main():
     validate_test_database_url(os.environ.get("TEST_DATABASE_URL"))
     if not os.environ.get("KNODO_PAT"):
         raise SystemExit("Configure KNODO_PAT in the private runtime file first.")
+    supplied = os.environ.get("K12_AI_REGISTRY_SNAPSHOT_INPUT")
+    if supplied:
+        source = Path(supplied)
+        if not source.is_absolute() or not source.is_file():
+            raise SystemExit("Registry snapshot must be an existing absolute private file.")
+        stat = source.stat()
+        if stat.st_uid != os.getuid() or stat.st_mode & 0o077:
+            raise SystemExit("Registry snapshot must be owned by this user with mode 600.")
+        snapshot = json.loads(source.read_text(encoding="utf-8"))
+        from app.modules.ai.schemas import RegistryData
+        RegistryData.model_validate(snapshot["data"])
+        if not snapshot.get("persisted") or not isinstance(snapshot.get("revision"), int):
+            raise SystemExit("Registry snapshot must contain a persisted registry revision.")
+        Path(os.environ["K12_ACCEPTANCE_SNAPSHOT"]).write_text(
+            json.dumps(snapshot, ensure_ascii=False), encoding="utf-8"
+        )
+        return
     settings = Settings()
     engine = get_engine(settings.active_database_url, settings.app_env)
     try:
         async with async_sessionmaker(engine)() as db:
             snapshot = await registry(db, settings)
         if not snapshot["persisted"]:
-            raise SystemExit("Save the AI registry in /admin/ai before live acceptance.")
+            raise SystemExit("Save the AI registry first, or supply K12_AI_REGISTRY_SNAPSHOT_INPUT (private mode 600).")
         Path(os.environ["K12_ACCEPTANCE_SNAPSHOT"]).write_text(
             json.dumps(snapshot, ensure_ascii=False), encoding="utf-8"
         )

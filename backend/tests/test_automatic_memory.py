@@ -21,6 +21,7 @@ from app.modules.memory.automatic import (
 from app.modules.memory.automatic_models import MemoryTask, PersonalMemoryItem
 from app.modules.memory.contracts import ExtractionResponse, SourceMessage
 from app.modules.memory.service import get_memory_context_revision
+from app.modules.teaching.models import ConversationMessage
 from app.modules.teaching.service import create_free_session, create_turn
 from tests.identity_helpers import create_synthetic_user
 
@@ -35,6 +36,29 @@ def source(text="我喜欢天文。", session_id=None):
         session_id=str(session_id or uuid.uuid4()),
         text=text,
         observed_at=datetime.now(UTC).isoformat(),
+    )
+
+
+async def saved_source(db, user, text="我喜欢天文。", *, session_id=None, observed_at=None):
+    from app.config import Settings
+
+    if session_id is None:
+        session = await create_free_session(db, settings=Settings(), user=user)
+        session_id = session.id
+    row = ConversationMessage(
+        owner_user_id=user.id,
+        session_id=session_id,
+        role="USER",
+        content_markdown=text,
+        created_at=observed_at or datetime.now(UTC),
+    )
+    db.add(row)
+    await db.flush()
+    return SourceMessage(
+        id=str(row.id),
+        session_id=str(row.session_id),
+        observed_at=row.created_at.isoformat(),
+        text=text,
     )
 
 
@@ -62,7 +86,7 @@ async def test_auto_update_does_not_invalidate_chat_and_manual_edit_wins(
     db = content_session
     user = await student(test_settings)
     await state_for(db, user.id)
-    s = source()
+    s = await saved_source(db, user)
     assert await apply_extraction(db, user.id, response(s), [s]) == 1
     await db.commit()
     assert await get_memory_context_revision(db, owner_user_id=user.id) == 0
@@ -72,7 +96,7 @@ async def test_auto_update_does_not_invalidate_chat_and_manual_edit_wins(
     )
     assert await get_memory_context_revision(db, owner_user_id=user.id) > 0
     assert await apply_extraction(db, user.id, response(source()), [s]) == 0
-    new = source("我喜欢天文。")
+    new = await saved_source(db, user, "我喜欢天文。")
     assert await apply_extraction(db, user.id, response(new), [new]) == 0
     assert item.statement == "现在更喜欢生物"
 
@@ -82,7 +106,7 @@ async def test_forget_blocks_replay_and_owner_context(content_session, test_sett
     db = content_session
     user = await student(test_settings)
     other = await student(test_settings, "auto.other")
-    s = source()
+    s = await saved_source(db, user)
     await apply_extraction(db, user.id, response(s), [s])
     await db.commit()
     item = await db.scalar(select(PersonalMemoryItem))
@@ -101,9 +125,9 @@ async def test_rejects_sensitive_hypothetical_and_invalid_sources(content_sessio
     db = content_session
     user = await student(test_settings)
     for text in ["假如我喜欢天文。", "我喜欢天文，密码是 ABC。"]:
-        s = source(text)
+        s = await saved_source(db, user, text)
         assert await apply_extraction(db, user.id, response(s), [s]) == 0
-    s = source()
+    s = await saved_source(db, user)
     assert await apply_extraction(db, user.id, response(s), []) == 0
     uncertain = response(s, certainty="UNCERTAIN")
     await apply_extraction(db, user.id, uncertain, [s])
@@ -117,11 +141,12 @@ async def test_duplicate_and_older_backfill_do_not_overwrite_current(
 ):
     db = content_session
     user = await student(test_settings)
-    s = source()
+    s = await saved_source(db, user)
     assert await apply_extraction(db, user.id, response(s), [s]) == 1
     assert await apply_extraction(db, user.id, response(s), [s]) == 0
-    old = source("我喜欢物理。")
-    old.observed_at = (datetime.now(UTC) - timedelta(days=2)).isoformat()
+    old = await saved_source(
+        db, user, "我喜欢物理。", observed_at=datetime.now(UTC) - timedelta(days=2)
+    )
     assert await apply_extraction(db, user.id, response(old, "喜欢物理"), [old]) == 0
     item = await db.scalar(select(PersonalMemoryItem))
     assert item.statement == "喜欢天文"
@@ -189,7 +214,7 @@ async def test_late_extraction_cannot_resurrect_after_disable(content_session, t
 async def test_chat_delete_keep_and_forget(content_session, test_settings):
     db = content_session
     user = await student(test_settings)
-    s = source()
+    s = await saved_source(db, user)
     await apply_extraction(db, user.id, response(s), [s])
     await db.commit()
     await delete_chat_memory(db, user.id, uuid.UUID(s.session_id), False)

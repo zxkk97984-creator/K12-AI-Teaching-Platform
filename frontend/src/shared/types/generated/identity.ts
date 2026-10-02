@@ -274,6 +274,11 @@ export interface components {
             /** Proactive Guidance Enabled */
             proactive_guidance_enabled: boolean;
             voice_preference: components["schemas"]["VoicePreference"];
+            /**
+             * Auto Read Replies
+             * @default false
+             */
+            auto_read_replies: boolean;
             /** Profile Revision */
             profile_revision: number;
         };
@@ -290,6 +295,8 @@ export interface components {
             /** Proactive Guidance Enabled */
             proactive_guidance_enabled?: boolean | null;
             voice_preference?: components["schemas"]["VoicePreference"] | null;
+            /** Auto Read Replies */
+            auto_read_replies?: boolean;
         };
         /**
          * PreferredStyle

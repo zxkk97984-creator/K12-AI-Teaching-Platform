@@ -190,6 +190,84 @@
         }
       }
     },
+    "/api/v1/chapters/{chapter_id}/self-test-answers/{question_id}": {
+      "get": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Get Self Test Answer",
+        "operationId": "get_self_test_answer_api_v1_chapters__chapter_id__self_test_answers__question_id__get",
+        "parameters": [
+          {
+            "name": "chapter_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Chapter Id"
+            }
+          },
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          },
+          {
+            "name": "revision_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Revision Id"
+            }
+          },
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelfTestAnswerDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/chapters/{chapter_id}/reading-state": {
       "get": {
         "tags": [
@@ -1439,6 +1517,101 @@
           }
         }
       }
+    },
+    "/api/v1/learning/lookup-target": {
+      "get": {
+        "tags": [
+          "lookup"
+        ],
+        "summary": "Lookup Target",
+        "operationId": "lookup_target_api_v1_learning_lookup_target_get",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "CHAPTER",
+                "RESOURCE",
+                "ANIMATION",
+                "PICTUREBOOK",
+                "QUIZ",
+                "LESSON",
+                "CODE_RUN"
+              ],
+              "type": "string",
+              "title": "Type"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160,
+              "title": "Id"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Revision"
+            }
+          },
+          {
+            "name": "sl_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sl Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupTargetDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1769,6 +1942,13 @@
           },
           "navigation": {
             "$ref": "#/components/schemas/ChapterNavigationDTO"
+          },
+          "self_test_questions": {
+            "items": {
+              "$ref": "#/components/schemas/SelfTestQuestionDTO"
+            },
+            "type": "array",
+            "title": "Self Test Questions"
           }
         },
         "additionalProperties": false,
@@ -2559,6 +2739,20 @@
         ],
         "title": "LicenseCode"
       },
+      "LookupTargetDTO": {
+        "properties": {
+          "route": {
+            "type": "string",
+            "title": "Route"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "route"
+        ],
+        "title": "LookupTargetDTO"
+      },
       "NeighborRefDTO": {
         "properties": {
           "chapter_id": {
@@ -3279,6 +3473,131 @@
           "HUMAN_APPROVED"
         ],
         "title": "ReviewStatus"
+      },
+      "SelfTestAnswerDTO": {
+        "properties": {
+          "chapter_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Chapter Id"
+          },
+          "revision_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Revision Id"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "question_id": {
+            "type": "string",
+            "enum": [
+              "Q01",
+              "Q02",
+              "Q03",
+              "Q04",
+              "Q05",
+              "Q06"
+            ],
+            "title": "Question Id"
+          },
+          "question_type": {
+            "type": "string",
+            "enum": [
+              "SINGLE_CHOICE",
+              "SHORT_ANSWER",
+              "PRACTICE"
+            ],
+            "title": "Question Type"
+          },
+          "correct_options": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ]
+            },
+            "type": "array",
+            "title": "Correct Options"
+          },
+          "reference_answer": {
+            "type": "string",
+            "title": "Reference Answer"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "chapter_id",
+          "revision_id",
+          "revision",
+          "question_id",
+          "question_type",
+          "correct_options",
+          "reference_answer",
+          "explanation"
+        ],
+        "title": "SelfTestAnswerDTO"
+      },
+      "SelfTestQuestionDTO": {
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "enum": [
+              "Q01",
+              "Q02",
+              "Q03",
+              "Q04",
+              "Q05",
+              "Q06"
+            ],
+            "title": "Question Id"
+          },
+          "question_type": {
+            "type": "string",
+            "enum": [
+              "SINGLE_CHOICE",
+              "SHORT_ANSWER",
+              "PRACTICE"
+            ],
+            "title": "Question Type"
+          },
+          "end_block_id": {
+            "type": "string",
+            "maxLength": 8,
+            "pattern": "^b[0-9]{1,4}$",
+            "title": "End Block Id"
+          },
+          "end_offset": {
+            "type": "integer",
+            "maximum": 4000.0,
+            "minimum": 0.0,
+            "title": "End Offset",
+            "description": "Unicode code point offset in end_block_id"
+          },
+          "has_reference_answer": {
+            "type": "boolean",
+            "title": "Has Reference Answer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question_id",
+          "question_type",
+          "end_block_id",
+          "end_offset",
+          "has_reference_answer"
+        ],
+        "title": "SelfTestQuestionDTO"
       },
       "SourceKind": {
         "type": "string",

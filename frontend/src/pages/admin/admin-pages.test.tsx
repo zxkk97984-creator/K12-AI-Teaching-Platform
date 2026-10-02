@@ -132,5 +132,7 @@ describe("admin authoring", () => {
     expect(screen.getByTestId("current-location").textContent).toContain("?job=" + jobId);
     expect(authoringApi.getAuthoringJob).toHaveBeenCalledWith(jobId);
     expect(authoringApi.getAuthoringPackage).toHaveBeenCalledWith(packageId);
+    expect(screen.queryByRole("button", { name: "新建草稿任务" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "重试任务" })).toBeNull();
   });
 });

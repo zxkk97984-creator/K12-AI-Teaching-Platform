@@ -84,6 +84,7 @@ def _session_public(row: InteractiveSession) -> dict[str, Any]:
         "completion_source": row.completion_source,
         "created_at": row.created_at.isoformat() if row.created_at else None,
         "updated_at": row.updated_at.isoformat() if row.updated_at else None,
+        "viewed_at": row.viewed_at.isoformat() if row.viewed_at else None,
         "completed_at": row.completed_at.isoformat() if row.completed_at else None,
     }
 
@@ -530,6 +531,9 @@ async def catalog(
                     )
                     and activity.base_revision > 0
                 ),
+                "viewed_at": activity.viewed_at.isoformat()
+                if activity and activity.viewed_at
+                else None,
                 "session_id": str(activity.id) if activity else None,
             }
         )
@@ -632,6 +636,7 @@ async def save_event(
     event_id: str,
     base_revision: int,
     kind: str,
+    playback_step: int | None = None,
     game_state: dict[str, Any] | None = None,
     scene_id: str | None = None,
     game_result: dict[str, Any] | None = None,
@@ -645,6 +650,8 @@ async def save_event(
         "game_result": game_result,
         "source": source,
     }
+    if playback_step is not None:
+        body["playback_step"] = playback_step
     digest = _data_hash(body)
     prior = await db.scalar(
         select(InteractiveEvent).where(
@@ -658,7 +665,10 @@ async def save_event(
             )
         return prior.receipt
     row = await db.scalar(
-        select(InteractiveSession).where(InteractiveSession.id == session.id).with_for_update()
+        select(InteractiveSession)
+        .where(InteractiveSession.id == session.id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
     )
     if row is None or row.owner_user_id != owner_id:
         raise InteractiveError("INTERACTIVE_SESSION_NOT_FOUND", "活动不存在", 404)
@@ -687,15 +697,35 @@ async def save_event(
         and "CHECKPOINTS" not in revision.capabilities
     ):
         raise InteractiveError("INTERACTIVE_CHECKPOINTS_DISABLED", "这个内容没有启用检查点")
+    if kind == "VIEWED" and revision.manifest.get("purpose") != "LESSON":
+        raise InteractiveError("INTERACTIVE_VIEWED_INVALID", "只有讲解课件可以记录已看完")
     if kind == "COMPLETE":
         if source == "SDK_REPORTED" and "COMPLETION" not in revision.capabilities:
             raise InteractiveError("INTERACTIVE_COMPLETION_DISABLED", "这个内容没有启用完成事件")
         if source == "USER_CONFIRMED" and ("COMPLETION" in revision.capabilities or game_result):
             raise InteractiveError("INTERACTIVE_COMPLETION_INVALID", "不能用手动完成覆盖游戏结果")
+    if playback_step is not None:
+        scenes = revision.manifest.get("scenes", [])
+        if (
+            kind != "CHECKPOINT"
+            or revision.manifest.get("purpose") != "LESSON"
+            or playback_step >= len(scenes)
+        ):
+            raise InteractiveError("INTERACTIVE_PLAYBACK_INVALID", "播放位置与课件不兼容")
+        row.host_state = {**row.host_state, "playback_step": playback_step}
     if game_state is not None:
         encoded = json.dumps(game_state, ensure_ascii=False)
         if len(encoded.encode("utf-8")) > 64 * 1024:
             raise InteractiveError("INTERACTIVE_CHECKPOINT_TOO_LARGE", "检查点超过 64 KB", 413)
+        if revision.manifest.get("content_key", "").startswith("autoplay-"):
+            from app.modules.interactive.autoplay_state import validate_state
+
+            try:
+                validate_state(game_state, revision.manifest["content_key"])
+            except ValueError as caught:
+                raise InteractiveError(
+                    "INTERACTIVE_STATE_INVALID", "实验状态与课件不兼容"
+                ) from caught
         row.game_state = game_state
     if scene_id is not None:
         row.current_scene_id = scene_id
@@ -724,6 +754,8 @@ async def save_event(
         row.completion_source = source or "SDK_REPORTED"
         row.completed_at = datetime.now(UTC)
         row.status = "COMPLETED"
+    if kind == "VIEWED" and row.viewed_at is None:
+        row.viewed_at = datetime.now(UTC)
     row.base_revision += 1
     row.updated_at = datetime.now(UTC)
     receipt = _session_public(row)

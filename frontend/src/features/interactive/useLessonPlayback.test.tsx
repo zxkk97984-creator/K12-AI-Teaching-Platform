@@ -6,9 +6,9 @@ import { useLessonPlayback } from './useLessonPlayback';
 
 const steps = [{scene_id: 'first', prompt_id: 'first-read'}, {scene_id: 'second', prompt_id: 'second-read'}];
 const prompts: InteractivePrompt[] = steps.map(step => ({id: step.prompt_id, scene_id: step.scene_id, text: '一起观察画面中的变化。', trigger: 'SCENE_ENTER'}));
-function setup(present = vi.fn(async () => {})) {
+function setup(present = vi.fn(async () => {}), options: {onEnded?: () => void; resumeFrom?: number} = {}) {
   let narrator = {status: 'idle', prompt_id: null, muted: false, rate: 1, play: vi.fn(async () => true), pause: vi.fn(), stop: vi.fn()} as unknown as ReturnType<typeof useNarration>;
-  const hook = renderHook(() => useLessonPlayback({steps, prompts, narrator, present}));
+  const hook = renderHook(() => useLessonPlayback({steps, prompts, narrator, present, ...options}));
   const update = (patch: Partial<typeof narrator>) => {
     narrator = {...narrator, ...patch};
     hook.rerender();
@@ -89,5 +89,59 @@ describe('automatic lesson playback', () => {
     await act(async () => h.result.current.resume());
     expect(h.result.current.status).toBe('error');
     expect(h.result.current.notice).toContain('保存冲突');
+  });
+});
+
+describe('viewing completion eligibility', () => {
+  it('reports once only after the last current prompt ends and ignores duplicate end snapshots', async () => {
+    const onEnded=vi.fn(); const h=setup(undefined,{onEnded});
+    await act(async () => h.result.current.start());
+    act(() => h.update({status:'speaking',prompt_id:'first-read'}));
+    act(() => h.update({status:'ended',prompt_id:'first-read'}));
+    await act(async () => vi.advanceTimersByTimeAsync(650));
+    expect(onEnded).not.toHaveBeenCalled();
+    act(() => h.update({status:'speaking',prompt_id:'second-read'}));
+    act(() => h.update({status:'ended',prompt_id:'second-read'}));
+    await act(async () => vi.advanceTimersByTimeAsync(650));
+    h.rerender(); await act(async () => vi.advanceTimersByTimeAsync(10000));
+    expect(onEnded).toHaveBeenCalledTimes(1);
+  });
+  it('does not report a direct last-scene start, but allows the saved playback cursor', async () => {
+    const onEnded=vi.fn(); const h=setup(undefined,{onEnded,resumeFrom:0});
+    await act(async () => h.result.current.start(1));
+    act(() => h.update({status:'speaking',prompt_id:'second-read'}));
+    act(() => h.update({status:'ended',prompt_id:'second-read'}));
+    await act(async () => vi.advanceTimersByTimeAsync(650));
+    expect(onEnded).not.toHaveBeenCalled();
+    h.unmount();const resumed=setup(undefined,{onEnded,resumeFrom:1});
+    await act(async () => resumed.result.current.start(1));
+    act(() => resumed.update({status:'speaking',prompt_id:'second-read'}));
+    act(() => resumed.update({status:'ended',prompt_id:'second-read'}));
+    await act(async () => vi.advanceTimersByTimeAsync(650));
+    expect(onEnded).toHaveBeenCalledTimes(1);
+  });
+  it('never reports stopped, paused or failed narration as ended', async () => {
+    const onEnded=vi.fn(); const h=setup(undefined,{onEnded,resumeFrom:1});
+    await act(async () => h.result.current.start(1));
+    act(() => h.update({status:'speaking',prompt_id:'second-read'}));
+    act(() => h.result.current.pause());
+    act(() => h.update({status:'ended',prompt_id:'second-read'}));
+    await act(async () => vi.advanceTimersByTimeAsync(10000));
+    expect(onEnded).not.toHaveBeenCalled();
+    await act(async () => h.result.current.resume());
+    act(() => h.update({status:'error',prompt_id:'second-read'}));
+    await act(async () => vi.advanceTimersByTimeAsync(100000));
+    expect(h.result.current.status).toBe('error');expect(onEnded).not.toHaveBeenCalled();
+    await act(async () => h.result.current.start(1));
+    act(() => h.result.current.stop());
+    act(() => h.update({status:'ended',prompt_id:'second-read'}));
+    await act(async () => vi.advanceTimersByTimeAsync(10000));expect(onEnded).not.toHaveBeenCalled();
+  });
+  it('reports completed caption time when muted without claiming speech', async () => {
+    const onEnded=vi.fn();const h=setup(undefined,{onEnded,resumeFrom:1});
+    act(() => h.update({muted:true}));
+    await act(async () => h.result.current.start(1));
+    expect(h.narrator.play).not.toHaveBeenCalled();
+    await act(async () => vi.advanceTimersByTimeAsync(100000));expect(onEnded).toHaveBeenCalledOnce();
   });
 });

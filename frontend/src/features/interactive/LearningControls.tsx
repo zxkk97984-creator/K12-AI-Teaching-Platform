@@ -13,6 +13,7 @@ function ControlText({ full, short }: { full: string; short: string }) {
 
 function compactAudioStatus(narrator: Narrator, enabled: boolean, recorded: boolean) {
   if (!enabled) return '朗读已关闭，仍可阅读讲解';
+  if (narrator.notice) return narrator.notice;
   if (narrator.muted) return '已静音，仍可阅读讲解';
   if (narrator.status === 'error') return '音频播放失败，可阅读讲解或重试';
   if (!recorded && narrator.voiceNotice.startsWith('所选声音当前不可用')) {
@@ -73,7 +74,7 @@ export function NarrationControls({ narrator, prompt, enabled, started, enable, 
   const playLabel = busy ? '准备语音…' : narrator.status === 'speaking' ? '暂停讲解' : narrator.status === 'paused' ? '继续讲解' : '播放讲解';
   const automaticLabel = automatic?.running ? '暂停播放' : automatic?.status === 'paused' ? '继续播放' : automatic?.status === 'ended' ? '再看一遍' : '自动播放';
   const audioStatus = compactAudioStatus(narrator, enabled, recorded);
-  const fullStatus = !enabled ? '朗读已关闭，仍可阅读讲解和操作课件。' : narrator.muted ? '已静音，仍可阅读讲解和操作课件。' : recorded ? `${NARRATION_LABELS[narrator.status]} · 本段使用课件音频，音色由音频文件决定。` : narrator.status === 'unavailable' ? narrator.voiceNotice : `${NARRATION_LABELS[narrator.status]} · ${narrator.voiceNotice}`;
+  const fullStatus = narrator.notice || (!enabled ? '朗读已关闭，仍可阅读讲解和操作课件。' : narrator.muted ? '已静音，仍可阅读讲解和操作课件。' : recorded ? `${NARRATION_LABELS[narrator.status]} · 本段使用课件音频，音色由音频文件决定。` : narrator.status === 'unavailable' ? narrator.voiceNotice : `${NARRATION_LABELS[narrator.status]} · ${narrator.voiceNotice}`);
   const playbackStatus = automatic?.status === 'ended' ? '演示播放完了，可以再看一遍或自己试一试' : automatic?.status === 'paused' ? '画面与讲解已暂停' : automatic?.status === 'error' ? '自动播放暂时中断，请重试' : `自动演示 ${automatic ? automatic.index + 1 : 0}/${automatic?.total ?? 0} · ${automatic?.status === 'reading' ? '按字幕播放' : '讲完本段再前进'}`;
   return <footer ref={root} className="interactive-control-area" data-pet-avoid data-automatic={automatic?.active || undefined}>
     <div className="interactive-voice-controls" aria-label="讲解朗读控制">
@@ -83,7 +84,7 @@ export function NarrationControls({ narrator, prompt, enabled, started, enable, 
           else if (automatic.status === 'paused') automatic.resume();
           else automatic.begin();
         }}><ControlText full={automaticLabel} short={automatic.running ? '暂停' : automatic.status === 'paused' ? '继续' : automatic.status === 'ended' ? '再看' : '自动播放'} /></button> : null}
-        {automatic?.active ? <><button type="button" className="secondary" aria-label="重播本段" onClick={automatic.replay}><ControlText full="重播本段" short="重播" /></button><button type="button" className="secondary" aria-label="自己试一试" onClick={automatic.manual}><ControlText full="自己试一试" short="试一试" /></button></> : null}
+        {automatic ? <>{automatic.active ? <button type="button" className="secondary" aria-label="重播本段" disabled={!started} onClick={automatic.replay}><ControlText full="重播本段" short="重播" /></button> : null}<button type="button" className="secondary" aria-label="自己试一试" disabled={!started} onClick={automatic.manual}><ControlText full="自己试一试" short="试一试" /></button></> : null}
         {enabled ? !automatic?.active ? <><button type="button" aria-label={playLabel} disabled={!started || !prompt || busy || narrator.muted} onClick={() => {
           if (narrator.status === 'speaking') narrator.pause();
           else if (narrator.status === 'paused') narrator.resume();
@@ -102,7 +103,7 @@ export function NarrationControls({ narrator, prompt, enabled, started, enable, 
             <label className="interactive-voice-choice">声音<select aria-label="朗读声音" title={recorded ? '本段使用课件音频，音色由音频文件决定' : `${narrator.voiceDescription} · 下一次播放时生效，选择会保存在当前浏览器`} disabled={recorded} value={recorded ? 'recorded' : narrator.voiceId} onChange={event => narrator.selectVoice(event.target.value)}>
               {recorded ? <option value="recorded">课件音频</option> : <><option value="">自动普通话</option>{missingVoice ? <option value={narrator.voiceId}>所选声音暂不可用</option> : null}{['普通话', '粤语', '其他声音'].map(group => <optgroup key={group} label={group}>{narrator.voiceOptions.filter(voice => voice.group === group).map(voice => <option key={voice.id} value={voice.id}>{voice.label}</option>)}</optgroup>)}</>}
             </select></label>
-            <label>语速<select aria-label="朗读语速" title="下一次播放时生效" value={narrator.rate} onChange={event => narrator.setRate(Number(event.target.value))}><option value="0.8">慢</option><option value="1">正常</option><option value="1.2">快</option></select></label>
+            <label>语速<select aria-label="朗读语速" title="下一次播放时生效" value={narrator.rate} onChange={event => narrator.setRate(Number(event.target.value))}><option value="0.8">慢</option><option value="1">正常</option><option value="1.2">快</option><option value="1.5">1.5 倍</option></select></label>
             <label><input type="checkbox" checked={narrator.muted} onChange={event => { narrator.setMuted(event.target.checked); narrator.stop(); }} />静音</label>
             <p className="interactive-voice-description">{fullStatus}</p>
             {automatic?.active && automatic.notice ? <p className="interactive-voice-description">{automatic.notice}</p> : null}

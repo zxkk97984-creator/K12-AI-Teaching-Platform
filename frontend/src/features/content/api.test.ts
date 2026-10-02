@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ApiError } from "../identity/api";
-import { getChapter, listCourses, postPageContext } from "./api";
+import { getChapter, getSelfTestAnswer, listCourses, postPageContext } from "./api";
 import type { ChapterDetailDTO } from "./types";
 
 afterEach(() => {
@@ -73,5 +73,16 @@ describe("content api client", () => {
   it("keeps the generated content DTO typing available to callers", () => {
     const revision: ChapterDetailDTO["revision"] = 1;
     expect(revision).toBe(1);
+  });
+
+  it("requests exactly one answer in the displayed revision and passes cancellation", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, { question_id: "Q04" }));
+    vi.stubGlobal("fetch", fetchMock);
+    const controller = new AbortController();
+    await getSelfTestAnswer("chapter-1", "revision-1", "Q04", controller.signal);
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/chapters/chapter-1/self-test-answers/Q04?revision_id=revision-1");
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.signal).toBe(controller.signal);
+    expect(init.credentials).toBe("same-origin");
   });
 });

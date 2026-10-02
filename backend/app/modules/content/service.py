@@ -39,6 +39,7 @@ from app.modules.content.models import (
     ReviewStatus,
     RevisionKnowledgePoint,
     SourceKind,
+    TextbookAnswer,
 )
 from app.modules.content.schemas import (
     ChapterDetailDTO,
@@ -53,10 +54,12 @@ from app.modules.content.schemas import (
     ReadingEventRequest,
     ReadingStateDTO,
     RenderedBlock,
+    SelfTestAnswerDTO,
     SourceRefDTO,
     UnknownBlockDTO,
     ViewerScope,
 )
+from app.modules.content.textbook_answers import question_locators
 from app.modules.identity.models import LearnerProfile
 
 FIXTURE_NOTICE = "测试内容，未作人工教学审校"
@@ -339,6 +342,18 @@ async def visible_chapter_detail(
         )
     ).scalars()
     summary = _summary(revision_row, chapter, course, release, review_state)
+    questions = []
+    if manifest.get("conversion") == "original-textbook-v1":
+        questions = question_locators(list(revision_row.body))
+        available = set(
+            await db.scalars(
+                select(TextbookAnswer.question_id).where(
+                    TextbookAnswer.chapter_revision_id == revision_row.id
+                )
+            )
+        )
+        for question in questions:
+            question.has_reference_answer = question.question_id in available
     return ChapterDetailDTO(
         **summary.model_dump(),
         objectives=list(revision_row.objectives),
@@ -361,6 +376,7 @@ async def visible_chapter_detail(
         ),
         license_code=LicenseCode(revision_row.license_code),
         navigation=await _chapter_navigation(db, chapter=chapter, viewer=viewer),
+        self_test_questions=questions,
     )
 
 
@@ -370,6 +386,7 @@ async def _visible_revision_row(
     chapter_id: uuid.UUID,
     viewer: ViewerScope,
     revision: int | None = None,
+    revision_id: uuid.UUID | None = None,
 ) -> ChapterRevision | None:
     condition = visibility_conditions(viewer)
     if condition is None:
@@ -382,11 +399,47 @@ async def _visible_revision_row(
             ChapterRevision.chapter_id == chapter_id,
             condition,
             *([ChapterRevision.revision == revision] if revision is not None else []),
+            *([ChapterRevision.id == revision_id] if revision_id is not None else []),
         )
         .order_by(ChapterRevision.revision.desc())
         .limit(1)
     )
     return await db.scalar(statement)
+
+
+async def visible_self_test_answer(
+    db: AsyncSession,
+    *,
+    chapter_id: uuid.UUID,
+    revision_id: uuid.UUID,
+    question_id: str,
+    viewer: ViewerScope,
+) -> SelfTestAnswerDTO | None:
+    revision = await _visible_revision_row(
+        db,
+        chapter_id=chapter_id,
+        revision_id=revision_id,
+        viewer=viewer,
+    )
+    if revision is None or revision.source_manifest.get("conversion") != "original-textbook-v1":
+        return None
+    questions = question_locators(list(revision.body))
+    locator = next((q for q in questions if q.question_id == question_id), None)
+    if locator is None:
+        return None
+    answer = await db.get(TextbookAnswer, (revision.id, question_id))
+    if answer is None or answer.question_type != locator.question_type:
+        return None
+    return SelfTestAnswerDTO(
+        chapter_id=chapter_id,
+        revision_id=revision.id,
+        revision=revision.revision,
+        question_id=answer.question_id,
+        question_type=answer.question_type,
+        correct_options=answer.correct_options,
+        reference_answer=answer.reference_answer,
+        explanation=answer.explanation,
+    )
 
 
 def normalize_selected_text(value: str) -> str:

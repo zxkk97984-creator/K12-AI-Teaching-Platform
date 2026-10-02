@@ -8,6 +8,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.modules.lookup.schemas import LookupCard
+
 OperationId = Literal["TEACH_TURN", "CODE_FEEDBACK"]
 
 
@@ -84,12 +86,19 @@ class SessionSummary(BaseModel):
     last_message_at: datetime | None
 
 
+class TeachingCardDTO(BaseModel):
+    # Preserve older cards while giving the additive local field a generated type.
+    model_config = ConfigDict(extra="allow")
+    message_markdown: str
+    lookup_cards: list[LookupCard] = Field(default_factory=list, max_length=33)
+
+
 class MessageDTO(BaseModel):
     id: uuid.UUID
     run_id: uuid.UUID | None = None
     role: str
     content_markdown: str
-    card: dict[str, Any] | None
+    card: TeachingCardDTO | None
     created_at: datetime
 
 
@@ -117,7 +126,7 @@ class RunDTO(BaseModel):
     error_category: str | None
     stale_reason: str | None
     draft_markdown: str | None = None
-    card: dict[str, Any] | None
+    card: TeachingCardDTO | None
     result_message_id: uuid.UUID | None = None
     created_at: datetime
     started_at: datetime | None

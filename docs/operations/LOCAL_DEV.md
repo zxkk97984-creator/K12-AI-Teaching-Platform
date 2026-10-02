@@ -104,12 +104,57 @@ Knodo ZIP 不提交 Git；首次克隆或修改提示词／技能／打包源后
 
 ## 浏览器检查与文件维护
 
+页面按路由拆分，当前页渲染后等待空闲时间，再按学段逐个预加载常用目录和练习。
+管理页面、教材正文和重型代码编辑器不参与首页预加载。桌宠只延迟加载对话内容，
+会话、编辑保护及桌宠状态的Provider保留；正常侧栏切页不刷新文档。
+模块网络加载失败显示重试。浏览器会缓存失败的模块图，点击“重新加载页面”会显式
+刷新文档重新请求代码；已有未保存编辑的离开保护仍生效。页面本身可恢复的渲染
+错误则原位重试。
+
+2026-10-02 A1在Chrome154、1366×768、禁用缓存、下载3Mbps/上传1Mbps、80ms延迟及
+4倍CPU限速下，各测三次：拆分前首页显示中位数1944.6ms，拆分后1626.3ms；首屏JS
+实际传输403338→132243字节，空闲预加载后共154897字节；首次切资料库78.4→80.4ms。
+最终入口JS约383.72kB（gzip122.32kB），原基线1264.49kB（gzip403.34kB），未提高
+体积告警阈值。此为受控本机测量，不代表真机、Safari或教学效果；各次请求记录在
+`frontend/test-results/a1-performance/`，生产构建的草稿与窄屏证据在 `a1-production/`。
+
+测试使用独立测试库，不能连接开发库。需要选择其他本机运行配置时，先设置
+`K12_RUNTIME_ENV_FILE` 的绝对路径，再加载配置；后续命令保留该变量：
+
+```bash
+. ./scripts/load-runtime-env.sh
+uv sync --project backend --locked
+npm ci --prefix frontend
+python3 scripts/package-knodo.py build
+python3 k12-autoplay-examples-v1/source/build.py
+./k12 check
+./scripts/test-learning-browser.sh
+npm run test:e2e:ui --prefix frontend
+```
+
+配置覆盖shell同名变量。测试脚本固定绑定 `127.0.0.1`，拒绝占用端口，不复用未知服务；
+退出时只结束自己启动的API/Vite进程。`QA_RUNTIME_DIR` 保存独立日志与临时文件，
+资源、教研产物及预算账本使用所属 `K12_RUNTIME_STORAGE_ROOT`。每个工作树的虚拟
+环境和node_modules均独立安装，不能软链接共享。
+
+pytest会清理测试表，同一测试库的pytest、业务浏览器测试和真实Knodo验收必须串行。
+学习浏览器入口在迁移后复用受保护的测试清理，再导入完整合成数据，避免上一轮单测的简化记录导致页面接口校验失败。
+迁移测试从本人的正常测试库推导 `_clean_test`，支持预建库；仅核验所属角色后重建
+clean库的public schema，并持有数据库锁直至迁移结束。其他Agent数据库拒绝连接，
+角色不授予CREATEDB。旧单机测试仍可自行创建所属clean库。
+浏览器必须使用独立Playwright context；Cookie不会按端口隔离，普通浏览器标签不能
+替代context隔离。UI fixture回归只拦截API，业务浏览器入口才连接实际测试库。
+
 合成浏览器回归入口和覆盖范围见[浏览器回归说明](../acceptance/ui-reuse/README.md)。
 所有浏览器截图、JSON 报告写到 `frontend/test-results/`，不放进文档目录或提交 Git。
 `frontend/dist/` 是可重建的运行产物，启动时由脚本检查；`frontend/public/` 中的品牌、绘本和
 桌宠素材是实际运行资源，需要保留。所有 Alembic 迁移及课程版本用于升级和历史快照，不按日期删除。
 
 当前 `/growth` 展示自动记忆、手写文档、条目管理及整理状态；旧学习证据和候选记忆仍保留兼容，不应因入口调整而删除相关表、API 或测试。旧 UI 导出与一次性截图可移到仓库外备份，不能替代现行源码和测试。
+
+管理员常规导航保留教师/能力、资源和互动内容三项；课程编排与教学包新建、重新生成
+暂缓，原 `/admin/authoring?job=…` 仍可恢复选择并查看历史任务和结果。后端协议、迁移
+和历史数据保留，学生章节、练习生成及CodeLab入口沿用原有流程。
 
 真实 CodeLab 浏览器验收使用 `frontend/src/e2e/codelab.spec.ts`，默认连到开发前端。需要隔离时，将 Playwright 指向 `http://127.0.0.1:15174`，并让测试 API 使用 `APP_ENV=test`、`TEST_DATABASE_URL` 和当前 loopback runner；不要让测试 API 使用开发库。分别设置 `E2E_CODELAB_STAGE=JUNIOR` 和 `E2E_CODELAB_STAGE=SENIOR`，从 `frontend` 目录明确运行该测试文件：
 
@@ -122,6 +167,36 @@ CODELAB_E2E_BASE_URL=http://127.0.0.1:15174 E2E_CODELAB_STAGE=JUNIOR \
 
 ## 验证入口与结果范围
 
+2026-10-02六模块收尾：`./k12 check` 协议41项、后端544项通过/7项跳过、前端265项通过；
+四套OpenAPI/类型从最终源码重新生成并核对，单迁移head为`i_02_a3`，Ruff、构建及Knodo资产通过。
+主入口JS384.73kB（gzip122.63kB）。标准UI fixture回归60场景通过，覆盖桌面与320/390等窄屏。
+完整学习入口使用真实隔离FastAPI/PostgreSQL及明确标识的fixture教材/题稿，覆盖四学段课堂、
+单选/判断/排序、提示与评分、错题查询、互动实验恢复、参考答案、刷新和账号隔离。
+默认入口28场景通过/7个十二课件用例按模式跳过，十二课件独立模式7场景全部通过。
+没有向演示库预写学生答案、成绩或完成状态，后端负责判分；课堂阶段按钮是学生自报，不等同题目成绩。
+
+默认跳过两项runner、一项真实记忆和四学段查询；本轮均另行实测：真实Knodo完成本地自动提取、
+跨教师召回、更正、遗忘和两账号隔离；四学段普通问答及三类查询通过，比较原始模型正文与落库正文，
+并解析本地结果目标。真实Docker十二题正确/错误解共186次可信用例运行，以及逐题36项边界检查通过。
+初高中CodeLab均确认真实Knodo建议READY、运行ID/代码哈希匹配、可信成绩70分不被AI修改。
+
+真人用户已确认日常浏览器朗读有声、识别草稿正常。具体浏览器名称及各语音入口的逐项真人结果仍待补齐；
+临时自动化配置的空声音列表不能代表日常Edge/Chrome不可用，不需要改浏览器启动参数。
+浏览器合成事件验证控制逻辑，实际媒体事件不等同人耳听声；窄屏是Chrome模拟视口，不涵盖真机/Safari。
+可查本机`frontend/test-results/`中的`finish-runner/`、`browser-voice/`、`final-learning-flow/`、
+`learning-content-browser/`及`autoplay-examples/`；清理工作树前在仓库外备份这些非Git证据。
+
+默认学习浏览器入口会先清理已校验的专属测试库，再初始化完整教材、五份旧课件和四档合成课堂题稿。
+测试账号显式启用语音，普通账号默认设置不变。十二份课件按独立模式初始化并运行，避免两种目录互相污染：
+
+```bash
+./scripts/test-learning-browser.sh
+K12_AUTOPLAY_EXAMPLES_E2E=1 ./scripts/test-learning-browser.sh --grep 'imported autoplay examples'
+```
+
+命令必须使用所选隔离测试配置；不要与同库pytest或真人演示并行。不同数据库并行运行时，为Playwright
+传入不同的`CODELAB_E2E_REPORT_FILE`与`--output=...`，分别保留对应QA运行目录的API日志。
+
 资源文件浏览器验收 `frontend/src/e2e/resources.spec.ts` 默认跳过，只有设置 `K12_RESOURCE_E2E=1` 后才启用，并在登录和上传前核对 `/health/live` 的 `environment` 为 `test`。它不能再连接开发库创建测试资料。
 
 `./k12 check` 使用隔离数据库和 fixture 网关，不发起真实 Knodo 调用。浏览器合成回归使用拦截 API，验证实际页面交互；真实模型调用需单独执行：
@@ -130,7 +205,21 @@ CODELAB_E2E_BASE_URL=http://127.0.0.1:15174 E2E_CODELAB_STAGE=JUNIOR \
 ./scripts/knodo-live-test.sh
 ```
 
-脚本从本机运行配置读取 PAT，对开发库的教师注册表仅做只读快照，然后在隔离的 `55434 / k12r1_test` 数据库运行 `test_knodo_live_ai_memory.py`。快照只在权限 600 的临时文件中保存，退出时删除。需要先启动测试数据库、完成迁移与 `/admin/ai` 配置；按当前三位教师的 `primary`、`junior`、`senior` 标识及内部记忆路由验收。它会清理隔离测试库，不能与其他后端 pytest 同时运行。
+脚本从所选配置读取PAT。默认只读该配置的业务库教师注册表；Agent配置指向空测试库时，
+必须由A1提供仓库外、当前用户拥有、权限600的注册表JSON快照（registry返回的
+`persisted/revision/data`），并设置 `K12_AI_REGISTRY_SNAPSHOT_INPUT=/绝对路径/registry.json`。
+它会校验快照后复制到600权限临时文件，不从空测试库误读注册表，也不复制学生聊天。
+验收写入所选 `TEST_DATABASE_URL` 的55434测试库，退出时删除临时副本。真实Bot发布和
+runner启停由A1串行协调；它会清理该测试库，不能与其他同库pytest或浏览器测试并行。
+
+只读查询另有可选真实验收 `backend/tests/test_knodo_live_lookup.py`。使用含Knodo凭证的专属测试配置，
+设置 `K12_LOOKUP_LIVE_ACCEPTANCE=1` 与 `K12_AI_REGISTRY_SNAPSHOT`（仓库外私有注册表快照）后运行该文件。
+数据库仍必须是本人的受保护测试库；普通检查默认跳过四个学段用例。2026-10-02四学段均已实测，
+普通问答一次、三类查询两次真实调用；最终模型正文与持久化正文一致，卡片目标解析及账号隔离通过。
+上游失败、协议被拒绝或本地回退必须如实记录，不能仅凭SUCCEEDED/两次调用就声称真实解释通过。
+首轮小学低段普通问题曾被模型额外请求查询，空结果触发本地解释回退，该次未计为模型解释通过。
+明确“不查询平台记录”的普通问答及三类查询随后复验通过；三档通过日志与小学低段复验日志分开保留，
+不能把某个指定问法通过理解为所有措辞下模型都不会选择查询。
 
 真实验收包含四学段路由、成功回复后的自动提取、跨会话与跨教师召回、人工更正、遗忘后的上下文、另一账号隔离和旧来源重放抑制。合成消息会在 Knodo 产生远端会话。结果按本次命令输出判断，不能用绑定核验、fixture 或历史结果代替真实调用。
 

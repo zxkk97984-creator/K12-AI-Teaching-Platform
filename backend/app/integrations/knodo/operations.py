@@ -35,7 +35,7 @@ class OperationSpec:
 
 OPERATION_SPECS: dict[Operation, OperationSpec] = {
     Operation.TEACH_TURN: OperationSpec(
-        Operation.TEACH_TURN, "tutor", "teaching-request", "teaching-response"
+        Operation.TEACH_TURN, "tutor", "teaching-request", "teaching-turn-response"
     ),
     Operation.CODE_FEEDBACK: OperationSpec(
         Operation.CODE_FEEDBACK, "tutor", "teaching-request", "teaching-response"

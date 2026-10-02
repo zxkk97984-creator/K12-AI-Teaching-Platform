@@ -1,0 +1,611 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "教学业务回合；兼容旧final，查询后强制final",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "k12.teaching.response.v1"
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "lesson_session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "base_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "curriculum_revision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "message_markdown": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "revision": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "locator": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "source_id",
+              "revision",
+              "locator"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 8,
+          "uniqueItems": true
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "minItems": 0,
+          "maxItems": 12,
+          "uniqueItems": true
+        },
+        "followup_question": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "action": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "OFFER_QUIZ"
+                },
+                "objective_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "uniqueItems": true
+                },
+                "question_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "difficulty": {
+                  "enum": [
+                    "EASY",
+                    "MEDIUM",
+                    "HARD"
+                  ]
+                }
+              },
+              "required": [
+                "type",
+                "objective_ids",
+                "question_count",
+                "difficulty"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "OPEN_RESOURCE"
+                },
+                "resource_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              },
+              "required": [
+                "type",
+                "resource_id"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "OPEN_ANIMATION"
+                },
+                "resource_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              },
+              "required": [
+                "type",
+                "resource_id"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "OPEN_CODE_TASK"
+                },
+                "task_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              },
+              "required": [
+                "type",
+                "task_id"
+              ]
+            }
+          ]
+        },
+        "phase_suggestion": {
+          "enum": [
+            null,
+            "ORIENT",
+            "EXPLAIN",
+            "CHECK",
+            "PRACTICE",
+            "REFLECT"
+          ]
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "INSUFFICIENT_SOURCE",
+              "NEEDS_HUMAN_REVIEW",
+              "ACTIVITY_UNAVAILABLE",
+              "NOT_SCORED"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 4,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema_version",
+        "request_id",
+        "lesson_session_id",
+        "base_revision",
+        "curriculum_revision",
+        "message_markdown",
+        "source_refs",
+        "evidence_refs",
+        "followup_question",
+        "action",
+        "phase_suggestion",
+        "warnings"
+      ],
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "霜铃教学回复；只可作为建议，不能写权限/成绩/审核事实"
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "k12.teaching.turn.v1"
+        },
+        "kind": {
+          "const": "final"
+        },
+        "response": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": "k12.teaching.response.v1"
+            },
+            "request_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "lesson_session_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "base_revision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "curriculum_revision": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "message_markdown": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
+            },
+            "source_refs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "source_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "revision": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "locator": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 300
+                  }
+                },
+                "required": [
+                  "source_id",
+                  "revision",
+                  "locator"
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 8,
+              "uniqueItems": true
+            },
+            "evidence_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "minItems": 0,
+              "maxItems": 12,
+              "uniqueItems": true
+            },
+            "followup_question": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 400
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "action": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "OFFER_QUIZ"
+                    },
+                    "objective_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 160
+                      },
+                      "minItems": 1,
+                      "maxItems": 8,
+                      "uniqueItems": true
+                    },
+                    "question_count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5
+                    },
+                    "difficulty": {
+                      "enum": [
+                        "EASY",
+                        "MEDIUM",
+                        "HARD"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "objective_ids",
+                    "question_count",
+                    "difficulty"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "OPEN_RESOURCE"
+                    },
+                    "resource_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "resource_id"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "OPEN_ANIMATION"
+                    },
+                    "resource_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "resource_id"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "OPEN_CODE_TASK"
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "task_id"
+                  ]
+                }
+              ]
+            },
+            "phase_suggestion": {
+              "enum": [
+                null,
+                "ORIENT",
+                "EXPLAIN",
+                "CHECK",
+                "PRACTICE",
+                "REFLECT"
+              ]
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "INSUFFICIENT_SOURCE",
+                  "NEEDS_HUMAN_REVIEW",
+                  "ACTIVITY_UNAVAILABLE",
+                  "NOT_SCORED"
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 4,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "schema_version",
+            "request_id",
+            "lesson_session_id",
+            "base_revision",
+            "curriculum_revision",
+            "message_markdown",
+            "source_refs",
+            "evidence_refs",
+            "followup_question",
+            "action",
+            "phase_suggestion",
+            "warnings"
+          ],
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "title": "霜铃教学回复；只可作为建议，不能写权限/成绩/审核事实"
+        }
+      },
+      "required": [
+        "schema_version",
+        "kind",
+        "response"
+      ]
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "k12.teaching.turn.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "kind": {
+          "const": "lookup_request",
+          "title": "Kind",
+          "type": "string"
+        },
+        "request_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Request Id",
+          "type": "string"
+        },
+        "lesson_session_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Lesson Session Id",
+          "type": "string"
+        },
+        "base_revision": {
+          "minimum": 0,
+          "title": "Base Revision",
+          "type": "integer"
+        },
+        "queries": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "tool": {
+                "enum": [
+                  "COURSE_SEARCH",
+                  "WRONG_QUESTIONS",
+                  "LEARNING_PROGRESS"
+                ],
+                "title": "Tool",
+                "type": "string"
+              },
+              "parameters": {
+                "additionalProperties": false,
+                "properties": {
+                  "keyword": {
+                    "maxLength": 120,
+                    "title": "Keyword",
+                    "type": "string"
+                  },
+                  "topic": {
+                    "maxLength": 80,
+                    "title": "Topic",
+                    "type": "string"
+                  },
+                  "content_type": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "COURSE",
+                          "RESOURCE",
+                          "READING",
+                          "LESSON",
+                          "WATCHING",
+                          "QUIZ",
+                          "CODE"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Content Type"
+                  },
+                  "since": {
+                    "anyOf": [
+                      {
+                        "maxLength": 10,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Since"
+                  },
+                  "until": {
+                    "anyOf": [
+                      {
+                        "maxLength": 10,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Until"
+                  },
+                  "limit": {
+                    "maximum": 10,
+                    "minimum": 1,
+                    "title": "Limit",
+                    "type": "integer"
+                  }
+                },
+                "title": "LookupInput",
+                "type": "object"
+              }
+            },
+            "required": [
+              "tool"
+            ],
+            "title": "LookupQuery",
+            "type": "object"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Queries",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "kind",
+        "request_id",
+        "lesson_session_id",
+        "base_revision",
+        "queries"
+      ],
+      "title": "LookupPlan",
+      "type": "object"
+    }
+  ]
+}

@@ -143,6 +143,8 @@ export function CodeLabWorkspace({
   const [problemPercent, setProblemPercent] = useState(38);
   const [resultPercent, setResultPercent] = useState(30);
   const [resultExpanded, setResultExpanded] = useState(true);
+  const [focusMode, setFocusMode] = useState(false);
+  const focusButtonRef = useRef<HTMLButtonElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
   const submittingRef = useRef(false);
@@ -164,6 +166,19 @@ export function CodeLabWorkspace({
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, []);
+
+  useEffect(() => {
+    if (!focusMode) return;
+    const exitOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setFocusMode(false);
+      focusButtonRef.current?.focus();
+    };
+    document.addEventListener("keydown", exitOnEscape);
+    return () => document.removeEventListener("keydown", exitOnEscape);
+  }, [focusMode]);
 
   useEffect(() => {
     if (!initialRun || initialRunRef.current === initialRun.id) return;
@@ -496,13 +511,26 @@ export function CodeLabWorkspace({
   const layoutStyle = { "--problem-percent": problemPercent, "--result-percent": resultPercent } as CSSProperties;
 
   return (
-    <main className="codelab-page codelab-workspace" data-testid="codelab-workspace" style={layoutStyle}>
+    <main className="codelab-page codelab-workspace" data-testid="codelab-workspace" data-focus-mode={focusMode} style={layoutStyle}>
       <RunPoller run={examplesRun} onUpdate={updatePolledRun} onError={setRunError} />
       <RunPoller run={gradeRun} onUpdate={updatePolledRun} onError={setRunError} />
       <header className="codelab-workspace-toolbar">
         <div className="codelab-workspace-title"><h1>{task.title}</h1><span className="codelab-difficulty">{task.catalog.difficulty === "EASY" ? "入门" : task.catalog.difficulty === "MEDIUM" ? "基础" : task.catalog.difficulty === "HARD" ? "进阶" : "未标注"}</span></div>
         <div className="codelab-header-actions">
           <span className={`codelab-runner-badge${runnerAvailable ? " is-ready" : ""}`} role="status" title={runnerReason}>{runnerAvailable ? runnerReason : "runner 不可用"}</span>
+          <button
+            ref={focusButtonRef}
+            type="button"
+            className="secondary codelab-focus-toggle"
+            aria-pressed={focusMode}
+            aria-keyshortcuts={focusMode ? "Escape" : undefined}
+            title={focusMode ? "退出专注模式（Esc）" : "收起导航与悬浮老师，专心编程"}
+            onClick={() => setFocusMode((value) => !value)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={focusMode ? "M9 3v6H3m12-6v6h6M9 21v-6H3m12 6v-6h6" : "M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"} /></svg>
+            {focusMode ? "退出专注" : "专注模式"}
+            {focusMode ? <kbd>Esc</kbd> : null}
+          </button>
           <CodeLabBackButton onClick={onPrevious} />
           <button type="button" className="secondary" onClick={onBack}>返回题库</button>
           <button type="button" className="secondary" onClick={onHistory}>本题记录</button>

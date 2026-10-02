@@ -312,6 +312,12 @@ async def test_admin_upload_student_resume_version_and_owner(test_settings, tmp_
         )
         assert started.status_code == 201, started.text
         session_id = started.json()["id"]
+        cannot_view_game = await client.post(
+            f"/api/v1/interactive/sessions/{session_id}/viewed",
+            json={"base_revision": 0, "event_id": "not-a-lesson"},
+            headers=await csrf_headers(client),
+        )
+        assert cannot_view_game.status_code == 422
         document = await client.get(f"/api/v1/interactive/sessions/{session_id}/document")
         assert document.status_code == 200
         assert "data:image/svg+xml" in document.json()["document_html"]

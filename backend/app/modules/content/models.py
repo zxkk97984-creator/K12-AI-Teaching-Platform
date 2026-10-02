@@ -276,6 +276,39 @@ class RevisionKnowledgePoint(Base):
     )
 
 
+class TextbookAnswer(Base):
+    """Private fixed answers; never part of an immutable public body snapshot."""
+
+    __tablename__ = "content_textbook_answers"
+
+    chapter_revision_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("content_chapter_revisions.id", ondelete="RESTRICT"),
+        primary_key=True,
+    )
+    question_id: Mapped[str] = mapped_column(String(3), primary_key=True)
+    question_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    correct_options: Mapped[list[str]] = mapped_column(JSONB, nullable=False)
+    reference_answer: Mapped[str] = mapped_column(Text, nullable=False)
+    explanation: Mapped[str] = mapped_column(Text, nullable=False)
+    source_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    __table_args__ = (
+        CheckConstraint("question_id ~ '^Q0[1-6]$'", name="ck_textbook_answer_id"),
+        CheckConstraint(
+            "(question_id IN ('Q01', 'Q02') AND question_type = 'SINGLE_CHOICE' "
+            "AND jsonb_array_length(correct_options) = 1 "
+            'AND correct_options <@ \'["A","B","C","D"]\'::jsonb) OR '
+            "(question_id IN ('Q03', 'Q04') AND question_type = 'SHORT_ANSWER' "
+            "AND correct_options = '[]'::jsonb) OR "
+            "(question_id IN ('Q05', 'Q06') AND question_type = 'PRACTICE' "
+            "AND correct_options = '[]'::jsonb)",
+            name="ck_textbook_answer_type",
+        ),
+        CheckConstraint("source_hash ~ '^[0-9a-f]{64}$'", name="ck_textbook_answer_hash"),
+    )
+
+
 class ChapterReviewState(Base):
     __tablename__ = "content_chapter_review_states"
 

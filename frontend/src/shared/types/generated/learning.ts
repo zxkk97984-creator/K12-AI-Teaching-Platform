@@ -160,6 +160,121 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Conversations */
+        get: operations["list_conversations_api_v1_conversations_get"];
+        put?: never;
+        /**
+         * Open Conversation
+         * @description Open a free conversation, optionally pinned to a visible chapter.
+         */
+        post: operations["open_conversation_api_v1_conversations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/conversations/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Conversation */
+        get: operations["get_conversation_api_v1_conversations__session_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Conversation */
+        delete: operations["delete_conversation_api_v1_conversations__session_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Conversation */
+        patch: operations["update_conversation_api_v1_conversations__session_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/conversations/{session_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Conversation Message
+         * @description Queue a turn in a free or chapter-backed conversation.
+         *
+         *     The run is handled by the same bounded worker and Knodo gateway as the
+         *     legacy lesson endpoint. Chapter sessions still undergo revision binding
+         *     checks; free sessions intentionally have no chapter to validate.
+         */
+        post: operations["create_conversation_message_api_v1_conversations__session_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent-runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Agent Run */
+        get: operations["get_agent_run_api_v1_agent_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent-runs/{run_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Agent Run */
+        post: operations["cancel_agent_run_api_v1_agent_runs__run_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent-runs/{run_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stream Agent Run */
+        get: operations["stream_agent_run_api_v1_agent_runs__run_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quiz-wrong-questions": {
         parameters: {
             query?: never;
@@ -595,6 +710,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/learning/lookup-target": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lookup Target */
+        get: operations["lookup_target_api_v1_learning_lookup_target_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/growth/documents": {
         parameters: {
             query?: never;
@@ -923,6 +1055,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/interactive/sessions/{session_id}/viewed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activity Viewed */
+        post: operations["activity_viewed_api_v1_interactive_sessions__session_id__viewed_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -939,6 +1088,8 @@ export interface components {
             game_state?: {
                 [key: string]: unknown;
             } | null;
+            /** Playback Step */
+            playback_step?: number | null;
             /** Game Result */
             game_result?: {
                 [key: string]: unknown;
@@ -961,6 +1112,15 @@ export interface components {
             game_state?: {
                 [key: string]: unknown;
             } | null;
+            /** Playback Step */
+            playback_step?: number | null;
+        };
+        /** ActivityViewed */
+        ActivityViewed: {
+            /** Base Revision */
+            base_revision: number;
+            /** Event Id */
+            event_id: string;
         };
         /** AnswerCreate */
         AnswerCreate: {
@@ -1361,6 +1521,25 @@ export interface components {
             /** Route */
             route: string;
         };
+        /**
+         * ConversationCreateRequest
+         * @description Create a free conversation, or a chapter-backed conversation when supplied.
+         */
+        ConversationCreateRequest: {
+            /** Title */
+            title?: string | null;
+            /** Chapter Id */
+            chapter_id?: string | null;
+            /** Idempotency Key */
+            idempotency_key?: string | null;
+        };
+        /** ConversationUpdateRequest */
+        ConversationUpdateRequest: {
+            /** Title */
+            title?: string | null;
+            /** Archived */
+            archived?: boolean | null;
+        };
         /** CourseLinkView */
         CourseLinkView: {
             /** Course Slug */
@@ -1520,6 +1699,8 @@ export interface components {
              * @enum {string}
              */
             activity_status: "NOT_STARTED" | "ACTIVE" | "COMPLETED" | "ABANDONED";
+            /** Viewed At */
+            viewed_at?: string | null;
             /** Can Resume */
             can_resume: boolean;
             /** Session Id */
@@ -1668,6 +1849,8 @@ export interface components {
             created_at: string | null;
             /** Updated At */
             updated_at: string | null;
+            /** Viewed At */
+            viewed_at?: string | null;
             /** Completed At */
             completed_at: string | null;
             /** Resource Title */
@@ -1753,6 +1936,59 @@ export interface components {
              * @default false
              */
             is_bookmarked: boolean;
+        };
+        /** LookupCard */
+        LookupCard: {
+            /** Id */
+            id: string;
+            /**
+             * Tool
+             * @enum {string}
+             */
+            tool: "COURSE_SEARCH" | "WRONG_QUESTIONS" | "LEARNING_PROGRESS";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "COURSE" | "RESOURCE" | "WRONG_QUESTION" | "PROGRESS";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "OK" | "EMPTY" | "FAILED" | "UNAVAILABLE";
+            /** Title */
+            title: string;
+            /** Description */
+            description: string;
+            /** Queried At */
+            queried_at: string;
+            target?: components["schemas"]["LookupTarget"] | null;
+            /** Route */
+            route?: string | null;
+            source_ref?: components["schemas"]["SourceRef"] | null;
+            /** Recorded At */
+            recorded_at?: string | null;
+            /** Explanation */
+            explanation?: string | null;
+            /** Content Notice */
+            content_notice?: string | null;
+        };
+        /** LookupTarget */
+        LookupTarget: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "CHAPTER" | "RESOURCE" | "ANIMATION" | "PICTUREBOOK" | "QUIZ" | "LESSON" | "CODE_RUN";
+            /** Id */
+            id: string;
+            /** Revision */
+            revision?: string | null;
+        };
+        /** LookupTargetDTO */
+        LookupTargetDTO: {
+            /** Route */
+            route: string;
         };
         /** MemoryDocumentCreateRequest */
         MemoryDocumentCreateRequest: {
@@ -1894,6 +2130,26 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** MessageDTO */
+        MessageDTO: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Run Id */
+            run_id?: string | null;
+            /** Role */
+            role: string;
+            /** Content Markdown */
+            content_markdown: string;
+            card: components["schemas"]["TeachingCardDTO"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** OpenEventReceipt */
         OpenEventReceipt: {
@@ -2118,6 +2374,109 @@ export interface components {
              */
             async_run: boolean;
         };
+        /** RunDTO */
+        RunDTO: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Operation */
+            operation: string;
+            /** Status */
+            status: string;
+            /** Attempt */
+            attempt: number;
+            /** Fixture */
+            fixture: boolean;
+            /** Error Category */
+            error_category: string | null;
+            /** Stale Reason */
+            stale_reason: string | null;
+            /** Draft Markdown */
+            draft_markdown?: string | null;
+            card: components["schemas"]["TeachingCardDTO"] | null;
+            /** Result Message Id */
+            result_message_id?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Idempotent Replay
+             * @default false
+             */
+            idempotent_replay: boolean;
+        };
+        /**
+         * SceneSnapshot
+         * @description Small, owner-scoped page snapshot captured at send time.
+         *
+         *     The client may describe the visible learning surface, but the server still
+         *     owns identity, content visibility and all durable relationships.
+         */
+        SceneSnapshot: {
+            /**
+             * Route
+             * @default
+             */
+            route: string;
+            /**
+             * Page Type
+             * @default
+             */
+            page_type: string;
+            /** Chapter Id */
+            chapter_id?: string | null;
+            /** Chapter Title */
+            chapter_title?: string | null;
+            /** Content Block Id */
+            content_block_id?: string | null;
+            /** Visible Section */
+            visible_section?: string | null;
+            /** Selected Text */
+            selected_text?: string | null;
+            /** Content Kind */
+            content_kind?: ("PICTUREBOOK" | "GUIDED_ANIMATION" | "INTERACTIVE") | null;
+            /** Content Id */
+            content_id?: string | null;
+            /** Content Version */
+            content_version?: string | null;
+            /** Section Index */
+            section_index?: number | null;
+            /** Knowledge Points */
+            knowledge_points?: string[];
+            /** Activity Type */
+            activity_type?: string | null;
+            /** Task Id */
+            task_id?: string | null;
+            /** Task Revision */
+            task_revision?: number | null;
+            /** Code Hash */
+            code_hash?: string | null;
+            /** Execution Status */
+            execution_status?: string | null;
+            /** Quiz Session Id */
+            quiz_session_id?: string | null;
+            /** Question Id */
+            question_id?: string | null;
+            /** Interactive Session Id */
+            interactive_session_id?: string | null;
+            /** Interactive Scene Id */
+            interactive_scene_id?: string | null;
+            /** Interactive Prompt Id */
+            interactive_prompt_id?: string | null;
+        };
         /** SceneSpec */
         SceneSpec: {
             /** Id */
@@ -2143,6 +2502,96 @@ export interface components {
              */
             restart: boolean;
         };
+        /** SessionDetail */
+        SessionDetail: {
+            /** Teacher */
+            teacher?: {
+                [key: string]: string;
+            } | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Chapter Id */
+            chapter_id: string | null;
+            /** Chapter Title */
+            chapter_title: string;
+            /**
+             * Conversation Type
+             * @default LESSON
+             * @enum {string}
+             */
+            conversation_type: "LESSON" | "FREE";
+            /** Title */
+            title: string;
+            /** Archived At */
+            archived_at?: string | null;
+            /** Curriculum Revision */
+            curriculum_revision: string;
+            /** Stage */
+            stage: string;
+            /** Grade */
+            grade: number | null;
+            /** Base Revision */
+            base_revision: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Message Count */
+            message_count: number;
+            /** Last Message At */
+            last_message_at: string | null;
+            /** Messages */
+            messages: components["schemas"]["MessageDTO"][];
+            /** Active Run Id */
+            active_run_id?: string | null;
+        };
+        /** SessionSummary */
+        SessionSummary: {
+            /** Teacher */
+            teacher?: {
+                [key: string]: string;
+            } | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Chapter Id */
+            chapter_id: string | null;
+            /** Chapter Title */
+            chapter_title: string;
+            /**
+             * Conversation Type
+             * @default LESSON
+             * @enum {string}
+             */
+            conversation_type: "LESSON" | "FREE";
+            /** Title */
+            title: string;
+            /** Archived At */
+            archived_at?: string | null;
+            /** Curriculum Revision */
+            curriculum_revision: string;
+            /** Stage */
+            stage: string;
+            /** Grade */
+            grade: number | null;
+            /** Base Revision */
+            base_revision: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Message Count */
+            message_count: number;
+            /** Last Message At */
+            last_message_at: string | null;
+        };
         /** SettingsUpdate */
         SettingsUpdate: {
             /** Base Revision */
@@ -2151,6 +2600,15 @@ export interface components {
             auto_enabled: boolean;
             /** Use Enabled */
             use_enabled: boolean;
+        };
+        /** SourceRef */
+        SourceRef: {
+            /** Source Id */
+            source_id: string;
+            /** Revision */
+            revision: string;
+            /** Locator */
+            locator: string;
         };
         /** StudentGenerationCreate */
         StudentGenerationCreate: {
@@ -2186,6 +2644,33 @@ export interface components {
              * @enum {string}
              */
             action: "CANCEL" | "RETRY";
+        };
+        /** TeachingCardDTO */
+        TeachingCardDTO: {
+            /** Message Markdown */
+            message_markdown: string;
+            /** Lookup Cards */
+            lookup_cards?: components["schemas"]["LookupCard"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** TurnAccepted */
+        TurnAccepted: {
+            run: components["schemas"]["RunDTO"];
+        };
+        /** TurnCreateRequest */
+        TurnCreateRequest: {
+            /** Message */
+            message: string;
+            /** Idempotency Key */
+            idempotency_key: string;
+            /**
+             * Operation
+             * @default TEACH_TURN
+             * @enum {string}
+             */
+            operation: "TEACH_TURN" | "CODE_FEEDBACK";
+            scene?: components["schemas"]["SceneSnapshot"] | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -2646,6 +3131,335 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CodeFeedbackView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_conversations_api_v1_conversations_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                include_archived?: boolean;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_conversation_api_v1_conversations_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path?: never;
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConversationCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_conversation_api_v1_conversations__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_conversation_api_v1_conversations__session_id__delete: {
+        parameters: {
+            query?: {
+                forget_memories?: boolean;
+            };
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_conversation_api_v1_conversations__session_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConversationUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_conversation_message_api_v1_conversations__session_id__messages_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TurnCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnAccepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_agent_run_api_v1_agent_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_agent_run_api_v1_agent_runs__run_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stream_agent_run_api_v1_agent_runs__run_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
@@ -3752,6 +4566,41 @@ export interface operations {
             };
         };
     };
+    lookup_target_api_v1_learning_lookup_target_get: {
+        parameters: {
+            query: {
+                type: "CHAPTER" | "RESOURCE" | "ANIMATION" | "PICTUREBOOK" | "QUIZ" | "LESSON" | "CODE_RUN";
+                id: string;
+                revision?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LookupTargetDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     read_documents_api_v1_growth_documents_get: {
         parameters: {
             query?: never;
@@ -4621,6 +5470,47 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ActivityComplete"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InteractiveSessionDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activity_viewed_api_v1_interactive_sessions__session_id__viewed_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivityViewed"];
             };
         };
         responses: {

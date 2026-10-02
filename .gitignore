@@ -48,6 +48,8 @@ docs/acceptance/ui-reuse/*.png
 
 # Dynamic multi-agent coordination state; durable summaries live under docs/
 .herdr-control/
+# Local implementation plans and agent handoff records.
+/tasks/
 
 # Local agent/editor state and temporary files
 .agents/

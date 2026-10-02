@@ -30,3 +30,16 @@ it("updates a voice selection changed by another tab", () => {
   });
   expect(result.current.voiceId).toBe("other-tab-voice");
 });
+
+it("shares speed across entrances and replaces account settings immediately", () => {
+  const first = renderHook(({ user }) => useNarrationVoice(narrationVoiceStorageKey(user)), { initialProps: { user: "a" } });
+  const second = renderHook(() => useNarrationVoice(narrationVoiceStorageKey("a")));
+  act(() => { first.result.current.selectVoice("private-a"); first.result.current.setRate(1.5); });
+  expect(second.result.current.rate).toBe(1.5);
+  first.rerender({ user: "b" });
+  expect(first.result.current.voiceId).toBe("");
+  expect(first.result.current.rate).toBe(1);
+  first.rerender({ user: "a" });
+  expect(first.result.current.voiceId).toBe("private-a");
+  expect(first.result.current.rate).toBe(1.5);
+});

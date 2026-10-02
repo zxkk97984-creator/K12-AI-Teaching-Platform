@@ -80,6 +80,9 @@ function stageText(value: string): string {
   return value;
 }
 
+// Keep generation implementation for later work; this release exposes history only.
+const generationEnabled = false;
+
 export function AdminAuthoringPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeJobId = searchParams.get("job");
@@ -388,12 +391,12 @@ export function AdminAuthoringPage() {
     <main className="admin-authoring" data-testid="admin-authoring">
       <header className="admin-page-header">
         <div>
-          <h1>课程编排</h1>
-          <p>按任务查看真实生成结果，人工审校后发布教学包。</p>
+          <h1>教学包历史</h1>
+          <p>查看已有任务、结果与发布记录。当前暂缓新增教学包生成。</p>
         </div>
-        <button type="button" disabled={busy} onClick={() => setCreating(true)}>
+        {generationEnabled && <button type="button" disabled={busy} onClick={() => setCreating(true)}>
           新建草稿任务
-        </button>
+        </button>}
       </header>
       {notice ? (
         <p
@@ -472,7 +475,7 @@ export function AdminAuthoringPage() {
             ) : null}
             {!jobsLoading && jobs?.items.length === 0 ? (
               <p className="admin-empty">
-                暂无符合条件的任务。选择章节版本后可创建草稿。
+                暂无符合条件的历史任务。
               </p>
             ) : null}
             {jobs &&
@@ -629,7 +632,7 @@ export function AdminAuthoringPage() {
                 </p>
                 {job.status === "FAILED" && job.error_code ? (
                   <p className="admin-error">
-                    任务失败：{job.error_code}。检查详情后可重试。
+                    任务失败：{job.error_code}。可查看历史错误详情。
                   </p>
                 ) : null}
                 <div className="admin-actions">
@@ -644,7 +647,7 @@ export function AdminAuthoringPage() {
                   >
                     取消任务
                   </button>
-                  <button
+                  {generationEnabled && <button
                     type="button"
                     className="admin-button-quiet"
                     disabled={
@@ -655,17 +658,17 @@ export function AdminAuthoringPage() {
                     onClick={() => void control("retry")}
                   >
                     重试任务
-                  </button>
+                  </button>}
                 </div>
                 <p className="admin-help">
                   {job.status !== "QUEUED" && job.status !== "RUNNING"
                     ? "仅排队或生成中的任务可取消。"
                     : ""}{" "}
-                  {job.status !== "FAILED" && job.status !== "CANCELLED"
+                  {generationEnabled && (job.status !== "FAILED" && job.status !== "CANCELLED"
                     ? "仅失败或已取消任务可重试。"
                     : job.attempt >= job.max_attempts
                       ? "已达最大尝试次数，服务器将拒绝重试。"
-                      : ""}
+                      : "")}
                 </p>
                 <details className="admin-technical">
                   <summary>技术诊断</summary>
@@ -905,7 +908,7 @@ export function AdminAuthoringPage() {
         </div>
       </div>
 
-      {creating && (
+      {generationEnabled && creating && (
         <AdminDrawer
           busy={Boolean(busy)}
           title="新建草稿任务"

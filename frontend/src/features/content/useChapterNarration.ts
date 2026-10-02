@@ -22,7 +22,7 @@ export function useChapterNarration(chapterKey: string, userId?: string) {
     setMessage("");
   }, [stopNarration]);
 
-  useEffect(() => () => stop(), [chapterKey, stop]);
+  useEffect(() => () => stop(), [chapterKey, userId, stop]);
 
   const start = useCallback((segments: ReadingSegment[], nextScope: "chapter" | "selection" = "chapter") => {
     stop();

@@ -114,6 +114,30 @@ it("can stop recall without disabling automatic collection", async () => {
   );
 });
 
+it("marks expired and unconfirmed memories as excluded from tutoring", async () => {
+  data.items[0].valid_until = "2000-01-01T00:00:00Z";
+  render(<AutomaticMemory />);
+  expect(await screen.findByText("已过期 · 不用于辅导")).toBeTruthy();
+  cleanup();
+  data.items[0].valid_until = null;
+  data.items[0].status = "CANDIDATE";
+  render(<AutomaticMemory />);
+  expect(await screen.findByText(/更正或遗忘后的新表述也需要你确认/)).toBeTruthy();
+  expect(screen.getByRole("button", { name: "确认使用" })).toBeTruthy();
+});
+
+it("shows interrupted work honestly and allows an explicit retry", async () => {
+  data.tasks = [{ id: "task-1", session_id: "session-1", status: "RETRY_REQUIRED",
+    reason: "INTERRUPTED_UNCERTAIN", attempt: 1, updated_at: "2026-10-02T00:00:00Z" }];
+  render(<AutomaticMemory />);
+  fireEvent.click(await screen.findByRole("button", { name: "整理记录" }));
+  expect(await screen.findByText(/是否已受理尚不确定/)).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "重试" }));
+  await waitFor(() => expect(writes[0]).toMatchObject({
+    path: "/api/v1/growth/personal-memory/tasks/task-1/events", body: { action: "RETRY" },
+  }));
+});
+
 it("distinguishes empty memory from filter misses and hides unnecessary pagination", async () => {
   data.items = [];
   data.total = 0;

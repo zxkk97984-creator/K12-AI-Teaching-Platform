@@ -193,6 +193,37 @@ class FixtureGateway:
         return sleep_task in done
 
     def _success_payload(self, operation: Operation, request: dict[str, Any]) -> dict[str, Any]:
+        lookup = request.get("lookup_context")
+        if operation is Operation.TEACH_TURN and lookup:
+            if lookup["phase"] == "FINAL":
+                payload = teaching_response_payload(operation, request)
+                payload.update(
+                    message_markdown="这是模拟教师解释。已按当前账号查询，请查看结果卡片。",
+                    source_refs=[],
+                    evidence_refs=[],
+                    action=None,
+                    followup_question=None,
+                    phase_suggestion=None,
+                )
+                return payload
+            student_input = request.get("student_input", "").rsplit("当前学生消息：\n", 1)[-1]
+            # Deliberately small offline demo vocabulary, never a real AI planner.
+            tools = []
+            if any(word in student_input for word in ("查课程", "找课程", "查资料", "找资料")):
+                tools.append("COURSE_SEARCH")
+            if "错题" in student_input:
+                tools.append("WRONG_QUESTIONS")
+            if any(word in student_input for word in ("学习进度", "学习记录")):
+                tools.append("LEARNING_PROGRESS")
+            if tools:
+                return {
+                    "schema_version": "k12.teaching.turn.v1",
+                    "kind": "lookup_request",
+                    "request_id": request["request_id"],
+                    "lesson_session_id": request["lesson_session_id"],
+                    "base_revision": request["base_revision"],
+                    "queries": [{"tool": tool, "parameters": {}} for tool in tools],
+                }
         if operation in (Operation.TEACH_TURN, Operation.CODE_FEEDBACK):
             return teaching_response_payload(operation, request)
         return designer_payload(operation, request)

@@ -7,7 +7,7 @@ import { SettingsPage } from "./SettingsPage";
 const me: MeResponse = {
   user: { id: "11111111-1111-1111-1111-111111111111", username: "student", role: "student", is_active: true },
   profile: { stage: "PRIMARY_LOWER", grade: 2, revision: 0, onboarding_completed: true, nickname: null, avatar_url: null },
-  preferences: { preferred_style: "EXAMPLE", teacher_style: "AUTO", companion_pet_id: "shuangling", interests: [], proactive_guidance_enabled: true, voice_preference: "DISABLED", profile_revision: 0 },
+  preferences: { preferred_style: "EXAMPLE", teacher_style: "AUTO", companion_pet_id: "shuangling", interests: [], proactive_guidance_enabled: true, voice_preference: "DISABLED", auto_read_replies: false, profile_revision: 0 },
 };
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
@@ -106,4 +106,16 @@ it("shows server-confirmed avatar and allows account-level removal", async () =>
   fireEvent.click(screen.getByRole("button", { name: "移除头像" }));
   await waitFor(() => expect(remove).toHaveBeenCalledOnce());
   expect(await screen.findByText("头像已移除。")).toBeTruthy();
+});
+
+it("defaults automatic narration off and preserves the choice on failure before retrying a refreshed revision", async () => {
+  vi.spyOn(identityApi, "getMe").mockResolvedValueOnce(me).mockResolvedValue({ ...me, profile: { ...me.profile!, revision: 2 }, preferences: { ...me.preferences!, profile_revision: 2 } });
+  const patch = vi.spyOn(identityApi, "patchPreferences").mockRejectedValueOnce(new identityApi.ApiError(409, "CONFLICT", "档案已更新", null)).mockResolvedValue({ ...me, preferences: { ...me.preferences!, auto_read_replies: true } });
+  render(<SettingsPage />);
+  const checkbox = await screen.findByRole("checkbox", {name: /自动朗读新回复/}) as HTMLInputElement;
+  expect(checkbox.checked).toBe(false);
+  fireEvent.click(checkbox); fireEvent.click(screen.getByRole("button", {name: "保存设置"}));
+  await screen.findByRole("alert"); expect(checkbox.checked).toBe(true);
+  fireEvent.click(screen.getByRole("button", {name: "保存设置"}));
+  await waitFor(() => expect(patch).toHaveBeenLastCalledWith(expect.objectContaining({base_revision: 2, auto_read_replies: true})));
 });

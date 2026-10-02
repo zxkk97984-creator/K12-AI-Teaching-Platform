@@ -136,6 +136,7 @@ describe("chapter narration playback", () => {
     await act(async () => result.current.start(segments));
     act(() => window.dispatchEvent(new Event("identity:signed-out")));
     expect(result.current.status).toBe("idle");
+    await act(async () => result.current.start(segments));
     const cancellations = synthesis.cancel.mock.calls.length;
     unmount();
     expect(synthesis.cancel.mock.calls.length).toBeGreaterThan(cancellations);
@@ -184,4 +185,11 @@ describe("chapter narration playback", () => {
     act(() => result.current.start([]));
     expect(result.current.message).toContain("正文仍在排版");
   });
+});
+
+it("whole-chapter narration excludes answers but selected visible answer text can be read", () => {
+  const root = document.createElement("div");
+  root.innerHTML = '<div class="content-reader__blocks"><div data-block-id="q">题目。<div data-narration-exclude="true">参考答案。</div></div></div>';
+  expect(chapterNarrationSegments(root).map(s => s.text)).toEqual(["题目。"]);
+  expect(selectionNarrationSegments(root, "参考答案。", "q").map(s => s.text)).toEqual(["参考答案。"]);
 });

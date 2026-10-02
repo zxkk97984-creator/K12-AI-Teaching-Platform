@@ -5,7 +5,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Protocol
 
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import case, delete, func, literal, or_, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +17,9 @@ from app.modules.memory.automatic_models import (
     PersonalMemoryState,
 )
 from app.modules.memory.contracts import ExtractionResponse, SourceMessage
+from app.modules.memory.provenance import source_reference, verified_sources
 from app.modules.memory.service import _bump_context_revision
+from app.modules.memory.summaries import save_summary
 
 SENSITIVE = re.compile(
     r"(?:密码|口令|身份证|银行卡|手机号|电话是|家庭住址|详细地址|诊断为|学校名称"
@@ -77,6 +79,7 @@ async def retract_context(db: AsyncSession, owner: uuid.UUID, state=None):
     state = state or await state_for(db, owner, lock=True)
     state.history_after = utcnow()
     await _bump_context_revision(db, owner)
+    state.lease_token, state.lease_until = None, None
     await db.execute(
         delete(ConversationMemorySummary).where(ConversationMemorySummary.owner_user_id == owner)
     )
@@ -241,17 +244,29 @@ async def apply_extraction(
     db: AsyncSession, owner: uuid.UUID, response: ExtractionResponse, sources: list[SourceMessage]
 ):
     """Caller owns the account lease and transaction. Exact quote + provenance required."""
-    by_id = {s.id: s for s in sources}
-    suppressed = list(
+    state = await state_for(db, owner, lock=True)
+    if not state.auto_enabled:
+        return 0
+    by_id = await verified_sources(db, owner, sources)
+    protected = list(
         await db.scalars(
             select(PersonalMemoryItem).where(
-                PersonalMemoryItem.owner_user_id == owner, PersonalMemoryItem.status == "REMOVED"
+                PersonalMemoryItem.owner_user_id == owner,
+                (PersonalMemoryItem.status == "REMOVED") | PersonalMemoryItem.manual.is_(True),
             )
         )
     )
-    blocked_sources = {ref["message_id"] for item in suppressed for ref in item.sources}
+    blocked_sources = {ref["message_id"] for item in protected for ref in item.sources}
+    # Unknown topic aliases require student confirmation after a personal correction.
+    # Keyword matching alone cannot prove that a paraphrase is a different fact.
     changed = 0
-    for fact in response.facts:
+    for fact in sorted(
+        response.facts,
+        key=lambda f: (
+            by_id[f.source_message_id].observed_at if f.source_message_id in by_id else "",
+            f.source_message_id,
+        ),
+    ):
         if fact.source_message_id in blocked_sources:
             continue
         source = by_id.get(fact.source_message_id)
@@ -280,6 +295,18 @@ async def apply_extraction(
                 PersonalMemoryItem.owner_user_id == owner, PersonalMemoryItem.key == key
             )
         )
+        if row is None:
+            # Exact normalized statements share a single entry even if the extractor
+            # varies its key. Do not guess that merely similar topics are equivalent.
+            peers = await db.scalars(
+                select(PersonalMemoryItem).where(
+                    PersonalMemoryItem.owner_user_id == owner,
+                    PersonalMemoryItem.category == fact.category,
+                )
+            )
+            row = next(
+                (p for p in peers if normalized(p.statement) == normalized(fact.statement)), None
+            )
         provenance = {
             "message_id": source.id,
             "session_id": source.session_id,
@@ -294,7 +321,9 @@ async def apply_extraction(
                 key=key,
                 category=fact.category,
                 statement=fact.statement,
-                status="ACTIVE" if fact.certainty == "EXPLICIT" else "CANDIDATE",
+                status=(
+                    "ACTIVE" if fact.certainty == "EXPLICIT" and not protected else "CANDIDATE"
+                ),
                 manual=False,
                 revision=1,
                 sources=[provenance],
@@ -305,6 +334,8 @@ async def apply_extraction(
             await db.flush()
             action = "AUTO_CREATE"
         else:
+            if any(s["message_id"] == source.id for s in row.sources):
+                continue
             refs = list(row.sources)
             if not any(s["message_id"] == source.id for s in refs):
                 refs.append(provenance)
@@ -313,8 +344,12 @@ async def apply_extraction(
                 continue
             if fact.statement == row.statement and refs == row.sources:
                 continue
+            needs_review = bool(protected) and (
+                row.status == "CANDIDATE" or normalized(fact.statement) != normalized(row.statement)
+            )
             row.statement, row.sources = fact.statement, refs[-100:]
-            row.category, row.status = fact.category, "ACTIVE"
+            row.category = fact.category
+            row.status = "CANDIDATE" if needs_review else "ACTIVE"
             row.valid_until, row.observed_at = valid_until, observed
             row.revision += 1
             action = "AUTO_UPDATE"
@@ -333,39 +368,6 @@ async def apply_extraction(
         state = await state_for(db, owner)
         state.content_revision += 1
         state.last_updated_at = utcnow()
-        # Rolling summaries are derived only from accepted, active facts, not raw model prose.
-        rows = list(
-            await db.scalars(
-                select(PersonalMemoryItem).where(
-                    PersonalMemoryItem.owner_user_id == owner, PersonalMemoryItem.status == "ACTIVE"
-                )
-            )
-        )
-        for session_id in {s.session_id for s in sources}:
-            content = "\n".join(
-                r.statement
-                for r in rows
-                if (not r.valid_until or r.valid_until > utcnow())
-                and any(s["session_id"] == session_id for s in r.sources)
-            )[:2400]
-            await db.execute(
-                insert(ConversationMemorySummary)
-                .values(
-                    id=uuid.uuid4(),
-                    owner_user_id=owner,
-                    session_id=session_id,
-                    content=content,
-                    revision=1,
-                )
-                .on_conflict_do_update(
-                    index_elements=["owner_user_id", "session_id"],
-                    set_={
-                        "content": content,
-                        "revision": ConversationMemorySummary.revision + 1,
-                        "updated_at": utcnow(),
-                    },
-                )
-            )
     for summary in response.summaries:
         cited = [by_id.get(source_id) for source_id in summary.source_message_ids]
         if (
@@ -380,39 +382,41 @@ async def apply_extraction(
             or SENSITIVE.search(summary.summary)
         ):
             continue
-        # Summaries are non-authoritative context and share the same withdrawal epoch.
-        previous = await db.scalar(
-            select(ConversationMemorySummary).where(
-                ConversationMemorySummary.owner_user_id == owner,
-                ConversationMemorySummary.session_id == summary.session_id,
+        if protected or any(NON_PERSONAL.search(source.text) for source in cited):
+            continue
+        # A withdrawal cuts off old prose. Historical facts may still be processed,
+        # but unchecked old summaries cannot carry them back into a teacher request.
+        if state.history_after and any(
+            datetime.fromisoformat(source.observed_at) <= state.history_after for source in cited
+        ):
+            continue
+        source_ids = {source.id for source in cited}
+        linked = list(
+            await db.scalars(
+                select(PersonalMemoryItem).where(
+                    PersonalMemoryItem.owner_user_id == owner,
+                )
             )
         )
-        content = (
-            summary.summary
-            if previous is None
-            else (previous.content + "\n" + summary.summary)[-2400:]
+        linked = [
+            item for item in linked if any(ref["message_id"] in source_ids for ref in item.sources)
+        ]
+        if any(item.status != "ACTIVE" for item in linked):
+            continue
+        saved = await save_summary(
+            db,
+            owner,
+            summary.session_id,
+            {
+                "text": summary.summary,
+                "sources": [source_reference(source) for source in cited],
+                "items": {str(item.id): item.revision for item in linked},
+                "epoch": state.history_after.isoformat() if state.history_after else None,
+            },
         )
-        await db.execute(
-            insert(ConversationMemorySummary)
-            .values(
-                id=uuid.uuid4(),
-                owner_user_id=owner,
-                session_id=summary.session_id,
-                content=content,
-                revision=1,
-            )
-            .on_conflict_do_update(
-                index_elements=["owner_user_id", "session_id"],
-                set_={
-                    "content": content,
-                    "revision": ConversationMemorySummary.revision + 1,
-                    "updated_at": utcnow(),
-                },
-            )
-        )
-        state = await state_for(db, owner)
-        state.content_revision += 1
-        state.last_updated_at = utcnow()
+        if saved:
+            state.content_revision += 1
+            state.last_updated_at = utcnow()
     return changed
 
 
@@ -429,34 +433,66 @@ def terms(text: str) -> set[str]:
     return words
 
 
+def normalized(text: str) -> str:
+    return re.sub(r"[\W_]+", "", text.casefold())
+
+
+PROFILE_QUERY = re.compile(r"我的?(?:兴趣|偏好|目标|计划|记忆)|之前.*(?:告诉|说)|结合我|关于我")
+CATEGORY_QUERY = {
+    "PREFERENCE": re.compile(r"讲解|解释|例子|偏好|图解|提示"),
+    "INTEREST": re.compile(r"兴趣|爱好"),
+    "GOAL": re.compile(r"目标"),
+    "PLAN": re.compile(r"计划|安排"),
+}
+
+
 class KeywordMemoryRetriever:
     async def retrieve(self, db, owner, query, limit=6):
+        limit = min(max(int(limit), 0), 6)
         state = await state_for(db, owner, create=False)
-        if state and not state.use_enabled:
+        if not limit or (state and not state.use_enabled):
             return []
-        rows = list(
-            await db.scalars(
-                select(PersonalMemoryItem)
-                .where(
-                    PersonalMemoryItem.owner_user_id == owner, PersonalMemoryItem.status == "ACTIVE"
-                )
-                .order_by(PersonalMemoryItem.updated_at.desc())
-                .limit(500)
+        tokens = set(sorted(terms(query[:1000]))[:64])
+        profile_query = bool(PROFILE_QUERY.search(query))
+        matches = [
+            PersonalMemoryItem.statement.icontains(t, autoescape=True)
+            | PersonalMemoryItem.key.icontains(t, autoescape=True)
+            for t in sorted(tokens)
+        ]
+        categories = [c for c, pattern in CATEGORY_QUERY.items() if pattern.search(query)]
+        metadata = PersonalMemoryItem.category.in_(categories)
+        clauses = [
+            PersonalMemoryItem.owner_user_id == owner,
+            PersonalMemoryItem.status == "ACTIVE",
+            (PersonalMemoryItem.valid_until.is_(None))
+            | (PersonalMemoryItem.valid_until > utcnow()),
+        ]
+        # Filter in SQL before ranking, so recent unrelated rows cannot crowd out
+        # an older relevant row beyond a fixed preselection window.
+        if not profile_query:
+            if not matches and not categories:
+                return []
+            clauses.append(or_(*matches, metadata))
+        relevance = sum((case((match, 1), else_=0) for match in matches), literal(0))
+        rows = await db.scalars(
+            select(PersonalMemoryItem)
+            .where(*clauses)
+            .order_by(
+                relevance.desc(),
+                metadata.desc(),
+                PersonalMemoryItem.manual.desc(),
+                PersonalMemoryItem.observed_at.desc(),
+                PersonalMemoryItem.id.desc(),
             )
-        )
-        tokens = terms(query)
-        rows = [r for r in rows if not r.valid_until or r.valid_until > utcnow()]
-        rows.sort(
-            key=lambda r: (r.manual, len(tokens & terms(r.statement + r.key)), r.updated_at),
-            reverse=True,
+            .limit(limit)
         )
         return [
             {
                 "id": f"personal-memory:{r.id}:v{r.revision}",
                 "source": "USER_EDITED" if r.manual else "AUTO_SUMMARIZED",
-                "summary": r.statement,
+                "summary": r.statement[:400],
             }
-            for r in rows[:limit]
+            for r in rows
         ]
 
 
@@ -504,7 +540,17 @@ async def history_backfill(db: AsyncSession, owner: uuid.UUID, session_ids: list
         inserted = await db.scalars(
             insert(MemoryTask)
             .values(values)
-            .on_conflict_do_nothing(index_elements=["owner_user_id", "source_run_id"])
+            .on_conflict_do_update(
+                index_elements=["owner_user_id", "source_run_id"],
+                set_={
+                    "status": "QUEUED",
+                    "reason": "BACKFILL",
+                    "lease_token": None,
+                    "available_at": utcnow(),
+                    "updated_at": utcnow(),
+                },
+                where=MemoryTask.status == "CANCELLED",
+            )
             .returning(MemoryTask.id)
         )
         added += len(list(inserted))

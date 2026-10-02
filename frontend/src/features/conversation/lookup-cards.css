@@ -1,0 +1,11 @@
+.lookup-results { min-width: 0; margin-top: 16px; }
+.lookup-results ul { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
+.lookup-card { min-width: 0; padding: 16px; border: var(--sl-border, 1px solid #e2e2df); border-radius: 12px; background: var(--sl-surface, #fff); overflow-wrap: anywhere; }
+.lookup-card strong { display: block; margin: 8px 0; }
+.lookup-card p { margin: 8px 0; line-height: 1.6; white-space: pre-wrap; }
+.lookup-card-label, .lookup-card-note, .lookup-card small { color: var(--sl-text-muted, #5f6368); }
+.lookup-card small { display: block; margin-top: 12px; line-height: 1.5; }
+.lookup-card button { max-width: 100%; min-height: 44px; white-space: normal; overflow-wrap: anywhere; }
+.lookup-card summary { cursor: pointer; padding: 8px 0; }
+.lookup-card :is(button, summary):focus-visible { outline: 2px solid var(--sl-focus, #526846); outline-offset: 3px; }
+@media (max-width: 420px) { .lookup-card { padding: 12px; } }

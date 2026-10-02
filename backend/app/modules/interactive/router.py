@@ -125,6 +125,7 @@ class ActivityPatch(BaseModel):
     event_id: str = Field(min_length=8, max_length=100, pattern=r"^[A-Za-z0-9._:-]+$")
     scene_id: str | None = Field(default=None, max_length=100)
     game_state: dict[str, Any] | None = None
+    playback_step: int | None = Field(default=None, ge=0)
 
 
 class ActivityComplete(ActivityPatch):
@@ -682,6 +683,7 @@ async def activity_checkpoint(
             event_id=body.event_id,
             base_revision=body.base_revision,
             kind="CHECKPOINT",
+            playback_step=body.playback_step,
             game_state=body.game_state,
             scene_id=body.scene_id,
         )
@@ -722,6 +724,46 @@ async def activity_complete(
             scene_id=body.scene_id,
             game_result=body.game_result,
             source=body.source,
+        )
+    except InteractiveError as caught:
+        fail(caught)
+
+
+class ActivityViewed(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    base_revision: int = Field(ge=0)
+    event_id: str = Field(min_length=8, max_length=100, pattern=r"^[A-Za-z0-9._:-]+$")
+
+
+@router.post(
+    "/interactive/sessions/{session_id}/viewed",
+    response_model=InteractiveSessionDTO,
+    dependencies=[Depends(csrf_dependency)],
+)
+async def activity_viewed(
+    session_id: uuid.UUID,
+    body: ActivityViewed,
+    request: Request,
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> dict[str, Any]:
+    viewer = await viewer_for(request, db, context.user.id)
+    try:
+        session, _resource, revision = await owned_session(
+            db,
+            session_id=session_id,
+            owner_id=context.user.id,
+            viewer=viewer,
+            settings=request.app.state.settings,
+        )
+        return await save_event(
+            db,
+            session=session,
+            revision=revision,
+            owner_id=context.user.id,
+            event_id=body.event_id,
+            base_revision=body.base_revision,
+            kind="VIEWED",
         )
     except InteractiveError as caught:
         fail(caught)

@@ -3,7 +3,8 @@
 Every endpoint resolves the viewer from the server-side session (T05) and
 applies the same visibility rules as the service layer, so a client can never
 read an unpublished, withdrawn, wrong-stage or fixture revision by guessing an
-id. Responses never contain answers, hidden tests or internal file paths.
+id. Only the single textbook-answer endpoint returns fixed reference answers;
+ordinary content responses never contain answers or hidden tests.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from app.modules.content.schemas import (
     ReadingEventReceipt,
     ReadingEventRequest,
     ReadingStateDTO,
+    SelfTestAnswerDTO,
     ViewerScope,
 )
 from app.modules.content.service import (
@@ -37,6 +39,7 @@ from app.modules.content.service import (
     visible_chapter_detail,
     visible_course,
     visible_courses,
+    visible_self_test_answer,
 )
 from app.modules.identity.dependencies import (
     SessionContext,
@@ -97,6 +100,30 @@ async def get_chapter(
     if chapter is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=CHAPTER_UNAVAILABLE)
     return chapter
+
+
+@router.get(
+    "/chapters/{chapter_id}/self-test-answers/{question_id}", response_model=SelfTestAnswerDTO
+)
+async def get_self_test_answer(
+    chapter_id: uuid.UUID,
+    question_id: str,
+    request: Request,
+    revision_id: uuid.UUID = Query(...),
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+) -> SelfTestAnswerDTO:
+    viewer = await _viewer(request, context, db)
+    answer = await visible_self_test_answer(
+        db,
+        chapter_id=chapter_id,
+        revision_id=revision_id,
+        question_id=question_id,
+        viewer=viewer,
+    )
+    if answer is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="参考答案暂不可用")
+    return answer
 
 
 @router.get("/chapters/{chapter_id}/reading-state", response_model=ReadingStateDTO | None)

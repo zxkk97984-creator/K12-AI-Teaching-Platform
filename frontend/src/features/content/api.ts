@@ -8,6 +8,8 @@ import type {
   ReadingEventReceipt,
   ReadingEventRequest,
   ReadingStateDTO,
+  SelfTestAnswerDTO,
+  SelfTestQuestionDTO,
 } from "./types";
 
 const API_BASE = "/api/v1";
@@ -79,6 +81,15 @@ export async function getReadingState(
   const suffix = revision ? `?revision=${revision}` : "";
   return request<ReadingStateDTO | null>(
     `${API_BASE}/chapters/${encodeURIComponent(chapterId)}/reading-state${suffix}`,
+  );
+}
+
+export async function getSelfTestAnswer(
+  chapterId: string, revisionId: string, questionId: SelfTestQuestionDTO["question_id"], signal?: AbortSignal,
+): Promise<SelfTestAnswerDTO> {
+  return request<SelfTestAnswerDTO>(
+    `${API_BASE}/chapters/${encodeURIComponent(chapterId)}/self-test-answers/${questionId}?revision_id=${encodeURIComponent(revisionId)}`,
+    { signal },
   );
 }
 

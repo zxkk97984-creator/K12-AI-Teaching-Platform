@@ -8,10 +8,12 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    StrictBool,
     StringConstraints,
     field_validator,
     model_validator,
 )
+from pydantic.json_schema import SkipJsonSchema
 
 from app.modules.identity.models import (
     PreferredStyle,
@@ -60,6 +62,7 @@ class PreferencesDTO(StrictModel):
     interests: list[ShortText]
     proactive_guidance_enabled: bool
     voice_preference: VoicePreference
+    auto_read_replies: bool = False
     profile_revision: int
 
 
@@ -118,6 +121,10 @@ class PreferencesPatch(VersionedPatch):
     interests: list[ShortText] | None = Field(default=None, max_length=10)
     proactive_guidance_enabled: bool | None = None
     voice_preference: VoicePreference | None = None
+    # Omission is internal; explicit null is rejected by require_change.
+    auto_read_replies: StrictBool | SkipJsonSchema[None] = Field(
+        default=None, json_schema_extra=lambda schema: schema.pop("default", None)
+    )
 
     @model_validator(mode="after")
     def require_change(self) -> PreferencesPatch:
@@ -128,6 +135,7 @@ class PreferencesPatch(VersionedPatch):
             "interests",
             "proactive_guidance_enabled",
             "voice_preference",
+            "auto_read_replies",
         }
         if not (fields & self.model_fields_set):
             raise ValueError("at least one preference field is required")

@@ -63,7 +63,8 @@ def validate_assistant_output(
 ) -> list[str]:
     problems: list[str] = []
 
-    if default_registry().validate_response(operation, payload):
+    # This function validates the final teaching content, never a query plan.
+    if default_registry().validate_response(Operation.CODE_FEEDBACK, payload):
         return ["RESPONSE_SCHEMA_MISMATCH"]
 
     message = str(payload.get("message_markdown", ""))

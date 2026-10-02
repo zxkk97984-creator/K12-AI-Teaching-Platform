@@ -5,6 +5,7 @@ import { isUnsupportedBlock } from "./types";
 import "./content.css";
 
 const ChapterMarkdown = lazy(() => import("./ChapterMarkdown").then((module) => ({ default: module.ChapterMarkdown })));
+const SelfTestMarkdown = lazy(() => import("./SelfTestMarkdown").then((module) => ({ default: module.SelfTestMarkdown })));
 
 function MarkedText({ text, mark }: { text: string; mark?: string | null }) {
   if (!mark || !text.includes(mark)) return <>{text}</>;
@@ -55,9 +56,15 @@ function FigureBlock({ block }: { block: RenderedBlock }) {
   );
 }
 
-function BlockBody({ block }: { block: RenderedBlock }) {
+function BlockBody({ block, chapter, accountId }: { block: RenderedBlock; chapter: ChapterDetailDTO; accountId?: string }) {
   switch (block.type) {
     case "MARKDOWN":
+      if (chapter.self_test_questions?.some((question) => question.end_block_id === block.block_id)) {
+        return <Suspense fallback={<p role="status">正在排版讲义…</p>}><SelfTestMarkdown
+          text={block.text ?? ""} questions={chapter.self_test_questions.filter((question) => question.end_block_id === block.block_id)}
+          chapterId={chapter.chapter_id} revisionId={chapter.revision_id} accountId={accountId}
+        /></Suspense>;
+      }
       return <Suspense fallback={<p role="status">正在排版讲义…</p>}><ChapterMarkdown text={block.text ?? ""} /></Suspense>;
     case "TITLE":
       return <h2 className="content-block__title">{block.text}</h2>;
@@ -125,12 +132,16 @@ export function ChapterReader({
   onReadPosition,
   onSelect,
   locationHash,
+  accountId,
+  onAnswerSelect,
 }: {
   chapter: ChapterDetailDTO;
   resume?: ReadingStateDTO | null;
   onReadPosition?: (blockId: string | null) => void;
   onSelect?: (blockId: string | null, selectedText: string) => void;
   locationHash?: string;
+  accountId?: string;
+  onAnswerSelect?: (blockId: string | null, selectedText: string) => void;
 }) {
   const readerRef = useRef<HTMLElement | null>(null);
   const restoringRef = useRef(false);
@@ -173,7 +184,7 @@ export function ChapterReader({
     return () => observer.disconnect();
   }, [chapter.revision_id, onReadPosition]);
   function handleSelection() {
-    if (!onSelect) return;
+    if (!onSelect && !onAnswerSelect) return;
     const selection = window.getSelection();
     const text = selection?.toString() ?? "";
     if (!text.trim()) return;
@@ -181,7 +192,11 @@ export function ChapterReader({
     const element =
       anchor instanceof Element ? anchor : (anchor?.parentElement ?? null);
     const host = element?.closest("[data-block-id]") ?? null;
-    onSelect(host?.getAttribute("data-block-id") ?? null, text);
+    if (element?.closest(".self-test-answer__panel")) {
+      onAnswerSelect?.(host?.getAttribute("data-block-id") ?? null, text);
+      return;
+    }
+    onSelect?.(host?.getAttribute("data-block-id") ?? null, text);
   }
 
   const sourceCommit = chapter.source.source_commit;
@@ -226,7 +241,7 @@ export function ChapterReader({
             {block.type === "TITLE" && block.text === chapter.title ? null : isUnsupportedBlock(block) ? (
               <UnsupportedBlock block={block} />
             ) : (
-              <BlockBody block={block} />
+              <BlockBody block={block} chapter={chapter} accountId={accountId} />
             )}
           </div>
         ))}

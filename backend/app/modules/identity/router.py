@@ -116,6 +116,7 @@ def _me_from_profile(user, profile) -> MeResponse:
             interests=profile.interests,
             proactive_guidance_enabled=profile.proactive_guidance_enabled,
             voice_preference=profile.voice_preference,
+            auto_read_replies=profile.auto_read_replies,
             profile_revision=profile.revision,
         )
     return MeResponse(

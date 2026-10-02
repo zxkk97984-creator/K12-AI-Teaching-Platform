@@ -39,6 +39,7 @@ CONTRACTS_DIR = PROJECT_ROOT / "contracts"
 CONTRACT_SCHEMA_FILES = {
     "teaching-request": "teaching-request.schema.json",
     "teaching-response": "teaching-response.schema.json",
+    "teaching-turn-response": "teaching-turn-response.schema.json",
     "designer-request": "designer-request.schema.json",
     "quiz-draft": "quiz-draft.schema.json",
     "lesson-package-draft": "lesson-package-draft.schema.json",

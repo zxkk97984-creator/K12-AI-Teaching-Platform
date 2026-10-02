@@ -21,7 +21,7 @@
         "PRIMARY_UPPER"
       ],
       "response_mode": "STREAMING_STRUCTURED",
-      "packaged_config_hash": "dc295330c33d503bd23e944102bcfd39103f4baa2d72ee4f8606e90b515f2372",
+      "packaged_config_hash": "bfdfffbb13c635969a2df49fb48b9f1ddc38b586485acb207dd780eb5ae3023b",
       "packaged_knowledge_bundle_hash": "6f207e73c4ccacf60ee664f6252f977f6c4fef9f14d9a15f435494b604526d0d",
       "deployed_config_hash": null,
       "deployment_verified": false
@@ -41,7 +41,7 @@
         "JUNIOR"
       ],
       "response_mode": "STREAMING_STRUCTURED",
-      "packaged_config_hash": "dc295330c33d503bd23e944102bcfd39103f4baa2d72ee4f8606e90b515f2372",
+      "packaged_config_hash": "bfdfffbb13c635969a2df49fb48b9f1ddc38b586485acb207dd780eb5ae3023b",
       "packaged_knowledge_bundle_hash": "6f207e73c4ccacf60ee664f6252f977f6c4fef9f14d9a15f435494b604526d0d",
       "deployed_config_hash": null,
       "deployment_verified": false
@@ -61,7 +61,7 @@
         "SENIOR"
       ],
       "response_mode": "STREAMING_STRUCTURED",
-      "packaged_config_hash": "dc295330c33d503bd23e944102bcfd39103f4baa2d72ee4f8606e90b515f2372",
+      "packaged_config_hash": "bfdfffbb13c635969a2df49fb48b9f1ddc38b586485acb207dd780eb5ae3023b",
       "packaged_knowledge_bundle_hash": "6f207e73c4ccacf60ee664f6252f977f6c4fef9f14d9a15f435494b604526d0d",
       "deployed_config_hash": null,
       "deployment_verified": false

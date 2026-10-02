@@ -29,6 +29,10 @@ export function ChapterReaderPage() {
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const { state, resume, context, contextError, selectText, recordPosition } = useReader(chapterId, revision);
   const account = useAccount();
+  const answerScope = `${account?.user.id}:${chapterId}:${state.kind === "ready" ? state.chapter.revision_id : ""}`;
+  const [answerSelection, setAnswerSelection] = useState<{ scope: string; blockId: string | null; text: string } | null>(null);
+  const selectedAnswer = answerSelection?.scope === answerScope ? answerSelection : null;
+  useEffect(() => { setAnswerSelection(null); }, [answerScope]);
   const documentRef = useRef<HTMLDivElement>(null);
   const [narrationOpen, setNarrationOpen] = useState(false);
   const narrator = useChapterNarration(`${chapterId}:${state.kind === "ready" ? state.chapter.revision_id : ""}`, account?.user.id);
@@ -70,16 +74,19 @@ export function ChapterReaderPage() {
   });
   const readChapter = () => {
     setNarrationOpen(true);
-    if (documentRef.current?.querySelector('[role="status"]')) {
+    if (Array.from(documentRef.current?.querySelectorAll('[role="status"]') ?? [])
+      .some((node) => !node.closest('[data-narration-exclude="true"]'))) {
       narrator.start([]);
       return;
     }
     narrator.start(documentRef.current ? chapterNarrationSegments(documentRef.current) : []);
   };
   const readSelection = () => {
-    if (!context?.selectedText || !documentRef.current) return;
+    const text = selectedAnswer?.text ?? context?.selectedText;
+    const blockId = selectedAnswer ? selectedAnswer.blockId : context?.blockId ?? null;
+    if (!text || !documentRef.current) return;
     setNarrationOpen(true);
-    narrator.start(selectionNarrationSegments(documentRef.current, context.selectedText, context.blockId), "selection");
+    narrator.start(selectionNarrationSegments(documentRef.current, text, blockId), "selection");
   };
 
   return <ContentLayout title={chapter.course_title} variant="reading" className={focused ? "reader-focus" : ""}
@@ -110,9 +117,11 @@ export function ChapterReaderPage() {
     {resume && !resume.is_current_revision ? <p className="content-note" data-testid="resume-note">章节已更新为 r{chapter.revision}，从当前版本开始阅读。</p> : null}
     {narrationOpen ? <ReaderNarrationPanel narrator={narrator} onReadChapter={readChapter} /> : null}
     <div ref={documentRef} className="reader-document" style={{ fontSize }}>
-      <ChapterReader chapter={chapter} resume={resume} locationHash={window.location.hash} onReadPosition={recordPosition} onSelect={selectText} />
+      <ChapterReader chapter={chapter} accountId={account?.user.id} resume={resume} locationHash={window.location.hash} onReadPosition={recordPosition}
+        onSelect={(blockId, text) => { setAnswerSelection(null); void selectText(blockId, text); }}
+        onAnswerSelect={(blockId, text) => setAnswerSelection({ scope: answerScope, blockId, text: text.trim().slice(0, 4000) })} />
     </div>
-    {context ? <div className="reader-selection-bar" data-testid="reader-aside" aria-live="polite"><span>已选中 {context.selectedChars} 字，可以朗读或向老师提问。</span><div className="reader-selection-actions"><button type="button" onClick={readSelection}>朗读这段</button><button type="button" onClick={askTeacher}>解释这段内容</button></div></div> : null}
+    {selectedAnswer ? <div className="reader-selection-bar" aria-live="polite"><span>已选中参考答案文字，可以手动朗读。</span><button type="button" onClick={readSelection}>朗读这段</button></div> : context ? <div className="reader-selection-bar" data-testid="reader-aside" aria-live="polite"><span>已选中 {context.selectedChars} 字，可以朗读或向老师提问。</span><div className="reader-selection-actions"><button type="button" onClick={readSelection}>朗读这段</button><button type="button" onClick={askTeacher}>解释这段内容</button></div></div> : null}
     {contextError ? <p className="form-error" role="alert">{contextError}</p> : null}
     <div className="reader-learning-links"><InteractiveLearningLinks revisionIds={[chapter.revision_id]} /></div>
     <div className="reader-study-actions" data-testid="practice-slot"><div><h2>学完这一章</h2><p>进入课堂，继续讲解、检查理解和练习。</p></div><a href={`/study/lesson?chapter=${chapterId}`}>进入本章课堂 →</a></div>

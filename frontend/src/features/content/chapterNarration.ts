@@ -66,7 +66,7 @@ export function chapterNarrationSegments(root: HTMLElement): ReadingSegment[] {
     const visit = (node: Node) => {
       if (node instanceof Text) { parts.push({ text: node.data, node }); return; }
       if (!(node instanceof Element)) return;
-      if (node.matches(".content-block__unsupported, .content-figure__pending")) return;
+      if (node.matches('.content-block__unsupported, .content-figure__pending, [data-narration-exclude="true"]')) return;
       if (node.matches("pre")) {
         flush();
         result.push({ text: "代码示例，请对照正文查看。", blockId });

@@ -15,7 +15,7 @@ from app.modules.identity.models import User
 from app.modules.interactive.learning_bundle import restore_known_files
 from app.modules.interactive.models import InteractiveRevision
 from app.modules.interactive.package import Manifest, build_document, read_package
-from app.modules.interactive.service import activate_version, upload_revision
+from app.modules.interactive.service import _data_hash, activate_version, upload_revision
 from app.modules.resources.models import Resource
 from app.modules.resources.schemas import ResourceCreateRequest
 from app.modules.resources.service import create_resource
@@ -70,11 +70,14 @@ async def import_autoplay_examples(
     packages = load_examples(root)
     previous = (
         {
-            manifest.content_key: hashlib.sha256(raw).hexdigest()
+            manifest.content_key: {
+                "package_sha256": hashlib.sha256(raw).hexdigest(),
+                "manifest_sha256": _data_hash(manifest.model_dump(mode="json")),
+            }
             for _, raw, manifest in load_examples(upgrade_from)
         }
         if upgrade_from
-        else {}
+        else json.loads(Path(__file__).with_name("autoplay_previous.json").read_text())
     )
     resources = {}
     for _, _, manifest in packages:
@@ -129,18 +132,21 @@ async def import_autoplay_examples(
             if resource.active_interactive_revision_id
             else None
         )
+        known_prior = previous.get(manifest.content_key, {})
+        safe_upgrade = bool(
+            active
+            and known_prior.get("package_sha256") == active.package_sha256
+            and known_prior.get("manifest_sha256") == _data_hash(active.manifest)
+        )
         if active:
             if active.package_sha256 == digest:
                 result["files_restored"] += await restore_known_files(
                     db, revision=active, raw=raw, settings=settings
                 )
                 result["versions_reused"] += 1
-            elif previous.get(manifest.content_key) != active.package_sha256:
+            elif not safe_upgrade:
                 result["versions_skipped"] += 1
-            if (
-                active.package_sha256 == digest
-                or previous.get(manifest.content_key) != active.package_sha256
-            ):
+            if active.package_sha256 == digest or not safe_upgrade:
                 continue
         existing = await db.scalar(
             select(InteractiveRevision).where(

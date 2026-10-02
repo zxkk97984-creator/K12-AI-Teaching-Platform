@@ -385,3 +385,11 @@
 .chapter-markdown th, .chapter-markdown td { border: 1px solid #dce4df; padding: .6em .8em; text-align: left; min-width: 90px; }
 .chapter-markdown th { background: #eef4ef; }
 .chapter-markdown .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: .25em 0; }
+
+.self-test-answer { margin: .7em 0 1.4em; }
+.self-test-answer__toggle { color: var(--sl-primary-ink); background: transparent; border: 1px solid currentColor; border-radius: .55em; padding: .45em .8em; font: inherit; cursor: pointer; }
+.self-test-answer__toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.self-test-answer__toggle:disabled { opacity: .65; cursor: default; }
+.self-test-answer__panel { margin-top: .75em; padding: 1em; border-left: 3px solid var(--sl-primary-ink); background: var(--sl-surface); border-radius: .3em; min-width: 0; overflow-wrap: anywhere; }
+.self-test-answer__panel pre { max-width: 100%; overflow-x: auto; }
+.self-test-answer__correct, .self-test-answer__label { font-weight: 600; margin: .5em 0; }

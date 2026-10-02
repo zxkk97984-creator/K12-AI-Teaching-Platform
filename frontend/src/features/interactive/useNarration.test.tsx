@@ -208,3 +208,69 @@ describe("platform narration", () => {
     expect(result.current.status).toBe('idle');
   });
 });
+
+it("lets manual speech take ownership without old hook cleanup cancelling the new owner", async () => {
+  const synthesis = installSpeech([{ lang: "zh-CN" }]);
+  const first = renderHook(() => useNarration(() => "/audio"));
+  const second = renderHook(() => useNarration(() => "/audio"));
+  await act(async () => first.result.current.play(prompt));
+  const previous = synthesis.speak.mock.calls[0][0];
+  await act(async () => second.result.current.play({ ...prompt, id: "second" }));
+  expect(first.result.current.status).toBe("idle");
+  expect(second.result.current.status).toBe("speaking");
+  const cancels = synthesis.cancel.mock.calls.length;
+  first.unmount();
+  expect(synthesis.cancel.mock.calls.length).toBe(cancels);
+  act(() => { previous.onend?.(); previous.onstart?.(); });
+  expect(second.result.current.status).toBe("speaking");
+});
+
+it("automatic replies yield to audio, speech and paused narration without retry", async () => {
+  const synthesis = installSpeech([{ lang: "zh-CN" }]);
+  const reader = renderHook(() => useNarration(() => "/audio"));
+  const reply = renderHook(() => useNarration(() => "/audio"));
+  await act(async () => reader.result.current.play(prompt));
+  await act(async () => expect(await reply.result.current.play(prompt, { automatic: true })).toBe(false));
+  expect(synthesis.speak).toHaveBeenCalledOnce();
+  expect(reply.result.current.notice).toContain("未自动朗读");
+  act(() => reader.result.current.pause());
+  await act(async () => expect(await reply.result.current.play(prompt, { automatic: true })).toBe(false));
+  act(() => reader.result.current.stop());
+  await act(async () => expect(await reply.result.current.play(prompt, { automatic: true })).toBe(true));
+});
+
+it("terminal speech events ignore later start, error and duplicate end callbacks", async () => {
+  const synthesis = installSpeech([{ lang: "zh-CN" }]);
+  const { result } = renderHook(() => useNarration(() => ""));
+  await act(async () => result.current.play(prompt));
+  const speech = synthesis.speak.mock.calls[0][0];
+  act(() => speech.onend?.());
+  expect(result.current.status).toBe("ended");
+  act(() => { speech.onstart?.(); (speech as { onerror?: () => void }).onerror?.(); });
+  expect(result.current.status).toBe("ended");
+});
+
+it("timeout cancellation cannot masquerade as normal ended", async () => {
+  vi.useFakeTimers();
+  const synthesis = installSpeech([{ lang: "zh-CN" }]);
+  synthesis.speak.mockImplementation(() => {});
+  const { result } = renderHook(() => useNarration(() => ""));
+  let request: Promise<boolean>;
+  act(() => { request = result.current.play(prompt); });
+  const speech = synthesis.speak.mock.calls[0][0];
+  synthesis.cancel.mockImplementation(() => speech.onend?.());
+  await act(async () => { vi.advanceTimersByTime(5000); expect(await request!).toBe(false); });
+  expect(result.current.status).toBe("error");
+});
+
+it("account storage changes clear current playback and prevent replaying the previous account's prompt", async () => {
+  const synthesis = installSpeech([{ lang: "zh-CN" }]);
+  const hook = renderHook(({ key }) => useNarration(() => "", key), {initialProps: {key: "account-a"}});
+  await act(async () => hook.result.current.play(prompt));
+  const previous = synthesis.speak.mock.calls[0][0];
+  hook.rerender({key:"account-b"});
+  expect(hook.result.current.status).toBe("idle");
+  act(() => previous.onend?.());
+  await act(async () => expect(await hook.result.current.replay()).toBe(false));
+  expect(hook.result.current.prompt_id).toBeNull();
+});

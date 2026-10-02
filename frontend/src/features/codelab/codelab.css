@@ -350,6 +350,9 @@ body .app-shell[data-code-surface="workspace"] .codelab-workspace { display: fle
 .codelab-workspace .codelab-difficulty { flex: none; font-size: 12px; white-space: nowrap; }
 .codelab-workspace .codelab-header-actions { align-items: center; gap: 6px; }
 .codelab-workspace .codelab-header-actions button { min-height: 34px; margin: 0; padding: 5px 9px; font-size: 13px; }
+.codelab-workspace .codelab-focus-toggle { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.codelab-workspace .codelab-focus-toggle[aria-pressed="true"] { background: var(--sl-primary-soft); border-color: var(--sl-primary-ink, #725300); }
+.codelab-focus-toggle kbd { font: inherit; font-size: 11px; color: var(--sl-text-muted); }
 .codelab-runner-badge { color: #8c1d1d; font-size: 12px; white-space: nowrap; }
 .codelab-runner-badge.is-ready { color: #17633b; }
 .codelab-runner-badge::before { content: "●"; margin-right: 5px; }
@@ -473,3 +476,13 @@ body .app-shell[data-code-surface="workspace"] .codelab-workspace { display: fle
   .codelab-workspace .codelab-workspace-right { grid-template-rows: minmax(0, 1fr) 8px minmax(96px, 25%); }
   .codelab-workspace .codelab-workspace-right.is-result-collapsed { grid-template-rows: minmax(0, 1fr) auto; }
 }
+
+/* Local workspace state also hides the teacher panel rendered into document.body. */
+body:has(.codelab-workspace[data-focus-mode="true"]) :is(.app-sidebar, .app-topbar, .k12-mobile-nav, .k12-mobile-settings, .app-mobile-toggle, .app-sidebar-backdrop, .codelab-pet-slot, .companion-dock, .companion-panel) {
+  display: none !important;
+}
+body .app-shell[data-code-surface="workspace"]:has(.codelab-workspace[data-focus-mode="true"]) { padding-bottom: 0; }
+body .app-shell[data-code-surface="workspace"]:has(.codelab-workspace[data-focus-mode="true"]) .app-content {
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+.codelab-workspace[data-focus-mode="true"] .codelab-header-actions > button:not(.codelab-focus-toggle) { display: none; }

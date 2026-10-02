@@ -17,8 +17,9 @@ from app.core.database import get_engine
 from app.core.test_database import validate_test_database_url
 from app.modules.content.importer import import_package
 from app.modules.content.package import load_package
-from app.modules.identity.models import PreferredStyle, UserRole
-from app.modules.identity.service import ensure_demo_user
+from app.modules.identity.models import LearnerProfile, PreferredStyle, UserRole, VoicePreference
+from app.modules.identity.schemas import PreferencesPatch
+from app.modules.identity.service import ensure_demo_user, update_preferences
 from app.modules.interactive.example_bundle import import_autoplay_examples
 from app.modules.interactive.learning_bundle import import_learning_activities
 from app.modules.interactive.models import InteractiveRevision
@@ -53,7 +54,7 @@ async def main():
                 ("JUNIOR", 8),
                 ("SENIOR", 11),
             ]:
-                await ensure_demo_user(
+                student, created = await ensure_demo_user(
                     db,
                     username="html." + stage.lower(),
                     password=PASSWORD,
@@ -64,6 +65,18 @@ async def main():
                     interests=[],
                     settings=settings,
                 )
+                if created:
+                    # These synthetic accounts exercise speech/media. Normal
+                    # accounts keep their default and existing preferences.
+                    profile = await db.get(LearnerProfile, student.id)
+                    await update_preferences(
+                        db,
+                        student.id,
+                        PreferencesPatch(
+                            base_revision=profile.revision,
+                            voice_preference=VoicePreference.INPUT_AND_OUTPUT,
+                        ),
+                    )
             if os.environ.get("K12_AUTOPLAY_EXAMPLES_E2E") == "1":
                 previous_examples = os.environ.get("K12_AUTOPLAY_EXAMPLES_UPGRADE_FROM")
                 print(

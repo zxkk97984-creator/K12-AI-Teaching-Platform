@@ -139,4 +139,33 @@ class DesignerTests(unittest.TestCase):
         q.update(type="ORDERING",items=[{"key":"a","text":"1"},{"key":"b","text":"2"},{"key":"c","text":"3"}],correct_order=["a","b"])
         with self.assertRaises(Exception): validate_designer(self.req,self.resp)
 
+class LookupRoundTests(unittest.TestCase):
+    def plan(self):
+        return {"schema_version": "k12.teaching.turn.v1", "kind": "lookup_request",
+                "request_id": "synthetic", "lesson_session_id": "synthetic",
+                "base_revision": 0,
+                "queries": [{"tool": "COURSE_SEARCH", "parameters": {"limit": 5}}]}
+
+    def test_legacy_and_final_envelope(self):
+        response = load("teaching-response")
+        schema_validate("teaching-turn-response", response)
+        schema_validate("teaching-turn-response", {
+            "schema_version": "k12.teaching.turn.v1", "kind": "final", "response": response})
+
+    def test_query_and_forbidden_identity(self):
+        plan = self.plan()
+        schema_validate("teaching-turn-response", plan)
+        plan["queries"][0]["parameters"]["owner_user_id"] = "another-student"
+        with self.assertRaises(Exception):
+            schema_validate("teaching-turn-response", plan)
+
+    def test_query_limits_and_no_reply_fields(self):
+        for change in ("limit", "tool", "message"):
+            plan = self.plan()
+            if change == "limit": plan["queries"][0]["parameters"]["limit"] = 11
+            elif change == "tool": plan["queries"][0]["tool"] = "DELETE_GRADES"
+            else: plan["message_markdown"] = "Already queried"
+            with self.subTest(change=change), self.assertRaises(Exception):
+                schema_validate("teaching-turn-response", plan)
+
 if __name__ == "__main__": unittest.main()

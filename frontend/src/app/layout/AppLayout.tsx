@@ -47,7 +47,6 @@ const ADMIN_NAV: NavigationItem[] = [
   { path: "/admin/ai", label: "AI 教师与能力", mobileLabel: "教师", icon: "chat" },
   { path: "/admin/resources", label: "资源管理", mobileLabel: "资源", icon: "resource", end: true },
   { path: "/admin/resources/interactive", label: "互动内容", mobileLabel: "互动", icon: "interactive" },
-  { path: "/admin/authoring", label: "课程编排", mobileLabel: "课程", icon: "practice" },
 ];
 
 function studentSection(pathname: string, search = ""): string | null {

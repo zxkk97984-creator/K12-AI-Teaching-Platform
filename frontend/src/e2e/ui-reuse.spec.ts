@@ -1,9 +1,82 @@
 import { expect, test, type Page } from "@playwright/test";
-import { fixture, session } from "./ui-reuse-fixtures";
+import { courses, fixture, session } from "./ui-reuse-fixtures";
 import { mkdir } from "node:fs/promises";
 
 async function fits(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+}
+
+test("home course previews stay compact with long introductions", async ({ page }) => {
+  await fixture(page, { stage: "JUNIOR" });
+  const longDescription = "本书面向初中七至九年级，用可运行的短程序系统讲解 Python 编程与问题解决方法。".repeat(12);
+  await page.route("**/api/v1/learning/catalog**", (route) => route.fulfill({ json: {
+    items: courses.map((course, index) => ({ kind: "COURSE", id: course.course_id, title: course.title, description: index < 2 ? longDescription : course.description, route: `/courses/${course.course_id}`, stage: "JUNIOR", available: true })),
+    total: 3, limit: 12, offset: 0,
+  } }));
+  for (const width of [1440, 768, 320]) {
+    await page.setViewportSize({ width, height: 820 });
+    await page.goto("/workbench");
+    const cards = page.locator(".od-home-resources article");
+    await expect(cards).toHaveCount(3);
+    const preview = cards.nth(1).locator("p");
+    const previewSize = await preview.evaluate((element) => ({
+      clipped: element.scrollHeight > element.clientHeight,
+      lines: element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight),
+    }));
+    expect(previewSize.clipped).toBe(true);
+    expect(previewSize.lines).toBeCloseTo(3, 2);
+    for (const card of await cards.all()) {
+      expect((await card.boundingBox())!.height).toBeLessThan(260);
+      await expect(card.getByRole("link", { name: "打开内容 →" })).toBeVisible();
+    }
+    const pathPreview = page.locator(".od-stage-path-grid article").first().locator("p");
+    expect(await pathPreview.evaluate((element) => element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight))).toBeLessThanOrEqual(3.01);
+    await fits(page);
+    if (width === 1440) await page.locator(".od-home-resources").screenshot({ path: "test-results/home-compact-preview-desktop.png" });
+  }
+  await page.locator(".od-home-resources article").nth(1).getByRole("link", { name: "打开内容 →" }).click();
+  await expect(page).toHaveURL(/\/courses\/course-2$/);
+});
+
+for (const viewport of [{ width: 1542, height: 718 }, { width: 320, height: 820 }]) {
+  test(`compact composer removes idle hints and preserves keyboard sending at ${viewport.width}px`, async ({ page }) => {
+    const state = await fixture(page);
+    state.account.preferences.voice_preference = "DISABLED";
+    await page.setViewportSize(viewport);
+    await page.goto(`/conversations?session=${session.id}`);
+    await expect(page.locator(".conversation-content--full textarea")).toBeVisible();
+    await page.getByRole("button", { name: "打开霜铃学习助手" }).click();
+    const panel = page.locator("#companion-panel");
+    const composer = panel.locator(".conv-composer");
+    const input = panel.getByLabel("想对老师说什么");
+    await expect(input).toBeVisible();
+    const bounds = (await panel.boundingBox())!;
+    expect(bounds.width).toBeLessThanOrEqual(380);
+    expect(bounds.height).toBeLessThanOrEqual(440);
+    expect((await composer.boundingBox())!.height).toBeLessThanOrEqual(76);
+    await expect(composer.locator(".conv-composer-context, .conv-composer-heading, .conv-composer-hint")).toHaveCount(0);
+    await expect(composer.getByTestId("voice-input")).toBeVisible();
+    await expect(composer.getByTestId("voice-input")).toBeDisabled();
+    await expect(composer.getByTestId("voice-input")).toHaveAttribute("title", /语音输入已关闭|不支持语音输入/);
+    await expect(composer.locator(".conv-voice-feedback")).toBeEmpty();
+    await expect(input).toHaveAttribute("title", /当前参考：让机器学会分类/);
+    await expect(panel.getByTestId("send-turn")).toBeDisabled();
+    const longDraft = "想问一个关于代码的问题。\n".repeat(20);
+    await input.fill(longDraft);
+    expect((await composer.boundingBox())!.height).toBeLessThanOrEqual(116);
+    expect(await input.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+    await input.fill("请讲一个例子");
+    await input.press("End");
+    await input.press("Shift+Enter");
+    await expect(input).toHaveValue("请讲一个例子\n");
+    expect(state.turns).toBe(0);
+    await mkdir("test-results/compact-composer", { recursive: true });
+    await panel.screenshot({ path: `test-results/compact-composer/composer-${viewport.width}.png` });
+    await input.press("Enter");
+    await expect.poll(() => state.turns).toBe(1);
+    await expect(panel.getByTestId("send-turn")).toBeDisabled();
+    await fits(page);
+  });
 }
 
 test("companion history stays a simple list and practice settings open in a separate dialog", async ({ page }) => {
@@ -187,7 +260,7 @@ test("companion formats Markdown and supports pinning, moving and resizing withi
     expect(tools.x + tools.width).toBeLessThanOrEqual(bounds.x + bounds.width);
     await expect(panel.getByRole("button", { name: "取消置顶" })).toBeVisible();
     await expect(panel.getByTestId("send-turn")).toBeVisible();
-    if (width <= 390) await expect(panel.getByLabel("想对老师说什么")).toHaveCSS("min-height", "68px");
+    if (width <= 390) await expect(panel.getByLabel("想对老师说什么")).toHaveCSS("min-height", "44px");
     await fits(page);
     await page.screenshot({ path: `test-results/companion-pinned-${width}.png`, animations: "disabled" });
   }
@@ -506,7 +579,7 @@ test("selected pet persists on account and appears beside teacher replies", asyn
   await expect(page.locator(".conv-main .conv-pet-head").first()).toHaveAttribute("aria-label", "阿尼亚头像");
   await page.reload();
   await expect(page.locator(".conv-main .conv-pet-head").first()).toHaveAttribute("aria-label", "阿尼亚头像");
-  await page.getByRole("button", { name: "最小化桌宠" }).click();
+  await expect(page.getByTestId("companion-dock")).toHaveAttribute("data-minimized", "true");
   const portrait = page.locator('.companion-dock[data-minimized="true"] .conv-pet-head');
   await expect(portrait).toBeVisible();
   await expect(portrait).toHaveAttribute("aria-label", "阿尼亚头像");
@@ -532,10 +605,10 @@ test("settings exposes all six companions and the saved pet follows the student"
   await expect.poll(() => state.account.preferences.companion_pet_id).toBe("anya");
   await expect(page.getByText("当前陪伴你的是阿尼亚。")).toBeVisible();
   await page.goto("/conversations");
-  await page.getByRole("button", { name: "最小化桌宠" }).click();
+  await expect(page.getByTestId("companion-dock")).toHaveAttribute("data-minimized", "true");
   await expect(page.locator('.companion-dock[data-minimized="true"] .conv-pet-head')).toHaveAttribute("aria-label", "阿尼亚头像");
   await page.reload();
-  await page.getByRole("button", { name: "最小化桌宠" }).click();
+  await expect(page.getByTestId("companion-dock")).toHaveAttribute("data-minimized", "true");
   await expect(page.locator('.companion-dock[data-minimized="true"] .conv-pet-head')).toHaveAttribute("aria-label", "阿尼亚头像");
   await page.setViewportSize({ width: 320, height: 760 });
   await page.goto("/settings");
@@ -683,7 +756,7 @@ test("all six selected pets render their own portrait crop", async ({ page }) =>
   for (const [id, name] of pets) {
     state.account.preferences.companion_pet_id = id;
     await page.goto("/conversations");
-    await page.getByRole("button", { name: "最小化桌宠" }).click();
+    await expect(page.getByTestId("companion-dock")).toHaveAttribute("data-minimized", "true");
     const portrait = page.locator('.companion-dock[data-minimized="true"] .conv-pet-head');
     await expect(portrait).toBeVisible();
     await expect(portrait).toHaveAttribute("aria-label", name + "头像");

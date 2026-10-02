@@ -38,6 +38,7 @@ function MemoryEntry({
     { revision: number; action: string; statement: string }[] | null
   >(null);
   const [error, setError] = useState("");
+  const expired = item.valid_until !== null && new Date(item.valid_until).getTime() <= Date.now();
   useEditingRegistration("automatic-memory:" + item.id, editing && text !== item.statement);
   return (
     <article className="memory-entry">
@@ -46,11 +47,13 @@ function MemoryEntry({
         <span>
           {item.status === "REMOVED"
             ? "已遗忘"
-            : item.status === "CANDIDATE"
-              ? "待确认"
-              : item.manual
-                ? "由你维护"
-                : "自动整理"}
+            : expired
+              ? "已过期 · 不用于辅导"
+              : item.status === "CANDIDATE"
+                ? "待确认"
+                : item.manual
+                  ? "由你维护"
+                  : "自动整理"}
         </span>
       </div>
       {editing ? (
@@ -86,6 +89,7 @@ function MemoryEntry({
       ) : (
         <p>{item.statement}</p>
       )}
+      {item.status === "CANDIDATE" && !expired && <p className="growth-muted">待确认的内容不会用于辅导；更正或遗忘后的新表述也需要你确认。</p>}
       <small className="memory-updated">更新于 {new Date(item.updated_at).toLocaleDateString()}</small>
       {item.valid_until && (
         <small>有效至 {new Date(item.valid_until).toLocaleDateString()}</small>
@@ -284,6 +288,7 @@ export function AutomaticMemory({ settingsOpen = false, onSettingsClose = () => 
       action,
       statement,
     });
+    setMessage(action === "FORGET" ? "已遗忘，后续辅导不再使用这条记忆。" : action === "EDIT" ? "更正已保存，后续辅导使用当前内容。" : "记忆选择已保存。");
   };
   if (!data)
     return (
@@ -454,13 +459,14 @@ export function AutomaticMemory({ settingsOpen = false, onSettingsClose = () => 
           {data.tasks.map((task) => (
             <div key={task.id} className="memory-task">
               <span>
-                {STATUS[task.status] ?? task.status}
+                {task.status === "QUEUED" && task.attempt > 0 ? "等待自动重试" : STATUS[task.status] ?? task.status}
                 {task.reason && (
                   <small>
                     {" "}
                     ·{" "}
                     {task.reason === "MEMORY_AGENT_NOT_CONFIGURED"
                       ? "记忆助手尚未配置，请联系管理员"
+                      : task.reason === "INTERRUPTED_UNCERTAIN" ? "上次整理中断，是否已受理尚不确定，请确认后重试"
                       : task.reason === "BACKFILL" ? "由你选择的历史聊天" : task.reason === "SOURCE_DELETED" ? "来源聊天已删除" : task.reason === "MEMORY_CONTEXT_CHANGED" ? "记忆或设置已更新" : "整理暂未完成，可稍后重试"}
                   </small>
                 )}

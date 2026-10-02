@@ -1,7 +1,13 @@
 import { ApiError, ensureCsrfToken } from "../identity/api";
-import type { RunDTO, SceneSnapshot, SessionDetail, SessionSummary, TurnAccepted } from "./types";
+import type { LookupCardDTO, RunDTO, SceneSnapshot, SessionDetail, SessionSummary, TurnAccepted } from "./types";
 
 const API_BASE = "/api/v1";
+
+export function resolveLookupTarget(target: NonNullable<LookupCardDTO["target"]>): Promise<{ route: string }> {
+  const query = new URLSearchParams({ type: target.type, id: target.id });
+  if (target.revision) query.set("revision", target.revision);
+  return request(`${API_BASE}/learning/lookup-target?${query}`);
+}
 
 type ErrorEnvelope = { error?: { code?: string; message?: string; request_id?: string } };
 

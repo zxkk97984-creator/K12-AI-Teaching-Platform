@@ -73,6 +73,7 @@ class InteractiveCatalogItemDTO(BaseModel):
     local_demo_visible: bool = False
     chapter_revision_ids: list[uuid.UUID] = Field(default_factory=list)
     activity_status: Literal["NOT_STARTED", "ACTIVE", "COMPLETED", "ABANDONED"]
+    viewed_at: datetime | None = None
     can_resume: bool
     session_id: uuid.UUID | None
 
@@ -107,6 +108,7 @@ class InteractiveSessionDTO(BaseModel):
     completion_source: str | None
     created_at: datetime | None
     updated_at: datetime | None
+    viewed_at: datetime | None = None
     completed_at: datetime | None
     resource_title: str | None = None
     resource_available: bool | None = None

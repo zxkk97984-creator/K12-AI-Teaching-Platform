@@ -1,7 +1,9 @@
+import { ReplyNarrationControl } from "../voice/ReplyNarrationControl";
 import { memo, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { CardDTO, MessageDTO } from "./types";
+import { LookupCards } from "./LookupCards";
 import { CompanionHeadAvatar, useCompanionName } from "../companion/CompanionAvatar";
 function FixtureBadge() {
   return (
@@ -11,13 +13,9 @@ function FixtureBadge() {
   );
 }
 
-function CardView({ card }: { card: CardDTO }) {
+function CardView({ card, onRetryLookup }: { card: CardDTO; onRetryLookup?: () => void }) {
   const [copied, setCopied] = useState(false);
-  const speak = () => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(new SpeechSynthesisUtterance(card.message_markdown));
-  };
+  const visibleSources = card.source_refs.filter((ref) => !ref.source_id.startsWith("lookup:"));
   const copy = async () => {
     try {
       await navigator.clipboard?.writeText(card.message_markdown);
@@ -30,26 +28,26 @@ function CardView({ card }: { card: CardDTO }) {
   return (
     <article className="conv-card" data-testid="assistant-card">
       <SafeMarkdown text={card.message_markdown} />
+      <LookupCards cards={card.lookup_cards} onRetry={onRetryLookup} />
       <div className="conv-card-actions">
         <button type="button" className="secondary" onClick={() => void copy()} aria-label="复制回复">
           {copied ? "已复制" : "复制"}
         </button>
-        <button type="button" className="secondary" onClick={speak} aria-label="朗读回复">朗读</button>
       </div>
       {card.followup_question ? (
         <p className="conv-followup">下一步：{card.followup_question}</p>
       ) : null}
-      {card.source_refs.length > 0 ? (
+      {visibleSources.length > 0 ? (
         <ul className="conv-sources" aria-label="来源">
-          {card.source_refs.map((ref) => (
+          {visibleSources.map((ref) => (
             <li key={`${ref.source_id}:${ref.locator}`}>
               {ref.source_id} · {ref.locator}
             </li>
           ))}
         </ul>
-      ) : (
+      ) : !card.lookup_cards?.length ? (
         <p className="conv-muted">本条没有可用来源（依据不足时不编造）。</p>
-      )}
+      ) : null}
       {card.warnings.length > 0 ? (
         <p className="conv-warnings">提示：{card.warnings.join("、")}</p>
       ) : null}
@@ -79,7 +77,7 @@ const SafeMarkdown = memo(function SafeMarkdown({ text }: { text: string }) {
   );
 });
 
-export function MessageView({ message, extra }: { message: MessageDTO; extra?: ReactNode }) {
+export function MessageView({ message, extra, onRetryLookup }: { message: MessageDTO; extra?: ReactNode; onRetryLookup?: () => void }) {
   const companionName = useCompanionName();
   const [copied, setCopied] = useState(false);
   const copyReply = async () => {
@@ -103,11 +101,12 @@ export function MessageView({ message, extra }: { message: MessageDTO; extra?: R
     <li className="conv-message conv-message-assistant">
       <div className="conv-assistant-author"><CompanionHeadAvatar /><strong>{companionName}</strong></div>
       {message.card ? (
-        <CardView card={message.card} />
+        <CardView card={message.card} onRetryLookup={onRetryLookup} />
       ) : (
         <SafeMarkdown text={message.content_markdown} />
       )}
       {!message.card && message.content_markdown ? <div className="conv-message-actions"><button type="button" className="secondary" onClick={() => void copyReply()} aria-label="复制回复">{copied ? "已复制" : "复制"}</button></div> : null}
+      {message.content_markdown ? <ReplyNarrationControl messageId={message.id} text={message.card?.message_markdown ?? message.content_markdown} /> : null}
       {extra}
     </li>
   );

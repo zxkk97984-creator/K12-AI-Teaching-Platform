@@ -94,6 +94,7 @@ async def run_once(settings=None, *, extractor=extract):
                 now + timedelta(seconds=settings.memory_extract_timeout_seconds + 30),
             )
             epoch = state.revision
+            content_epoch = state.content_revision
             for task in tasks:
                 task.status, task.lease_token = "RUNNING", token
                 task.attempt += 1
@@ -109,6 +110,7 @@ async def run_once(settings=None, *, extractor=extract):
                     .order_by(ConversationMessage.created_at)
                 )
             )
+            task_sessions = {t.source_run_id: t.session_id for t in tasks}
             sources = [
                 SourceMessage(
                     id=str(m.id),
@@ -118,6 +120,7 @@ async def run_once(settings=None, *, extractor=extract):
                 )
                 for m in messages
                 if not SENSITIVE.search(m.content_markdown)
+                and str(m.session_id) == task_sessions.get(str(m.run_id))
             ][:20]
             existing = list(
                 await db.scalars(
@@ -152,7 +155,7 @@ async def run_once(settings=None, *, extractor=extract):
         except ExtractionFailure as exc:
             failure = exc
         except Exception:
-            logger.exception("memory extraction failed (no message bodies logged)")
+            logger.warning("memory extraction failed: MEMORY_PROCESSING_FAILED")
             failure = ExtractionFailure("MEMORY_PROCESSING_FAILED")
         async with factory() as db:
             state = await state_for(db, owner, lock=True, create=False)
@@ -167,7 +170,13 @@ async def run_once(settings=None, *, extractor=extract):
                     )
                 )
             )
-            valid = state.auto_enabled and state.revision == epoch and state.lease_until > utcnow()
+            current = (
+                bool(claimed)
+                and state.auto_enabled
+                and state.revision == epoch
+                and state.content_revision == content_epoch
+            )
+            valid = current and state.lease_until is not None and state.lease_until > utcnow()
             if valid and result:
                 allowed_runs = {t.source_run_id for t in claimed}
                 allowed_messages = {str(m.id) for m in messages if str(m.run_id) in allowed_runs}
@@ -177,6 +186,8 @@ async def run_once(settings=None, *, extractor=extract):
             for task in claimed:
                 task.status = "SUCCEEDED" if valid and failure is None else "CANCELLED"
                 task.reason = None if task.status == "SUCCEEDED" else "MEMORY_CONTEXT_CHANGED"
+                if current and not valid:
+                    task.status, task.reason = "RETRY_REQUIRED", "INTERRUPTED_UNCERTAIN"
                 if valid and failure:
                     retry = failure.retryable and task.attempt < 3
                     task.status = "QUEUED" if retry else "RETRY_REQUIRED"
@@ -195,7 +206,7 @@ async def serve():
         try:
             await run_once(settings)
         except Exception:
-            logger.exception("memory worker cycle failed")
+            logger.warning("memory worker cycle failed: MEMORY_PROCESSING_FAILED")
         await asyncio.sleep(2)
 
 

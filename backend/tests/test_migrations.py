@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 import subprocess
 import sys
@@ -11,6 +12,7 @@ from alembic.config import Config
 from alembic.script import ScriptDirectory
 from sqlalchemy.engine import make_url
 
+from app.core.clean_test_database import clean_test_database_url, empty_clean_test_schema
 from app.core.test_database import UnsafeTestDatabase, validate_test_database_url
 
 BACKEND = Path(__file__).resolve().parents[1]
@@ -30,11 +32,6 @@ def _run_upgrade(url: str) -> None:
         env=env,
         check=True,
     )
-
-
-def _clean_url(base_url: str, database: str) -> str:
-    parsed = make_url(base_url)
-    return parsed.set(database=database).render_as_string(hide_password=False)
 
 
 @pytest.mark.asyncio
@@ -243,25 +240,17 @@ async def test_t04_baseline_upgrade_is_idempotent(test_settings):
 
 @pytest.mark.asyncio
 async def test_clean_test_baseline_upgrade_is_idempotent(test_settings):
-    admin_url = test_settings.active_database_url.replace("postgresql+asyncpg", "postgresql")
-    connection = await asyncpg.connect(admin_url)
-    clean_name = "k12r1_clean_test"
-    exists = await connection.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", clean_name)
-    if not exists:
-        await connection.execute(f'CREATE DATABASE "{clean_name}"')
-    await connection.close()
-    clean_url = _clean_url(test_settings.active_database_url, clean_name)
-    validate_test_database_url(clean_url)
-    _run_upgrade(clean_url)
-    _run_upgrade(clean_url)
-    connection = await asyncpg.connect(clean_url.replace("postgresql+asyncpg", "postgresql"))
-    try:
-        revision = await connection.fetchval("SELECT version_num FROM alembic_version")
-        triggers = await connection.fetch(
-            "SELECT tgname FROM pg_trigger WHERE NOT tgisinternal ORDER BY tgname"
-        )
-    finally:
-        await connection.close()
+    async with empty_clean_test_schema(test_settings.active_database_url) as clean_url:
+        _run_upgrade(clean_url)
+        _run_upgrade(clean_url)
+        connection = await asyncpg.connect(clean_url.replace("postgresql+asyncpg", "postgresql"))
+        try:
+            revision = await connection.fetchval("SELECT version_num FROM alembic_version")
+            triggers = await connection.fetch(
+                "SELECT tgname FROM pg_trigger WHERE NOT tgisinternal ORDER BY tgname"
+            )
+        finally:
+            await connection.close()
     assert revision == _migration_head()
     assert {
         "content_chapter_revisions_immutable",
@@ -279,3 +268,41 @@ def test_development_database_is_rejected_before_migration(test_settings):
     )
     with pytest.raises(UnsafeTestDatabase):
         validate_test_database_url(dev_url)
+
+
+def test_clean_database_is_derived_and_cannot_be_the_base(test_settings):
+    base = test_settings.active_database_url
+    clean = clean_test_database_url(base)
+    assert make_url(clean).database == make_url(base).database.removesuffix("_test") + "_clean_test"
+    with pytest.raises(UnsafeTestDatabase):
+        clean_test_database_url(clean)
+
+
+@pytest.mark.asyncio
+async def test_clean_schema_starts_empty_on_every_run(test_settings):
+    for _ in range(2):
+        async with empty_clean_test_schema(test_settings.active_database_url) as url:
+            connection = await asyncpg.connect(url.replace("postgresql+asyncpg", "postgresql"))
+            try:
+                assert not await connection.fetchval(
+                    "SELECT count(*) FROM pg_tables WHERE schemaname = 'public'"
+                )
+                await connection.execute("CREATE TABLE migration_reset_probe (id integer)")
+            finally:
+                await connection.close()
+
+
+@pytest.mark.asyncio
+async def test_clean_migration_runs_are_serialized(test_settings):
+    entered = asyncio.Event()
+
+    async def second_run():
+        async with empty_clean_test_schema(test_settings.active_database_url):
+            entered.set()
+
+    async with empty_clean_test_schema(test_settings.active_database_url):
+        pending = asyncio.create_task(second_run())
+        await asyncio.sleep(0.1)
+        assert not entered.is_set()
+    await asyncio.wait_for(pending, timeout=5)
+    assert entered.is_set()

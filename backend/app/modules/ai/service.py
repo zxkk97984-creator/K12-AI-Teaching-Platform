@@ -20,6 +20,7 @@ class CapabilityHandler:
     run: Callable[..., Awaitable[Any]]
     input_model: type[BaseModel]
     output_model: type[BaseModel]
+    requires_runtime: bool = False
 
 
 BACKEND_HANDLERS: dict[str, CapabilityHandler] = {}
@@ -31,10 +32,11 @@ def register_backend_handler(
     *,
     input_model: type[BaseModel],
     output_model: type[BaseModel],
+    requires_runtime: bool = False,
 ) -> None:
     if name in BACKEND_HANDLERS:
         raise ValueError("duplicate capability handler")
-    BACKEND_HANDLERS[name] = CapabilityHandler(handler, input_model, output_model)
+    BACKEND_HANDLERS[name] = CapabilityHandler(handler, input_model, output_model, requires_runtime)
 
 
 def initial_data(settings) -> dict:
@@ -181,11 +183,17 @@ async def target_arguments(
 
 
 async def execute_backend_capability(
-    db: AsyncSession, capability_id: str, payload: Any, context: dict
+    db: AsyncSession, capability_id: str, payload: Any, context: dict, *, runtime=None
 ):
     """Future business tools receive only declared context, not arbitrary student/global state."""
     config = await registry(db)
     cap = next((c for c in config["data"]["capabilities"] if c["id"] == capability_id), None)
+    # Reserved local read-only tools are installed by code, not model/admin paths.
+    from app.modules.lookup.capabilities import installed_capability
+
+    builtin = installed_capability(capability_id)
+    if builtin is not None:
+        cap = builtin
     if not cap or not cap["enabled"] or cap["executor"] != "BACKEND":
         raise ValueError("capability unavailable")
     handler = BACKEND_HANDLERS.get(cap.get("handler"))
@@ -193,7 +201,12 @@ async def execute_backend_capability(
         raise ValueError("capability handler not installed")
     allowed = {key: value for key, value in context.items() if key in cap["allowed_context"]}
     request = handler.input_model.model_validate(payload)
-    result = await handler.run(request, allowed)
+    if handler.requires_runtime:
+        if runtime is None:
+            raise ValueError("server runtime required")
+        result = await handler.run(request, allowed, runtime=runtime)
+    else:
+        result = await handler.run(request, allowed)
     return handler.output_model.model_validate(result)
 
 

@@ -243,3 +243,40 @@ describe("shared conversation ownership", () => {
     expect(api.subscribeRun).toHaveBeenCalledTimes(1);
   });
 });
+
+it("offers a fresh validated reply once, ignoring drafts, failures, repeat receipts and restored history", async () => {
+  const card = { message_markdown: "解释正文", source_refs: [], evidence_refs: [], warnings: [], fixture: true };
+  const completed = { ...run("SUCCEEDED"), card, result_message_id: "message-a" };
+  const c = new ConversationController();
+  await c.select("a");
+  expect(c.claimReplyNarration(completed)).toBe(false);
+  c.setDraft("新问题"); await c.send();
+  expect(c.claimReplyNarration({ ...completed, status: "RUNNING" })).toBe(false);
+  expect(c.claimReplyNarration({ ...completed, status: "FAILED" })).toBe(false);
+  expect(c.claimReplyNarration({ ...completed, card: null })).toBe(false);
+  expect(c.claimReplyNarration(completed)).toBe(true);
+  expect(c.claimReplyNarration(completed)).toBe(false);
+  c.dispose();
+  const restored = new ConversationController();
+  vi.mocked(api.getSession).mockResolvedValue({ ...detail(), active_run_id: "run-a" });
+  vi.mocked(api.getRun).mockResolvedValue(completed);
+  await restored.select("a");
+  expect(restored.claimReplyNarration(completed)).toBe(false);
+  restored.dispose();
+});
+
+it("does not read a completed reply after switching away and reopening history", async () => {
+  const c = new ConversationController(); await c.select("a"); c.setDraft("新问题"); await c.send(); await c.select("b");
+  const completed = { ...run("SUCCEEDED"), card: { message_markdown: "正文", source_refs: [], evidence_refs: [], warnings: [], fixture: true }, result_message_id: "message-a" };
+  expect(c.claimReplyNarration(completed)).toBe(false);
+  await c.select("a");
+  expect(c.claimReplyNarration(completed)).toBe(false);
+  c.dispose();
+});
+
+it("does not offer an idempotent accepted result for automatic narration", async () => {
+  const completed = { ...run("SUCCEEDED"), idempotent_replay: true, card: { message_markdown: "正文", source_refs: [], evidence_refs: [], warnings: [], fixture: true }, result_message_id: "m" };
+  vi.mocked(api.createTurn).mockResolvedValue({ run: completed });
+  const c = new ConversationController(); await c.select("a"); c.setDraft("question"); await c.send();
+  expect(c.claimReplyNarration(completed)).toBe(false); c.dispose();
+});

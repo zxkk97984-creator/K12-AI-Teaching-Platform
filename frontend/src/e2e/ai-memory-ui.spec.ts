@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { fixture } from "./ui-reuse-fixtures";
+import { expectCompactChoices } from "./choice-input-assertions";
 
 const memory = () => ({
   settings: { auto_enabled: true, use_enabled: true, revision: 1 },
@@ -16,7 +17,7 @@ const memory = () => ({
       status: "ACTIVE",
       manual: false,
       revision: 1,
-      valid_until: null,
+      valid_until: null as string | null,
       updated_at: "2026-09-29T07:00:00Z",
       sources: [
         {
@@ -29,6 +30,49 @@ const memory = () => ({
     },
   ],
   tasks: [],
+});
+
+test("memory sources, versions, expiry and interrupted retry remain usable at 390px", async ({ page }) => {
+  await fixture(page);
+  const data = memory();
+  data.items[0].valid_until = "2000-01-01T00:00:00Z";
+  let task = { id: "task-ui", session_id: "session-ui", status: "RETRY_REQUIRED",
+    reason: "INTERRUPTED_UNCERTAIN", attempt: 1, updated_at: "2026-10-02T00:00:00Z" };
+  const errors: string[] = [];
+  page.on("pageerror", e => errors.push(e.message));
+  page.on("console", e => { if (e.type() === "error") errors.push(e.text()); });
+  await page.route("**/api/v1/growth/personal-memory**", async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.includes("/items/") && path.endsWith("/events") && route.request().method() === "GET") {
+      await route.fulfill({ json: { items: [{ revision: 1, action: "AUTO_CREATE", statement: "喜欢天文" }] } });
+      return;
+    }
+    if (path.includes("/tasks/") && route.request().method() === "POST") task = { ...task, status: "QUEUED", reason: "" };
+    if (path.endsWith("/settings")) data.settings = { ...route.request().postDataJSON(), revision: 2 };
+    await route.fulfill({ json: { ...data, tasks: [task] } });
+  });
+  await page.goto("/growth");
+  await expect(page.getByText("已过期 · 不用于辅导")).toBeVisible();
+  await page.getByText("来源与版本 · 1 条依据").click();
+  await expect(page.getByRole("link", { name: "查看来源对话" })).toHaveAttribute("href", "/conversations?session=session-ui");
+  await page.getByRole("button", { name: "查看版本记录" }).click();
+  await expect(page.getByText("v1 · 喜欢天文")).toBeVisible();
+  await page.getByRole("searchbox", { name: "搜索记忆" }).fill("天文");
+  await expect(page.getByText("已过期 · 不用于辅导")).toBeVisible();
+  await page.getByRole("button", { name: "整理记录", exact: true }).click();
+  await expect(page.getByText(/是否已受理尚不确定/)).toBeVisible();
+  await page.screenshot({ path: "test-results/a5-memory-interrupted-desktop.png", fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: "test-results/a5-memory-interrupted-390.png", fullPage: true });
+  await page.getByRole("button", { name: "重试", exact: true }).click();
+  await expect(page.getByText("等待自动重试")).toBeVisible();
+  await page.getByRole("button", { name: "关闭", exact: true }).click();
+  await page.getByRole("button", { name: "记忆设置", exact: true }).click();
+  await expectCompactChoices(page);
+  await page.getByRole("switch", { name: "从聊天中自动整理" }).uncheck();
+  await expect(page.getByRole("switch", { name: "用于 AI 辅导" })).toBeChecked();
+  expect(errors).toEqual([]);
 });
 
 test("personal memory can be corrected, forgotten and disabled on desktop and narrow screens", async ({
@@ -75,8 +119,10 @@ test("personal memory can be corrected, forgotten and disabled on desktop and na
   await page.getByRole("button", { name: "遗忘", exact: true }).click();
   await expect(page.getByText("暂时没有正在使用的记忆")).toBeVisible();
   await page.getByLabel("显示已遗忘的条目").check();
+  await expectCompactChoices(page);
   await expect(page.getByRole("button", { name: "重新记住" })).toBeVisible();
   await page.getByRole("button", { name: "记忆设置", exact: true }).click();
+  await expectCompactChoices(page);
   await page.getByRole("switch", { name: "用于 AI 辅导" }).uncheck();
   await expect.poll(() => data.settings.use_enabled).toBe(false);
   await page.getByRole("button", { name: "关闭", exact: true }).click();
@@ -231,6 +277,7 @@ test("memory management empty states, dialogs, draft retention and failed saves"
   await expect(page.getByRole("dialog", { name: "整理历史聊天" })).toBeVisible();
   expect(backfills).toHaveLength(0);
   const choices = page.getByRole("dialog").getByRole("checkbox");
+  await expectCompactChoices(page);
   await choices.first().check();
   await page.getByRole("button", { name: "开始整理所选聊天" }).click();
   await expect(page.getByText("所选聊天已加入整理队列")).toBeVisible();

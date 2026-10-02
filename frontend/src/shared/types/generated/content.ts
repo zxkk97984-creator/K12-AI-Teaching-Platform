@@ -55,6 +55,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/chapters/{chapter_id}/self-test-answers/{question_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Self Test Answer */
+        get: operations["get_self_test_answer_api_v1_chapters__chapter_id__self_test_answers__question_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/chapters/{chapter_id}/reading-state": {
         parameters: {
             query?: never;
@@ -247,6 +264,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/learning/lookup-target": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lookup Target */
+        get: operations["lookup_target_api_v1_learning_lookup_target_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -372,6 +406,8 @@ export interface components {
             source: components["schemas"]["SourceRefDTO"];
             license_code: components["schemas"]["LicenseCode"];
             navigation: components["schemas"]["ChapterNavigationDTO"];
+            /** Self Test Questions */
+            self_test_questions?: components["schemas"]["SelfTestQuestionDTO"][];
         };
         /** ChapterNavigationDTO */
         ChapterNavigationDTO: {
@@ -630,6 +666,11 @@ export interface components {
          * @enum {string}
          */
         LicenseCode: "CC-BY" | "CC-BY-SA" | "CC0" | "PROJECT-ORIGINAL" | "SYNTHETIC-FIXTURE" | "UNKNOWN";
+        /** LookupTargetDTO */
+        LookupTargetDTO: {
+            /** Route */
+            route: string;
+        };
         /** NeighborRefDTO */
         NeighborRefDTO: {
             /**
@@ -882,6 +923,59 @@ export interface components {
          * @enum {string}
          */
         ReviewStatus: "UNREVIEWED" | "AUTO_VALIDATED" | "HUMAN_APPROVED";
+        /** SelfTestAnswerDTO */
+        SelfTestAnswerDTO: {
+            /**
+             * Chapter Id
+             * Format: uuid
+             */
+            chapter_id: string;
+            /**
+             * Revision Id
+             * Format: uuid
+             */
+            revision_id: string;
+            /** Revision */
+            revision: number;
+            /**
+             * Question Id
+             * @enum {string}
+             */
+            question_id: "Q01" | "Q02" | "Q03" | "Q04" | "Q05" | "Q06";
+            /**
+             * Question Type
+             * @enum {string}
+             */
+            question_type: "SINGLE_CHOICE" | "SHORT_ANSWER" | "PRACTICE";
+            /** Correct Options */
+            correct_options: ("A" | "B" | "C" | "D")[];
+            /** Reference Answer */
+            reference_answer: string;
+            /** Explanation */
+            explanation: string;
+        };
+        /** SelfTestQuestionDTO */
+        SelfTestQuestionDTO: {
+            /**
+             * Question Id
+             * @enum {string}
+             */
+            question_id: "Q01" | "Q02" | "Q03" | "Q04" | "Q05" | "Q06";
+            /**
+             * Question Type
+             * @enum {string}
+             */
+            question_type: "SINGLE_CHOICE" | "SHORT_ANSWER" | "PRACTICE";
+            /** End Block Id */
+            end_block_id: string;
+            /**
+             * End Offset
+             * @description Unicode code point offset in end_block_id
+             */
+            end_offset: number;
+            /** Has Reference Answer */
+            has_reference_answer: boolean;
+        };
         /**
          * SourceKind
          * @enum {string}
@@ -1075,6 +1169,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChapterDetailDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_self_test_answer_api_v1_chapters__chapter_id__self_test_answers__question_id__get: {
+        parameters: {
+            query: {
+                revision_id: string;
+            };
+            header?: never;
+            path: {
+                chapter_id: string;
+                question_id: string;
+            };
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SelfTestAnswerDTO"];
                 };
             };
             /** @description Validation Error */
@@ -1551,6 +1681,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ContinueDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lookup_target_api_v1_learning_lookup_target_get: {
+        parameters: {
+            query: {
+                type: "CHAPTER" | "RESOURCE" | "ANIMATION" | "PICTUREBOOK" | "QUIZ" | "LESSON" | "CODE_RUN";
+                id: string;
+                revision?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LookupTargetDTO"];
                 };
             };
             /** @description Validation Error */

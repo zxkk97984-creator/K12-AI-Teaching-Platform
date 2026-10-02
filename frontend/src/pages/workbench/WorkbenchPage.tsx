@@ -24,7 +24,7 @@ function AdminNotice({ username }: { username: string }) {
     <StatePanel
       tone="empty"
       title="管理员账号不进入学生工作台"
-      description={`${username} 的角色由服务端会话校验。管理端能力请从资源管理和课程编排进入。`}
+      description={`${username} 的角色由服务端会话校验。管理端能力请从资源管理、互动内容和 AI 教师设置进入。`}
       action={
         <>
           <a className="wb-link" href="/admin/resources">

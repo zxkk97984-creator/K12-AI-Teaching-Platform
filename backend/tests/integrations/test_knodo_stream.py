@@ -275,3 +275,46 @@ def test_partial_filter_holds_split_forbidden_marker():
         assert visible is not None
         assert marker[:index] not in visible
     assert safe_partial_markdown(prefix + marker, max_chars=1200) is None
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("native", ["tool_calls", "function_call", None])
+async def test_lookup_plan_never_streams_and_native_tools_remain_rejected(native):
+    semantic = {
+        "schema_version": "k12.teaching.turn.v1",
+        "kind": "lookup_request",
+        "message_markdown": "伪造的查询中结果，不可展示",
+        "queries": [{"tool": "WRONG_QUESTIONS", "parameters": {}}],
+    }
+    document = json.dumps(semantic, ensure_ascii=False)
+    sse = "".join(_event(document[i : i + 9]) for i in range(0, len(document), 9))
+    if native:
+        wire = json.loads(_event("").split("data: ", 1)[1])
+        wire["choices"][0]["delta"] = {native: [] if native == "tool_calls" else {}}
+        sse = "data: " + json.dumps(wire) + "\n\n" + sse
+    sse += _event(finish="stop") + "data: [DONE]\n\n"
+    client = httpx.AsyncClient(
+        transport=httpx.MockTransport(
+            lambda _: httpx.Response(200, headers={"content-type": "text/event-stream"}, text=sse)
+        )
+    )
+    mapper = KnodoWireMapper(
+        base_url="https://knodo.example.invalid",
+        token="synthetic-credential",
+        targets={"tutor": KnodoTarget(bot_id="tutor-test", workspace_id="workspace-test")},
+        transport=HttpTransport(client, max_output_bytes=16384),
+        budget=InMemoryRequestBudget(1),
+    )
+    drafts = []
+
+    async def capture(value):
+        drafts.append(value)
+
+    outcome = await mapper.invoke(
+        Operation.TEACH_TURN,
+        {"request_id": "synthetic", "lookup_context": {"phase": "PLAN"}},
+        on_content=capture,
+    )
+    await mapper.aclose()
+    assert drafts == []
+    assert (outcome.error is not None) == bool(native)

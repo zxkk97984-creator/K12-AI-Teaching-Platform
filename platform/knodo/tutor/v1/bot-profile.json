@@ -9,7 +9,8 @@
   ],
   "contracts": [
     "teaching-request.schema.json",
-    "teaching-response.schema.json"
+    "teaching-response.schema.json",
+    "teaching-turn-response.schema.json"
   ],
   "skills": [
     "k12-teaching-core"

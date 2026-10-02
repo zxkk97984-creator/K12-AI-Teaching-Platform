@@ -26,6 +26,7 @@ from app.modules.interactive.router import admin_router as interactive_admin_rou
 from app.modules.interactive.router import router as interactive_router
 from app.modules.learning.growth_router import router as growth_router
 from app.modules.learning.study_router import router as study_router
+from app.modules.lookup.router import router as lookup_router
 from app.modules.memory.automatic_router import router as automatic_memory_router
 from app.modules.memory.router import router as memory_router
 from app.modules.privacy.router import router as privacy_router
@@ -87,6 +88,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(quiz_router, prefix="/api/v1")
     application.include_router(growth_router, prefix="/api/v1")
     application.include_router(study_router, prefix="/api/v1")
+    application.include_router(lookup_router, prefix="/api/v1")
     application.include_router(memory_router, prefix="/api/v1")
     application.include_router(automatic_memory_router, prefix="/api/v1")
     application.include_router(recommendation_router, prefix="/api/v1")

@@ -63,7 +63,7 @@
     } else if (message.type === "narration_state") {
       if (object(message.payload) && ["idle", "loading", "speaking", "paused", "ended", "unavailable", "error"].includes(message.payload.status)) listeners.forEach((listener) => listener(message.payload));
     } else if (message.type === "workspace_state") {
-      if (object(message.payload) && identifier(message.payload.scene_id)) sessionListeners.forEach(listener => listener(message.payload));
+      if (object(message.payload) && (identifier(message.payload.scene_id) || Number.isInteger(message.payload.base_revision))) sessionListeners.forEach(listener => listener(message.payload));
     } else if (message.type === "workspace_command") {
       if (!identifier(message.message_id) || !object(message.payload) || !commands.includes(message.payload.command) || !commandHandler) return;
       Promise.resolve().then(() => commandHandler(message.payload)).then(() => reply(true), error => reply(false, String(error?.message || "操作未完成").slice(0, 500)));

@@ -43,6 +43,7 @@ SKILL_SCHEMAS = {
     "k12-teaching-core": (
         "teaching-request.schema.json",
         "teaching-response.schema.json",
+        "teaching-turn-response.schema.json",
     ),
     "k12-assessment-author": ("designer-request.schema.json", "quiz-draft.schema.json"),
     "k12-content-author": (

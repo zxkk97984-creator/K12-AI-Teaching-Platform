@@ -1185,6 +1185,11 @@
           "voice_preference": {
             "$ref": "#/components/schemas/VoicePreference"
           },
+          "auto_read_replies": {
+            "type": "boolean",
+            "title": "Auto Read Replies",
+            "default": false
+          },
           "profile_revision": {
             "type": "integer",
             "title": "Profile Revision"
@@ -1279,6 +1284,10 @@
                 "type": "null"
               }
             ]
+          },
+          "auto_read_replies": {
+            "type": "boolean",
+            "title": "Auto Read Replies"
           }
         },
         "additionalProperties": false,

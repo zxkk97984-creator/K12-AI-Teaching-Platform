@@ -1,6 +1,7 @@
 import {
   act,
   cleanup,
+  fireEvent,
   render,
   renderHook,
   screen,
@@ -13,6 +14,7 @@ vi.mock("./api", async (importOriginal) => {
   return {
     ...actual,
     getChapter: vi.fn(),
+    getSelfTestAnswer: vi.fn(),
     getReadingState: vi.fn(),
     postPageContext: vi.fn(),
     postReadingEvent: vi.fn(),
@@ -94,6 +96,7 @@ const chapter: ChapterDetailDTO = {
 
 beforeEach(() => {
   vi.mocked(api.getChapter).mockReset();
+  vi.mocked(api.getSelfTestAnswer).mockReset();
   vi.mocked(api.getReadingState).mockReset();
   vi.mocked(api.postPageContext).mockReset();
   vi.mocked(api.postReadingEvent).mockReset();
@@ -174,6 +177,38 @@ describe("ChapterReader", () => {
     const { container } = render(<ChapterReader chapter={withAsset} />);
     expect(container.querySelector("img")).toBeNull();
     expect(screen.getByText(/暂不可显示/)).toBeTruthy();
+  });
+
+  it("routes visible answer selections to narration without submitting private text as body context", async () => {
+    const text = "## 练习与自测\n\n### Q01 · 单选题\n\n合成题目\n\n";
+    const onSelect = vi.fn();
+    const onAnswerSelect = vi.fn();
+    vi.mocked(api.getSelfTestAnswer).mockResolvedValue({
+      chapter_id: chapter.chapter_id, revision_id: chapter.revision_id, revision: 1,
+      question_id: "Q01", question_type: "SINGLE_CHOICE", correct_options: ["A"],
+      reference_answer: "合成可朗读参考答案", explanation: "合成解析内容",
+    });
+    const { container } = render(<ChapterReader chapter={{ ...chapter,
+      blocks: [{ type: "MARKDOWN", text, block_id: "b3" }],
+      self_test_questions: [{ question_id: "Q01", question_type: "SINGLE_CHOICE", end_block_id: "b3", end_offset: Array.from(text).length, has_reference_answer: true }],
+    }} onSelect={onSelect} onAnswerSelect={onAnswerSelect} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Q01 查看参考答案" }));
+    const selected = await screen.findByText("合成可朗读参考答案");
+    const range = document.createRange(); range.selectNodeContents(selected);
+    window.getSelection()?.removeAllRanges(); window.getSelection()?.addRange(range);
+    fireEvent.mouseUp(selected);
+    expect(onAnswerSelect).toHaveBeenCalledWith("b3", "合成可朗读参考答案");
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(api.postPageContext).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-narration-exclude="true"]')).toBeTruthy();
+    window.getSelection()?.removeAllRanges();
+  });
+
+  it("keeps legacy Q headings unchanged when there is no answer metadata", async () => {
+    render(<ChapterReader chapter={{ ...chapter, blocks: [{ type: "MARKDOWN", text: "### Q01 · 单选题\n\n旧章节问题", block_id: "b3" }] }} />);
+    await screen.findByRole("heading", { name: "Q01 · 单选题" });
+    expect(screen.queryByRole("button", { name: /查看参考答案/ })).toBeNull();
+    expect(api.getSelfTestAnswer).not.toHaveBeenCalled();
   });
 });
 

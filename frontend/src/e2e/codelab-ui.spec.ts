@@ -3,6 +3,62 @@ import { fixture } from "./ui-reuse-fixtures";
 
 const screenshotDir = process.env.CODELAB_QA_SCREENSHOTS_DIR;
 
+for (const size of [{ width: 1542, height: 718 }, { width: 320, height: 820 }]) {
+  test(`CodeLab focus mode preserves editing and restores the shell at ${size.width}`, async ({ page }) => {
+    const state = await fixture(page, { stage: "SENIOR", codeRunnerAvailable: true });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+    await page.setViewportSize(size);
+    await page.goto("/code?task=double&revision=1");
+    const workspace = page.getByTestId("codelab-workspace");
+    await expect(workspace).toBeVisible();
+    if (size.width < 1024) await page.getByRole("button", { name: "代码", exact: true }).click();
+    const code = "def double(x):\n    return x * 2\n";
+    await page.locator(".cm-content").fill(code);
+    const editorBefore = (await page.getByTestId("codelab-editor").boundingBox())!;
+    await page.getByRole("button", { name: "打开霜铃学习助手" }).click();
+    await page.getByRole("button", { name: "置顶对话" }).click();
+    await expect(page.locator("#companion-panel")).toBeVisible();
+    // The pinned teacher can overlap the toolbar; keyboard activation remains available.
+    await page.getByRole("button", { name: "专注模式", exact: true }).press("Enter");
+    const exit = page.getByRole("button", { name: "退出专注 Esc", exact: true });
+    await expect(exit).toHaveAttribute("aria-pressed", "true");
+    await expect(workspace).toHaveAttribute("data-focus-mode", "true");
+    for (const selector of [".app-sidebar", ".app-topbar", ".k12-mobile-nav", ".k12-mobile-settings", ".companion-dock", "#companion-panel"]) {
+      await expect(page.locator(selector)).toBeHidden();
+    }
+    await expect(page.locator(".cm-content")).toContainText("return x * 2");
+    const editorAfter = (await page.getByTestId("codelab-editor").boundingBox())!;
+    expect(editorAfter.height).toBeGreaterThan(editorBefore.height);
+    if (size.width >= 1024) expect(editorAfter.width).toBeGreaterThan(editorBefore.width);
+    for (const label of ["运行示例", "提交判题"]) await inViewport(page.getByRole("button", { name: label, exact: true }), page);
+    await expect.poll(() => state.code).toBe(code);
+    if (screenshotDir) await page.screenshot({ path: `${screenshotDir}/focus-${size.width}.png` });
+    await page.locator(".cm-content").press("Escape");
+    await expect(workspace).toHaveAttribute("data-focus-mode", "false");
+    await expect(page.getByRole("button", { name: "专注模式", exact: true })).toBeFocused();
+    await expect(page.locator(".app-topbar")).toBeVisible();
+    await expect(page.locator("#companion-panel")).toBeVisible();
+    await page.getByRole("button", { name: "收起对话" }).click();
+    await page.getByRole("button", { name: "专注模式", exact: true }).click();
+    await page.getByRole("button", { name: "运行示例", exact: true }).click();
+    await expect.poll(() => state.codeRuns.length).toBe(1);
+    expect(state.codeRuns[0].code).toBe(code);
+    if (size.width < 1024) await page.getByRole("button", { name: "结果", exact: true }).click();
+    await expect(page.getByTestId("codelab-result-example")).toBeVisible();
+    await exit.click();
+    await expect(page.locator(".app-topbar")).toBeVisible();
+    await page.getByRole("button", { name: "专注模式", exact: true }).click();
+    await page.goto("/workbench");
+    await expect(page.getByTestId("workbench-shell")).toBeVisible();
+    await expect(page.locator(".app-topbar")).toBeVisible();
+    await expect(page.getByTestId("companion-dock")).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);
+    expect(errors).toEqual([]);
+  });
+}
+
 test("CodeLab catalogue, favourite, draft and compact workspace use only labelled UI fixtures", async ({ page }) => {
   const state = await fixture(page, { stage: "JUNIOR", codeTasksCount: 12 });
   const errors: string[] = [];

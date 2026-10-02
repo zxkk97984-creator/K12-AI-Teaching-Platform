@@ -27,6 +27,7 @@ export function SettingsPage() {
   const [interests, setInterests] = useState("");
   const [proactive, setProactive] = useState(true);
   const [voice, setVoice] = useState<VoicePreference>("DISABLED");
+  const [autoRead, setAutoRead] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [avatarMessage, setAvatarMessage] = useState("");
@@ -54,6 +55,7 @@ export function SettingsPage() {
         setInterests(value.preferences.interests.join(", "));
         setProactive(value.preferences.proactive_guidance_enabled);
         setVoice(value.preferences.voice_preference);
+        setAutoRead(value.preferences.auto_read_replies ?? false);
       }
     }).catch((reason) => {
       if (!active) return;
@@ -92,7 +94,8 @@ export function SettingsPage() {
         || companionPetId !== me.preferences.companion_pet_id
         || interestList.join("\u0000") !== me.preferences.interests.join("\u0000")
         || proactive !== me.preferences.proactive_guidance_enabled
-        || voice !== me.preferences.voice_preference;
+        || voice !== me.preferences.voice_preference
+        || autoRead !== (me.preferences.auto_read_replies ?? false);
       if (preferenceChanged) {
         latest = await patchPreferences({
           base_revision: latest.profile?.revision ?? me.preferences.profile_revision,
@@ -102,12 +105,17 @@ export function SettingsPage() {
           interests: interestList,
           proactive_guidance_enabled: proactive,
           voice_preference: voice,
+          auto_read_replies: autoRead,
         });
         setMe(latest);
         setCompanionPetId(getCompanionPet(latest.preferences?.companion_pet_id ?? "").id);
       }
       setMessage(profileChanged || preferenceChanged ? "已保存到当前账号，侧栏与学习内容已同步。" : "没有需要保存的修改。");
     } catch (reason) {
+      if (reason instanceof ApiError && reason.status === 409) {
+        // Refresh the revision without replacing the student's unsaved choices.
+        try { setMe(await getMe()); } catch { /* retain choices and show original failure */ }
+      }
       setError(`${latest !== me ? "个人资料已保存，但学习偏好未保存：" : "保存失败："}${reason instanceof Error ? reason.message : "请重试"}`);
     } finally {
       setBusy(false);
@@ -202,6 +210,7 @@ export function SettingsPage() {
             <label className="settings-field"><span>感兴趣的内容</span><input value={interests} onChange={(event) => setInterests(event.target.value)} placeholder="例如：机器人、绘画" /><small>用逗号分隔，最多十项。</small></label>
             <label className="settings-field"><span>语音偏好</span><select value={voice} onChange={(event) => setVoice(event.target.value as VoicePreference)}>{VOICE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select><small>朗读不会自动开启麦克风。</small></label>
             <NarrationVoiceSettings userId={me.user.id} />
+            <label className="settings-toggle"><input type="checkbox" checked={autoRead} onChange={(event) => setAutoRead(event.target.checked)} /><span><strong>自动朗读新回复</strong><small>默认关闭；仅在语音输出开启时朗读当前对话的新回复一次，不打断课文、课件或录音。</small></span></label>
             <label className="settings-toggle"><input type="checkbox" checked={proactive} onChange={(event) => setProactive(event.target.checked)} /><span><strong>主动引导</strong><small>需要时由霜铃提示下一步。</small></span></label>
           </div>
         </section>

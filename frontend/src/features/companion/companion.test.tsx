@@ -139,7 +139,7 @@ describe("reused companion assets and bounds", () => {
     fireEvent.click(screen.getByRole("button", { name: /打开.*学习助手/ }));
     await screen.findByRole("dialog", { name: /对话面板/ });
     for (const label of ["讲清概念", "读懂代码", "梳理思路"])
-      expect(screen.getByRole("button", { name: new RegExp(label) })).toBeTruthy();
+      expect(await screen.findByRole("button", { name: new RegExp(label) })).toBeTruthy();
     expect(screen.queryByText("选择学习伙伴")).toBeNull();
     expect(screen.queryByTestId("history-item")).toBeNull();
 
@@ -160,7 +160,7 @@ describe("reused companion assets and bounds", () => {
     const more = screen.getByRole("button", { name: "更多选项" });
     fireEvent.click(more);
     expect(more.getAttribute("aria-expanded")).toBe("true");
-    expect(screen.getByRole("tab", { name: "对话记录" }).getAttribute("aria-selected")).toBe("true");
+    expect((await screen.findByRole("tab", { name: "对话记录" })).getAttribute("aria-selected")).toBe("true");
     expect(screen.queryByLabelText("选择学习伙伴")).toBeNull();
     expect(screen.getByTestId("history-item").textContent).toBe("之前的问题");
     expect(screen.queryByRole("menuitem", { name: "重命名" })).toBeNull();

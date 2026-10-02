@@ -127,8 +127,11 @@ body .companion-panel .companion-resize--se:not(:disabled):hover { background: t
   body .companion-panel .companion-panel-tools { gap: 0; }
   body .companion-panel .companion-panel-avatar { display: none; }
   body .companion-panel .companion-extra-options { top: 60px; }
-  body .companion-panel .conv-composer .conv-input-line textarea { min-height: 68px; }
+  body .companion-panel .conv-composer .conv-input-line textarea { min-height: 44px; }
 }
+
+body .companion-panel .conversation-content--compact .conv-composer--compact { margin: 8px 12px 16px; padding: 8px 10px; }
+body .companion-panel .conv-composer--compact .conv-input-line textarea { min-height: 44px; max-height: 96px; padding: 8px 0; line-height: 24px; }
 .companion-panel-header strong {
   font-size: 18px;
 }

@@ -122,7 +122,7 @@ function quizOfferFrom(messages: MessageDTO[]): QuizOffer | null {
 function practiceHref(sessionId: string, chapterId: string): string {
   // The explicit click on this link is the authorization for one create call;
   // the practice page strips `start` as soon as it has created or restored.
-  return `/practice?session=${sessionId}&chapter=${chapterId}&start=1`;
+  return `/practice?tab=teacher&session=${sessionId}&chapter=${chapterId}&start=1`;
 }
 
 type PhaseAction = { event: LessonEventName; label: string; testId: string };

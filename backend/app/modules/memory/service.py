@@ -538,6 +538,8 @@ async def _bump_context_revision(db: AsyncSession, owner_user_id: uuid.UUID) -> 
         .values(
             history_after=datetime.now(UTC),
             content_revision=PersonalMemoryState.content_revision + 1,
+            lease_token=None,
+            lease_until=None,
         )
     )
     await db.execute(

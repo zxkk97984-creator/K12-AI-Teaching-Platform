@@ -22,3 +22,5 @@ Tutor的TEACH_TURN/CODE_FEEDBACK调用。先读取references/teaching-request.sc
 request_id/lesson_session_id/revision保持一致；source_refs有依据；evidence_refs属于本轮；未出现密钥、其他用户记录、隐藏答案、任意代码执行。没有来源时说明一般解释/依据不足，不编造引用。
 
 不得通过任意工具读取环境/其他会话；技能本身不提供执行脚本。运行环境权限仍需团队技术检查。
+
+TEACH_TURN 的 lookup_context 使用 references/teaching-turn-response.schema.json；先请求受限本地查询，phase=FINAL 必须解释实际结果，不再查询。CODE_FEEDBACK 仍只用原教学回复协议。

@@ -35,6 +35,7 @@ from app.modules.ai.teaching_context import build_runtime_context
 from app.modules.identity.models import LearnerProfile
 from app.modules.learning.projection import merge_learner_context, project_and_observe
 from app.modules.learning.service import snapshot_for
+from app.modules.lookup.rounds import complete_lookup_round, planning_context
 from app.modules.memory.automatic import state_for
 from app.modules.memory.service import build_learner_context, derive_candidates
 from app.modules.recommendation.service import refresh_snapshot as refresh_recommendation
@@ -101,7 +102,7 @@ async def execute_run(
             if settings.gateway_mode == "knodo"
             else settings.gateway_timeout_seconds
         )
-        lease_seconds = max(settings.teaching_lease_seconds, math.ceil(attempt_timeout) + 15)
+        lease_seconds = max(settings.teaching_lease_seconds, math.ceil(attempt_timeout) * 2 + 45)
         token = await acquire_lease(db, run_id=run_id, ttl_seconds=lease_seconds)
     if token is None:
         return "LEASE_HELD"
@@ -302,6 +303,8 @@ async def execute_run(
             "schema_version": "k12.personal-context.v1",
             "items": personal_items[:8],
         }
+    if operation is Operation.TEACH_TURN:
+        request["lookup_context"] = planning_context()
 
     signal = cancel_signal or _CANCEL_SIGNALS.get(run_id)
     # Dev/test only: an explicitly configured fixture delay turns the synthetic
@@ -368,6 +371,41 @@ async def execute_run(
         remote_conversation_id=remote_conversation_id,
         on_content=on_content,
     )
+    lookup_cards = []
+    if operation is Operation.TEACH_TURN:
+        result, lookup_cards = await complete_lookup_round(
+            result,
+            request=request,
+            gateway=gateway,
+            factory=factory,
+            settings=settings,
+            run_id=run.id,
+            lease_token=token,
+            owner_user_id=run.owner_user_id,
+            expected_stage=stage,
+            signal=signal,
+            target=selected_target,
+            context=context,
+            allowance=allowance,
+            invoke_args={
+                "scenario": fixture_scenario,
+                "timeout_seconds": settings.gateway_timeout_seconds,
+                "cancel": signal,
+                "delay_seconds": settings.teaching_fixture_delay_seconds or None,
+            },
+        )
+        if lookup_cards:
+            context = {
+                **context,
+                "allowed_source_ids": [
+                    *context.get("allowed_source_ids", []),
+                    *(
+                        card["source_ref"]["source_id"]
+                        for card in lookup_cards
+                        if card.get("source_ref")
+                    ),
+                ],
+            }
     fixture = result.mode == "fixture"
 
     async with factory() as db:
@@ -449,6 +487,8 @@ async def execute_run(
                 gateway_invocation_id=result.invocation_id,
             )
         card = build_card(result.output, fixture=fixture)
+        if lookup_cards:
+            card["lookup_cards"] = lookup_cards
         try:
             return await finalize_run(
                 db,

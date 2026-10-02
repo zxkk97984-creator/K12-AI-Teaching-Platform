@@ -389,3 +389,13 @@ body .conv-session-menu { position:fixed; inset:auto; margin:0; z-index:21474836
 body .conv-session-menu button { display:block; width:100%; min-height:36px; padding:8px 10px; border:0; border-radius:6px; background:transparent; color:var(--sl-text); text-align:left; font-size:13px; font-weight:400; }
 body .conv-session-menu button:last-child { color:var(--k12-danger, #a83d35); }
 body .conv-session-menu button:not(:disabled):hover { background:var(--k12-selected, #f0f0ee); }
+
+/* Reserve space for feedback inside the composer, clear of message actions. */
+body .conversation-content .conv-composer { position: relative; }
+body .conversation-content .conv-composer:has(.conv-voice-feedback:not(:empty)) { padding-bottom: 44px; }
+body .conversation-content .conv-voice-control { position: static; }
+.conv-voice-feedback:not(:empty) { position: absolute; bottom: 10px; left: 15px; right: 15px; width: auto; box-sizing: border-box; white-space: normal; pointer-events: none; }
+.conv-message-actions { flex-wrap: wrap; }
+
+body .companion-panel .conv-voice-feedback:not(:empty),
+body .companion-panel .conv-reply-voice-status:not(:empty) { display: block; }

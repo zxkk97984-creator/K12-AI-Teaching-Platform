@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.config import Settings
 from app.core.database import get_engine
 from app.modules.identity.models import LearnerProfile, UserRole
+from app.modules.identity.schemas import PreferencesPatch
 from tests.identity_helpers import ORIGIN, create_synthetic_user, login, write_headers
 
 
@@ -18,6 +19,13 @@ async def _login_profile(client, username: str, password: str):
 
 async def _patch(client, path: str, payload: dict, token: str):
     return await client.patch(path, json=payload, headers=write_headers(token))
+
+
+def test_auto_read_patch_schema_is_boolean_and_omission_is_not_an_update():
+    schema = PreferencesPatch.model_json_schema()["properties"]["auto_read_replies"]
+    assert schema["type"] == "boolean" and "anyOf" not in schema and "default" not in schema
+    patch = PreferencesPatch(base_revision=1, preferred_style="CODE")
+    assert "auto_read_replies" not in patch.model_dump(exclude_unset=True)
 
 
 @pytest.mark.asyncio
@@ -284,3 +292,65 @@ async def test_teacher_style_and_pet_are_separate_account_preferences(
         data["csrf_token"],
     )
     assert rejected.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_auto_read_default_patch_conflict_and_account_isolation(
+    client, test_settings: Settings
+):
+    await create_synthetic_user(test_settings, username="voice.a", password="Voice-Pass-123")
+    await create_synthetic_user(test_settings, username="voice.b", password="Voice-Pass-123")
+    data = await _login_profile(client, "voice.a", "Voice-Pass-123")
+    assert data["preferences"]["auto_read_replies"] is False
+    token = data["csrf_token"]
+    changed = await _patch(
+        client,
+        "/api/v1/me/preferences",
+        {
+            "base_revision": data["profile"]["revision"],
+            "auto_read_replies": True,
+            "voice_preference": "INPUT_AND_OUTPUT",
+        },
+        token,
+    )
+    assert changed.status_code == 200, changed.text
+    assert changed.json()["preferences"]["auto_read_replies"] is True
+    assert changed.json()["preferences"]["profile_revision"] == 1
+    stale = await _patch(
+        client,
+        "/api/v1/me/preferences",
+        {
+            "base_revision": 0,
+            "auto_read_replies": False,
+        },
+        token,
+    )
+    assert stale.status_code == 409
+    for invalid in (None, "yes", "true", "false", 1, 0):
+        response = await _patch(
+            client,
+            "/api/v1/me/preferences",
+            {
+                "base_revision": 1,
+                "auto_read_replies": invalid,
+            },
+            token,
+        )
+        assert response.status_code == 422
+    assert (await client.get("/api/v1/me")).json()["preferences"]["auto_read_replies"] is True
+    partial = await _patch(
+        client,
+        "/api/v1/me/preferences",
+        {"base_revision": 1, "preferred_style": "CODE"},
+        token,
+    )
+    assert partial.status_code == 200, partial.text
+    assert partial.json()["preferences"]["auto_read_replies"] is True
+    assert partial.json()["preferences"]["preferred_style"] == "CODE"
+    assert partial.json()["preferences"]["profile_revision"] == 2
+    reloaded = (await client.get("/api/v1/me")).json()
+    assert reloaded["preferences"]["auto_read_replies"] is True
+    await client.post("/api/v1/auth/logout", headers=write_headers(token))
+    other = await _login_profile(client, "voice.b", "Voice-Pass-123")
+    assert other["preferences"]["auto_read_replies"] is False
+    assert other["preferences"]["voice_preference"] == "DISABLED"

@@ -2,8 +2,8 @@
 
 export const DOCK_WIDTH = 140;
 export const DOCK_HEIGHT = 168;
-export const PANEL_WIDTH = 408;
-export const PANEL_HEIGHT = 560;
+export const PANEL_WIDTH = 380;
+export const PANEL_HEIGHT = 440;
 export const PANEL_GAP = 16;
 export const PANEL_MOBILE_BREAKPOINT = 720;
 export const DOCK_DRAG_THRESHOLD = 5;

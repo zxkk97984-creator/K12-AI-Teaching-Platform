@@ -18,7 +18,7 @@
 :is(.admin-resources,.admin-authoring,.admin-interactive,.admin-drawer) .admin-button-quiet { background:#fff; color:var(--admin-ink); border-color:var(--admin-line); }
 :is(.admin-resources,.admin-authoring,.admin-interactive,.admin-drawer) .admin-button-danger { color:#9d3430; background:#fff; border-color:#e8c2bf; }
 :is(.admin-resources,.admin-authoring,.admin-interactive,.admin-drawer) label { display:flex; flex-direction:column; align-items:stretch; gap:6px; color:var(--admin-ink); font-size:13px; font-weight:500; }
-:is(.admin-resources,.admin-authoring,.admin-interactive,.admin-drawer) :is(input,select,textarea) { width:100%; max-width:100%; min-height:38px; padding:7px 10px; color:var(--admin-ink); border:1px solid #d6d9dc; border-radius:7px; background:white; font:inherit; font-weight:400; }
+:is(.admin-resources,.admin-authoring,.admin-interactive,.admin-drawer) :is(input:where(:not([type="checkbox"]):not([type="radio"])),select,textarea) { width:100%; max-width:100%; min-height:38px; padding:7px 10px; color:var(--admin-ink); border:1px solid #d6d9dc; border-radius:7px; background:white; font:inherit; font-weight:400; }
 :is(.admin-resources,.admin-authoring,.admin-interactive,.admin-drawer) textarea { resize:vertical; }
 :is(.admin-resources,.admin-authoring,.admin-interactive,.admin-drawer) input[readonly] { background:var(--admin-soft); }
 /* Override the inherited column direction, width and minimum input height. */

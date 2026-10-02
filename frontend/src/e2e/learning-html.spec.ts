@@ -285,6 +285,15 @@ test('JUNIOR: start and resume play the introduction once, with real media event
   await expect(page.getByRole('button', {name: '开启朗读', exact: true})).toBeVisible();
   await page.getByRole('button', {name: '开始学习', exact: true}).click();
   const observations = () => page.evaluate(() => (window as unknown as {introAudioObservations: {plays: number; playing: number; ended: number}}).introAudioObservations);
+  await expect(page.locator('.interactive-audio-status')).toContainText('语音输出已关闭');
+  expect(await observations()).toEqual({plays: 0, playing: 0, ended: 0});
+  const disabled = (await (await page.request.get('/api/v1/me')).json()).preferences;
+  expect(disabled.voice_preference).toBe('DISABLED');
+  const enabled = await page.request.patch('/api/v1/me/preferences', {data: {base_revision: disabled.profile_revision, voice_preference: 'OUTPUT_ONLY'}, headers: {Origin: new URL(page.url()).origin, 'X-CSRF-Token': csrf}});
+  expect(enabled.ok()).toBe(true);
+  await page.reload();
+  // No experiment was recorded while speech was disabled, so the entry is still "start".
+  await page.getByRole('button', {name: '开始学习', exact: true}).click();
   await expect(page.locator('.interactive-audio-status')).toContainText('正在朗读本段');
   await expect.poll(observations).toEqual({plays: 1, playing: 1, ended: 0});
   await page.getByRole('button', {name: '收起讲解', exact: true}).click();
@@ -293,7 +302,7 @@ test('JUNIOR: start and resume play the introduction once, with real media event
   await page.getByRole('button', {name: '退出专注', exact: true}).click();
   await expect(page.locator('.interactive-audio-status')).toContainText('本段朗读已结束', {timeout: 10000});
   await expect.poll(observations).toEqual({plays: 1, playing: 1, ended: 1});
-  expect((await (await page.request.get('/api/v1/me')).json()).preferences.voice_preference).toBe('DISABLED');
+  expect((await (await page.request.get('/api/v1/me')).json()).preferences.voice_preference).toBe('OUTPUT_ONLY');
   await page.frameLocator('iframe').getByRole('button', {name: '执行下一轮'}).click(); await saved(page);
   await page.reload(); await page.getByRole('button', {name: '继续学习', exact: true}).click();
   await expect(page.locator('.interactive-audio-status')).toContainText('正在朗读本段');

@@ -1,3 +1,5 @@
+import type { components } from "../../shared/types/generated/learning";
+
 export type RunStatus =
   | "QUEUED"
   | "RUNNING"
@@ -50,7 +52,10 @@ export type SceneSnapshot = {
   interactive_prompt_id?: string | null;
 };
 
+export type LookupCardDTO = components["schemas"]["LookupCard"];
+
 export type CardDTO = {
+  lookup_cards?: LookupCardDTO[];
   message_markdown: string;
   source_refs: Array<{ source_id: string; revision: string; locator: string }>;
   evidence_refs: string[];

@@ -219,4 +219,19 @@ describe("LessonPage", () => {
     await waitFor(() => expect(conversationApi.createSession).toHaveBeenCalledTimes(1));
     expect(navigate).toHaveBeenCalledWith(`/lessons?session=${SESSION_ID}`);
   });
+
+  it("opens the chapter quiz tab from a primary lesson", async () => {
+    vi.mocked(conversationApi.listSessions).mockResolvedValue([
+      { id: SESSION_ID, chapter_id: "22222222-2222-2222-2222-222222222222" },
+    ] as never);
+    await openLesson();
+    await waitFor(() => expect(screen.getByTestId("open-practice")).toBeTruthy());
+    fireEvent.click(screen.getByTestId("open-practice"));
+    const destination = new URL(navigate.mock.calls.at(-1)![0], "http://localhost");
+    expect(destination.pathname).toBe("/practice");
+    expect(destination.searchParams.get("tab")).toBe("teacher");
+    expect(destination.searchParams.get("session")).toBe(SESSION_ID);
+    expect(destination.searchParams.get("chapter")).toBe("22222222-2222-2222-2222-222222222222");
+    expect(destination.searchParams.get("start")).toBe("1");
+  });
 });

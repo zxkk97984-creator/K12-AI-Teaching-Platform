@@ -1327,6 +1327,486 @@
       "release_key": "legacy-k12-696364f-pending-review",
       "chapter": "python-first-steps/ch05",
       "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-01-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-02-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-03-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-04-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-05-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-06-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-07-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-08-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-09-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-10-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-11-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-ai-data/ch-12-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-01-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-02-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-03-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-04-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-05-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-06-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-07-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-08-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-09-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-10-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-11-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-junior-python/ch-12-junior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-01-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-01-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-02-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-02-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-03-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-03-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-04-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-04-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-05-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-05-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-06-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-06-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-07-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-07-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-08-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-08-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-09-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-09-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-10-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-10-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-11-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-11-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-12-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-ai/ch-12-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-01-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-01-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-02-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-02-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-03-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-03-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-04-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-04-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-05-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-05-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-06-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-06-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-07-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-07-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-08-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-08-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-09-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-09-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-10-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-10-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-11-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-11-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-12-primary-lower",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-primary-computing/ch-12-primary-upper",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-01-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-02-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-03-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-04-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-05-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-06-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-07-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-08-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-09-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-10-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-11-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-ai/ch-12-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-01-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-02-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-03-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-04-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-05-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-06-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-07-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-08-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-09-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-10-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-11-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
+    },
+    {
+      "release_key": "original-books-v1-04236ab4f779",
+      "chapter": "book-senior-algorithms/ch-12-senior",
+      "reason": "非测试内容且未处于 HUMAN_APPROVED+PUBLISHED；文件系统打包器不产出正式包"
     }
   ]
 }

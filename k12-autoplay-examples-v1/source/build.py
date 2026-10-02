@@ -459,7 +459,7 @@ def manifest_for(lesson):
         scene_id=f"scene-{i:02d}"
         scenes.append({"id":scene_id,"title":s["title"],"summary":s["text"]})
         prompts.append({"id":scene_id+"-read","scene_id":scene_id,"text":s["text"],"trigger":"SCENE_ENTER"})
-    return {"schema_version":"k12-interactive-v1","content_key":"autoplay-"+lesson["key"],"title":lesson["title"],"purpose":"LESSON","stage":lesson["stage"],"subject":lesson["subject"],"entry":"index.html","cover":"assets/cover.svg","summary":lesson["summary"],"knowledge_points":lesson["knowledge_points"],"capabilities":["SCENES"],"scenes":scenes,"prompts":prompts}
+    return {"schema_version":"k12-interactive-v1","content_key":"autoplay-"+lesson["key"],"title":lesson["title"],"purpose":"LESSON","stage":lesson["stage"],"subject":lesson["subject"],"entry":"index.html","cover":"assets/cover.svg","summary":lesson["summary"],"knowledge_points":lesson["knowledge_points"],"capabilities":["SCENES","CHECKPOINTS"],"scenes":scenes,"prompts":prompts}
 
 
 def build():

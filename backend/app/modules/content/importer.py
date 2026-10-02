@@ -456,7 +456,16 @@ async def import_package(
     dry_run: bool = True,
     mirror_root: Path | None = None,
 ) -> ImportResult:
+    # Local import avoids coupling the generic package loader to private answers.
+    from app.modules.content.textbook_answers import (
+        apply_answers,
+        plan_answers,
+        validated_answer_bundles,
+    )
+
+    bundles = validated_answer_bundles(package)
     plan = await build_plan(db, package)
+    answer_plan = await plan_answers(db, bundles)
     result = ImportResult(
         dry_run=dry_run,
         release_key=package.release.release_key,
@@ -476,11 +485,15 @@ async def import_package(
             for item in plan.chapters
         ],
     )
+    if answer_plan:
+        result.counters["answers_created"] = sum(6 - len(existing) for _, existing in answer_plan)
+        result.counters["answers_reused"] = sum(len(existing) for _, existing in answer_plan)
     if dry_run:
         await db.rollback()
         return result
 
     await _apply_plan(db, plan)
+    await apply_answers(db, answer_plan)
     await db.commit()
 
     if mirror_root is not None:

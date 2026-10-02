@@ -6,7 +6,8 @@
     "lesson-package-draft.schema.json",
     "quiz-draft.schema.json",
     "teaching-request.schema.json",
-    "teaching-response.schema.json"
+    "teaching-response.schema.json",
+    "teaching-turn-response.schema.json"
   ],
   "wire_status": "LOCAL_SEMANTIC_ONLY_NOT_KNODO_HTTP"
 }

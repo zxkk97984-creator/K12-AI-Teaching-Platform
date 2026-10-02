@@ -69,6 +69,13 @@
   var rateValue = 1;
   var voicesChangeHandler = null;
   var practice = initialPractice();
+  practice.operated = false;
+  var practiceRevision = 0;
+  var restoreNotice = '';
+  var saveNotice = document.createElement('p');
+  saveNotice.id = 'practice-save-status';
+  saveNotice.setAttribute('role', 'status');
+  byId('practice-error').after(saveNotice);
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function esc(value) {
@@ -212,7 +219,7 @@
   }
   function renderBubble(state) {
     var arr=state.cards||state.array||[], s=text(480,52,'相邻两张卡片比较数值大小','section-title');
-    var x0=150,w=132,gap=22;
+    var x0=arr.length===6?70:150,w=arr.length===6?118:132,gap=arr.length===6?20:22;
     arr.forEach(function(card,i){
       var value=typeof card==='object'?card.value:card;
       var x=x0+i*(w+gap), active=i===state.left||i===state.right;
@@ -606,40 +613,22 @@
     var order=rule==='shape'?['circle','triangle','square']:['red','blue','yellow'];
     return order.map(function(k){return items.filter(function(v){return rule==='shape'?v.shape===k:v.color===k;});});
   }
+  // Only confirmed controls become account checkpoints. Never persist generated SVG.
   function handlePractice(event) {
-    var b=event.currentTarget;
-    var kind=lesson.kind;
-    if(kind==='input-process-output'){
-      practice.input=b.dataset.action==='inputB'?'按键 B':'按键 A';
-      var out=practice.input==='按键 A'?'圆灯亮':'三角灯亮';
-      setPracticeResult({stage:'output',input:practice.input,output:out,rule:lesson.data.rules[practice.input]},'手动输入“'+practice.input+'”，设备按已写好的规则显示“'+out+'”。');
-    } else if(kind==='sorting-by-rule'){
-      practice.rule=b.dataset.rule;
-      var groups=grouping(lesson.data.items,practice.rule);
-      setPracticeResult({rule:practice.rule,groups:groups,note:'同一组图形换了规则，因此分组方式改变。'},'当前按照'+(practice.rule==='shape'?'形状':'颜色')+'分类，共分成 '+groups.length+' 组。');
-    } else if(kind==='robot-instructions'){
-      practice.route=b.dataset.route;
-      var rr=practice.route==='correct'?lesson.data.correct:lesson.data.wrong;
-      var sim=simulateRobot(rr,lesson.data.walls,lesson.data.goal);
-      setPracticeResult(sim,'指令检查：'+(sim.status==='done'?'到达终点。':sim.status==='blocked'?'第 '+sim.current+' 条指令遇到障碍，已经停止。':'还没有到达终点。'));
-    } else if(kind==='pixels-build-picture'){
-      practice.size=Number(b.dataset.size);
-      setPracticeResult({matrix:lesson.data.matrix,coarse:lesson.data.coarse,filled:16,note:'同一颜色图案；8×8 记录的单元比 4×4 多。'},'当前显示 '+practice.size+'×'+practice.size+' 网格。方格数量是 4×4 的 16 个与 8×8 的 64 个。');
-    } else if(kind==='cards-bubble-sort'){
+    var b=event.currentTarget, kind=lesson.kind;
+    if(kind==='input-process-output')practice.input=b.dataset.action==='inputB'?'按键 B':'按键 A';
+    else if(kind==='sorting-by-rule')practice.rule=b.dataset.rule;
+    else if(kind==='robot-instructions')practice.route=b.dataset.route;
+    else if(kind==='pixels-build-picture')practice.size=Number(b.dataset.size);
+    else if(kind==='cards-bubble-sort'){
       var raw=(byId('sort-input').value||'').split(',').map(function(x){return x.trim();});
       if(raw.length<3||raw.length>6||raw.some(function(x){return !/^\d{1,2}$/.test(x)||Number(x)>99;})){invalidPractice('请输入 3 到 6 个 0–99 的整数，使用逗号分开。原有结果已保留。');return;}
-      practice.values=raw.map(Number);var sorted=bubbleSortValues(practice.values);
-      setPracticeResult({array:sorted,left:null,right:null,note:'按相邻比较与交换得到结果。'},'排序完成：['+sorted.join(', ')+']。原数组中的数值没有增加或丢失。');
-    } else if(kind==='message-packets'){
-      practice.order=b.dataset.order;
-      var ids=practice.order.split(',');
-      setPracticeResult({packets:ids.map(function(id,i){return{id:id,chunk:lesson.data.chunks[Number(id)-1],status:'arrived',order:i,path:id==='1'?['S','A','C','T']:id==='2'?['S','B','D','T']:['S','A','D','T']};}),note:'手动选择传输顺序：'+ids.join('、')+'。接收端按编号重组。'},'到达顺序 '+ids.join('、')+'；按块编号重组：'+lesson.data.message+'。');
-    } else if(kind==='linear-search'){
-      var val=Number(byId('search-target').value);
-      if(!Number.isInteger(val)||val<0||val>99){invalidPractice('目标请填 0 到 99 的整数。原有结果已保留。');return;}
-      practice.target=val;var ix=lesson.data.array.indexOf(val);
-      var visited=ix>=0?Array.from({length:ix+1},function(_,i){return i;}):lesson.data.array.map(function(_,i){return i;});
-      setPracticeResult({array:lesson.data.array,target:val,current:ix>=0?ix:null,checked:visited,codeLine:ix>=0?2:3,note:ix>=0?'找到后立即停止。':'全部检查后停止，不越界。'},ix>=0?'找到 '+val+'：第 '+(ix+1)+' 项，下标 '+ix+'。':'检查完全部 '+lesson.data.array.length+' 项，没有找到 '+val+'。');
+      practice.values=raw.map(Number);
+    } else if(kind==='message-packets')practice.order=b.dataset.order;
+    else if(kind==='linear-search'){
+      var rawTarget=byId('search-target').value, val=Number(rawTarget);
+      if(!rawTarget.trim()||!Number.isInteger(val)||val<0||val>99){invalidPractice('目标请填 0 到 99 的整数。原有结果已保留。');return;}
+      practice.target=val;
     } else if(kind==='stack-and-queue'){
       if(b.dataset.kind){practice.kind=b.dataset.kind;practice.items=[];practice.removed=[];}
       if(b.dataset.action==='clear'){practice.items=[];practice.removed=[];}
@@ -649,29 +638,79 @@
       }
       if(b.dataset.action==='pop'){
         if(!practice.items.length){invalidPractice('容器已空，不能继续取出。');return;}
-        var removed=practice.kind==='queue'?practice.items.shift():practice.items.pop();
-        practice.removed.push(removed);
+        practice.removed.push(practice.kind==='queue'?practice.items.shift():practice.items.pop());
+        practice.removed=practice.removed.slice(-100);
       }
-      var sState={focus:practice.kind,stack:practice.kind==='stack'?practice.items:[],queue:practice.kind==='queue'?practice.items:[],queueOut:practice.kind==='queue'?practice.removed:[],stackOut:practice.kind==='stack'?practice.removed:[],note:'练习项目：'+(practice.items.join('、')||'空')};
-      setPracticeResult(sState,(practice.kind==='stack'?'栈':'队列')+'当前有 '+practice.items.length+' 个项目。');
-    } else if(kind==='training-and-testing'){
-      practice.testIndex=Number(b.dataset.test);var t=lesson.data.tests[practice.testIndex],pred=nearest(t.xy,lesson.data.train);
-      var ok=pred.label===t.truth;
-      setPracticeResult({train:lesson.data.train,test:{xy:t.xy},nearest:pred,phase:'test',prediction:pred.label,truth:t.truth,correct:ok,note:'测试真实类别只在预测之后揭示。'},'预测 '+pred.label+'，真实类别 '+t.truth+'；'+(ok?'本次正确。':'本次不同。'));
-    } else if(kind==='shortest-path'){
-      practice.start=byId('path-start').value;practice.end=byId('path-end').value;
-      var result=dijkstra(practice.start,lesson.data.edges);var path=reconstruct(practice.start,practice.end,result.prev);
-      if(result.dist[practice.end]===Infinity){setPracticeResult(graphState(result,practice.start,[],[]),'从 '+practice.start+' 无法到达 '+practice.end+'。');}
-      else {var es=[];for(var i=0;i<path.length-1;i++)es.push(edgeKey(path[i],path[i+1]));setPracticeResult(graphState(result,practice.end,path,es),'最短路径 '+path.join(' → ')+'，总成本 '+result.dist[practice.end]+'。');}
+    } else if(kind==='training-and-testing')practice.testIndex=Number(b.dataset.test);
+    else if(kind==='shortest-path'){
+      var start=byId('path-start').value,end=byId('path-end').value;
+      if(lesson.data.nodes.indexOf(start)<0||lesson.data.nodes.indexOf(end)<0){invalidPractice('请选择图中的起点与终点。');return;}
+      practice.start=start;practice.end=end;
     } else if(kind==='gradient-descent'){
-      var alpha=Number(byId('alpha').value);practice.alpha=alpha;
-      var points=gradient(4,alpha,6);var last=points[points.length-1];
-      setPracticeResult({points:points,current:last,iteration:points.length-1,note:'每一步按 x ← x − α × 2x 计算。'},'步长 '+alpha+'：第 6 次后 x = '+n(last.x)+'，f(x) = '+n(last.y)+'。');
+      var alpha=Number(byId('alpha').value);
+      if([0.05,0.15,0.6,1.1].indexOf(alpha)<0){invalidPractice('请选择已有的学习步长。');return;}
+      practice.alpha=alpha;
     } else if(kind==='classification-metrics'){
-      var th=Number(byId('threshold').value);if(!Number.isFinite(th)||th<0.35||th>0.9){invalidPractice('阈值请在 0.35 到 0.90 之间。原有结果已保留。');return;}
-      practice.threshold=th;var m=metricCounts(th);
-      setPracticeResult({counts:m,threshold:th,currentId:'全部样例',note:'结果根据 8 个合成分数重新计数。'},'准确率 '+pct(safeDiv(m.tp+m.tn,8))+'，精确率 '+pct(safeDiv(m.tp,m.tp+m.fp))+'，召回率 '+pct(safeDiv(m.tp,m.tp+m.fn))+'。');
+      var rawThreshold=byId('threshold').value, th=Number(rawThreshold);
+      if(!rawThreshold.trim()||!Number.isFinite(th)||th<0.35||th>0.9){invalidPractice('阈值请在 0.35 到 0.90 之间。原有结果已保留。');return;}
+      practice.threshold=th;
     }
+    practice.operated=true;restoreNotice='';showPractice();savePractice();
+  }
+  function practiceResult() {
+    var kind=lesson.kind, state=practiceState(), message='选择一个操作，观察结果。';
+    if(!practice.operated)return {state:state,message:message};
+    if(kind==='input-process-output')message='手动输入“'+practice.input+'”，设备按已写好的规则显示“'+state.output+'”。';
+    else if(kind==='sorting-by-rule')message='当前按照'+(practice.rule==='shape'?'形状':'颜色')+'分类，共分成 '+state.groups.length+' 组。';
+    else if(kind==='robot-instructions')message='指令检查：'+(state.status==='done'?'到达终点。':state.status==='blocked'?'第 '+(state.current+1)+' 条指令遇到障碍，已经停止。':'还没有到达终点。');
+    else if(kind==='pixels-build-picture')message='当前显示 '+practice.size+'×'+practice.size+' 网格。方格数量是 4×4 的 16 个与 8×8 的 64 个。';
+    else if(kind==='cards-bubble-sort')message='排序完成：['+state.array.join(', ')+']。原数组中的数值没有增加或丢失。';
+    else if(kind==='message-packets')message='到达顺序 '+practice.order.split(',').join('、')+'；按块编号重组：'+lesson.data.message+'。';
+    else if(kind==='linear-search')message=state.current!==null?'找到 '+practice.target+'：第 '+(state.current+1)+' 项，下标 '+state.current+'。':'检查完全部 '+lesson.data.array.length+' 项，没有找到 '+practice.target+'。';
+    else if(kind==='stack-and-queue')message=(practice.kind==='stack'?'栈':'队列')+'当前有 '+practice.items.length+' 个项目。取出记录：'+(practice.removed.join('、')||'无')+'。';
+    else if(kind==='training-and-testing')message='预测 '+state.prediction+'，真实类别 '+state.truth+'；'+(state.correct?'本次正确。':'本次不同。');
+    else if(kind==='shortest-path')message=state.path.length?'最短路径 '+state.path.join(' → ')+'，总成本 '+state.distances[practice.end]+'。':'从 '+practice.start+' 无法到达 '+practice.end+'。';
+    else if(kind==='gradient-descent')message='步长 '+practice.alpha+'：第 6 次后 x = '+n(state.current.x)+'，f(x) = '+n(state.current.y)+'。';
+    else if(kind==='classification-metrics'){var m=state.counts;message='TP='+m.tp+'，FP='+m.fp+'，FN='+m.fn+'，TN='+m.tn+'；精确率 '+pct(safeDiv(m.tp,m.tp+m.fp))+'，召回率 '+pct(safeDiv(m.tp,m.tp+m.fn))+'。';}
+    return {state:state,message:message};
+  }
+  function showPractice(){
+    var result=practiceResult();setPracticeResult(result.state,result.message);
+    if(embedded)stageNode.innerHTML=render(result.state);
+    if(restoreNotice)byId('practice-error').textContent=restoreNotice;
+  }
+  function savePractice(){
+    var token=++practiceRevision;
+    if(!embedded||!window.K12.checkpoint){saveNotice.textContent='独立打开：实验只保留在当前页面，未保存到账号。';return;}
+    saveNotice.textContent='正在保存实验到账号…';
+    var state={state_version:1,content_key:'autoplay-'+lesson.key,practice:JSON.parse(JSON.stringify(practice))};
+    window.K12.checkpoint.save(state).then(function(){if(token===practiceRevision)saveNotice.textContent='实验已保存到账号';},function(){if(token===practiceRevision)saveNotice.textContent='实验未保存，当前画面已保留；请使用平台的“重试保存”。';});
+  }
+  function restorePractice(state){
+    if(!state||Object.keys(state).length===0)return;
+    var p=state.practice, defaults=initialPractice();
+    var keys=Object.keys(defaults).concat('operated');
+    var object=function(v){return v&&typeof v==='object'&&!Array.isArray(v);};
+    var valid=object(state)&&state.state_version===1&&state.content_key==='autoplay-'+lesson.key&&Object.keys(state).sort().join(',')==='content_key,practice,state_version'&&object(p)&&Object.keys(p).sort().join(',')===keys.sort().join(',')&&typeof p.operated==='boolean';
+    var oneOf=function(v,a){return a.indexOf(v)>=0;};
+    var integer=function(v,min,max){return Number.isInteger(v)&&v>=min&&v<=max;};
+    if(valid)switch(lesson.kind){
+      case 'input-process-output':valid=oneOf(p.input,['按键 A','按键 B']);break;
+      case 'sorting-by-rule':valid=oneOf(p.rule,['shape','color']);break;
+      case 'robot-instructions':valid=oneOf(p.route,['correct','wrong']);break;
+      case 'pixels-build-picture':valid=oneOf(p.size,[4,8]);break;
+      case 'cards-bubble-sort':valid=Array.isArray(p.values)&&p.values.length>=3&&p.values.length<=6&&p.values.every(function(v){return integer(v,0,99);});break;
+      case 'message-packets':valid=oneOf(p.order,['2,3,1','1,2,3']);break;
+      case 'linear-search':valid=integer(p.target,0,99);break;
+      case 'stack-and-queue':valid=oneOf(p.kind,['stack','queue'])&&Array.isArray(p.items)&&p.items.length<=3&&Array.isArray(p.removed)&&p.removed.length<=100&&p.items.concat(p.removed).every(function(v){return oneOf(v,['A','B','C']);});break;
+      case 'training-and-testing':valid=integer(p.testIndex,0,lesson.data.tests.length-1);break;
+      case 'shortest-path':valid=oneOf(p.start,lesson.data.nodes)&&oneOf(p.end,lesson.data.nodes);break;
+      case 'gradient-descent':valid=oneOf(p.alpha,[0.05,0.15,0.6,1.1]);break;
+      case 'classification-metrics':valid=typeof p.threshold==='number'&&Number.isFinite(p.threshold)&&p.threshold>=0.35&&p.threshold<=0.9;break;
+      default:valid=false;
+    }
+    if(valid){practice=JSON.parse(JSON.stringify(p));saveNotice.textContent='已恢复账号中的实验';}
+    else {restoreNotice='保存的实验状态与本课件不兼容，已使用默认值；请重新操作后保存。';saveNotice.textContent=restoreNotice;}
   }
   function openPractice() {
     if(embedded)return;
@@ -679,7 +718,7 @@
     practiceOpen=!practiceOpen;
     byId('practice-panel').hidden=!practiceOpen;
     practiceButton.textContent=practiceOpen?'收起练习':'自己试一试';
-    if(practiceOpen){practiceControls();byId('practice-output').textContent='选择一个操作，观察结果。';byId('practice-visual').innerHTML=render(practiceState());}
+    if(practiceOpen){practiceControls();showPractice();if(!window.K12)saveNotice.textContent='独立打开：实验只保留在当前页面，未保存到账号。';}
   }
   function simulateRobot(commands,walls,goal) {
     var pos=[0,0],path=[[0,0]],previous=[0,0],status='ready',current=0;
@@ -717,7 +756,7 @@
     statusNode.textContent='尚未开始；点击一次开始播放';
   }
   function metricPct(value){return value==null?'暂无可计算值':(Math.round(value*1000)/10)+'%';}
-  window.addEventListener('resize',function(){if(lastState){stageNode.innerHTML=render(lastState);fitEmbeddedVisual();}});
+  window.addEventListener('resize',function(){if(practiceOpen){showPractice();}else if(lastState){stageNode.innerHTML=render(lastState);fitEmbeddedVisual();}});
   beginButton.addEventListener('click',function(){if(!embedded&&mode!=='playing')startFrom(0);});
   pauseButton.addEventListener('click',function(){if(mode==='paused')resumePlayback();else pausePlayback();});
   replayButton.addEventListener('click',function(){if(!embedded)startFrom(index);});
@@ -737,7 +776,11 @@
   async function setupHost() {
     try {
       hostContext=await window.K12.ready();
-      hostReady=true;
+      hostReady=true;restorePractice(hostContext.gameState);
+      if(window.K12.workspace&&window.K12.workspace.onSession)window.K12.workspace.onSession(function(s){
+        var state=s.game_state;
+        if(state&&state.state_version===1&&state.content_key==='autoplay-'+lesson.key&&state.practice&&Object.keys(practice).every(function(k){return JSON.stringify(state.practice[k])===JSON.stringify(practice[k]);}))saveNotice.textContent='实验已保存到账号';
+      });
       var restoredIndex=lesson.steps.findIndex(function(_,i){return 'scene-'+String(i+1).padStart(2,'0')===hostContext.currentScene;});
       index=Math.max(0,restoredIndex);mode='host';void renderStep(lesson.steps[index]);
       if(window.K12.narration&&window.K12.narration.onState){window.K12.narration.onState(function(s){if(s.subtitle)captionNode.textContent=s.subtitle;statusNode.textContent=s.status==='speaking'?'平台正在朗读':s.status==='paused'?'平台朗读已暂停':s.status==='unavailable'?'没有可用声音，保留字幕':'平台讲解';});}
@@ -753,7 +796,7 @@
         } else if(command.command==='pause'){
           generation++;clearTimer();stopSpeech();mode='host-paused';document.body.classList.add('is-paused');var activeSvg=stageNode.querySelector('svg');if(activeSvg&&activeSvg.pauseAnimations)activeSvg.pauseAnimations();
         } else if(command.command==='demonstrate'){
-          if(command.prompt_id===null){document.body.classList.remove('is-paused');document.body.classList.add('is-practicing');mode='manual';practiceOpen=true;byId('practice-panel').hidden=false;practiceControls();var manualState=practiceState();stageNode.innerHTML=render(manualState);byId('practice-visual').innerHTML=render(manualState);captionNode.textContent='手动实践已恢复；自动演示没有覆盖已保留的操作。';byId('practice-output').textContent='选择一个操作，观察结果。';return;}
+          if(command.prompt_id===null){document.body.classList.remove('is-paused');document.body.classList.add('is-practicing');mode='manual';practiceOpen=true;byId('practice-panel').hidden=false;practiceControls();showPractice();captionNode.textContent='手动实践已恢复；自动演示没有覆盖已保留的操作。';return;}
           var i=lesson.steps.findIndex(function(_,k){return 'scene-'+String(k+1).padStart(2,'0')+'-read'===command.prompt_id;});
           if(i<0||i!==index)throw new Error('讲解与当前场景不匹配');
           document.body.classList.remove('is-practicing');byId('practice-panel').hidden=true;practiceOpen=false;mode='host';await renderStep(lesson.steps[i]);
@@ -772,12 +815,12 @@
     if(lesson.kind==='sorting-by-rule')return{rule:practice.rule,groups:grouping(lesson.data.items,practice.rule),note:'手动选择分类规则。'};
     if(lesson.kind==='robot-instructions')return simulateRobot(practice.route==='correct'?lesson.data.correct:lesson.data.wrong,lesson.data.walls,lesson.data.goal);
     if(lesson.kind==='pixels-build-picture')return{matrix:lesson.data.matrix,coarse:lesson.data.coarse,filled:16,note:practice.size+'×'+practice.size+' 网格使用同一图案。'};
-    if(lesson.kind==='cards-bubble-sort')return{array:practice.values,left:null,right:null,note:'手动输入的数据。'};
+    if(lesson.kind==='cards-bubble-sort')return{array:practice.operated?bubbleSortValues(practice.values):practice.values,left:null,right:null,note:practice.operated?'按相邻比较与交换得到结果。':'手动输入的数据。'};
     if(lesson.kind==='message-packets'){var order=(practice.order||'1,2,3').split(',');return{packets:order.map(function(id,i){var route=lesson.data.paths[id]||['S','A','C','T'];return{id:id,chunk:lesson.data.chunks[Number(id)-1],status:'arrived',order:i,path:route};}),note:'手动选择传输顺序：'+order.join('、')+'。'};}
-    if(lesson.kind==='linear-search')return{array:lesson.data.array,target:practice.target,current:null,checked:[],codeLine:0,note:'手动输入目标。'};
+    if(lesson.kind==='linear-search'){var ix=lesson.data.array.indexOf(practice.target);return{array:lesson.data.array,target:practice.target,current:practice.operated&&ix>=0?ix:null,checked:practice.operated?Array.from({length:ix>=0?ix+1:lesson.data.array.length},function(_,i){return i;}):[],codeLine:practice.operated?(ix>=0?2:3):0,note:practice.operated?(ix>=0?'找到后立即停止。':'全部检查后停止，不越界。'):'手动输入目标。'};}
     if(lesson.kind==='stack-and-queue')return{focus:practice.kind,stack:practice.kind==='stack'?practice.items:[],queue:practice.kind==='queue'?practice.items:[],stackOut:practice.kind==='stack'?practice.removed:[],queueOut:practice.kind==='queue'?practice.removed:[],note:'手动练习状态。'};
     if(lesson.kind==='training-and-testing'){var t=lesson.data.tests[practice.testIndex],pred=nearest(t.xy,lesson.data.train);return{train:lesson.data.train,test:{xy:t.xy},nearest:pred,phase:'test',prediction:pred.label,truth:t.truth,correct:pred.label===t.truth,note:'手动选择测试点。'};}
-    if(lesson.kind==='shortest-path'){var r=dijkstra(practice.start,lesson.data.edges),path=reconstruct(practice.start,practice.end,r.prev),es=[];for(var j=0;j<path.length-1;j++)es.push(edgeKey(path[j],path[j+1]));return graphState(r,practice.end,path,es);}
+    if(lesson.kind==='shortest-path'){var r=dijkstra(practice.start,lesson.data.edges),path=reconstruct(practice.start,practice.end,r.prev),es=[];for(var j=0;j<path.length-1;j++)es.push(edgeKey(path[j],path[j+1]));return Object.assign(graphState(r,practice.end,path,es),{path:path});}
     if(lesson.kind==='gradient-descent'){var pts=gradient(4,practice.alpha,6);return{points:pts,current:pts[pts.length-1],iteration:pts.length-1,note:'按所选学习步长计算。'};}
     if(lesson.kind==='classification-metrics')return{counts:metricCounts(practice.threshold),threshold:practice.threshold,currentId:'全部样例',note:'手动阈值计算。'};
     return lesson.steps[index].state;

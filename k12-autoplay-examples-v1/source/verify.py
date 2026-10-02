@@ -144,11 +144,13 @@ train=by["training-and-testing"]
 check(train["data"]["correct"]==2,"最近邻测试正确数量从三次预测实际计算为 2")
 check(all("truth" not in st["state"].get("test",{}) for st in train["steps"] if st["state"].get("test") and st["state"].get("truth") is None),"测试点真实标签仅在预测后揭示")
 
+REPORTS=ROOT.parent/"frontend"/"test-results"/"autoplay-examples-static"
+REPORTS.mkdir(parents=True,exist_ok=True)
 result={"status":"passed" if not errors else "failed","sample_count":len(lessons),"stage_counts":dict(counts),"scene_count":sum(len(x["steps"]) for x in lessons),"checks_passed":sum(x["passed"] for x in checks),"checks_total":len(checks),"errors":errors,"checks":checks,"project_package_parser":"read_package + build_document","platform_actual_import":"not verified"}
-(ROOT/"test-results"/"static-validation.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(REPORTS/"static-validation.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 lines=["# 静态与内容包检查", "", f"状态：{'通过' if not errors else '失败'}。共 {result['checks_passed']}/{result['checks_total']} 项检查通过，12 个样例、{result['scene_count']} 个场景。", "", "检查包括清单字段与引用、项目包解析器、隔离 HTML 构建、文件边界、目录链接和关键算法结果。没有访问数据库。", "", "平台实际导入：未验证。", ""]
 if errors:lines+= ["## 失败项", ""]+["- "+e for e in errors]
-(ROOT/"test-results"/"static-validation.md").write_text("\n".join(lines),encoding="utf-8")
+(REPORTS/"static-validation.md").write_text("\n".join(lines),encoding="utf-8")
 print(f"static validation: {result['status']} ({result['checks_passed']}/{result['checks_total']})")
 for err in errors:print("ERROR:",err)
 if errors:raise SystemExit(1)

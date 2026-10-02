@@ -24,6 +24,17 @@ async function request<T>(path: string, init: RequestInit = {}, mutation = false
   return body as T;
 }
 
+// An unknown/lost response remains retryable with the queue's exact event ID.
+async function persistRequest<T>(path: string, init: RequestInit, mutation = true): Promise<T> {
+  const abort = new AbortController();
+  const timer = window.setTimeout(() => abort.abort(), 12000);
+  try { return await request<T>(path, {...init, signal: abort.signal}, mutation); }
+  catch (error) {
+    if (abort.signal.aborted) throw new Error("保存超时，当前操作已保留，请重试保存。");
+    throw error;
+  } finally { window.clearTimeout(timer); }
+}
+
 export function listInteractive(purpose?: InteractivePurpose, q?: string, signal?: AbortSignal) {
   const params = new URLSearchParams();
   if (purpose) params.set("purpose", purpose);
@@ -35,8 +46,8 @@ export const startInteractive = (id: string, restart = false) => request<Interac
 export const getInteractiveSession = (id: string, signal?: AbortSignal) => request<InteractiveDetail>(`/api/v1/interactive/sessions/${id}`, { signal });
 export const getInteractiveDocument = (id: string, signal?: AbortSignal) => request<LearningComponents["schemas"]["InteractiveDocumentDTO"]>(`/api/v1/interactive/sessions/${id}/document`, { signal });
 export const listInteractiveHistory = (signal?: AbortSignal) => request<LearningComponents["schemas"]["InteractiveHistoryDTO"]>("/api/v1/interactive/sessions", { signal });
-export const saveInteractive = (id: string, payload: { base_revision: number; event_id: string; scene_id?: string | null; game_state?: Record<string, unknown> | null }) => request<InteractiveSession>(`/api/v1/interactive/sessions/${id}/checkpoint`, { method: "PATCH", body: JSON.stringify(payload) }, true);
-export const completeInteractive = (id: string, payload: { base_revision: number; event_id: string; scene_id?: string | null; game_state?: Record<string, unknown> | null; game_result?: Record<string, unknown>; source?: "SDK_REPORTED" | "USER_CONFIRMED" }) => request<InteractiveSession>(`/api/v1/interactive/sessions/${id}/complete`, { method: "POST", body: JSON.stringify(payload) }, true);
+export const saveInteractive = (id: string, payload: { base_revision: number; event_id: string; scene_id?: string | null; game_state?: Record<string, unknown> | null; playback_step?: number }) => persistRequest<InteractiveSession>(`/api/v1/interactive/sessions/${id}/checkpoint`, { method: "PATCH", body: JSON.stringify(payload) }, true);
+export const completeInteractive = (id: string, payload: { base_revision: number; event_id: string; scene_id?: string | null; game_state?: Record<string, unknown> | null; game_result?: Record<string, unknown>; source?: "SDK_REPORTED" | "USER_CONFIRMED" }) => persistRequest<InteractiveSession>(`/api/v1/interactive/sessions/${id}/complete`, { method: "POST", body: JSON.stringify(payload) }, true);
 
 export const adminListInteractiveVersions = (id: string) => request<AdminComponents["schemas"]["InteractiveVersionsDTO"]>(`/api/v1/admin/resources/${id}/interactive-revisions`);
 export const adminListInteractiveOverview = () => request<AdminComponents["schemas"]["InteractiveAdminListDTO"]>("/api/v1/admin/interactive/resources");
@@ -46,3 +57,5 @@ export const adminActivateInteractive = (id: string, revision: string) => reques
 export const adminCloneInteractive = (id: string, revision: string) => request<AdminComponents["schemas"]["InteractiveVersionDTO"]>(`/api/v1/admin/resources/${id}/interactive-revisions/${revision}/clone`, { method: "POST", body: "{}" }, true);
 export const adminPreviewInteractive = (id: string, revision: string) => request<AdminComponents["schemas"]["InteractivePreviewDTO"]>(`/api/v1/admin/resources/${id}/interactive-revisions/${revision}/preview`);
 export const adminUploadPromptAudio = (id: string, revision: string, prompt: string, file: File) => request(`/api/v1/admin/resources/${id}/interactive-revisions/${revision}/audio/${prompt}`, { method: "PUT", body: file, headers: { "X-Filename": file.name, "Content-Type": file.type || "application/octet-stream" } }, true);
+
+export const viewedInteractive = (id: string, payload: {base_revision: number; event_id: string}) => persistRequest<InteractiveSession>(`/api/v1/interactive/sessions/${id}/viewed`, {method: "POST", body: JSON.stringify(payload)}, true);

@@ -1,13 +1,13 @@
 """Compose a server-owned target and bounded, account-scoped personal context."""
 
+import json
 from dataclasses import dataclass
-
-from sqlalchemy import select
+from hashlib import sha256
 
 from app.integrations.knodo.wire import KnodoTarget
 from app.modules.ai.service import resolve
-from app.modules.memory.automatic import KeywordMemoryRetriever, state_for
-from app.modules.memory.automatic_models import ConversationMemorySummary
+from app.modules.memory.automatic import KeywordMemoryRetriever, state_for, utcnow
+from app.modules.memory.summaries import recall_summary
 
 
 @dataclass(frozen=True)
@@ -33,24 +33,16 @@ async def build_runtime_context(db, *, settings, gateway, session, operation, qu
     scope = gateway.continuation_scope(operation, **({"target": target} if target else {}))
     state = await state_for(db, session.owner_user_id, create=False)
     items = await KeywordMemoryRetriever().retrieve(db, session.owner_user_id, query)
-    if state is None or state.use_enabled:
-        summary = await db.scalar(
-            select(ConversationMemorySummary).where(
-                ConversationMemorySummary.owner_user_id == session.owner_user_id,
-                ConversationMemorySummary.session_id == str(session.id),
-            )
-        )
-        if summary and summary.content:
-            items.append(
-                {
-                    "id": f"session-summary:{summary.id}:v{summary.revision}",
-                    "source": "SESSION_SUMMARY",
-                    "summary": summary.content,
-                }
-            )
+    summary = await recall_summary(db, session.owner_user_id, session.id, state, utcnow())
+    if summary:
+        items.append(summary)
     if scope and target_snapshot:
         scope += "|agent=" + target_snapshot["signature"]
         scope += f"|registry={target_snapshot['configuration_revision']}"
     if scope and state and state.content_revision:
         scope += f"|memory={state.content_revision}"
+    if scope and (items or (state and state.content_revision)):
+        # Expiry and changed recall also retire a continuation carrying old facts.
+        digest = sha256(json.dumps(items, sort_keys=True).encode()).hexdigest()[:24]
+        scope += "|recall=" + digest
     return TeachingRuntimeContext(target, scope, items[:8])

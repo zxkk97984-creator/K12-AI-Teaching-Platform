@@ -25,7 +25,7 @@ function studentMe(stage: Stage | null = "JUNIOR"): MeResponse {
   return {
     user: { id: "00000000-0000-0000-0000-000000000001", username: "student", role: "student", is_active: true },
     profile: { stage, grade: null, revision: 3, onboarding_completed: !!stage },
-    preferences: { preferred_style: "AUTO", teacher_style: "AUTO", companion_pet_id: "shuangling", interests: [], proactive_guidance_enabled: true, voice_preference: "DISABLED", profile_revision: 3 },
+    preferences: { preferred_style: "AUTO", teacher_style: "AUTO", companion_pet_id: "shuangling", interests: [], proactive_guidance_enabled: true, voice_preference: "DISABLED", auto_read_replies: false, profile_revision: 3 },
   };
 }
 

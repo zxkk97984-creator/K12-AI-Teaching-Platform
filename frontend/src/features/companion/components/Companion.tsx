@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
-import { ConversationCompactOptions, ConversationContent } from "../../conversation/ConversationContent";
+import { createLazyPage } from "../../../app/routing/lazyPage";
 import { useConversation } from "../../conversation/ConversationProvider";
 import { CompanionHeadAvatar } from "../CompanionAvatar";
 import { useCompanionPosition } from "../hooks/useCompanionPosition";
@@ -13,6 +13,11 @@ import "../companion.css";
 import { useCompanionPet } from "../hooks/useCompanionPet";
 import type { CompanionPageContext } from "../openCompanion";
 import { useLearningTeacher } from "../LearningTeacherContext";
+
+// The dock and its state stay mounted. Load the conversation renderer only
+// when its panel is actually opened, sharing the existing provider/controller.
+const ConversationContent = createLazyPage(() => import("../../conversation/ConversationContent").then(m => ({ default: m.ConversationContent })), "对话").Page;
+const ConversationCompactOptions = createLazyPage(() => import("../../conversation/ConversationContent").then(m => ({ default: m.ConversationCompactOptions })), "对话设置").Page;
 
 export function Companion({ userId }: { userId: string }) {
   const [pet, selectPet] = useCompanionPet(userId);
@@ -27,6 +32,7 @@ export function Companion({ userId }: { userId: string }) {
   const panel = useRef<HTMLElement>(null);
   const location = useLocation();
   const previousPath = useRef(location.pathname);
+  const conversationSurface = ["/conversations", "/lessons"].includes(location.pathname);
   const codeSurface = location.pathname === "/code";
   const interactiveSurface = location.pathname.startsWith("/interactive/");
   const learningTeacher = useLearningTeacher();
@@ -181,7 +187,7 @@ export function Companion({ userId }: { userId: string }) {
       <div
         className="companion-dock"
         data-testid="companion-dock"
-        data-minimized={minimized || interactiveSurface}
+        data-minimized={minimized || interactiveSurface || conversationSurface}
         style={{
           left: position.position.x,
           top: position.position.y,
@@ -191,7 +197,7 @@ export function Companion({ userId }: { userId: string }) {
           "--codelab-pet-top": `${position.position.y}px`,
         } as CSSProperties}
       >
-        {!minimized && !interactiveSurface ? (
+        {!minimized && !interactiveSurface && !conversationSurface ? (
           <button
             className="companion-minimize"
             aria-label="最小化桌宠"
@@ -224,7 +230,7 @@ export function Companion({ userId }: { userId: string }) {
             }
           }}
         >
-          {minimized ? (
+          {minimized || conversationSurface ? (
             <CompanionHeadAvatar pet={pet} size={codeSurface ? 36 : 54} />
           ) : interactiveSurface ? (
             <CompanionSprite petId={pet.id} state={position.movement ?? state} size={54} />
@@ -270,7 +276,6 @@ export function Companion({ userId }: { userId: string }) {
             {optionsOpen ? <ConversationCompactOptions chapterId={chapterId} onSelect={() => setOptionsOpen(false)} partnerSettings={<><label className="companion-picker">选择学习伙伴<select value={pet.id} onChange={(event) => { setPetError(""); void selectPet(event.target.value).then(() => setOptionsOpen(false)).catch((caught) => setPetError(caught instanceof Error ? caught.message : "桌宠选择未保存")); }}>{COMPANION_PETS.map((p) => <option key={p.id} value={p.id}>{p.displayName}</option>)}</select></label>{petError && <p role="alert">{petError}</p>}</>} /> : null}
           </div>
           <ConversationContent chapterId={chapterId} compact learningWorkspace={interactiveSurface} beforeSend={interactiveSurface ? learningTeacher.beforeSend : undefined} />
-          <footer className="companion-panel-footer">AI 回答请结合课程核对</footer>
           {(["n", "s", "e", "w", "ne", "nw", "sw"] as PanelGesture[]).map((direction) => <div key={direction} aria-hidden="true" className={`companion-resize companion-resize--${direction}`}
             onPointerDown={(event) => panelPosition.pointerDown(event, direction)} {...panelPointerEvents} />)}
           <button type="button" className="companion-resize companion-resize--se" aria-label="调整对话窗口大小" title="拖动调整大小；方向键也可调整"

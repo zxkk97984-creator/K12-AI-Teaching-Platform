@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { CodeEditor } from "../codelab/CodeEditor";
+import { createLazyPage } from "../../app/routing/lazyPage";
+
 import { createCodeRun, getCodeRun } from "../codelab/api";
 import type { CodeRun } from "../codelab/types";
 import type { QuizQuestionDTO } from "./types";
+
+const CodeEditor = createLazyPage(() => import("../codelab/CodeEditor").then(m => ({ default: m.CodeEditor })), "代码编辑器").Page;
 
 type Props = {
   question: QuizQuestionDTO;

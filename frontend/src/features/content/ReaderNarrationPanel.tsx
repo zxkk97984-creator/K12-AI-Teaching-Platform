@@ -8,7 +8,7 @@ const labels = {
 };
 
 export function ReaderNarrationPanel({ narrator, onReadChapter }: { narrator: ReaderNarrator; onReadChapter: () => void }) {
-  const status = narrator.message || labels[narrator.status];
+  const status = narrator.message || narrator.notice || labels[narrator.status];
   const failed = Boolean(narrator.message) || narrator.status === "error" || narrator.status === "unavailable";
   return <section id="reader-narration" className="reader-narration" aria-label="课文朗读" data-pet-avoid>
     <div className="reader-narration-heading"><h2>课文朗读</h2><span>系统语音</span></div>

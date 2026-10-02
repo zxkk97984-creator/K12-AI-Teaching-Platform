@@ -42,6 +42,14 @@ const initial = (): ConversationState => ({
 /** One owner-scoped controller, one run subscription; no conversation content in storage. */
 export class ConversationController {
   private state = initial();
+  private freshReplyRuns = new Set<string>();
+  private narratedReplies = new Set<string>();
+  claimReplyNarration = (run: RunDTO) => {
+    if (!this.freshReplyRuns.has(run.id) || run.status !== "SUCCEEDED" || !run.card || !run.result_message_id || this.narratedReplies.has(run.result_message_id)) return false;
+    this.narratedReplies.add(run.result_message_id);
+    this.freshReplyRuns.delete(run.id);
+    return this.state.detail?.id === run.session_id;
+  };
   private disposed = false;
   activate = () => {
     this.disposed = false;
@@ -219,6 +227,7 @@ export class ConversationController {
   trackRun = (run: RunDTO) => {
     if (this.disposed) return;
     if (this.state.run?.id === run.id && this.subscription) return;
+    if (!run.idempotent_replay) this.freshReplyRuns.add(run.id);
     this.follow(run);
   };
   private follow(run: RunDTO) {
@@ -334,6 +343,7 @@ export class ConversationController {
         ...(this.state.detail?.id === detail.id ? { draft: "" } : {}),
         sending: false,
       });
+      if (!result.run.idempotent_replay) this.freshReplyRuns.add(result.run.id);
       this.follow(result.run);
       await this.refresh(detail.id, epoch);
     } catch (error) {
@@ -412,6 +422,8 @@ export class ConversationController {
     this.initialized = false;
     this.pending = null;
     this.selectingId = null;
+    this.freshReplyRuns.clear();
+    this.narratedReplies.clear();
     this.patch(initial());
   };
 }

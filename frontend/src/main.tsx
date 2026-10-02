@@ -1,30 +1,13 @@
-import { lazy, StrictMode, Suspense } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Home } from "./pages/Home";
-import { LoginPage } from "./pages/login/LoginPage";
-import { OnboardingPage } from "./pages/onboarding/OnboardingPage";
-import { SettingsPage } from "./pages/settings/SettingsPage";
-import { WorkbenchPage } from "./pages/workbench/WorkbenchPage";
-import { CourseListPage } from "./pages/courses/CourseListPage";
-import { CourseDetailPage } from "./pages/courses/CourseDetailPage";
-import { ChapterReaderPage } from "./pages/reader/ChapterReaderPage";
-import { ConversationRoutePage } from "./features/conversation/ConversationPage";
-import { LessonPage } from "./features/lesson/LessonPage";
-import { StagePracticePage } from "./pages/practice/StagePracticePage";
-import { GrowthPage } from "./features/growth/GrowthPage";
-import { NextStepPage } from "./features/learning-next/NextStepPage";
-import { ResourceDetailPage } from "./features/resources/ResourceDetailPage";
-import { AnimationPage } from "./features/animation/AnimationPage";
-import { AdminResourcesPage } from "./pages/admin/AdminResourcesPage";
-const AdminAIPage = lazy(() => import("./pages/admin/AdminAIPage").then((module) => ({ default: module.AdminAIPage })));
-import { AdminAuthoringPage } from "./pages/admin/AdminAuthoringPage";
-import { StudyPage } from "./features/study/StudyPage";
-import { PicturebookPage } from "./features/picturebooks/PicturebookPage";
-import { ResourceLibraryPage } from "./features/resources/ResourceLibraryPage";
-import { InteractiveCatalogPage } from "./features/interactive/InteractiveCatalogPage";
-import { InteractivePlayerPage } from "./features/interactive/InteractivePlayerPage";
-import { AdminInteractivePage } from "./pages/admin/AdminInteractivePage";
-import { MorePage } from "./pages/more/MorePage";
+import { pages } from "./app/routing/pages";
+const {
+  Home, LoginPage, OnboardingPage, SettingsPage, WorkbenchPage, CourseListPage, CourseDetailPage,
+  ChapterReaderPage, ConversationRoutePage, LessonPage, StagePracticePage, GrowthPage, NextStepPage,
+  ResourceDetailPage, AnimationPage, AdminResourcesPage, AdminAIPage, AdminAuthoringPage, StudyPage,
+  PicturebookPage, ResourceLibraryPage, InteractiveCatalogPage, InteractivePlayerPage, AdminInteractivePage,
+  MorePage, CodeLabPage, BookReaderPage,
+} = pages;
 import "./styles.css";
 import { createBrowserRouter, Navigate, RouterProvider, useLocation } from "react-router-dom";
 import { AppLayout } from "./app/layout/AppLayout";
@@ -33,17 +16,6 @@ import "./app/layout/design-system.css";
 import "./app/layout/k12-redesign.css";
 import "./app/layout/student-pages.css";
 import { navigate } from "./features/identity/session";
-
-const CodeLabPage = lazy(() =>
-  import("./pages/code/CodeLabPage").then((module) => ({
-    default: module.CodeLabPage,
-  })),
-);
-const BookReaderPage = lazy(() =>
-  import("./features/books/BookReaderPage").then((module) => ({
-    default: module.BookReaderPage,
-  })),
-);
 
 function Page() {
   const { pathname: path, search } = useLocation();
@@ -62,13 +34,7 @@ function Page() {
   if (path.startsWith("/admin/authoring")) return <AdminAuthoringPage />;
   if (path.startsWith("/admin/resources/interactive")) return <AdminInteractivePage />;
   if (path.startsWith("/admin/resources")) return <AdminResourcesPage />;
-  if (path.startsWith("/code")) {
-    return (
-      <Suspense fallback={<main>正在加载 CodeLab…</main>}>
-        <CodeLabPage />
-      </Suspense>
-    );
-  }
+  if (path.startsWith("/code")) return <CodeLabPage />;
   if (path.startsWith("/interactive/")) return <InteractivePlayerPage />;
   if (path.startsWith("/activities")) return <InteractiveCatalogPage />;
   if (path.startsWith("/animations/")) return <AnimationPage />;
@@ -81,13 +47,7 @@ function Page() {
   if (path.startsWith("/resources/")) return <ResourceDetailPage />;
   if (path.startsWith("/conversations")) return <ConversationRoutePage />;
   if (path.startsWith("/chapters/")) return <ChapterReaderPage />;
-  if (path.startsWith("/books/")) {
-    return (
-      <Suspense fallback={<main className="book-reader-loading" role="status">正在打开教材…</main>}>
-        <BookReaderPage />
-      </Suspense>
-    );
-  }
+  if (path.startsWith("/books/")) return <BookReaderPage />;
   if (path.startsWith("/picturebooks/") || path === "/picturebooks") return <PicturebookPage />;
   if (path === "/courses") return <CourseListPage />;
   if (path.startsWith("/courses/")) return <CourseDetailPage />;

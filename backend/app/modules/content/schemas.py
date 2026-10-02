@@ -356,6 +356,29 @@ class SourceRefDTO(StrictModel):
     license_code: LicenseCode
 
 
+SelfTestQuestionId = Literal["Q01", "Q02", "Q03", "Q04", "Q05", "Q06"]
+SelfTestQuestionType = Literal["SINGLE_CHOICE", "SHORT_ANSWER", "PRACTICE"]
+
+
+class SelfTestQuestionDTO(StrictModel):
+    question_id: SelfTestQuestionId
+    question_type: SelfTestQuestionType
+    end_block_id: Annotated[str, StringConstraints(pattern=r"^b[0-9]{1,4}$", max_length=8)]
+    end_offset: int = Field(ge=0, le=4000, description="Unicode code point offset in end_block_id")
+    has_reference_answer: bool
+
+
+class SelfTestAnswerDTO(StrictModel):
+    chapter_id: uuid.UUID
+    revision_id: uuid.UUID
+    revision: int
+    question_id: SelfTestQuestionId
+    question_type: SelfTestQuestionType
+    correct_options: list[Literal["A", "B", "C", "D"]]
+    reference_answer: str
+    explanation: str
+
+
 class ChapterDetailDTO(ChapterSummaryDTO):
     objectives: list[str]
     knowledge_points: list[KnowledgePointDTO]
@@ -363,6 +386,7 @@ class ChapterDetailDTO(ChapterSummaryDTO):
     source: SourceRefDTO
     license_code: LicenseCode
     navigation: ChapterNavigationDTO
+    self_test_questions: list[SelfTestQuestionDTO] = Field(default_factory=list)
 
 
 class CourseListDTO(StrictModel):
