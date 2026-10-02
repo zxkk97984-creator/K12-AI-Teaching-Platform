@@ -37,6 +37,31 @@
 ./k12 check                 # 隔离测试库中的完整本地检查
 ```
 
+六本原创教材已包含在 `curriculum/source/original/original-books-v1/`，首次初始化会自动导入。
+已运行的开发环境可执行以下命令完成迁移和幂等导入，保留现有课程、账号和阅读进度：
+
+```bash
+. scripts/load-runtime-env.sh
+cd backend
+uv run --locked alembic -c alembic.ini upgrade head
+uv run --locked python -m app.scripts.import_content import \
+  --release-dir ../curriculum/source/original/original-books-v1 --apply
+```
+
+复核接收包和转换结果时，可运行：
+
+```bash
+cd backend
+uv run --locked python -m app.scripts.import_content books \
+  --source-dir ../curriculum/source/original/original-books-v1/source \
+  --output-dir ../curriculum/source/original/original-books-v1
+```
+
+省略 `--output-dir` 为只读核验；如有原 ZIP，可另传 `--zip` 逐字节核对。
+固定 v1 的转换产物不会覆盖不同的已有文件；教材修改需要另建内容版本。
+72 个原创章节映射为四学段的 96 个章节版本，每个账号仍看到两本书、每本 12 章。
+`source/answers/` 是后端参考答案源，不发布为教学资源，也不自动创建判分任务。
+
 需要编程执行时，首次运行 `./k12 setup --with-runner` 构建受限 runner 镜像，然后使用
 `./k12 start --with-runner`（或前台开发用 `./k12 dev --with-runner`）。脚本在 `~/.local/state/k12/runner-control-token` 生成权限为 600 的
 控制 token，runner 只绑定回环地址；API 不获得 Docker socket。未启动 runner 时，CodeLab
@@ -132,3 +157,33 @@ Tutor/Designer 环境变量只用于注册表首次初始化，Tutor 的 Bot／�
 管理员浏览器回归使用合成数据拦截全部 API：`cd frontend && npx playwright test --config playwright.admin.config.ts`。截图及结果位于 `frontend/test-results/admin-workspace/`，不会修改开发库或调用 Knodo。
 
 用户可分别关闭自动整理和聊天召回；手动整理历史聊天可取消、重试。删除会话默认保留自动记忆，勾选“同时遗忘”才撤回关联自动条目。遗忘不删除手写文档，也不承诺删除 Knodo 的历史。个人数据导出与清理覆盖自动条目、来源、摘要和后台任务。
+
+## 私有云端开发环境
+
+杭州 ECS `i-bp12dwxd5gl0kxdfvkri` 已配置为开发与验证环境。源码位于云服务器内
+`/opt/k12/current`，保留迁移时的 Git 历史与工作区修改；后续本机改动需要显式同步。
+Python 3.12 和 Node 22 在 Docker 中运行，API 支持源码重载，Vite 支持前端调试。
+网站、API、数据库及 runner 控制服务均只监听服务器回环地址。
+
+当前电脑的入口脚本为 `~/.local/bin/k12-cloud`：
+
+```bash
+k12-cloud tunnel      # 建立 SSH 私有隧道
+k12-cloud shell       # 通过 Workbench 进入云端终端
+k12-cloud status      # 查看云端服务
+k12-cloud dev         # 启动云端 Vite
+k12-cloud check       # 在隔离测试库和合成配置中检查
+k12-cloud stop-dev    # 停止 Vite，保留其他服务
+k12-cloud untunnel    # 关闭本机隧道
+```
+
+隧道建立后，当前构建为 `http://127.0.0.2:15175`，Vite 调试为
+`http://127.0.0.2:15176`。这些地址只在当前电脑可用；独立回环地址用于隔离云端与本机
+站点的登录 Cookie。本机原有 `15173` 开发服务可以继续运行。
+
+在云端终端中使用 `/opt/k12/k12-cloud` 管理 Compose 服务，
+`/opt/k12/k12-cloud-check` 执行隔离检查。运行配置、合成测试配置及 runner token
+分别保存在 `/etc/k12/runtime.env`、`/etc/k12/test.env` 和 `/etc/k12/runner.env`，
+均为权限 600 的仓库外文件；上传资源位于 `/srv/k12/runtime-storage`。
+默认检查使用独立 `55434 / k12r1_test` 数据库和 fixture，不发起真实 Knodo 调用。
+云端开发数据与本机数据分开保存，优化后的代码也需明确同步回本机。

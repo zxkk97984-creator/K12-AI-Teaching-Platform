@@ -16,6 +16,7 @@ frontend/node_modules/
 frontend/dist/
 frontend/.vite/
 frontend/test-results/
+frontend/frontend/test-results/
 frontend/playwright-report/
 # Browser outputs from older scripts are local artifacts, not documentation.
 frontend/docs/
@@ -59,3 +60,7 @@ docs/acceptance/ui-reuse/*.png
 # Local competition brief and generated bundles.
 docs/competition/*.docx
 **/*.zip
+# Reproducible source is kept under curriculum/source/original/; keep the
+# identical incoming exchange copy and local autoplay QA evidence out of Git.
+/k12-original-books-v1/
+/k12-autoplay-examples-v1/test-results/
