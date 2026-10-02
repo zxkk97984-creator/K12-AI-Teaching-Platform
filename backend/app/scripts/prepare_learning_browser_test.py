@@ -4,6 +4,7 @@ import asyncio
 import io
 import json
 import math
+import os
 import struct
 import wave
 from pathlib import Path
@@ -18,6 +19,7 @@ from app.modules.content.importer import import_package
 from app.modules.content.package import load_package
 from app.modules.identity.models import PreferredStyle, UserRole
 from app.modules.identity.service import ensure_demo_user
+from app.modules.interactive.example_bundle import import_autoplay_examples
 from app.modules.interactive.learning_bundle import import_learning_activities
 from app.modules.interactive.models import InteractiveRevision
 from app.modules.interactive.service import activate_version, add_prompt_audio, clone_draft
@@ -62,11 +64,28 @@ async def main():
                     interests=[],
                     settings=settings,
                 )
+            if os.environ.get("K12_AUTOPLAY_EXAMPLES_E2E") == "1":
+                previous_examples = os.environ.get("K12_AUTOPLAY_EXAMPLES_UPGRADE_FROM")
+                print(
+                    json.dumps(
+                        await import_autoplay_examples(
+                            db,
+                            actor=admin,
+                            settings=settings,
+                            upgrade_from=Path(previous_examples) if previous_examples else None,
+                        )
+                    )
+                )
+                return
             root = (
                 Path(__file__).resolve().parents[3]
                 / "curriculum/source/imported/computing-ai-md-v1"
             )
             await import_package(db, load_package(root), dry_run=False)
+            books = (
+                Path(__file__).resolve().parents[3] / "curriculum/source/original/original-books-v1"
+            )
+            await import_package(db, load_package(books), dry_run=False)
             print(json.dumps(await import_learning_activities(db, actor=admin, settings=settings)))
             # A real, local media fixture exercises playback events, not speech quality.
             resource = await db.scalar(

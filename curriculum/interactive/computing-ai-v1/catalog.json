@@ -1,6 +1,12 @@
 {
   "items": [
     {
+      "folder": "ai-fruit-trainer",
+      "course_slug": "primary-ai",
+      "chapter_slug": "ch-003-lower",
+      "stage": "PRIMARY_LOWER"
+    },
+    {
       "folder": "ai-picture",
       "course_slug": "primary-ai",
       "chapter_slug": "ch-003-lower",

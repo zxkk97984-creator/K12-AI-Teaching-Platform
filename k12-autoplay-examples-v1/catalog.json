@@ -1,0 +1,260 @@
+[
+  {
+    "id": "primary-lower-input-process-output",
+    "title": "小机器人收到指令以后会做什么",
+    "stage": "PRIMARY_LOWER",
+    "suggested_grades": "1—3 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "输入",
+      "处理",
+      "输出"
+    ],
+    "standalone_html": "standalone/primary-lower/input-process-output.html",
+    "package_zip": "packages/primary-lower-input-process-output.zip",
+    "cover": "assets/primary-lower-input-process-output-cover.svg",
+    "summary": "按键进入设备，设备按明确规则处理，并显示对应的灯光结果。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "primary-lower-sorting-by-rule",
+    "title": "给图形找家：按规则分类",
+    "stage": "PRIMARY_LOWER",
+    "suggested_grades": "1—3 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "分类规则",
+      "形状",
+      "颜色"
+    ],
+    "standalone_html": "standalone/primary-lower/sorting-by-rule.html",
+    "package_zip": "packages/primary-lower-sorting-by-rule.zip",
+    "cover": "assets/primary-lower-sorting-by-rule-cover.svg",
+    "summary": "同一组图形分别按形状、按颜色分类，观察规则如何改变分组。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "primary-lower-robot-instructions",
+    "title": "箭头指令带机器人走到终点",
+    "stage": "PRIMARY_LOWER",
+    "suggested_grades": "1—3 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "指令顺序",
+      "方向",
+      "障碍"
+    ],
+    "standalone_html": "standalone/primary-lower/robot-instructions.html",
+    "package_zip": "packages/primary-lower-robot-instructions.zip",
+    "cover": "assets/primary-lower-robot-instructions-cover.svg",
+    "summary": "机器人按箭头逐格移动，遇到障碍会停止，并用改正后的顺序到达终点。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "primary-upper-pixels-build-picture",
+    "title": "小方格怎样组成一张图片",
+    "stage": "PRIMARY_UPPER",
+    "suggested_grades": "4—6 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "像素",
+      "颜色矩阵",
+      "图像细节"
+    ],
+    "standalone_html": "standalone/primary-upper/pixels-build-picture.html",
+    "package_zip": "packages/primary-upper-pixels-build-picture.zip",
+    "cover": "assets/primary-upper-pixels-build-picture-cover.svg",
+    "summary": "同一份颜色矩阵逐步填色，并对比四乘四与八乘八网格的细节和单元数量。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "primary-upper-cards-bubble-sort",
+    "title": "数字卡片怎样排整齐",
+    "stage": "PRIMARY_UPPER",
+    "suggested_grades": "4—6 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "相邻比较",
+      "交换",
+      "冒泡排序"
+    ],
+    "standalone_html": "standalone/primary-upper/cards-bubble-sort.html",
+    "package_zip": "packages/primary-upper-cards-bubble-sort.zip",
+    "cover": "assets/primary-upper-cards-bubble-sort-cover.svg",
+    "summary": "默认数组 [5, 2, 4, 1, 3] 由真实相邻比较和交换得到升序结果。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "primary-upper-message-packets",
+    "title": "一条消息怎样通过网络送出去",
+    "stage": "PRIMARY_UPPER",
+    "suggested_grades": "4—6 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "发送与接收",
+      "信息块",
+      "编号重组"
+    ],
+    "standalone_html": "standalone/primary-upper/message-packets.html",
+    "package_zip": "packages/primary-upper-message-packets.zip",
+    "cover": "assets/primary-upper-message-packets-cover.svg",
+    "summary": "模拟一条短消息分块、沿连接节点到达、按编号重组的过程。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "junior-linear-search",
+    "title": "从一排数据中找到目标：线性查找",
+    "stage": "JUNIOR",
+    "suggested_grades": "7—9 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "线性查找",
+      "数组下标",
+      "停止条件"
+    ],
+    "standalone_html": "standalone/junior/linear-search.html",
+    "package_zip": "packages/junior-linear-search.zip",
+    "cover": "assets/junior-linear-search-cover.svg",
+    "summary": "真实检查目标 9 和不存在的目标 8，显示比较位置、代码步骤和停止条件。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "junior-stack-and-queue",
+    "title": "叠盘子和排队：栈与队列",
+    "stage": "JUNIOR",
+    "suggested_grades": "7—9 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "栈",
+      "队列",
+      "先进先出",
+      "后进先出"
+    ],
+    "standalone_html": "standalone/junior/stack-and-queue.html",
+    "package_zip": "packages/junior-stack-and-queue.zip",
+    "cover": "assets/junior-stack-and-queue-cover.svg",
+    "summary": "用同样的 A、B、C 顺序真实展示栈顶与队首的取出次序和空栈边界。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "junior-training-and-testing",
+    "title": "为什么学习样例和检查样例要分开",
+    "stage": "JUNIOR",
+    "suggested_grades": "7—9 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "训练数据",
+      "测试数据",
+      "最近邻",
+      "评估"
+    ],
+    "standalone_html": "standalone/junior/training-and-testing.html",
+    "package_zip": "packages/junior-training-and-testing.zip",
+    "cover": "assets/junior-training-and-testing-cover.svg",
+    "summary": "用训练点建立最近邻分类，再预测并揭示独立测试点的真实类别。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "senior-shortest-path",
+    "title": "怎样找到总路程最短的路线",
+    "stage": "SENIOR",
+    "suggested_grades": "10—12 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "带权图",
+      "Dijkstra 算法",
+      "候选距离",
+      "前驱"
+    ],
+    "standalone_html": "standalone/senior/shortest-path.html",
+    "package_zip": "packages/senior-shortest-path.zip",
+    "cover": "assets/senior-shortest-path-cover.svg",
+    "summary": "对六节点非负带权图实际执行 Dijkstra，得到 A 到 E 的路径成本 10，并检查不可达节点 F。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "senior-gradient-descent",
+    "title": "梯度下降怎样一步步靠近最低点",
+    "stage": "SENIOR",
+    "suggested_grades": "10—12 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "目标函数",
+      "导数方向",
+      "学习步长",
+      "梯度下降"
+    ],
+    "standalone_html": "standalone/senior/gradient-descent.html",
+    "package_zip": "packages/senior-gradient-descent.zip",
+    "cover": "assets/senior-gradient-descent-cover.svg",
+    "summary": "按 x_next=x−α×2x 计算 f(x)=x² 的更新，并对照实际计算出的过大步长轨迹。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  },
+  {
+    "id": "senior-classification-metrics",
+    "title": "分类模型的误报与漏报",
+    "stage": "SENIOR",
+    "suggested_grades": "10—12 年级",
+    "subject": "计算机与人工智能",
+    "knowledge_points": [
+      "混淆矩阵",
+      "准确率",
+      "精确率",
+      "召回率",
+      "阈值"
+    ],
+    "standalone_html": "standalone/senior/classification-metrics.html",
+    "package_zip": "packages/senior-classification-metrics.zip",
+    "cover": "assets/senior-classification-metrics-cover.svg",
+    "summary": "用八个合成编号样例分别计算 0.50 与 0.65 阈值下的混淆矩阵、准确率、精确率与召回率。",
+    "verification": {
+      "files": "passed: generated; validated with project read_package/build_document",
+      "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+      "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+    }
+  }
+]

@@ -29,9 +29,9 @@ from tests.teaching_helpers import csrf_headers
 COURSES = Path(__file__).resolve().parents[2] / "curriculum/source/imported/computing-ai-md-v1"
 
 
-def test_four_offline_packages_are_reproducible_and_complete():
+def test_offline_packages_are_reproducible_and_complete():
     items = json.loads((ROOT / "catalog.json").read_text())["items"]
-    assert len(items) == 4
+    assert len(items) == 5
     for item in items:
         folder = ROOT / item["folder"]
         raw = package_bytes(folder)
@@ -49,10 +49,14 @@ def test_four_offline_packages_are_reproducible_and_complete():
         )
         assert "connect-src 'none'" in document
         scripts = BeautifulSoup(document, "html.parser").select("script[src]")
-        assert any(
-            b"window.LESSON_SCENES" in base64.b64decode(script["src"].split(",", 1)[1])
-            for script in scripts
-        )
+        if parsed.purpose == "GAME":
+            assert scripts == []
+            assert "简化分类教学模拟" in document
+        else:
+            assert any(
+                b"window.LESSON_SCENES" in base64.b64decode(script["src"].split(",", 1)[1])
+                for script in scripts
+            )
 
 
 @pytest.mark.asyncio
@@ -72,12 +76,12 @@ async def test_four_stage_activities_restore_context_and_remain_private(
     )
     await import_package(content_session, load_package(COURSES), dry_run=False)
     first = await import_learning_activities(content_session, actor=admin, settings=settings)
-    assert first["resources_created"] == first["versions_created"] == 4
+    assert first["resources_created"] == first["versions_created"] == 5
     second = await import_learning_activities(content_session, actor=admin, settings=settings)
     assert second == {
         "resources_created": 0,
         "versions_created": 0,
-        "versions_reused": 4,
+        "versions_reused": 5,
         "files_restored": 0,
     }
 
@@ -100,7 +104,12 @@ async def test_four_stage_activities_restore_context_and_remain_private(
             transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:15173"
         ) as client:
             assert (await login(client, user.username, "synthetic-pass-1")).status_code == 200
-            catalog = (await client.get("/api/v1/interactive/resources")).json()
+            catalog = (
+                await client.get(
+                    "/api/v1/interactive/resources",
+                    params={"purpose": "LESSON" if stage.startswith("PRIMARY") else "EXPERIMENT"},
+                )
+            ).json()
             assert catalog["stage"] == stage and len(catalog["items"]) == 1
             item = catalog["items"][0]
             assert item["local_demo_visible"] and item["chapter_revision_ids"]
@@ -318,6 +327,12 @@ async def test_workspace_upgrade_preserves_edits_audio_and_locked_documents(
     )
     new_root = tmp_path / "new-source"
     shutil.copytree(ROOT, new_root)
+    manifest_path = new_root / "conditions-loops/manifest.json"
+    new_manifest = json.loads(manifest_path.read_text())
+    new_manifest["prompts"][0]["text"] = "新版内置台词，不覆盖管理员自定义讲解。"
+    new_manifest["prompts"][1]["text"] = "新版自动演示讲解。"
+    new_manifest["scenes"][1]["summary"] = "新版自动演示摘要。"
+    manifest_path.write_text(json.dumps(new_manifest, ensure_ascii=False))
     with (new_root / "shared/style.css").open("a") as stream:
         stream.write("\n/* new workspace revision */\n")
     result = await import_learning_activities(
@@ -328,6 +343,8 @@ async def test_workspace_upgrade_preserves_edits_audio_and_locked_documents(
     latest = await content_session.get(InteractiveRevision, resource.active_interactive_revision_id)
     assert latest.manifest["prompts"][0]["text"] == copied["prompts"][0]["text"]
     assert latest.manifest["prompts"][0]["audio"] == "audio/observe-read.wav"
+    assert latest.manifest["prompts"][1]["text"] == "新版自动演示讲解。"
+    assert latest.manifest["scenes"][1]["summary"] == "新版自动演示摘要。"
     with zipfile.ZipFile(
         Path(settings.resource_storage_root, latest.package_storage_key)
     ) as archive:
@@ -340,11 +357,11 @@ async def test_workspace_upgrade_preserves_edits_audio_and_locked_documents(
     again = await import_learning_activities(
         content_session, actor=admin, settings=settings, root=new_root, upgrade_from=ROOT
     )
-    assert again["versions_created"] == 0 and again["versions_reused"] == 4
+    assert again["versions_created"] == 0 and again["versions_reused"] == 5
     ordinary_setup = await import_learning_activities(
         content_session, actor=admin, settings=settings, root=new_root
     )
-    assert ordinary_setup["versions_created"] == 0 and ordinary_setup["versions_reused"] == 4
+    assert ordinary_setup["versions_created"] == 0 and ordinary_setup["versions_reused"] == 5
     # An independently authored script is not a managed template.
     asset = await content_session.scalar(
         select(InteractiveFile).where(
@@ -362,4 +379,148 @@ async def test_workspace_upgrade_preserves_edits_audio_and_locked_documents(
             settings=settings,
         )
         is None
+    )
+
+
+@pytest.mark.asyncio
+async def test_targeted_game_import_catalog_restore_and_result(
+    test_settings, content_session, tmp_path
+):
+    from app.modules.interactive.service import activate_version, clone_draft, update_draft
+
+    settings = test_settings.model_copy(
+        update={"resource_storage_root": str(tmp_path / "resources")}
+    )
+    admin = await create_synthetic_user(
+        settings,
+        username="fruit.admin",
+        password="synthetic-pass-1",
+        role=UserRole.ADMIN,
+        stage=None,
+        grade=None,
+    )
+    await import_package(content_session, load_package(COURSES), dry_run=False)
+    with pytest.raises(ValueError, match="Unknown built-in"):
+        await import_learning_activities(
+            content_session, actor=admin, settings=settings, content_key="unknown"
+        )
+    assert (
+        await content_session.scalar(select(Resource).where(Resource.kind == "INTERACTIVE")) is None
+    )
+    first = await import_learning_activities(
+        content_session, actor=admin, settings=settings, content_key="game-ai-fruit-trainer"
+    )
+    assert first["resources_created"] == first["versions_created"] == 1
+    assert (
+        await content_session.scalar(
+            select(Resource).where(Resource.stable_slug == "learning-ai-picture")
+        )
+        is None
+    )
+    resource = await content_session.scalar(
+        select(Resource).where(Resource.stable_slug == "game-ai-fruit-trainer")
+    )
+    revision = await content_session.get(
+        InteractiveRevision, resource.active_interactive_revision_id
+    )
+    # Narration edited in the admin remains authoritative on ordinary setup.
+    draft = await clone_draft(
+        content_session,
+        resource_id=resource.id,
+        revision_id=revision.id,
+        actor=admin,
+        settings=settings,
+    )
+    manifest = draft["manifest"]
+    manifest["prompts"][0]["text"] = "保留管理员为小游戏编辑的讲解。"
+    await update_draft(
+        content_session,
+        resource_id=resource.id,
+        revision_id=uuid.UUID(draft["id"]),
+        manifest_data=manifest,
+    )
+    await activate_version(
+        content_session,
+        resource_id=resource.id,
+        revision_id=uuid.UUID(draft["id"]),
+        settings=settings,
+    )
+    second = await import_learning_activities(
+        content_session, actor=admin, settings=settings, content_key="game-ai-fruit-trainer"
+    )
+    assert second["versions_created"] == 0 and second["versions_reused"] == 1
+    app = create_app(settings)
+    session_id = None
+    for stage, grade in [("PRIMARY_LOWER", 1), ("PRIMARY_UPPER", 4)]:
+        user = await create_synthetic_user(
+            settings,
+            username=f"fruit.{stage}",
+            password="synthetic-pass-1",
+            stage=stage,
+            grade=grade,
+        )
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:15173"
+        ) as client:
+            await login(client, user.username, "synthetic-pass-1")
+            catalog = (
+                await client.get("/api/v1/interactive/resources", params={"purpose": "GAME"})
+            ).json()
+            if stage != "PRIMARY_LOWER":
+                assert catalog["items"] == []
+                assert (
+                    await client.get(f"/api/v1/interactive/sessions/{session_id}")
+                ).status_code == 404
+                continue
+            assert len(catalog["items"]) == 1
+            assert catalog["items"][0]["grade_min"] == 1 and catalog["items"][0]["grade_max"] == 3
+            headers = await csrf_headers(client)
+            response = await client.post(
+                "/api/v1/interactive/sessions",
+                json={"resource_id": str(resource.id)},
+                headers=headers,
+            )
+            assert response.status_code == 201, response.text
+            activity = response.json()
+            session_id = activity["id"]
+            document = (
+                await client.get(f"/api/v1/interactive/sessions/{session_id}/document")
+            ).json()
+            assert "connect-src 'none'" in document["document_html"]
+            assert document["manifest"]["prompts"][0]["text"] == manifest["prompts"][0]["text"]
+            state = {"schema": 1, "scene": "label", "rounds": [{"labels": {"r1": "apple"}}]}
+            saved = await client.patch(
+                f"/api/v1/interactive/sessions/{session_id}/checkpoint",
+                json={
+                    "base_revision": activity["base_revision"],
+                    "event_id": str(uuid.uuid4()),
+                    "scene_id": "label",
+                    "game_state": state,
+                },
+                headers=headers,
+            )
+            assert saved.status_code == 200, saved.text
+            restored = (await client.get(f"/api/v1/interactive/sessions/{session_id}")).json()[
+                "session"
+            ]
+            assert restored["game_state"] == state
+            result = {"score": 3, "maxScore": 3, "badge": "AI 小训练员"}
+            completed = await client.post(
+                f"/api/v1/interactive/sessions/{session_id}/complete",
+                json={
+                    "base_revision": restored["base_revision"],
+                    "event_id": str(uuid.uuid4()),
+                    "source": "SDK_REPORTED",
+                    "game_result": result,
+                },
+                headers=headers,
+            )
+            assert completed.status_code == 200, completed.text
+            history = (await client.get("/api/v1/interactive/sessions")).json()["items"]
+            assert history[0]["status"] == "COMPLETED" and history[0]["game_result"] == result
+
+    # Leave the reproducible package active so later browser fixtures can restore
+    # its bytes into their own isolated storage root. The edited copy stays intact.
+    await activate_version(
+        content_session, resource_id=resource.id, revision_id=revision.id, settings=settings
     )

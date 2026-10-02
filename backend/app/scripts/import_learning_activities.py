@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.config import Settings
 from app.core.database import get_engine
 from app.modules.identity.models import User
+from app.modules.interactive.example_bundle import import_autoplay_examples
 from app.modules.interactive.learning_bundle import import_learning_activities
 
 
@@ -25,7 +26,13 @@ async def main():
         type=Path,
         help="已备份的旧内置课件源目录；仅升级匹配模板，保留当前台词与音频",
     )
+    parser.add_argument("--content-key", help="仅导入指定的内置内容，不修改其他资源")
+    parser.add_argument(
+        "--examples-root", type=Path, help="导入十二份自动播放 HTML 交付目录；保留已编辑的当前版本"
+    )
     args = parser.parse_args()
+    if args.examples_root and args.content_key:
+        parser.error("--examples-root cannot be combined with --content-key")
     settings = Settings()
     engine = get_engine(settings.active_database_url, settings.app_env)
     try:
@@ -37,10 +44,28 @@ async def main():
             admins = list(await db.scalars(statement.limit(2)))
             if len(admins) != 1:
                 raise SystemExit("Configure/seed the demo admin before importing activities")
+            if args.examples_root:
+                print(
+                    json.dumps(
+                        await import_autoplay_examples(
+                            db,
+                            actor=admins[0],
+                            settings=settings,
+                            root=args.examples_root,
+                            upgrade_from=args.upgrade_from,
+                        ),
+                        ensure_ascii=False,
+                    )
+                )
+                return
             print(
                 json.dumps(
                     await import_learning_activities(
-                        db, actor=admins[0], settings=settings, upgrade_from=args.upgrade_from
+                        db,
+                        actor=admins[0],
+                        settings=settings,
+                        upgrade_from=args.upgrade_from,
+                        content_key=args.content_key,
                     ),
                     ensure_ascii=False,
                 )

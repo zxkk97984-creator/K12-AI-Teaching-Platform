@@ -1,0 +1,25 @@
+{
+  "schema_version": "k12-interactive-v1",
+  "content_key": "game-ai-fruit-trainer",
+  "title": "训练小小 AI·水果分类员",
+  "purpose": "GAME",
+  "stage": "PRIMARY_LOWER",
+  "subject": "计算机与人工智能",
+  "entry": "index.html",
+  "cover": "assets/cover.svg",
+  "summary": "给水果图卡贴标签，测试小机器人的判断，再补充样例、纠正标签。用三个小游戏认识 AI 怎样从例子中学习。",
+  "knowledge_points": ["AI 如何认图片", "样例学习", "样例多样性", "标签质量与人工核验"],
+  "capabilities": ["SCENES", "CHECKPOINTS", "COMPLETION"],
+  "scenes": [
+    {"id": "label", "title": "教它认水果", "summary": "给苹果和香蕉贴标签，再用没有参与训练的新图卡测试。"},
+    {"id": "variety", "title": "见多识广", "summary": "观察黄苹果的误判，补充不同颜色的样例后重新测试。"},
+    {"id": "repair", "title": "检查标签", "summary": "检查一组带错误标签的样例，改正后观察判断变化。"},
+    {"id": "celebrate", "title": "领取徽章", "summary": "回顾三个发现，并明确提交本次挑战。"}
+  ],
+  "prompts": [
+    {"id": "label-read", "scene_id": "label", "text": "先选一张水果图卡，给它贴上苹果或香蕉标签。给机器人看过两类样例后，再用新图卡试一试。标签就是你告诉机器人的答案。", "trigger": "SCENE_ENTER"},
+    {"id": "variety-read", "scene_id": "variety", "text": "机器人只见过红苹果和黄香蕉。先试试黄苹果和绿色水果，再给它补充不同颜色的样例，看看判断怎样变化。更多样例也不保证它永远正确。", "trigger": "SCENE_ENTER"},
+    {"id": "repair-read", "scene_id": "repair", "text": "另一位小训练员送来一组样例。标签也可能贴错。先让机器人猜一猜，然后检查每张图片和标签是否一致，改正后重新测试。", "trigger": "SCENE_ENTER"},
+    {"id": "celebrate-read", "scene_id": "celebrate", "text": "你是 AI 小训练员！你发现了：AI 从样例学习，不同样例很重要，标签要正确，AI 的答案也要检查。点击领取徽章，确认完成本次挑战。", "trigger": "SCENE_ENTER"}
+  ]
+}

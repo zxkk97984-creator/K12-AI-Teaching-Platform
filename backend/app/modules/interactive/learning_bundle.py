@@ -1,4 +1,4 @@
-"""Reproducible offline packages and idempotent import of four learning activities."""
+"""Reproducible offline packages and idempotent import of learning activities."""
 
 from __future__ import annotations
 
@@ -54,15 +54,18 @@ def package_bytes(
         else (folder / "manifest.json").read_bytes(),
         "index.html": (folder / "index.html").read_bytes(),
         "assets/cover.svg": (folder / "cover.svg").read_bytes(),
-        "assets/style.css": (folder.parent / "shared/style.css").read_bytes(),
-        "assets/bootstrap.js": (folder.parent / "shared/bootstrap.js").read_bytes(),
-        "assets/activity.js": (
+    }
+    # Games may author one directly openable HTML; lecture templates retain
+    # their shared assets and injected scene text without changing their bytes.
+    if manifest["purpose"] != "GAME" or (folder / "activity.js").exists():
+        files["assets/style.css"] = (folder.parent / "shared/style.css").read_bytes()
+        files["assets/bootstrap.js"] = (folder.parent / "shared/bootstrap.js").read_bytes()
+        files["assets/activity.js"] = (
             "window.LESSON_SCENES="
             + json.dumps(scenes, ensure_ascii=False).replace("</", "<\\/")
             + ";\n"
             + (folder / "activity.js").read_text(encoding="utf-8")
-        ).encode("utf-8"),
-    }
+        ).encode("utf-8")
     files.update(extra_files or {})
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w") as archive:
@@ -81,10 +84,20 @@ async def import_learning_activities(
     settings: Settings,
     root: Path = ROOT,
     upgrade_from: Path | None = None,
+    content_key: str | None = None,
 ) -> dict[str, int]:
     if settings.app_env == "production":
         raise ValueError("Local learning activities must be imported in development/test")
     items = json.loads((root / "catalog.json").read_text(encoding="utf-8"))["items"]
+    if content_key is not None:
+        items = [
+            item
+            for item in items
+            if json.loads((root / item["folder"] / "manifest.json").read_text())["content_key"]
+            == content_key
+        ]
+        if not items:
+            raise ValueError(f"Unknown built-in content key: {content_key}")
     result = {
         "resources_created": 0,
         "versions_created": 0,
@@ -126,7 +139,7 @@ async def import_learning_activities(
                     interactive_purpose=manifest["purpose"],
                     interactive_subject=manifest["subject"],
                     source_kind="NEW_SOURCE",
-                    source_note="霜铃项目编写的 HTML 互动知识讲解；台词依据本地学习讲义整理。",
+                    source_note="霜铃项目编写的 HTML 互动学习内容；台词依据本地学习讲义整理。",
                     license_code="PROJECT-ORIGINAL",
                     local_demo_visible=True,
                     chapter_revision_ids=[chapter.id],
@@ -136,6 +149,7 @@ async def import_learning_activities(
         elif (
             resource.kind != "INTERACTIVE"
             or resource.stage != item["stage"]
+            or resource.interactive_purpose != manifest["purpose"]
             or not resource.local_demo_visible
         ):
             raise ValueError("Learning content key conflicts with an existing resource")
@@ -225,9 +239,16 @@ async def uses_current_template(
             select(InteractiveFile).where(InteractiveFile.revision_id == active.id)
         )
     }
-    for name in ("index.html", "assets/style.css", "assets/bootstrap.js"):
+    controlled = ("index.html", "assets/style.css", "assets/bootstrap.js")
+    if "assets/activity.js" not in expected:
+        controlled = ("index.html",)
+    for name in controlled:
         if name not in assets or assets[name].sha256 != hashlib.sha256(expected[name]).hexdigest():
             return False
+        if not store.exists(assets[name].storage_key):
+            return False
+    if "assets/activity.js" not in expected:
+        return True
     activity = assets.get("assets/activity.js")
     if activity is None or not store.exists(activity.storage_key):
         return False
@@ -255,6 +276,8 @@ async def preserved_upgrade_package(
     settings: Settings,
 ) -> bytes | None:
     """Only upgrade known authored assets. Keep all current metadata and audio."""
+    if not (previous_folder / "manifest.json").exists():
+        return None
     new_manifest = json.loads((folder / "manifest.json").read_text())
     prior = active.manifest
     if (
@@ -268,7 +291,21 @@ async def preserved_upgrade_package(
         return None
     with zipfile.ZipFile(io.BytesIO(package_bytes(previous_folder))) as archive:
         previous = {name: archive.read(name) for name in archive.namelist()}
-    with zipfile.ZipFile(io.BytesIO(package_bytes(folder, manifest_override=prior))) as archive:
+    # Update untouched built-in narration along with its demonstration. Preserve
+    # authored text and audio on existing published versions.
+    previous_manifest = json.loads(previous["manifest.json"])
+    upgraded_manifest = deepcopy(prior)
+    if prior.get("summary") == previous_manifest.get("summary"):
+        upgraded_manifest["summary"] = new_manifest["summary"]
+    for collection, field in (("scenes", "summary"), ("prompts", "text")):
+        old_by_id = {item["id"]: item for item in previous_manifest[collection]}
+        new_by_id = {item["id"]: item for item in new_manifest[collection]}
+        for item in upgraded_manifest[collection]:
+            if item.get(field) == old_by_id.get(item["id"], {}).get(field):
+                item[field] = new_by_id[item["id"]][field]
+    with zipfile.ZipFile(
+        io.BytesIO(package_bytes(folder, manifest_override=upgraded_manifest))
+    ) as archive:
         current = {name: archive.read(name) for name in archive.namelist()}
     assets = {
         asset.relative_path: asset
@@ -276,7 +313,14 @@ async def preserved_upgrade_package(
             select(InteractiveFile).where(InteractiveFile.revision_id == active.id)
         )
     }
-    controlled = [prior["entry"], "assets/style.css", "assets/bootstrap.js", "assets/activity.js"]
+    controlled = [
+        prior["entry"],
+        *(
+            name
+            for name in ("assets/style.css", "assets/bootstrap.js", "assets/activity.js")
+            if name in current
+        ),
+    ]
     for name in controlled:
         asset = assets.get(name)
         if asset is None or asset.sha256 not in {
@@ -295,7 +339,17 @@ async def preserved_upgrade_package(
             if asset is None or not store.exists(asset.storage_key):
                 return None
             additional[name] = store.resolve(asset.storage_key).read_bytes()
-    return package_bytes(folder, manifest_override=deepcopy(prior), extra_files=additional)
+    if (
+        upgraded_manifest == prior
+        and all(
+            assets[name].sha256 == hashlib.sha256(current[name]).hexdigest() for name in controlled
+        )
+        and store.exists(active.package_storage_key)
+    ):
+        original = store.resolve(active.package_storage_key).read_bytes()
+        if hashlib.sha256(original).hexdigest() == active.package_sha256:
+            return original
+    return package_bytes(folder, manifest_override=upgraded_manifest, extra_files=additional)
 
 
 async def restore_known_files(

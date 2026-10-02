@@ -20,3 +20,10 @@ body.embedded{padding:16px;font-family:var(--lesson-font-family);color:var(--les
 .learning-confirm{border:1px solid var(--lesson-line);border-radius:12px;max-width:calc(100% - 24px);color:var(--lesson-text);background:#fff;padding:20px}.learning-confirm::backdrop{background:#20212466}.learning-confirm .controls{justify-content:flex-end}
 @media(max-width:660px){.loop-workspace{grid-template-columns:minmax(0,1fr);gap:16px}.embedded{padding:12px!important}.variable-pair strong{font-size:24px}.loop-controls label{flex-wrap:nowrap}.loop-controls input{width:70px}.loop-code .code{font-size:14px}.loop-controls{margin-top:12px}.embedded .result{font-size:24px}}
 .embedded>#activity-error{display:none}
+.demonstrating .training button[aria-pressed=true],.demonstrating .bit[aria-pressed=true],.demonstrating .demo-focus{box-shadow:0 0 0 3px #e5b63c;animation:demo-arrive .65s ease-out}
+.demonstrating .training .tag{visibility:hidden}
+.demonstrating .result{animation:demo-arrive .65s ease-out}
+@keyframes demo-arrive{from{transform:translateY(10px);opacity:.35}to{transform:translateY(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){.demonstrating *{animation:none!important}}
+.demonstrating .tag,.demonstrating .controls{display:none}
+@media(max-width:520px){.demonstrating .notice{margin:0 0 8px}.demonstrating .training button{min-height:0;padding:8px}.demonstrating .training svg{width:64px;height:56px}.demonstrating .result{margin:14px 0}}

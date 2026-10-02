@@ -2,6 +2,12 @@ createLearningActivity({
   scenes: window.LESSON_SCENES,
   restore: raw => ({ bits: Array.from({length:5}, (_, i) => Array.isArray(raw.bits) && raw.bits[i] === true), target: Number.isInteger(raw.target) && raw.target >= 0 && raw.target <= 31 ? raw.target : 13 }),
   reset: state => { state.bits = Array(5).fill(false); },
+  demonstrations: {
+    'observe-read': state => { state.bits = [false, false, false, false, true]; state.target = 1; },
+    'compose-read': state => { state.bits = [false, true, true, false, true]; state.target = 13; },
+    'challenge-read': state => { state.bits = [true, false, true, false, true]; state.target = 21; },
+    'reflect-read': state => { state.bits = Array(5).fill(true); state.target = 31; },
+  },
   render: function renderCards(node, state, scene, save) {
     const weights = [16,8,4,2,1];
     const total = weights.reduce((sum, value, index) => sum + (state.bits[index] ? value : 0), 0);

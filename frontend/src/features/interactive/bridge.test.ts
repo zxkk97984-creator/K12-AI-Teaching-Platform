@@ -25,6 +25,9 @@ describe("sandbox message boundary", () => {
     expect(message('workspace_ready', {version: 1, commands: ['scene', 'reset']})).not.toBeNull();
     expect(message('workspace_ready', {version: 1, commands: ['navigate']})).toBeNull();
     expect(message('workspace_ready', {version: 2, commands: []})).toBeNull();
+    expect(message('workspace_ready', {version: 1, commands: ['demonstrate'], playback_steps: [{scene_id: 'first', prompt_id: 'first-read'}]})).not.toBeNull();
+    expect(message('workspace_ready', {version: 1, commands: ['scene'], playback_steps: [{scene_id: 'first', prompt_id: 'first-read'}]})).toBeNull();
+    expect(message('workspace_ready', {version: 1, commands: ['demonstrate'], playback_steps: [{scene_id: 'first', prompt_id: 123}]})).toBeNull();
     expect(message('checkpoint', {game_state: ['invalid']})).toBeNull();
     expect(message('activity_state', {scene_id: 'first', game_state: {}, hint: '观察变化'})).not.toBeNull();
     expect(message('activity_state', {scene_id: 'first', game_state: {}, hint: 123})).toBeNull();

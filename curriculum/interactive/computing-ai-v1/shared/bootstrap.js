@@ -18,6 +18,7 @@ window.createLearningActivity = async function (lesson) {
   if (!window.K12) { status.textContent = '请在霜铃平台中打开此讲解。'; return; }
   const context = await K12.ready();
   const state = lesson.restore(context.gameState || {});
+  let demonstration = null;
   let scene = Math.max(0, lesson.scenes.findIndex(item => item.id === context.currentScene));
   let saving = 0;
   let embedded = false;
@@ -26,15 +27,19 @@ window.createLearningActivity = async function (lesson) {
   const canvas = document.getElementById('visual');
   const report = () => {
     if (!K12.workspace || !embedded) return;
-    const hint = (lesson.hint?.(state, scene) || canvas.querySelector('.summary')?.textContent || '动手操作，观察画面中的变化。').slice(0, 500);
-    void K12.workspace.report({scene_id: lesson.scenes[scene].id, game_state: JSON.parse(JSON.stringify(state)), hint}).catch(() => {});
+    const shown = demonstration || state;
+    const hint = (lesson.hint?.(shown, scene) || canvas.querySelector('.summary')?.textContent || '动手操作，观察画面中的变化。').slice(0, 500);
+    void K12.workspace.report({scene_id: lesson.scenes[scene].id, game_state: JSON.parse(JSON.stringify(shown)), hint}).catch(() => {});
   };
   const render = () => {
     document.getElementById('scene-title').textContent = lesson.scenes[scene].title;
     document.querySelectorAll('nav button').forEach((button, index) => button.setAttribute('aria-pressed', String(index === scene)));
     const prompt = (context.prompts || []).find(item => item.scene_id === lesson.scenes[scene].id && item.trigger === 'SCENE_ENTER');
     caption.textContent = prompt?.text || lesson.scenes[scene].text;
-    lesson.render(canvas, state, scene, save);
+    lesson.render(canvas, demonstration || state, scene, save);
+    // Demonstrations leave the student's saved experiment untouched.
+    canvas.inert = Boolean(demonstration);
+    document.body.classList.toggle('demonstrating', Boolean(demonstration));
     report();
   };
   async function save() {
@@ -82,14 +87,25 @@ window.createLearningActivity = async function (lesson) {
       const index = lesson.scenes.findIndex(item => item.id === value.scene_id);
       if (index >= 0 && index !== scene) { scene = index; render(); }
     });
-    const commands = ['scene', 'pause', 'complete', ...(lesson.reset ? ['reset'] : [])];
+    const playbackSteps = lesson.demonstrations ? lesson.scenes.map(item => ({scene_id: item.id, prompt_id: item.id + '-read'})) : undefined;
+    const commands = ['scene', 'pause', 'complete', ...(lesson.reset ? ['reset'] : []), ...(playbackSteps ? ['demonstrate'] : [])];
     try {
       const receipt = await K12.workspace.register(commands, async value => {
         if (value.command === 'scene') await enter(value.scene_id);
         else if (value.command === 'pause') lesson.pause?.();
+        else if (value.command === 'demonstrate') {
+          if (value.prompt_id === null) demonstration = null;
+          else {
+            const apply = lesson.demonstrations?.[value.prompt_id];
+            if (!apply || !playbackSteps.some(step => step.prompt_id === value.prompt_id && step.scene_id === lesson.scenes[scene].id)) throw new Error('当前环节没有这个自动演示');
+            demonstration = lesson.restore({});
+            apply(demonstration);
+          }
+          render();
+        }
         else if (value.command === 'reset' && lesson.reset) { lesson.reset(state); render(); await save(); if (error.textContent) throw new Error(error.textContent); }
         else if (value.command === 'complete') await finish();
-      });
+      }, {playback_steps: playbackSteps});
       if (receipt.embedded === true) {
         const allowed = ['font-family', 'text', 'muted', 'surface', 'soft', 'line', 'accent', 'radius'];
         for (const key of allowed) if (typeof receipt.theme?.[key] === 'string') document.documentElement.style.setProperty('--lesson-' + key, receipt.theme[key]);

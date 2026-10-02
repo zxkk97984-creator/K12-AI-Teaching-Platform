@@ -40,4 +40,4 @@ for _ in $(seq 1 30); do
 done
 curl -fsS http://127.0.0.1:18082/health/ready >/dev/null
 cd frontend
-HTML_LEARNING_E2E=1 CODELAB_E2E_BASE_URL=http://localhost:15174 ./node_modules/.bin/playwright test --config playwright.config.ts src/e2e/learning-html.spec.ts "$@"
+HTML_LEARNING_E2E=1 CODELAB_E2E_BASE_URL=http://localhost:15174 ./node_modules/.bin/playwright test --config playwright.config.ts src/e2e/learning-html.spec.ts src/e2e/original-books.spec.ts src/e2e/ai-fruit-trainer.spec.ts src/e2e/autoplay-examples.spec.ts "$@"

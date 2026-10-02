@@ -1,4 +1,4 @@
-import {chromium, expect, test, type Page} from '@playwright/test';
+import {chromium, expect, request, test, type Page} from '@playwright/test';
 import {mkdir, writeFile, mkdtemp, rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -16,11 +16,16 @@ async function enableVoice(page: Page) {
   const button = page.getByRole('button', {name: '开启朗读', exact: true});
   if (await button.isVisible()) await button.click();
 }
+async function voiceSettings(page: Page) {
+  const settings = page.locator('.interactive-voice-settings');
+  if (await settings.getAttribute('open') === null) await settings.locator('summary').click();
+  await expect(page.getByLabel('朗读语速', {exact: true})).toBeVisible();
+}
 async function checkGeometry(page: Page) {
   const host = await page.evaluate(() => ({overflow: document.documentElement.scrollWidth > innerWidth, scroll: document.scrollingElement!.scrollHeight > innerHeight + 1, height: document.querySelector('.interactive-stage')!.getBoundingClientRect().height}));
   expect(host.overflow).toBe(false); expect(host.scroll).toBe(false); expect(host.height).toBeGreaterThan(80);
   const frame = page.frames().find(frame => frame.parentFrame());
-  expect(await frame!.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  await expect.poll(() => frame!.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   await expect.poll(() => page.getByTestId('companion-dock').evaluate(el => { const pet = el.getBoundingClientRect(); return pet.left >= 0 && pet.right <= innerWidth; })).toBe(true);
 }
 for (const item of cases) test(`${item.stage}: unified workspace, restore, teacher and responsive layout`, async ({page}) => {
@@ -35,7 +40,7 @@ for (const item of cases) test(`${item.stage}: unified workspace, restore, teach
   await page.getByRole('button', {name: '登录并继续'}).click();
   await expect(page).toHaveURL(/\/workbench$/);
   const catalog = await (await page.request.get('/api/v1/interactive/resources')).json();
-  const activity = catalog.items[0];
+  const activity = catalog.items.find((entry: {purpose: string}) => entry.purpose !== "GAME");
   const courses = await (await page.request.get('/api/v1/courses')).json();
   const course = courses.items.find((entry: {slug: string}) => entry.slug === item.slug);
   const chapter = course.chapters.find((entry: {revision_id: string}) => activity.chapter_revision_ids.includes(entry.revision_id));
@@ -53,6 +58,7 @@ for (const item of cases) test(`${item.stage}: unified workspace, restore, teach
   await expect(frame.locator('#scenes')).toBeHidden();
   await expect(frame.getByRole('button', {name: '朗读当前台词'})).toBeHidden();
   if (item.key === 'ai-picture') {
+    await page.getByRole('button', {name: '自己试一试', exact: true}).click();
     for (const name of ['红苹果 · 苹果', '黄香蕉 · 香蕉', '绿苹果 · 苹果']) await frame.getByRole('button', {name: new RegExp(name)}).click();
     await expect(frame.locator('#prediction')).toHaveText('绿色苹果 → 苹果');
   } else if (item.key === 'binary-cards') {
@@ -64,7 +70,7 @@ for (const item of cases) test(`${item.stage}: unified workspace, restore, teach
     await expect(frame.locator('.code-line[aria-current=step]')).toContainText('total += number');
     expect(await frame.getByRole('button', {name: '执行下一轮'}).isEnabled()).toBe(false);
     // Loop completion does not complete the course.
-    expect((await (await page.request.get(`/api/v1/interactive/sessions/${(await (await page.request.get('/api/v1/interactive/resources')).json()).items[0].session_id}`)).json()).session.status).toBe('ACTIVE');
+    expect((await (await page.request.get(`/api/v1/interactive/sessions/${(await (await page.request.get('/api/v1/interactive/resources')).json()).items.find((entry: {purpose: string}) => entry.purpose !== "GAME").session_id}`)).json()).session.status).toBe('ACTIVE');
   } else {
     await frame.getByRole('button', {name: '下一次比较'}).click();
     await expect(frame.locator('.summary')).toContainText('找到目标 23，下标为 5');
@@ -88,6 +94,7 @@ for (const item of cases) test(`${item.stage}: unified workspace, restore, teach
   await expect(page.getByRole('button', {name: '继续学习', exact: true})).toBeVisible();
   await page.screenshot({path: `${evidence}/${item.key}-resume.png`});
   await page.getByRole('button', {name: '继续学习', exact: true}).click();
+  if (item.key === 'ai-picture') await page.getByRole('button', {name: '自己试一试', exact: true}).click();
   await expect(frame.locator('.result, #prediction')).toHaveText(before ?? '');
 
   if (item.key === 'conditions-loops') {
@@ -111,9 +118,9 @@ for (const item of cases) test(`${item.stage}: unified workspace, restore, teach
     await expect(page.locator('.interactive-audio-status')).toContainText('音频播放失败');
     await page.screenshot({path: `${evidence}/${item.key}-audio-failure.png`});
     await page.unroute('**/api/v1/interactive/sessions/*/audio/*');
-    await page.getByLabel('静音', {exact: true}).check();
+    await voiceSettings(page); await page.getByLabel('静音', {exact: true}).check();
     await expect(page.locator('.interactive-audio-status')).toContainText('已静音');
-    await page.getByLabel('静音', {exact: true}).uncheck();
+    await voiceSettings(page); await page.getByLabel('静音', {exact: true}).uncheck();
   }
   await page.getByRole('button', {name: '下一环节', exact: true}).click();
   await expect(page.getByLabel('当前课程环节')).toHaveValue(item.key === 'ai-picture' ? 'examples' : item.key === 'binary-cards' ? 'compose' : item.key === 'conditions-loops' ? 'condition' : 'middle');
@@ -157,7 +164,7 @@ for (const item of cases) test(`${item.stage}: unified workspace, restore, teach
 
 async function openJunior(page: Page) {
   await page.goto('/login'); await page.getByLabel('用户名', {exact: true}).fill('html.junior'); await page.getByLabel('密码', {exact: true}).fill('synthetic-html-pass-2026'); await page.getByRole('button', {name: '登录并继续'}).click(); await expect(page).toHaveURL(/\/workbench$/);
-  const activity = (await (await page.request.get('/api/v1/interactive/resources')).json()).items[0];
+  const activity = (await (await page.request.get('/api/v1/interactive/resources')).json()).items.find((entry: {purpose: string}) => entry.purpose !== "GAME");
   const csrf = (await (await page.request.get('/api/v1/auth/csrf')).json()).csrf_token;
   const session = await (await page.request.post('/api/v1/interactive/sessions', {data: {resource_id: activity.id, restart: true}, headers: {Origin: new URL(page.url()).origin, 'X-CSRF-Token': csrf}})).json();
   await page.goto(`/interactive/${activity.id}`); await page.getByRole('button', {name: '开始学习', exact: true}).click(); await expect(page.frameLocator('iframe').locator('body')).toHaveClass(/embedded/);
@@ -235,7 +242,7 @@ test('JUNIOR: synthetic browser voices prefer Mandarin, remember selection and r
   await page.getByRole('button', {name: '重播本段', exact: true}).click();
   const lastVoice = () => page.evaluate(() => (window as unknown as {syntheticVoiceHistory: Array<{name: string; lang: string}>}).syntheticVoiceHistory.at(-1));
   await expect.poll(lastVoice).toEqual({name: '合成测试普通话 A', lang: 'zh-CN'});
-  await select.selectOption({label: '合成测试普通话 B · zh-CN'});
+  await voiceSettings(page); await select.selectOption({label: '合成测试普通话 B · zh-CN'});
   await page.getByRole('button', {name: '重播本段', exact: true}).click();
   await expect.poll(lastVoice).toEqual({name: '合成测试普通话 B', lang: 'zh-CN'});
   const selection = await select.inputValue();
@@ -244,10 +251,10 @@ test('JUNIOR: synthetic browser voices prefer Mandarin, remember selection and r
   await expect(select).toHaveValue(selection);
   await page.evaluate(() => (window as unknown as {useOnlySyntheticCantonese: () => void}).useOnlySyntheticCantonese());
   await expect(page.locator('.interactive-audio-status')).toContainText('所选声音当前不可用');
-  await select.selectOption(''); await page.getByRole('button', {name: '重播本段', exact: true}).click();
+  await voiceSettings(page); await select.selectOption(''); await page.getByRole('button', {name: '重播本段', exact: true}).click();
   await expect(page.locator('.interactive-audio-status')).toContainText('没有可用的普通话声音');
   await page.screenshot({path: `${evidence}/voice-selection-unavailable.png`});
-  await select.selectOption({label: '合成测试粤语 · zh-HK'}); await page.getByRole('button', {name: '重播本段', exact: true}).click();
+  await voiceSettings(page); await select.selectOption({label: '合成测试粤语 · zh-HK'}); await page.getByRole('button', {name: '重播本段', exact: true}).click();
   await expect.poll(lastVoice).toEqual({name: '合成测试粤语', lang: 'zh-HK'});
 });
 
@@ -272,7 +279,7 @@ test('JUNIOR: start and resume play the introduction once, with real media event
   const csrf = (await (await page.request.get('/api/v1/auth/csrf')).json()).csrf_token;
   const preferences = await page.request.patch('/api/v1/me/preferences', {data: {base_revision: me.preferences.profile_revision, voice_preference: 'DISABLED'}, headers: {Origin: new URL(page.url()).origin, 'X-CSRF-Token': csrf}});
   expect(preferences.ok()).toBe(true);
-  const activity = (await (await page.request.get('/api/v1/interactive/resources')).json()).items[0];
+  const activity = (await (await page.request.get('/api/v1/interactive/resources')).json()).items.find((entry: {purpose: string}) => entry.purpose !== "GAME");
   await page.request.post('/api/v1/interactive/sessions', {data: {resource_id: activity.id, restart: true}, headers: {Origin: new URL(page.url()).origin, 'X-CSRF-Token': csrf}});
   await page.goto(`/interactive/${activity.id}`);
   await expect(page.getByRole('button', {name: '开启朗读', exact: true})).toBeVisible();
@@ -292,9 +299,146 @@ test('JUNIOR: start and resume play the introduction once, with real media event
   await expect(page.locator('.interactive-audio-status')).toContainText('正在朗读本段');
   await expect.poll(observations).toEqual({plays: 1, playing: 1, ended: 0});
   await page.screenshot({path: `${evidence}/start-auto-narration.png`});
-  await page.reload(); await expect(page.getByRole('button', {name: '继续学习', exact: true})).toBeVisible(); await enableVoice(page); await page.getByLabel('静音', {exact: true}).check();
+  await page.reload(); await expect(page.getByRole('button', {name: '继续学习', exact: true})).toBeVisible(); await enableVoice(page); await voiceSettings(page); await page.getByLabel('静音', {exact: true}).check();
   await page.getByRole('button', {name: '继续学习', exact: true}).click();
   await expect(page.frameLocator('iframe').locator('body')).toHaveClass(/embedded/);
   await expect(page.locator('.interactive-audio-status')).toContainText('已静音');
   expect(await observations()).toEqual({plays: 0, playing: 0, ended: 0});
+});
+
+// Local WAVs verify native media timing; they are test tones, not spoken teaching audio.
+test('PRIMARY_LOWER: automatic HTML follows media end, pauses, and preserves manual experiments', async ({page}) => {
+  test.setTimeout(90000);
+  await page.addInitScript(() => {
+    const observations = {playing: 0, ended: 0};
+    Object.assign(window, {automaticMediaObservations: observations});
+    const nativePlay = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      if (this.src.includes('/interactive/sessions/')) {
+        this.addEventListener('playing', () => observations.playing++, {once: true});
+        this.addEventListener('ended', () => observations.ended++, {once: true});
+      }
+      return nativePlay.call(this);
+    };
+  });
+  await page.setViewportSize({width: 1366, height: 768});
+  await page.goto('/login');
+  await page.getByLabel('用户名', {exact: true}).fill('html.primary_lower');
+  await page.getByLabel('密码', {exact: true}).fill('synthetic-html-pass-2026');
+  await page.getByRole('button', {name: '登录并继续'}).click();
+  await expect(page).toHaveURL(/\/workbench$/);
+  const activity = (await (await page.request.get('/api/v1/interactive/resources')).json()).items.find((entry: {purpose: string}) => entry.purpose !== "GAME");
+  const origin = new URL(page.url()).origin;
+  const admin = await request.newContext({baseURL: origin});
+  try {
+    const csrf = (await (await admin.get('/api/v1/auth/csrf')).json()).csrf_token;
+    const headers = {Origin: origin, 'X-CSRF-Token': csrf};
+    expect((await admin.post('/api/v1/auth/login', {data: {username: 'html.bundle.admin', password: 'synthetic-html-pass-2026'}, headers})).ok()).toBe(true);
+    const token = (await (await admin.get('/api/v1/auth/csrf')).json()).csrf_token;
+    headers['X-CSRF-Token'] = token;
+    const content = await (await page.request.get(`/api/v1/interactive/resources/${activity.id}`)).json();
+    const cloned = await admin.post(`/api/v1/admin/resources/${activity.id}/interactive-revisions/${content.revision_id}/clone`, {data: {}, headers});
+    expect(cloned.ok()).toBe(true);
+    const draft = await cloned.json();
+    const draftUrl = `/api/v1/admin/resources/${activity.id}/interactive-revisions/${draft.id}`;
+    for (const [index, prompt] of draft.manifest.prompts.entries()) {
+      // A repeated run clones the earlier test audio together with the HTML.
+      if (prompt.audio) continue;
+      const count = 8000 * (index === 0 ? 4 : 2);
+      const audio = Buffer.alloc(44 + count * 2);
+      audio.write('RIFF', 0); audio.writeUInt32LE(audio.length - 8, 4); audio.write('WAVEfmt ', 8);
+      audio.writeUInt32LE(16, 16); audio.writeUInt16LE(1, 20); audio.writeUInt16LE(1, 22);
+      audio.writeUInt32LE(8000, 24); audio.writeUInt32LE(16000, 28); audio.writeUInt16LE(2, 32); audio.writeUInt16LE(16, 34);
+      audio.write('data', 36); audio.writeUInt32LE(count * 2, 40);
+      const uploaded = await admin.put(`${draftUrl}/audio/${prompt.id}`, {data: audio, headers: {...headers, 'Content-Type': 'audio/wav', 'X-Filename': 'timing.wav'}});
+      expect(uploaded.ok(), await uploaded.text()).toBe(true);
+    }
+    expect((await admin.post(`${draftUrl}/activate`, {data: {}, headers})).ok()).toBe(true);
+  } finally { await admin.dispose(); }
+  const csrf = (await (await page.request.get('/api/v1/auth/csrf')).json()).csrf_token;
+  const started = await page.request.post('/api/v1/interactive/sessions', {data: {resource_id: activity.id, restart: true}, headers: {Origin: origin, 'X-CSRF-Token': csrf}});
+  const session = await started.json();
+  await page.goto(`/interactive/${activity.id}`);
+  await page.getByRole('button', {name: '开始学习', exact: true}).click();
+  const player = page.getByTestId('interactive-player');
+  const frame = page.frameLocator('.interactive-stage iframe');
+  await expect(page.locator('.interactive-audio-status')).toContainText('正在朗读本段');
+  await expect(player).toHaveAttribute('data-playback-step', '0');
+  await page.waitForTimeout(1000);
+  await expect(player).toHaveAttribute('data-playback-step', '0');
+  await page.getByRole('button', {name: '暂停播放', exact: true}).click();
+  await page.waitForTimeout(4500);
+  await expect(player).toHaveAttribute('data-playback', 'paused');
+  await expect(player).toHaveAttribute('data-playback-step', '0');
+  await page.getByRole('button', {name: '自己试一试', exact: true}).click();
+  await frame.getByRole('button', {name: /红苹果 · 苹果/}).click(); await saved(page);
+  const manualState = (await (await page.request.get(`/api/v1/interactive/sessions/${session.id}`)).json()).session.game_state;
+  let heldScene = false;
+  let releaseScene!: () => void;
+  const sceneGate = new Promise<void>(resolve => { releaseScene = resolve; });
+  await page.route('**/api/v1/interactive/sessions/*/checkpoint', async route => {
+    if (!heldScene && route.request().postDataJSON()?.scene_id === 'examples') { heldScene = true; await sceneGate; }
+    await route.continue();
+  });
+  await page.getByRole('button', {name: '自动播放', exact: true}).click();
+  await expect.poll(() => heldScene, {timeout: 8000}).toBe(true);
+  await page.getByRole('button', {name: '暂停播放', exact: true}).click();
+  const playsBeforeRelease = await page.evaluate(() => (window as unknown as {automaticMediaObservations: {playing: number}}).automaticMediaObservations.playing);
+  releaseScene(); await saved(page);
+  await page.waitForTimeout(500);
+  expect(await page.evaluate(() => (window as unknown as {automaticMediaObservations: {playing: number}}).automaticMediaObservations.playing)).toBe(playsBeforeRelease);
+  await page.unroute('**/api/v1/interactive/sessions/*/checkpoint');
+  await page.getByRole('button', {name: '继续播放', exact: true}).click();
+  await expect(player).toHaveAttribute('data-playback-step', '1', {timeout: 8000});
+  await expect(frame.locator('#prediction')).toHaveText('红苹果和黄香蕉 → 已加入样例');
+  await page.getByRole('button', {name: '问老师', exact: true}).click();
+  await expect(player).toHaveAttribute('data-playback', 'paused');
+  await page.getByRole('button', {name: '收起对话', exact: true}).click();
+  await page.getByRole('button', {name: '继续播放', exact: true}).click();
+  await expect(player).toHaveAttribute('data-playback', 'ended', {timeout: 15000});
+  await expect(frame.locator('#prediction')).toHaveText('绿色苹果 → 苹果');
+  const after = (await (await page.request.get(`/api/v1/interactive/sessions/${session.id}`)).json()).session;
+  expect(after.status).toBe('ACTIVE'); expect(after.game_state).toEqual(manualState);
+  const observed = await page.evaluate(() => (window as unknown as {automaticMediaObservations: {playing: number; ended: number}}).automaticMediaObservations);
+  expect(observed.ended).toBeGreaterThanOrEqual(4);
+  await page.screenshot({path: `${evidence}/automatic-media-end.png`});
+  for (const width of [390, 320]) {
+    await page.setViewportSize({width, height: width === 320 ? 568 : 844}); await checkGeometry(page);
+    await page.screenshot({path: `${evidence}/automatic-${width}.png`});
+  }
+  await page.getByRole('button', {name: '自己试一试', exact: true}).click();
+  await expect(frame.getByRole('button', {name: /红苹果 · 苹果/})).toHaveAttribute('aria-pressed', 'true');
+  await expect(frame.getByRole('button', {name: /黄香蕉 · 香蕉/})).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('PRIMARY_UPPER: binary cards automatically demonstrate 13, 21 and 31 with synthetic speech events', async ({page}) => {
+  await page.addInitScript(() => {
+    class TestSpeech {
+      voice = null; lang = ''; rate = 1; onstart?: () => void; onend?: () => void;
+      constructor(public text: string) {}
+    }
+    let timer = 0;
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {configurable: true, value: TestSpeech});
+    Object.defineProperty(window, 'speechSynthesis', {configurable: true, value: {
+      getVoices: () => [{name: '合成测试普通话', lang: 'zh-CN', voiceURI: 'synthetic', localService: true}],
+      addEventListener() {}, removeEventListener() {}, resume() {},
+      cancel() { clearTimeout(timer); },
+      speak(speech: TestSpeech) { speech.onstart?.(); timer = window.setTimeout(() => speech.onend?.(), 1400); },
+    }});
+  });
+  await page.goto('/login'); await page.getByLabel('用户名', {exact: true}).fill('html.primary_upper');
+  await page.getByLabel('密码', {exact: true}).fill('synthetic-html-pass-2026'); await page.getByRole('button', {name: '登录并继续'}).click();
+  await expect(page).toHaveURL(/\/workbench$/);
+  const activity = (await (await page.request.get('/api/v1/interactive/resources')).json()).items.find((entry: {purpose: string}) => entry.purpose !== "GAME");
+  const csrf = (await (await page.request.get('/api/v1/auth/csrf')).json()).csrf_token;
+  await page.request.post('/api/v1/interactive/sessions', {data: {resource_id: activity.id, restart: true}, headers: {Origin: new URL(page.url()).origin, 'X-CSRF-Token': csrf}});
+  await page.goto(`/interactive/${activity.id}`); await page.getByRole('button', {name: '开始学习', exact: true}).click();
+  await page.getByRole('button', {name: '自动播放', exact: true}).click();
+  const frame = page.frameLocator('iframe'); const player = page.getByTestId('interactive-player');
+  for (const [index, value] of [[1, '01101₂ = 13₁₀'], [2, '10101₂ = 21₁₀'], [3, '11111₂ = 31₁₀']] as const) {
+    await expect(player).toHaveAttribute('data-playback-step', String(index), {timeout: 8000});
+    await expect(frame.locator('.result')).toHaveText(value);
+  }
+  await expect(player).toHaveAttribute('data-playback', 'ended');
+  await page.screenshot({path: `${evidence}/automatic-binary-cards.png`});
 });

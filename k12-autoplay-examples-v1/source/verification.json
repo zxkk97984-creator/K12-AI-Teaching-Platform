@@ -1,0 +1,62 @@
+{
+  "primary-lower-input-process-output": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "primary-lower-sorting-by-rule": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "primary-lower-robot-instructions": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "primary-upper-pixels-build-picture": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "primary-upper-cards-bubble-sort": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "primary-upper-message-packets": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "junior-linear-search": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "junior-stack-and-queue": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "junior-training-and-testing": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "senior-shortest-path": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "senior-gradient-descent": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  },
+  "senior-classification-metrics": {
+    "files": "passed: generated; validated with project read_package/build_document",
+    "browser": "passed: Chrome 154; 470 checks across four viewport sizes",
+    "platform": "passed: real platform host on isolated PostgreSQL; playback, pause, refresh/resume and manual practice; synthetic TTS events, 2026-10-02"
+  }
+}

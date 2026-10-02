@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f5ec">
+<title>训练小小 AI · 水果分类员</title>
+<style>
+:root{color-scheme:light;--ink:#263e37;--muted:#52695f;--paper:#f6f5ec;--surface:#fffef9;--line:#d8e2d6;--mint:#e4efe3;--green:#315e48;--gold:#f4ce66;--radius:16px;--lesson-font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--paper);font-family:var(--lesson-font-family);line-height:1.6}button{font:inherit;color:inherit;cursor:pointer;min-height:46px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 16px;touch-action:manipulation}button:hover:not(:disabled){background:#edf3e8;border-color:#779780}button:focus-visible{outline:3px solid #3578a0;outline-offset:3px}button:disabled{cursor:default;opacity:.55}.primary{background:var(--green);color:white;border-color:var(--green);font-weight:700}.primary:hover:not(:disabled){background:#244b38}h1,h2,h3,p{margin:0}h1{font-size:clamp(22px,3vw,32px);line-height:1.3}.title-suffix{font-weight:400}h2{font-size:clamp(20px,2.5vw,27px);line-height:1.4}h3{font-size:18px}.muted{color:var(--muted)}main{max-width:1160px;margin:auto;padding:24px}.page-header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:20px}.eyebrow{font-size:13px;color:var(--green);letter-spacing:2px;font-weight:700;margin-bottom:6px}.subtitle{margin-top:8px;color:var(--muted)}.standalone-controls{display:flex;gap:8px;flex-wrap:wrap}.scene-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}.scene-tabs button{flex:1;padding:10px 12px;white-space:normal}.scene-tabs button[aria-current="step"]{border-color:var(--green);background:var(--mint);font-weight:700}.mission{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;margin-bottom:18px}.mission-copy{min-width:0}.mission-copy p{margin-top:8px}.pill{display:inline-block;background:var(--mint);color:var(--green);padding:4px 10px;border-radius:8px;font-size:13px;font-weight:700;white-space:nowrap}.progress{display:flex;gap:6px;margin-top:10px}.progress i{width:24px;height:7px;border-radius:4px;background:var(--line)}.progress i.done{background:var(--green)}.play-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px}.board,.robot-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;min-width:0}.board-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.board-head span{font-size:13px;color:var(--muted)}.card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.fruit-card{min-width:0;padding:10px 6px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px}.fruit-card svg{width:100%;max-width:108px;height:82px;display:block}.fruit-card[aria-pressed="true"]{border:2px solid var(--green);background:var(--mint);padding:9px 5px}.fruit-card span{font-size:14px}.fruit-card small{font-size:12px;font-weight:700;line-height:1.4;padding:4px 6px;border-radius:6px;background:#eef0e8;max-width:100%}.fruit-card small.labelled{background:#e3edde;color:#30583f}.label-tools{margin-top:16px;padding:14px;background:#f0f3e9;border-radius:12px}.label-tools p{font-size:14px;margin-bottom:10px}.label-buttons{display:flex;flex-wrap:wrap;gap:8px}.label-buttons button{flex:1;white-space:nowrap;padding:8px 12px}.key-tip{font-size:12px;color:var(--muted);margin-top:8px}.robot-heading{display:flex;align-items:center;gap:14px;margin-bottom:12px}.robot{width:112px;flex-shrink:0;animation:bob 3.5s ease-in-out infinite}.robot-heading p{font-size:14px;color:var(--muted);margin-top:6px}.robot-panel{background:#edf3e8}.speech{padding:14px;background:white;border:1px solid var(--line);border-radius:12px;margin-bottom:14px;font-size:15px}.test-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.test-card{background:#fffef9;border:1px solid var(--line);border-radius:10px;padding:8px 5px;text-align:center;min-width:0}.test-card svg{width:100%;height:62px}.test-card p{font-size:13px;line-height:1.5;overflow-wrap:anywhere}.test-card .verdict{font-weight:700;margin-top:5px}.test-card .correct{color:#315e48}.test-card .incorrect{color:#944b25}.test-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.test-actions button{flex:1}.feedback{margin-top:16px;padding:14px 16px;background:#fff2cf;border:1px solid #e7d6a3;border-radius:12px;min-height:56px}.feedback.good{background:#e7f0df;border-color:#c7d8bb}.footer-actions{margin-top:16px;display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}.footer-actions .action-group{display:flex;gap:8px;flex-wrap:wrap}.caption{font-size:14px;color:var(--muted);margin-top:18px;border-top:1px solid var(--line);padding-top:12px}.status-line{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;margin-top:10px;color:var(--muted)}#error{color:#944b25;overflow-wrap:anywhere}#retry-save{padding:5px 10px;min-height:36px}.celebration{text-align:center;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:28px 20px}.medal{width:136px;margin:0 auto 10px}.celebration h2{margin-bottom:10px}.learnings{max-width:600px;text-align:left;margin:20px auto;display:grid;gap:10px}.learning{padding:12px 16px;background:var(--mint);border-radius:10px}.learning strong{display:block}.learning span{color:var(--muted);font-size:14px}.celebration button{margin:4px}.simulation-note{font-size:12px;color:var(--muted);margin-top:12px}.embedded main{padding:18px;max-width:none}.embedded .page-header,.embedded .scene-tabs,.embedded .standalone-controls{display:none}dialog{max-width:min(420px,calc(100vw - 32px));border:1px solid var(--line);border-radius:16px;padding:24px;color:var(--ink);background:var(--surface)}dialog::backdrop{background:#20382c80}dialog p{margin-bottom:18px}dialog .action-group{display:flex;flex-wrap:wrap;gap:10px}[hidden]{display:none!important}@keyframes bob{50%{transform:translateY(-4px)}}@media(max-width:800px){main{padding:18px}.page-header{align-items:flex-start;flex-direction:column}.play-grid{grid-template-columns:minmax(0,1fr)}.robot-heading{margin-bottom:8px}.robot{width:85px}.test-card svg{height:70px}}@media(max-width:440px){main,.embedded main{padding:12px}.board,.robot-panel{padding:14px}.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.scene-tabs{gap:6px}.scene-tabs button{flex-basis:45%;font-size:14px}.mission{gap:8px}.mission .pill{font-size:12px;padding:4px 6px}.robot-heading{gap:8px}.robot{width:68px}.test-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-actions>button{width:100%}.label-buttons button{padding:8px}.celebration{padding:20px 14px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main id="game-root">
+<header class="page-header"><div><p class="eyebrow">霜铃 · AI 探索工坊</p><h1>训练小小 AI <span class="title-suffix">· 水果分类员</span></h1><p class="subtitle">你来教，机器人来猜。一起发现 AI 学习的小秘密。</p></div><div class="standalone-controls"><button id="read">读给我听</button><button id="ask" hidden>问问霜铃</button></div></header>
+<nav id="scenes" class="scene-tabs" aria-label="游戏关卡"></nav>
+<section id="play-area">
+<div class="mission"><div class="mission-copy"><p class="eyebrow" id="mission-kicker"></p><h2 id="mission-title"></h2><p id="mission-description" class="muted"></p></div><div><span class="pill" id="mission-count"></span><div class="progress" id="progress" aria-label="关卡进度"></div></div></div>
+<div class="play-grid">
+<section class="board" aria-labelledby="sample-heading"><div class="board-head"><h3 id="sample-heading">给机器人看的样例</h3><span id="sample-count"></span></div><div id="training-cards" class="card-grid"></div><div class="label-tools"><p id="selection-text">先选一张图卡，再告诉机器人它是什么。</p><div class="label-buttons"><button id="label-apple" data-label="apple">贴上「苹果」</button><button id="label-banana" data-label="banana">贴上「香蕉」</button><button id="label-clear" data-label="clear">取下标签</button></div><p class="key-tip">也可以用 Tab 选图卡，再按 1 贴苹果、按 2 贴香蕉。</p></div></section>
+<section class="robot-panel" aria-labelledby="robot-heading"><div class="robot-heading"><svg class="robot" viewBox="0 0 140 140" role="img" aria-label="等待学习的小机器人"><path d="M46 109l-8 20h24l5-18m28-2 8 20H80l-5-18" fill="#b9cdb9" stroke="#42644e" stroke-width="3"/><rect x="37" y="82" width="66" height="35" rx="12" fill="#f2d37b" stroke="#42644e" stroke-width="3"/><path d="M35 90 18 99m88-9 17 9" stroke="#42644e" stroke-width="9" stroke-linecap="round"/><rect x="20" y="31" width="100" height="64" rx="23" fill="#d0e1ca" stroke="#42644e" stroke-width="3"/><rect x="31" y="42" width="78" height="39" rx="15" fill="#fffef5"/><circle cx="52" cy="60" r="6" fill="#315e48"/><circle cx="88" cy="60" r="6" fill="#315e48"/><path d="M63 73q7 5 14 0M70 30V17" stroke="#315e48" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="70" cy="12" r="6" fill="#f4ce66" stroke="#42644e" stroke-width="2"/><circle cx="70" cy="101" r="4" fill="#42644e"/></svg><div><h3 id="robot-heading">小 AI 的试验台</h3><p>这些新图卡没有用来训练。<br>看看我能不能认出来！</p></div></div><p id="robot-speech" class="speech"></p><div id="test-cards" class="test-grid"></div><div class="test-actions"><button id="test" class="primary">让机器人猜一猜</button><button id="hint">给我一点提示</button></div></section>
+</div>
+<p id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+<div class="footer-actions"><button id="restart-level">重玩本关</button><button id="next" class="primary" disabled>完成挑战后去下一关 →</button></div>
+</section>
+<section id="celebration" class="celebration" hidden>
+<svg class="medal" viewBox="0 0 150 160" role="img" aria-label="AI 小训练员奖章"><path d="m40 84-13 61 32-13 16 21 7-64m15-5 25 61-31-12-14 20-16-67" fill="#81a883"/><circle cx="75" cy="64" r="54" fill="#f4ce66" stroke="#b58828" stroke-width="4"/><circle cx="75" cy="64" r="44" fill="#fff0bd" stroke="#cfac4f" stroke-width="2"/><path d="m75 32 9 20 23 3-17 16 4 23-19-11-20 11 4-23-17-16 23-3Z" fill="#b58828"/><text x="75" y="117" text-anchor="middle" fill="#315e48" font-size="15" font-weight="bold">AI</text></svg>
+<p class="eyebrow">三个挑战，都完成啦</p><h2 id="badge-title">你是 AI 小训练员！</h2><p class="muted">你教会了机器人，也学会了检查它的判断。</p>
+<div class="learnings"><p class="learning"><strong>① AI 从样例中学习</strong><span>你给它什么例子、贴什么标签，都会影响它的判断。</span></p><p class="learning"><strong>② 不同的样例很重要</strong><span>多看看不同颜色的水果，能帮助它认识更多情况。</span></p><p class="learning"><strong>③ AI 的答案也要检查</strong><span>标签贴错了，机器人可能学错。遇到错误，先检查，再改进。</span></p></div>
+<button id="finish" class="primary">领取徽章，完成本次挑战</button><button id="restart-all">再玩一次</button><p id="finish-note" class="muted">点击领取徽章，确认完成。</p>
+</section>
+<p id="caption" class="caption"></p>
+<div class="status-line"><span id="save-status">独立体验：本次进度保留在当前页面。</span><span id="error" role="alert"></span><button id="retry-save" hidden>重试保存</button></div>
+<p class="simulation-note">简化分类教学模拟 · 使用图卡预设的颜色和形状特征。真实 AI 的图片识别更复杂，也可能出错。</p>
+</main>
+<dialog id="reset-dialog" aria-labelledby="reset-title"><h2 id="reset-title">要重新开始吗？</h2><p id="reset-message"></p><div class="action-group"><button id="reset-cancel" autofocus>保留当前进度</button><button id="reset-confirm" class="primary">确认重玩</button></div></dialog>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const names = Object.freeze({__proto__:null,apple:'苹果',banana:'香蕉'});
+const sceneIds = ['label','variety','repair','celebrate'];
+const sceneTitles = ['教它认水果','见多识广','检查标签','领取徽章'];
+const makeCard = (id,color,shape,truth,variant=0) => ({id,color,shape,truth,variant});
+const redApple = id => makeCard(id,'red','round','apple');
+const yellowBanana = id => makeCard(id,'yellow','curved','banana');
+const rounds = [
+ {title:'教机器人认水果',description:'把图卡贴上正确的标签，再让机器人试试新图片。',prompt:'先选一张水果图卡，给它贴上苹果或香蕉标签。给机器人看过两类样例后，再用新图卡试一试。',hint:'圆圆的、有小叶子的是苹果；弯弯的是香蕉。标签就是你告诉机器人的答案。',training:[redApple('r1'),makeCard('r2','red','round','apple',1),yellowBanana('b1'),makeCard('b2','yellow','curved','banana',1)],tests:[makeCard('test-r','red','round','apple',2),makeCard('test-b','yellow','curved','banana',2)],initial:{}},
+ {title:'帮机器人见多识广',description:'先试一试新图卡。认错了？给它看看更多不同的样例！',prompt:'机器人只见过红苹果和黄香蕉。先试试黄苹果和绿色水果，再给它补充不同颜色的样例，看看判断怎样变化。',hint:'它可能太在意颜色了。黄色也可能是苹果，绿色也不只是一种水果。把三张新样例都贴好标签，再测试。',training:[redApple('r1'),yellowBanana('b1'),makeCard('y1','yellow','round','apple'),makeCard('g1','green','round','apple'),makeCard('g2','green','curved','banana')],tests:[makeCard('test-y','yellow','round','apple',2),makeCard('test-g','green','round','apple',1),makeCard('test-gb','green','curved','banana',2)],initial:{r1:'apple',b1:'banana'}},
+ {title:'检查一下，标签贴对了吗？',description:'另一位小训练员送来一组样例。先测试，再检查它的标签。',prompt:'样例的标签也可能贴错。先让机器人猜一猜，然后看看每张样例的图片和标签是否一致，改正后重新测试。',hint:'看看黄色、圆圆的那张样例：它长得像苹果，可是现在贴着什么标签？AI 不会知道你把标签贴错了。',training:[redApple('r1'),yellowBanana('b1'),makeCard('y1','yellow','round','apple'),makeCard('g2','green','curved','banana')],tests:[makeCard('test-y','yellow','round','apple',1),makeCard('test-r','red','round','apple',2),makeCard('test-b','green','curved','banana',1)],initial:{r1:'apple',b1:'banana',y1:'banana',g2:'banana'}}
+];
+// Only labelled training features enter this learner. Test truth is used below
+// for educational feedback, never for selecting a prediction.
+function classify(card, training, labels) {
+ const samples = training.filter(sample => names[labels[sample.id]]);
+ if (!samples.length) return {label:null,reason:'empty'};
+ if (new Set(samples.map(sample => labels[sample.id])).size < 2) return {label:null,reason:'missing-class'};
+ let distance = Infinity; const winners = new Set();
+ for (const sample of samples) {
+  const d = (card.color === sample.color ? 0 : 2) + (card.shape === sample.shape ? 0 : 1);
+  if (d < distance) {distance = d; winners.clear();}
+  if (d === distance) winners.add(labels[sample.id]);
+ }
+ return {label:winners.size === 1 ? [...winners][0] : null,reason:winners.size === 1 ? 'nearest' : 'tie'};
+}
+const newRound = index => ({labels:{...rounds[index].initial},tested:false,sawError:false,solved:false,baseline:null});
+const fresh = () => ({schema:1,scene:'label',rounds:rounds.map((_,i)=>newRound(i))});
+let state = fresh(), selected = null, host = null, context = null, moving = false, submitted = false;
+let saveTail = Promise.resolve(), saveGeneration = 0;
+const currentIndex = () => sceneIds.indexOf(state.scene);
+const predictions = index => rounds[index].tests.map(card => classify(card,rounds[index].training,state.rounds[index].labels));
+const allLabelsCorrect = index => rounds[index].training.every(card => state.rounds[index].labels[card.id] === card.truth);
+function canPass(index) {
+ const progress = state.rounds[index];
+ return progress.tested && allLabelsCorrect(index) && (index === 0 || progress.sawError) && predictions(index).every((p,i)=>p.label === rounds[index].tests[i].truth);
+}
+function restore(raw) {
+ const next = fresh();
+ if (!raw || raw.schema !== 1 || !Array.isArray(raw.rounds)) return next;
+ next.rounds.forEach((progress,i) => {
+  const saved = raw.rounds[i];
+  if (!saved || typeof saved !== 'object') return;
+  for (const card of rounds[i].training) {const value = saved.labels?.[card.id]; if (names[value]) progress.labels[card.id] = value; else delete progress.labels[card.id];}
+  progress.tested = saved.tested === true; progress.sawError = saved.sawError === true;
+  progress.baseline = Number.isInteger(saved.baseline) && saved.baseline >= 0 && saved.baseline <= rounds[i].tests.length ? saved.baseline : null;
+ });
+ const before = state; state = next;
+ next.rounds.forEach((progress,i) => {progress.solved = canPass(i) && (i === 0 || next.rounds[i-1].solved);});
+ const index = sceneIds.indexOf(raw.scene);
+ if (index >= 0 && (index === 0 || next.rounds.slice(0,index).every(p=>p.solved))) next.scene = raw.scene;
+ state = before; return next;
+}
+function fruit(card) {
+ const colors = {red:'#d96b59',yellow:'#e4bc47',green:'#85ae62'};
+ const fill = colors[card.color];
+ const transform = card.variant === 1 ? 'translate(10 8) scale(.83)' : card.variant === 2 ? 'translate(15 4) scale(.78)' : '';
+ const drawing = card.shape === 'round' ? '<path d="M58 24C36 9 15 27 23 53c8 26 21 27 34 22 15 5 28 3 35-24 7-27-14-40-34-27Z" fill="'+fill+'"/><path d="M57 25 59 12" stroke="#765838" stroke-width="5" stroke-linecap="round"/><path d="M60 19C64 6 78 5 82 6c-2 13-13 16-22 13" fill="#4d7b4c"/><path d="M32 36q-7 14 0 22" stroke="#fff" stroke-opacity=".45" stroke-width="5" fill="none" stroke-linecap="round"/>' : '<path d="M22 16c4 39 38 59 75 14-9 39-41 59-64 31C23 47 19 28 22 16Z" fill="'+fill+'" stroke="#8f853c" stroke-width="3"/><path d="M28 23c9 29 35 36 59 16" stroke="#fff" stroke-opacity=".45" stroke-width="4" fill="none" stroke-linecap="round"/><path d="m21 16-3-7m78 21 5-5" stroke="#6d6436" stroke-width="5" stroke-linecap="round"/>';
+ const description = {red:'红色',yellow:'黄色',green:'绿色'}[card.color]+'、'+(card.shape === 'round' ? '圆形' : '弯形')+'水果图卡';
+ return '<svg viewBox="0 0 120 90" role="img" aria-label="'+description+'"><g transform="'+transform+'">'+drawing+'</g></svg>';
+}
+function tell(text,good=false) {$('feedback').textContent=text;$('feedback').classList.toggle('good',good);}
+function fail(error) {$('error').textContent=error.message || '暂时没有保存成功，请重试。';}
+function report() {
+ if (!host?.workspace || currentIndex() === 3) return;
+ const i = currentIndex();
+ void host.workspace.report({scene_id:state.scene,game_state:JSON.parse(JSON.stringify(state)),hint:rounds[i].title+'；已标注 '+Object.keys(state.rounds[i].labels).length+' 张图卡，'+(state.rounds[i].solved?'挑战完成':state.rounds[i].tested?'已测试，可检查结果':'等待测试')}).catch(()=>{});
+}
+function saveProgress() {
+ if (!host) return Promise.resolve();
+ const snapshot = JSON.parse(JSON.stringify(state)); const generation = ++saveGeneration;
+ $('save-status').textContent='正在保存游戏进度…';
+ const task = saveTail.then(()=>host.checkpoint.save(snapshot));
+ saveTail = task.catch(()=>{});
+ return task.then(receipt=>{
+  if (generation === saveGeneration) {$('save-status').textContent=receipt?.persisted === false?'预览：未写入学生记录':'游戏进度已保存';$('error').textContent='';$('retry-save').hidden=true;}
+ }).catch(error=>{
+  if (generation === saveGeneration) {$('save-status').textContent='当前操作尚未保存';$('retry-save').hidden=false;fail(error);}
+  throw error;
+ });
+}
+function render() {
+ const focusCard = document.activeElement?.dataset?.card;
+ const i = currentIndex(), complete = i === 3;
+ $('play-area').hidden=complete; $('celebration').hidden=!complete;
+ $('scenes').innerHTML=sceneIds.map((id,j)=>'<button data-scene="'+id+'" '+(id===state.scene?'aria-current="step"':'')+' '+(moving || j>0 && !state.rounds.slice(0,j).every(p=>p.solved)?'disabled':'')+'>'+ (j<3?(state.rounds[j].solved?'✓ ':'')+(j+1)+'. ':'☆ ')+sceneTitles[j]+'</button>').join('');
+ $('caption').textContent=complete?'记住：给 AI 的样例要多样、标签要正确，AI 的结果也要检查。':(context?.prompts?.find(p=>p.scene_id===state.scene && p.trigger==='SCENE_ENTER')?.text || rounds[i].prompt);
+ if (complete) {$('finish').disabled=moving || submitted;$('finish-note').textContent=submitted?'徽章已领取，本次挑战已完成。':'点击领取徽章，'+(host?'保存本次学习记录。':'确认完成。');return;}
+ const level=rounds[i],progress=state.rounds[i],results=predictions(i);
+ const observeFirst=i>0 && !progress.sawError;
+ $('mission-kicker').textContent='挑战 '+(i+1)+' / 3';$('mission-title').textContent=level.title;$('mission-description').textContent=level.description;$('mission-count').textContent='已完成 '+state.rounds.filter(p=>p.solved).length+' / 3';$('progress').innerHTML=state.rounds.map(p=>'<i class="'+(p.solved?'done':'')+'"></i>').join('');
+ $('sample-count').textContent='已贴标签 '+Object.keys(progress.labels).length+' / '+level.training.length;
+ $('training-cards').innerHTML=level.training.map((card,j)=>'<button class="fruit-card" data-card="'+card.id+'" aria-pressed="'+(selected===card.id)+'" '+(progress.solved||moving||observeFirst?'disabled':'')+' aria-label="样例 '+(j+1)+'，'+(names[progress.labels[card.id]]?'标签：'+names[progress.labels[card.id]]:'尚未标注')+'">'+fruit(card)+'<span>样例 '+(j+1)+'</span><small class="'+(names[progress.labels[card.id]]?'labelled':'')+'">'+(names[progress.labels[card.id]]?'标签：'+names[progress.labels[card.id]]:'还没贴标签')+'</small></button>').join('');
+ $('selection-text').textContent=observeFirst?'先让机器人猜一猜，再检查并修改样例。':progress.solved?'这一关完成啦！可以去下一关，或者重玩本关。':selected?'已选样例 '+(level.training.findIndex(c=>c.id===selected)+1)+'。你想给它贴什么标签？':'先选一张图卡，再告诉机器人它是什么。';
+ ['label-apple','label-banana','label-clear'].forEach(id=>{$(id).disabled=!selected||progress.solved||moving||observeFirst;});
+ $('robot-speech').textContent=progress.solved?'谢谢你！我们完成了这个挑战。':!progress.tested?'我会找颜色、形状最像的已标注样例，再照着它的标签猜。':'这是我的猜测。请帮我检查，猜对了吗？';
+ $('test-cards').innerHTML=level.tests.map((card,j)=>{
+  const prediction=results[j],correct=prediction.label===card.truth;
+  return '<article class="test-card">'+fruit(card)+'<p>新图卡 '+(j+1)+'</p><p class="verdict">'+(progress.tested?prediction.label?'我猜：'+names[prediction.label]:'暂时不确定':'等待机器人猜')+'</p>'+(progress.tested?'<p class="'+(correct?'correct':'incorrect')+'">'+(correct?'✓ 猜对啦':prediction.label?'再看看：其实是'+names[card.truth]:'需要更多线索')+'</p>':'')+'</article>';
+ }).join('');
+ $('test').disabled=progress.solved||moving;$('test').textContent=progress.tested?'重新测试新图卡':'让机器人猜一猜';$('next').disabled=!progress.solved||moving;$('next').textContent=progress.solved?i===2?'去领取训练员徽章 →':'去下一关 →':'完成挑战后去下一关 →';
+ if (!progress.tested) tell(i===0?'图卡上的标签，就是你给机器人的学习样例。':i===1?'先测试一下：没见过的颜色，会让机器人认错吗？':'先测试，然后检查每一张样例的标签。');
+ else showTestFeedback(i,results);
+ if(focusCard) [...$('training-cards').querySelectorAll('button')].find(button=>button.dataset.card===focusCard && !button.disabled)?.focus();
+}
+function showTestFeedback(i,results) {
+ const progress=state.rounds[i],correct=results.filter((p,j)=>p.label===rounds[i].tests[j].truth).length;
+ if (results.some(p=>p.reason==='empty')) {tell('还没有学习样例。先选图卡，贴上标签，再来测试。');return;}
+ if (results.some(p=>p.reason==='missing-class')) {tell('机器人只见过一种标签。请给它苹果和香蕉两类样例，再试一试。');return;}
+ if (progress.solved) {tell(i===0?'挑战成功！机器人照着你提供的样例，认出了新图卡。':i===1?'挑战成功！从 '+progress.baseline+' / '+results.length+' 到 '+correct+' / '+results.length+'：这次，不同颜色的样例帮上了忙。更多样例也不保证永远正确。':'挑战成功！标签改对了，机器人的判断也变了。AI 的结果需要我们检查。',true);return;}
+ if (i>0 && !progress.sawError) {tell('先观察最初的错误，再试着改进。这一关可以点击“重玩本关”重新探索。');return;}
+ if (results.some(p=>p.reason==='tie')) {tell('有不同标签的样例一样像！机器人暂时不确定。检查标签，或者补充更有代表性的样例。');return;}
+ if (correct<results.length) tell('机器人猜对了 '+correct+' / '+results.length+' 张。'+(i===1?'黄苹果也有黄色外衣！给三张新样例贴好标签，再重新测试。':i===2?'看看样例的图片和标签，是不是有一个贴错了？':'检查一下：每张样例的标签都贴对了吗？'));
+ else tell('新图卡猜对啦！再把每张样例的标签检查、补充完整，就能完成挑战。');
+}
+function testRound() {
+ const i=currentIndex();if(i===3 || state.rounds[i].solved || moving)return;
+ const progress=state.rounds[i],results=predictions(i);
+ progress.tested=true;
+ if(results.every(p=>p.label) && results.some((p,j)=>p.label!==rounds[i].tests[j].truth)){progress.sawError=true;if(progress.baseline===null)progress.baseline=results.filter((p,j)=>p.label===rounds[i].tests[j].truth).length;}
+ progress.solved=canPass(i);if(progress.solved)selected=null;
+ render();report();void saveProgress().catch(()=>{});
+}
+function labelSelected(value) {
+ const i=currentIndex();if(!selected || i===3 || state.rounds[i].solved || moving || i>0 && !state.rounds[i].sawError)return;
+ const progress=state.rounds[i];if(value==='clear')delete progress.labels[selected];else if(names[value])progress.labels[selected]=value;else return;
+ progress.tested=false;progress.solved=false;render();tell('标签已更新。再让机器人猜一猜，看看判断有没有变化。');report();void saveProgress().catch(()=>{});
+}
+async function goScene(id) {
+ const index=sceneIds.indexOf(id);
+ if(index<0 || index>0 && !state.rounds.slice(0,index).every(p=>p.solved))throw new Error('先完成前面的挑战，再进入这一关。');
+ if(moving)throw new Error('正在保存操作，请稍等。');
+ moving=true;render();
+ try {await saveProgress();if(host)await host.scene.enter(id);state.scene=id;selected=null;render();document.scrollingElement?.scrollTo?.(0,0);await saveProgress();report();}
+ finally{moving=false;render();}
+}
+function confirmReset(index) {
+ const dialog=$('reset-dialog'),previous=document.activeElement;
+ $('reset-message').textContent=index===0?'将清空三个挑战的本次游戏进度。':'将重玩这一关和后面的挑战。前面完成的关卡会保留。';
+ return new Promise(resolve=>{
+  const finish=value=>{dialog.close();previous?.focus();resolve(value);};
+  $('reset-cancel').onclick=()=>finish(false);$('reset-confirm').onclick=()=>finish(true);dialog.oncancel=event=>{event.preventDefault();finish(false);};dialog.showModal();$('reset-cancel').focus();
+ });
+}
+async function resetFrom(index) {
+ if(moving)throw new Error('正在保存操作，请稍等。');moving=true;
+ try{await saveTail;for(let i=index;i<3;i++)state.rounds[i]=newRound(i);state.scene=sceneIds[index];selected=null;submitted=false;render();document.scrollingElement?.scrollTo?.(0,0);await saveProgress();if(host)await host.scene.enter(state.scene);report();}
+ finally{moving=false;render();}
+}
+async function finish() {
+ if(!state.rounds.every(p=>p.solved))throw new Error('完成三个挑战后，才能领取徽章。');
+ if(submitted || moving)return;
+ moving=true;render();
+ try{await saveProgress();if(host)await host.complete({score:3,maxScore:3,badge:'AI 小训练员',activity:'fruit-classification',knowledge_points:['样例学习','样例多样性','标签质量与人工核验']});submitted=true;$('badge-title').textContent='徽章已领取，你是 AI 小训练员！';}
+ finally{moving=false;render();}
+}
+$('training-cards').onclick=event=>{const button=event.target.closest('button[data-card]');if(button && !button.disabled){selected=button.dataset.card;render();document.querySelector('.label-tools').scrollIntoView?.({block:'nearest'});}};
+for(const button of document.querySelectorAll('[data-label]'))button.onclick=()=>labelSelected(button.dataset.label);
+$('scenes').onclick=event=>{const button=event.target.closest('button[data-scene]');if(button && !button.disabled)void goScene(button.dataset.scene).catch(fail);};
+$('test').onclick=testRound;$('hint').onclick=()=>tell(rounds[currentIndex()].hint);
+$('next').onclick=()=>void goScene(sceneIds[currentIndex()+1]).catch(fail);
+$('restart-level').onclick=async()=>{const i=currentIndex();if(await confirmReset(i))void resetFrom(i).catch(fail);};
+$('restart-all').onclick=async()=>{if(await confirmReset(0))void resetFrom(0).catch(fail);};
+$('finish').onclick=()=>void finish().catch(fail);
+$('retry-save').onclick=()=>void saveProgress().catch(()=>{});
+$('ask').onclick=async()=>{try{await saveProgress();await host.askTeacher();}catch(error){fail(error);}};
+$('read').onclick=()=>{
+ if(host){void host.narration.play(state.scene+'-read').catch(fail);return;}
+ if(!('speechSynthesis' in window)){fail(new Error('此浏览器没有朗读功能，可以阅读下方文字。'));return;}
+ const voice=speechSynthesis.getVoices().find(v=>/^zh[-_]CN$/i.test(v.lang));
+ if(!voice){fail(new Error('未找到普通话声音，可以阅读下方文字。'));return;}
+ speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance($('caption').textContent);utterance.lang='zh-CN';utterance.voice=voice;utterance.rate=.9;utterance.onerror=()=>fail(new Error('朗读暂时不可用，可以阅读下方文字。'));speechSynthesis.speak(utterance);
+};
+document.addEventListener('keydown',event=>{if(!event.altKey&&!event.ctrlKey&&!event.metaKey&&!$('reset-dialog').open && (event.key==='1'||event.key==='2') && !$('label-apple').disabled){event.preventDefault();labelSelected(event.key==='1'?'apple':'banana');}});
+render();
+async function connect() {
+ if(!window.K12)return;
+ $('game-root').inert=true;$('save-status').textContent='正在连接学习工作区…';
+ try{
+  host=window.K12;context=await host.ready();state=restore(context.gameState);
+  const index=sceneIds.indexOf(context.currentScene);if(index>=0 && (index===0 || state.rounds.slice(0,index).every(p=>p.solved)))state.scene=context.currentScene;
+  $('ask').hidden=false;
+  if(host.workspace){const receipt=await host.workspace.register(['scene','reset','complete'],async command=>{if(command.command==='scene')await goScene(command.scene_id);else if(command.command==='reset')await resetFrom(0);else if(command.command==='complete')await finish();});if(receipt.embedded===true)document.body.classList.add('embedded');}
+  $('save-status').textContent=context.preview?'预览：未写入学生记录':'游戏进度将保存到你的账号。';render();report();
+ }catch(error){fail(error);$('save-status').textContent='工作区连接失败，请重新打开活动。';}
+ finally{$('game-root').inert=false;}
+}
+void connect();
+})();
+</script>
+</body>
+</html>

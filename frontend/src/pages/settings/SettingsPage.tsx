@@ -3,6 +3,7 @@ import { CompanionPetPicker } from "../../features/companion/CompanionPetPicker"
 import { getCompanionPet, type CompanionPetId } from "../../features/companion/lib/sprite";
 import { AccountAvatar } from "../../features/identity/AccountAvatar";
 import { GradePicker } from "../../features/identity/GradePicker";
+import { NarrationVoiceSettings } from "./NarrationVoiceSettings";
 import {
   ApiError, deleteAvatar, getMe, logout, patchPreferences, patchProfile, uploadAvatar,
 } from "../../features/identity/api";
@@ -32,6 +33,12 @@ export function SettingsPage() {
   const [avatarError, setAvatarError] = useState("");
   const [busy, setBusy] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
+  const narrationTargetRequested = window.location.hash === "#settings-narration-voice";
+  useEffect(() => {
+    if (me?.user.id && narrationTargetRequested) {
+      document.getElementById("settings-narration-voice")?.scrollIntoView?.({ block: "center" });
+    }
+  }, [me?.user.id, narrationTargetRequested]);
 
   useEffect(() => {
     let active = true;
@@ -194,6 +201,7 @@ export function SettingsPage() {
             <label className="settings-field"><span>教师风格</span><select value={teacherStyle} onChange={(event) => setTeacherStyle(event.target.value as TeacherStyle)}>{TEACHER_STYLES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
             <label className="settings-field"><span>感兴趣的内容</span><input value={interests} onChange={(event) => setInterests(event.target.value)} placeholder="例如：机器人、绘画" /><small>用逗号分隔，最多十项。</small></label>
             <label className="settings-field"><span>语音偏好</span><select value={voice} onChange={(event) => setVoice(event.target.value as VoicePreference)}>{VOICE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select><small>朗读不会自动开启麦克风。</small></label>
+            <NarrationVoiceSettings userId={me.user.id} />
             <label className="settings-toggle"><input type="checkbox" checked={proactive} onChange={(event) => setProactive(event.target.checked)} /><span><strong>主动引导</strong><small>需要时由霜铃提示下一步。</small></span></label>
           </div>
         </section>

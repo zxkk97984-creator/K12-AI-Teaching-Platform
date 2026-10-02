@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { InteractivePrompt } from "./api";
 import { chooseNarrationVoice, narrationVoiceGroup, narrationVoiceId, narrationVoiceLabel } from "./narrationVoices";
+import { useNarrationVoice } from "./useNarrationVoice";
 
 export type NarrationStatus = "idle" | "loading" | "speaking" | "paused" | "ended" | "unavailable" | "error";
 export type NarrationSnapshot = { status: NarrationStatus; prompt_id: string | null; subtitle: string };
@@ -10,23 +11,7 @@ export function useNarration(audioUrl: (prompt: InteractivePrompt) => string, vo
   const [snapshot, setSnapshot] = useState<NarrationSnapshot>({ status: "idle", prompt_id: null, subtitle: "" });
   const [rate, setRate] = useState(1);
   const [muted, setMuted] = useState(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [voiceId, setVoiceId] = useState(() => { try { return localStorage.getItem(voiceStorageKey) ?? ""; } catch { return ""; } });
-  useEffect(() => {
-    try { setVoiceId(localStorage.getItem(voiceStorageKey) ?? ""); } catch { setVoiceId(""); }
-  }, [voiceStorageKey]);
-  useEffect(() => {
-    const synthesis = window.speechSynthesis;
-    if (!synthesis) return;
-    const update = () => setVoices([...synthesis.getVoices()]);
-    update();
-    synthesis.addEventListener?.("voiceschanged", update);
-    return () => synthesis.removeEventListener?.("voiceschanged", update);
-  }, []);
-  const selectVoice = useCallback((id: string) => {
-    setVoiceId(id);
-    try { if (id) localStorage.setItem(voiceStorageKey, id); else localStorage.removeItem(voiceStorageKey); } catch { /* session-only preference */ }
-  }, [voiceStorageKey]);
+  const { voices, setVoices, voiceId, selectVoice } = useNarrationVoice(voiceStorageKey);
   const audio = useRef<HTMLAudioElement | null>(null);
   const utterance = useRef<SpeechSynthesisUtterance | null>(null);
   const current = useRef<InteractivePrompt | null>(null);
@@ -60,9 +45,11 @@ export function useNarration(audioUrl: (prompt: InteractivePrompt) => string, vo
   useEffect(() => {
     const onHidden = () => { if (document.hidden) stop(); };
     document.addEventListener("visibilitychange", onHidden);
+    window.addEventListener("pagehide", stop);
     window.addEventListener("identity:signed-out", stop);
     return () => {
       document.removeEventListener("visibilitychange", onHidden);
+      window.removeEventListener("pagehide", stop);
       window.removeEventListener("identity:signed-out", stop);
       stop();
     };
@@ -136,22 +123,31 @@ export function useNarration(audioUrl: (prompt: InteractivePrompt) => string, vo
       speech.onend = () => { if (token === generation.current) change("ended", prompt); finish(false); };
       speech.onerror = () => { if (token === generation.current) change("error", prompt); finish(false); };
       utterance.current = speech;
-      try { synthesis.speak(speech); }
+      try { if (synthesis.paused) synthesis.resume(); synthesis.speak(speech); }
       catch { if (token === generation.current) change("error", prompt); finish(false); }
     });
   }, [change, muted, rate, stop, voiceId]);
 
   const pause = useCallback(() => {
     if (audio.current) audio.current.pause();
-    else if (utterance.current) window.speechSynthesis?.pause();
-  }, []);
+    else if (utterance.current) {
+      // Some browser voices never emit pause/resume events or cannot resume.
+      // Cancel this utterance and retain its prompt for a fresh playback.
+      generation.current += 1;
+      pending.current?.();
+      pending.current = null;
+      utterance.current = null;
+      window.speechSynthesis?.cancel();
+      change("paused", current.current);
+    }
+  }, [change]);
   const resume = useCallback(() => {
     if (audio.current) {
       const element = audio.current, token = generation.current;
       void element.play().catch(() => { if (token === generation.current && audio.current === element) change("error", current.current); });
     }
-    else if (utterance.current) window.speechSynthesis?.resume();
-  }, [change]);
+    else if (current.current && snapshot.status === "paused") void play(current.current);
+  }, [change, play, snapshot.status]);
   const replay = useCallback(() => current.current ? play(current.current) : Promise.resolve(false), [play]);
   const choice = chooseNarrationVoice(voices, voiceId);
   const voiceDescription = choice.voice ? narrationVoiceLabel(choice.voice) : "暂无可用声音";

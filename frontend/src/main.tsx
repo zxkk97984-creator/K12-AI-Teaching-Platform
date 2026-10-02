@@ -70,7 +70,7 @@ function Page() {
     );
   }
   if (path.startsWith("/interactive/")) return <InteractivePlayerPage />;
-  if (path.startsWith("/activities")) return <InteractiveCatalogPage purposeOverride="EXPERIMENT" />;
+  if (path.startsWith("/activities")) return <InteractiveCatalogPage />;
   if (path.startsWith("/animations/")) return <AnimationPage />;
   if (path === "/animations") return new URLSearchParams(search).has("legacy") ? <AnimationPage /> : <InteractiveCatalogPage purposeOverride="LESSON" />;
   if (path.startsWith("/more")) return <MorePage />;

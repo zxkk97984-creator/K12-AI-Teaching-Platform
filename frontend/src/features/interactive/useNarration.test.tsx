@@ -11,7 +11,7 @@ const prompt: InteractivePrompt = {
 function installSpeech(voices: Array<{ lang: string; name?: string; voiceURI?: string; default?: boolean }>) {
   const synthesis = {
     getVoices: vi.fn(() => voices),
-    speak: vi.fn((utterance: { onstart?: () => void }) => utterance.onstart?.()),
+    speak: vi.fn((utterance: { onstart?: () => void; onend?: () => void }) => utterance.onstart?.()),
     pause: vi.fn(), resume: vi.fn(), cancel: vi.fn(),
   };
   class Utterance {
@@ -34,6 +34,20 @@ function installSpeech(voices: Array<{ lang: string; name?: string; voiceURI?: s
 afterEach(() => { cleanup(); localStorage.removeItem('k12:interactive:voice:v1'); localStorage.removeItem('voice-test'); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 describe("platform narration", () => {
+  it("can pause and continue when the speech engine does not emit pause or resume events", async () => {
+    const synthesis = installSpeech([{ lang: "zh-CN" }]);
+    const { result } = renderHook(() => useNarration(() => "/audio"));
+    await act(async () => { await result.current.play(prompt); });
+    const original = synthesis.speak.mock.calls[0][0];
+    act(() => result.current.pause());
+    expect(result.current.status).toBe("paused");
+    await act(async () => result.current.resume());
+    expect(result.current.status).toBe("speaking");
+    expect(synthesis.speak).toHaveBeenCalledTimes(2);
+    expect(synthesis.speak.mock.calls[1][0]).toMatchObject({ text: prompt.text });
+    act(() => original.onend?.());
+    expect(result.current.status).toBe("speaking");
+  });
   it("prefers mainland Mandarin even when Cantonese is first and the browser default", async () => {
     const synthesis = installSpeech([{lang: 'zh-HK', name: 'Cantonese', default: true}, {lang: 'zh-TW', name: 'Taiwan'}, {lang: 'zh-CN', name: 'Mandarin'}]);
     const {result} = renderHook(() => useNarration(() => '/audio'));
@@ -136,9 +150,11 @@ describe("platform narration", () => {
     expect(started).toBe(true);
     expect(result.current.status).toBe("speaking");
     expect(synthesis.speak).toHaveBeenCalledOnce();
-    act(() => { result.current.pause(); result.current.resume(); result.current.stop(); });
-    expect(synthesis.pause).toHaveBeenCalledOnce();
-    expect(synthesis.resume).toHaveBeenCalledOnce();
+    act(() => result.current.pause());
+    expect(result.current.status).toBe("paused");
+    await act(async () => result.current.resume());
+    expect(synthesis.speak).toHaveBeenCalledTimes(2);
+    act(() => result.current.stop());
     expect(result.current.status).toBe("idle");
     expect(states).toContain(true);
     expect(states.at(-1)).toBe(false);

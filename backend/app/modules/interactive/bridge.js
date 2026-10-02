@@ -83,10 +83,10 @@
     complete: (result = {}) => send("complete", { game_result: result }),
     askTeacher: () => send("ask_teacher", {}),
     workspace: Object.freeze({
-      register: (supported, handler) => {
-        if (!Array.isArray(supported) || supported.some(value => !["scene", "pause", "reset", "complete"].includes(value)) || typeof handler !== "function") return Promise.reject(new Error("工作区控制无效"));
+      register: (supported, handler, options = {}) => {
+        if (!Array.isArray(supported) || supported.some(value => !["scene", "pause", "reset", "complete", "demonstrate"].includes(value)) || typeof handler !== "function") return Promise.reject(new Error("工作区控制无效"));
         commands = [...new Set(supported)]; commandHandler = handler;
-        return send("workspace_ready", {version: 1, commands});
+        return send("workspace_ready", {version: 1, commands, ...(options.playback_steps ? {playback_steps: options.playback_steps} : {})});
       },
       report: (value) => send("activity_state", value),
       onSession: (listener) => { sessionListeners.add(listener); return () => sessionListeners.delete(listener); },

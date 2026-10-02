@@ -12,6 +12,23 @@ const me: MeResponse = {
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
+it("opens the voice settings after the account finishes loading", async () => {
+  vi.spyOn(identityApi, "getMe").mockResolvedValue(me);
+  const previousUrl = window.location.href;
+  const previousScroll = Element.prototype.scrollIntoView;
+  const scroll = vi.fn();
+  Element.prototype.scrollIntoView = scroll;
+  window.history.replaceState(null, "", "/settings#settings-narration-voice");
+  try {
+    render(<SettingsPage />);
+    await screen.findByLabelText("朗读声音");
+    await waitFor(() => expect(scroll).toHaveBeenCalledWith({ block: "center" }));
+  } finally {
+    Element.prototype.scrollIntoView = previousScroll;
+    window.history.replaceState(null, "", previousUrl);
+  }
+});
+
 it("saves nickname, exact grade, matching stage and teacher style", async () => {
   vi.spyOn(identityApi, "getMe").mockResolvedValue(me);
   const updatedProfile: MeResponse = {

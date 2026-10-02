@@ -7,12 +7,13 @@ import { useConversation } from "../conversation/ConversationProvider";
 import { useLearningTeacher } from "../companion/LearningTeacherContext";
 import { getInteractive, getInteractiveDocument, getInteractiveSession, listInteractive, startInteractive, type InteractiveDetail, type InteractivePrompt, type InteractiveSession } from "./api";
 import { useNarration } from "./useNarration";
-import { CHANNEL, isObject, validatedMessage, type WorkspaceCommand } from "./bridge";
+import { CHANNEL, isObject, validatedMessage, type PlaybackStep, type WorkspaceCommand } from "./bridge";
+import { useLessonPlayback } from "./useLessonPlayback";
 import { ActivitySaveQueue, type ActivityPatch } from "./ActivitySaveQueue";
 import { NarrationControls } from "./LearningControls";
 import "./interactive.css";
 
-type CommandRequest = { resolve: () => void; reject: (error: Error) => void; timer: number };
+type CommandRequest = { resolve: () => void; reject: (error: Error) => void; timer: number; sceneId?: unknown; narrate: boolean };
 export function InteractivePlayerPage() {
   const { resourceId = "" } = useParams();
   const navigate = useNavigate();
@@ -34,6 +35,9 @@ export function InteractivePlayerPage() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const [commands, setCommands] = useState<WorkspaceCommand[]>([]);
+  const [playbackSteps, setPlaybackSteps] = useState<PlaybackStep[]>([]);
+  const playbackController = useRef<ReturnType<typeof useLessonPlayback> | null>(null);
+  const autoStartRequested = useRef(false);
   const [commandBusy, setCommandBusy] = useState(false);
   const [checkpointDirty, setCheckpointDirty] = useState(false);
   const [hint, setHint] = useState("");
@@ -56,7 +60,7 @@ export function InteractivePlayerPage() {
   const commandRequests = useRef(new Map<string, CommandRequest>());
   const narrator = useNarration(prompt => `/api/v1/interactive/sessions/${sessionRef.current?.id}/audio/${encodeURIComponent(prompt.id)}`, `k12:interactive:voice:${account?.user.id}:v1`);
   const manifest = detail?.manifest;
-  const catalogRoute = detail?.resource.purpose === "GAME" ? "/practice" : stage?.startsWith("PRIMARY") ? "/animations" : "/activities";
+  const catalogRoute = detail?.resource.purpose === "GAME" ? "/practice" : detail?.resource.purpose === "LESSON" ? "/animations" : "/activities";
   const currentScene = manifest?.scenes.find(item => item.id === sceneId) ?? manifest?.scenes[0];
   const prompts = manifest?.prompts.filter(item => item.scene_id === currentScene?.id) ?? [];
   const currentPrompt = prompts.find(item => item.id === promptId) ?? prompts.find(item => item.trigger === 'SCENE_ENTER') ?? prompts[0];
@@ -74,7 +78,7 @@ export function InteractivePlayerPage() {
       setDetail(previous => previous ? {...previous, session: saved} : previous);
       setSceneId(saved.current_scene_id);
       post('workspace_state', crypto.randomUUID(), {scene_id: saved.current_scene_id});
-      if (saved.status === 'COMPLETED') { startedRef.current = false; narrator.stop(); setStarted(false); }
+      if (saved.status === 'COMPLETED') { startedRef.current = false; playbackController.current?.stop(); narrator.stop(); setStarted(false); }
     },
     status: (status, message) => { setSaveStatus(status); setSaveError(message ?? ''); },
   });
@@ -84,7 +88,8 @@ export function InteractivePlayerPage() {
   useEffect(() => {
     let alive = true; alivePage.current = true;
     const abort = new AbortController();
-    setLoading(true); setError(''); setDetail(null); setDocumentHtml(''); setCommands([]); setHint('');
+    playbackController.current?.stop(); autoStartRequested.current = false;
+    setLoading(true); setError(''); setDetail(null); setDocumentHtml(''); setCommands([]); setPlaybackSteps([]); setHint('');
     startedRef.current = false; setStarted(false); setFrameMounted(false); setExitRequested(false); setCommandBusy(false); setSaveStatus('ready'); setSaveError(''); setCheckpointDirty(false);
     saver.current!.reset(); sessionRef.current = null; instanceId.current = crypto.randomUUID();
     setFocused(false);
@@ -103,12 +108,12 @@ export function InteractivePlayerPage() {
       const document = session.status === 'ACTIVE' ? await getInteractiveDocument(session.id, abort.signal) : null;
       if (!alive) return;
       if (activity.session.stage !== stage || (document && document.revision_id !== session.revision_id)) throw new Error('课件版本或学段已变化，请重新读取。');
-      sessionRef.current = activity.session; setDetail(activity); setDocumentHtml(document?.document_html ?? '');
+      sessionRef.current = activity.session; setDetail(activity); setDocumentHtml(document?.document_html ?? ''); setFrameMounted(Boolean(document));
       setSceneId(activity.session.current_scene_id ?? activity.manifest.scenes[0]?.id ?? null);
     })().catch(caught => { if (alive) setError(caught instanceof Error ? caught.message : '内容暂时无法打开'); })
       .finally(() => { if (alive) setLoading(false); });
     return () => {
-      alive = false; alivePage.current = false; startedRef.current = false; instanceId.current = crypto.randomUUID(); abort.abort(); narrator.stop(); saver.current!.reset();
+      alive = false; alivePage.current = false; startedRef.current = false; instanceId.current = crypto.randomUUID(); abort.abort(); playbackController.current?.stop(); narrator.stop(); saver.current!.reset();
       if (checkpointTimer.current !== null) window.clearTimeout(checkpointTimer.current);
       checkpointTimer.current = null; checkpointBatch.current = null;
       for (const request of commandRequests.current.values()) { clearTimeout(request.timer); request.reject(new Error('活动已切换')); }
@@ -121,7 +126,7 @@ export function InteractivePlayerPage() {
     const style = getComputedStyle(root.current);
     const compact = root.current.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) < 1040;
     setDrawer(compact);
-    setPanelOpen(!compact);
+    setPanelOpen(!compact && detail?.resource.purpose !== "GAME");
     const observer = new ResizeObserver(([entry]) => {
       const nextDrawer = entry.contentRect.width < 1040;
       setDrawer(nextDrawer);
@@ -129,7 +134,7 @@ export function InteractivePlayerPage() {
     });
     observer.observe(root.current);
     return () => observer.disconnect();
-  }, [loading]);
+  }, [loading, detail?.resource.purpose]);
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('interactive:layout', {detail: {focused}}));
     return () => { window.dispatchEvent(new CustomEvent('interactive:layout', {detail: {focused: false}})); };
@@ -153,12 +158,12 @@ export function InteractivePlayerPage() {
     if (drawer && panelOpen) panel.current?.querySelector<HTMLButtonElement>('button')?.focus();
   }, [drawer, panelOpen]);
 
-  const command = useCallback((value: WorkspaceCommand, payload: Record<string, unknown> = {}) => {
+  const command = useCallback((value: WorkspaceCommand, payload: Record<string, unknown> = {}, options = {narrate: true}) => {
     if (!commands.includes(value)) return Promise.reject(new Error('此课件未接管这项操作，请使用课件内的控件。'));
     const id = crypto.randomUUID();
     return new Promise<void>((resolve, reject) => {
       const timer = window.setTimeout(() => { commandRequests.current.delete(id); reject(new Error('课件未确认操作，请重试。')); }, 20000);
-      commandRequests.current.set(id, {resolve, reject, timer});
+      commandRequests.current.set(id, {resolve, reject, timer, sceneId: value === 'scene' ? payload.scene_id : undefined, narrate: options.narrate});
       post('workspace_command', id, {command: value, ...payload});
     });
   }, [commands, post]);
@@ -176,12 +181,33 @@ export function InteractivePlayerPage() {
       throw caught;
     }
   }, [persist, post]);
+  const presentStep = useCallback(async (step: PlaybackStep, isCurrent: () => boolean) => {
+    await flushCheckpoint();
+    if (!isCurrent() || !alivePage.current) return;
+    if (sessionRef.current?.current_scene_id !== step.scene_id) await command('scene', {scene_id: step.scene_id}, {narrate: false});
+    if (!isCurrent() || !alivePage.current) return;
+    await command('demonstrate', {prompt_id: step.prompt_id});
+    if (isCurrent()) setPromptId(step.prompt_id);
+  }, [command, flushCheckpoint]);
+  const playback = useLessonPlayback({steps: playbackSteps, prompts: manifest?.prompts ?? [], narrator, present: presentStep});
+  playbackController.current = playback;
+  useEffect(() => {
+    if (started && playbackSteps.length && autoStartRequested.current) {
+      autoStartRequested.current = false;
+      playback.start(Math.max(0, playbackSteps.findIndex(step => step.scene_id === sessionRef.current?.current_scene_id)));
+    }
+  }, [started, playbackSteps, playback.start]);
+  const tryManually = useCallback(() => {
+    autoStartRequested.current = false; playback.stop();
+    if (commands.includes('demonstrate')) void command('demonstrate', {prompt_id: null}).catch(caught => setError(caught.message));
+  }, [command, commands, playback.stop]);
   const setTeacherContext = useCallback((selectedPrompt?: string) => {
     const session = sessionRef.current;
     if (!session || !manifest) return;
     controller.setPageContext({page_type: 'INTERACTIVE', activity_type: detail?.resource.purpose, content_kind: 'INTERACTIVE', content_id: session.resource_id, content_version: session.revision_id, interactive_session_id: session.id, interactive_scene_id: session.current_scene_id ?? manifest.scenes[0]?.id, interactive_prompt_id: selectedPrompt, visible_section: currentScene?.title ?? manifest.title, knowledge_points: manifest.knowledge_points});
   }, [controller, currentScene?.title, detail?.resource.purpose, manifest]);
   const prepareTeacher = useCallback((selectedPrompt?: string) => {
+    playbackController.current?.pause();
     if (narrator.status === 'speaking') narrator.pause();
     else if (narrator.status === 'loading') narrator.stop();
     if (commands.includes('pause')) void command('pause').catch(() => {});
@@ -225,13 +251,16 @@ export function InteractivePlayerPage() {
         return;
       }
       if (message.type === 'ready') { post('narration_state', crypto.randomUUID(), {status: narrator.status, prompt_id: narrator.prompt_id, subtitle: narrator.subtitle}); return; }
-      if (!startedRef.current || session.status !== 'ACTIVE') { reply('save_failed', {message: '请先开始学习'}); return; }
       if (message.type === 'workspace_ready') {
+        if (session.status !== 'ACTIVE') return;
         setCommands(payload.commands as WorkspaceCommand[]);
+        const steps = payload.playback_steps as PlaybackStep[] | undefined;
+        setPlaybackSteps(steps && detail?.resource.purpose === 'LESSON' && steps.every(step => manifest.scenes.some(scene => scene.id === step.scene_id) && manifest.prompts.some(prompt => prompt.id === step.prompt_id && prompt.scene_id === step.scene_id)) ? steps : []);
         const style = getComputedStyle(root.current!);
         reply('saved', {embedded: true, theme: {'font-family': style.fontFamily, text: style.getPropertyValue('--sl-text').trim(), muted: style.getPropertyValue('--sl-text-muted').trim(), surface: '#fff', soft: '#fffcf4', line: style.getPropertyValue('--sl-border-color').trim() || '#e2e2df', accent: style.getPropertyValue('--sl-primary').trim(), radius: '12px'}});
         return;
       }
+      if (!startedRef.current || session.status !== 'ACTIVE') { reply('save_failed', {message: '请先开始学习'}); return; }
       if (message.type === 'activity_state') {
         if (payload.scene_id !== (session.current_scene_id ?? manifest.scenes[0]?.id)) { reply('save_failed', {message: '环节已变化'}); return; }
         setHint(payload.hint as string); reply('saved', {received: true}); return;
@@ -240,15 +269,17 @@ export function InteractivePlayerPage() {
       if (message.type === 'request_narration') {
         const prompt = manifest.prompts.find(item => item.id === payload.prompt_id && item.scene_id === (session.current_scene_id ?? manifest.scenes[0]?.id));
         if (!prompt) { reply('save_failed', {message: '当前环节没有这个讲解'}); return; }
+        playbackController.current?.stop(); setPromptId(prompt.id);
         void playPrompt(prompt).then(accepted => reply(accepted ? 'saved' : 'save_failed', {message: accepted ? '朗读已开始' : '朗读不可用，请阅读讲解'})); return;
       }
       if (message.type === 'scene_changed') {
         if (!manifest.scenes.some(item => item.id === payload.scene_id)) { reply('save_failed', {message: '环节不存在'}); return; }
+        const automaticScene = [...commandRequests.current.values()].some(request => request.sceneId === payload.scene_id && !request.narrate);
         narrator.stop();
         void flushCheckpoint().then(() => persistCurrent({scene_id: payload.scene_id as string})).then(saved => {
           reply('saved', saved); setHint('');
           const prompt = manifest.prompts.find(item => item.scene_id === payload.scene_id && item.trigger === 'SCENE_ENTER');
-          if (prompt && sessionRef.current?.id === session.id && !learningTeacher.isVisible()) void playPrompt(prompt);
+          if (prompt && !automaticScene && sessionRef.current?.id === session.id && !learningTeacher.isVisible() && !playbackController.current?.isRunning()) void playPrompt(prompt);
         }).catch(failed); return;
       }
       if (message.type === 'checkpoint') {
@@ -269,7 +300,7 @@ export function InteractivePlayerPage() {
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [askTeacher, currentPrompt?.id, flushCheckpoint, manifest, narrator.pause, narrator.prompt_id, narrator.status, narrator.stop, narrator.subtitle, learningTeacher, persist, playPrompt, post, started]);
+  }, [askTeacher, currentPrompt?.id, detail?.resource.purpose, flushCheckpoint, manifest, narrator.pause, narrator.prompt_id, narrator.status, narrator.stop, narrator.subtitle, learningTeacher, persist, playPrompt, post, started]);
 
   const initFrame = () => {
     const session = sessionRef.current;
@@ -284,6 +315,7 @@ export function InteractivePlayerPage() {
   };
   const runCommand = async (value: WorkspaceCommand, payload?: Record<string, unknown>) => {
     if (commandBusy) return;
+    if (playback.active) tryManually();
     const generation = instanceId.current;
     setCommandBusy(true); setError(''); narrator.stop();
     try { await flushCheckpoint(); if (!alivePage.current || generation !== instanceId.current) return; await command(value, payload); }
@@ -293,17 +325,16 @@ export function InteractivePlayerPage() {
   const restart = async () => {
     if (commandBusy) return;
     const generation = instanceId.current;
-    if (!window.confirm('重新开始会保留旧活动记录，并从当前版本开始一轮新的学习。确定继续吗？')) return;
-    narrator.stop(); setCommandBusy(true);
+    playback.stop(); narrator.stop(); setCommandBusy(true);
     try { await flushCheckpoint(); if (!alivePage.current || generation !== instanceId.current) return; await startInteractive(resourceId, true); if (alivePage.current && generation === instanceId.current) setRetryIndex(value => value + 1); }
     catch (caught) { if (alivePage.current && generation === instanceId.current) setError(caught instanceof Error ? caught.message : '重新开始失败'); }
     finally { if (alivePage.current && generation === instanceId.current) setCommandBusy(false); }
   };
   const finishManual = async () => {
-    const generation = instanceId.current; narrator.stop();
+    const generation = instanceId.current; playback.stop(); narrator.stop();
     try { await flushCheckpoint(); if (alivePage.current && generation === instanceId.current) await persist({complete: true, source: 'USER_CONFIRMED', game_result: {}}); } catch { /* Saving exposes its recoverable error. */ }
   };
-  const saveAndExit = async () => { const generation = instanceId.current; narrator.stop(); try { await flushCheckpoint(); if (alivePage.current && generation === instanceId.current) setExitRequested(true); } catch { /* Keep current work and expose retry. */ } };
+  const saveAndExit = async () => { const generation = instanceId.current; playback.stop(); narrator.stop(); try { await flushCheckpoint(); if (alivePage.current && generation === instanceId.current) setExitRequested(true); } catch { /* Keep current work and expose retry. */ } };
   useEffect(() => { if (exitRequested && !checkpointDirty && saveStatus !== 'saving' && saveStatus !== 'unsaved') navigate(catalogRoute); }, [exitRequested, checkpointDirty, saveStatus, navigate, catalogRoute]);
   const restored = Boolean(detail && detail.session.base_revision > 0);
   const active = detail?.session.status === 'ACTIVE';
@@ -313,20 +344,21 @@ export function InteractivePlayerPage() {
 
   if (loading) return <main className="interactive-player" role="status">正在读取课件与账号中已保存的活动…</main>;
   if (!detail || !manifest) return <main className="interactive-player"><h1>内容暂时不可用</h1><p role="alert">{error || '无法读取上次进度，请重试。'}</p><button onClick={() => setRetryIndex(value => value + 1)}>重试</button><Link to={catalogRoute}>返回目录</Link></main>;
-  return <main ref={root} className={`interactive-player${focused ? ' is-focused' : ''}${drawer ? ' has-drawer' : ''}`} data-testid="interactive-player" data-panel-open={panelOpen}>
-    <header className="interactive-player-header" data-pet-avoid><Link to={catalogRoute} onClick={event => { event.preventDefault(); void saveAndExit(); }}>← 返回</Link><div className="interactive-course-title"><h1>{detail.resource.title}</h1><span>{currentScene?.title} · 环节 {sceneIndex + 1}/{manifest.scenes.length}</span></div><span className="interactive-status" role="status">{saveStatus === 'unsaved' ? '未保存 · 请重试' : checkpointDirty || saveStatus === 'saving' ? '正在保存…' : restored || saveStatus === 'saved' ? '已保存到账号' : '尚未记录操作'}</span><button ref={focusButton} type="button" className="secondary" aria-pressed={focused} onClick={toggleFocus}>{focused ? '退出专注' : '专注模式'}</button></header>
+  return <main ref={root} className={`interactive-player${focused ? ' is-focused' : ''}${drawer ? ' has-drawer' : ''}`} data-testid="interactive-player" data-panel-open={panelOpen} data-playback={playback.status} data-playback-step={playback.index}>
+    <header className="interactive-player-header" data-pet-avoid><Link to={catalogRoute} onClick={event => { event.preventDefault(); void saveAndExit(); }}>← 返回</Link><div className="interactive-course-title"><h1>{detail.resource.title}</h1><div className="interactive-course-meta"><span>{currentScene?.title} · 环节 {sceneIndex + 1}/{manifest.scenes.length}</span><span className="interactive-status" role="status">{saveStatus === 'unsaved' ? '未保存 · 请重试' : checkpointDirty || saveStatus === 'saving' ? '正在保存…' : restored || saveStatus === 'saved' ? '已保存到账号' : '尚未记录操作'}</span></div></div><button ref={focusButton} type="button" className="secondary" aria-pressed={focused} onClick={toggleFocus}>{focused ? '退出专注' : '专注模式'}</button></header>
     <nav className="interactive-scene-nav" aria-label="课程环节" data-pet-avoid>
       {started && commands.includes('scene') ? <><button type="button" className="secondary" disabled={sceneIndex === 0 || commandBusy} onClick={() => void runCommand('scene', {scene_id: manifest.scenes[sceneIndex - 1].id})}>上一环节</button><select aria-label="当前课程环节" value={currentScene?.id} disabled={commandBusy} onChange={event => void runCommand('scene', {scene_id: event.target.value})}>{manifest.scenes.map((scene, index) => <option key={scene.id} value={scene.id}>{index + 1}. {scene.title}</option>)}</select><button type="button" className="secondary" disabled={sceneIndex === manifest.scenes.length - 1 || commandBusy} onClick={() => void runCommand('scene', {scene_id: manifest.scenes[sceneIndex + 1].id})}>下一环节</button></> : <span>{started ? '原版课件 · 请使用画布内的环节与实验控件' : detail.resource.subject}</span>}
       <button ref={panelButton} type="button" className="secondary interactive-panel-toggle" aria-expanded={panelOpen} aria-controls="interactive-guide" onClick={openPanel}>{panelOpen ? '收起讲解' : '本步讲解'}</button><button type="button" className="secondary" onClick={() => askTeacher(currentPrompt?.id)}>问老师</button>
     </nav>
     <div className="interactive-player-layout">
       <section className="interactive-stage" aria-label="互动画布" inert={panelModal}>
-        {!started ? <div className="interactive-start"><div>{manifest.cover && latestRevisionId === detail.session.revision_id ? <img className="interactive-preview" src={`/api/v1/interactive/resources/${resourceId}/cover`} alt={`${detail.resource.title}课件预览`} /> : <div className="interactive-preview-text">{manifest.scenes.map((scene, index) => <span key={scene.id}>{index + 1}. {scene.title}</span>)}</div>}</div><div><span className="interactive-kicker">{active ? restored ? '继续上次学习' : '准备开始' : '学习记录'}</span><h2>{active && restored ? `上次学到：${currentScene?.title}` : active ? '观察、操作，再说出你的发现' : '本次活动已完成'}</h2><p>{manifest.summary}</p>{!active && detail.session.game_result && "score" in detail.session.game_result ? <p>游戏上报得分 {String(detail.session.game_result.score)}。游戏结果不计入正式练习成绩。</p> : null}{manifest.knowledge_points.length ? <p>学习目标：{manifest.knowledge_points.join('、')}</p> : null}<button type="button" onClick={() => {
+        {!started ? <div className="interactive-start"><div>{manifest.cover && latestRevisionId === detail.session.revision_id ? <img className="interactive-preview" src={`/api/v1/interactive/resources/${resourceId}/cover`} alt={`${detail.resource.title}课件预览`} /> : <div className="interactive-preview-text">{manifest.scenes.map((scene, index) => <span key={scene.id}>{index + 1}. {scene.title}</span>)}</div>}</div><div><span className="interactive-kicker">{active ? restored ? '继续上次学习' : '准备开始' : '学习记录'}</span><h2>{active && restored ? `上次学到：${currentScene?.title}` : active ? playbackSteps.length ? '点一下，听讲解、看演示' : '观察、操作，再说出你的发现' : '本次活动已完成'}</h2><p>{manifest.summary}</p>{!active && detail.session.game_result && "score" in detail.session.game_result ? <p>游戏上报得分 {String(detail.session.game_result.score)}。游戏结果不计入正式练习成绩。</p> : null}{manifest.knowledge_points.length ? <p>学习目标：{manifest.knowledge_points.join('、')}</p> : null}<button type="button" onClick={() => {
           if (!active) { void restart(); return; }
           if (startedRef.current) return;
           startedRef.current = true; setFrameMounted(true); setStarted(true);
-          const prompt = prompts.find(item => item.trigger === 'SCENE_ENTER');
-          if (prompt) { setVoiceEnabled(true); void narrator.play(prompt); }
+          setVoiceEnabled(true);
+          autoStartRequested.current = stage === 'PRIMARY_LOWER' && detail.resource.purpose === 'LESSON';
+          if (!autoStartRequested.current || !playbackSteps.length) { const prompt = prompts.find(item => item.trigger === 'SCENE_ENTER'); if (prompt) void narrator.play(prompt); }
         }}>{active ? restored ? '继续学习' : '开始学习' : '重新体验'}</button></div></div> : null}
         {frameMounted && documentHtml ? <iframe hidden={!started} ref={frame} key={instanceId.current} title={detail.resource.title} sandbox="allow-scripts" referrerPolicy="no-referrer" srcDoc={documentHtml} onLoad={initFrame} /> : null}
       </section>
@@ -338,12 +370,12 @@ export function InteractivePlayerPage() {
         if (document.activeElement === (event.shiftKey ? elements[0] : elements.at(-1))) { event.preventDefault(); target?.focus(); }
       }}>
         <div className="interactive-guide-tabs" data-pet-avoid><strong>本步讲解</strong>{drawer ? <button type="button" className="secondary interactive-guide-close" aria-label="关闭学习面板" onClick={() => { setPanelOpen(false); panelButton.current?.focus(); }}>×</button> : null}</div>
-        <div className="interactive-explanation"><p className="interactive-kicker">预设讲解 · 可反复朗读</p>{prompts.length > 1 ? <label>讲解段落<select value={currentPrompt?.id} onChange={event => { narrator.stop(); setPromptId(event.target.value); }}>{prompts.map((prompt, index) => <option key={prompt.id} value={prompt.id}>第 {index + 1} 段</option>)}</select></label> : null}<p className={`interactive-explanation-text${narrator.status === 'speaking' && narrator.prompt_id === currentPrompt?.id ? ' is-speaking' : ''}`}>{currentPrompt?.text ?? currentScene?.summary ?? '本环节没有预设讲解，请观察课件中的操作提示。'}</p><p className="interactive-guide-note">看画布中的变化，有疑问时点击“问老师”，也可以拖动桌宠打开随身对话。</p></div>
+        <div className="interactive-explanation"><p className="interactive-kicker">{playback.active ? `自动演示 · 第 ${playback.index + 1}/${playbackSteps.length} 段` : '预设讲解 · 可反复朗读'}</p>{prompts.length > 1 ? <label>讲解段落<select value={currentPrompt?.id} onChange={event => { tryManually(); narrator.stop(); setPromptId(event.target.value); }}>{prompts.map((prompt, index) => <option key={prompt.id} value={prompt.id}>第 {index + 1} 段</option>)}</select></label> : null}<p className={`interactive-explanation-text${narrator.status === 'speaking' && narrator.prompt_id === currentPrompt?.id ? ' is-speaking' : ''}`}>{currentPrompt?.text ?? currentScene?.summary ?? '本环节没有预设讲解，请观察课件中的操作提示。'}</p><p className="interactive-guide-note">{playbackSteps.length ? '画面会自动演示，讲完一段再往下走。可以暂停、问老师，或选择“自己试一试”。' : '看画布中的变化，有疑问时点击“问老师”，也可以拖动桌宠打开随身对话。'}</p></div>
       </aside>
     </div>
-    <NarrationControls narrator={narrator} prompt={currentPrompt} enabled={voiceEnabled} started={started} enable={() => void enableVoice()} play={prompt => void playPrompt(prompt)}>
-      <details className="interactive-more"><summary>学习操作</summary><div className="interactive-more-menu">
-        <button type="button" className="secondary" onClick={narrator.stop} disabled={narrator.status === 'idle' || narrator.status === 'ended'}>停止讲解</button>
+    <NarrationControls narrator={narrator} prompt={currentPrompt} enabled={voiceEnabled} started={started} enable={() => void enableVoice()} play={prompt => void playPrompt(prompt)} automatic={playbackSteps.length ? { ...playback, total: playbackSteps.length, begin: () => { setVoiceEnabled(true); playback.start(); }, manual: tryManually } : undefined}>
+      <details className="interactive-more"><summary aria-label="学习操作" title="更多学习操作"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><span className="interactive-control-label">学习操作</span></summary><div className="interactive-more-menu">
+        <button type="button" className="secondary" onClick={() => { if (playback.active) tryManually(); else narrator.stop(); }} disabled={!playback.active && (narrator.status === 'idle' || narrator.status === 'ended')}>停止讲解</button>
         {commands.includes('reset') && started ? <button type="button" className="secondary" disabled={commandBusy} onClick={() => { if (window.confirm('重置当前实验会清除实验操作进度，保留当前课程环节。确定继续吗？')) void runCommand('reset'); }}>重置当前实验</button> : null}
         {commands.includes('complete') && started ? <button type="button" disabled={commandBusy} onClick={() => void runCommand('complete')}>完成本次学习</button> : null}
         {!manifest.capabilities.includes('COMPLETION') && active && started ? <button type="button" onClick={() => void finishManual()}>标记本次完成</button> : null}
