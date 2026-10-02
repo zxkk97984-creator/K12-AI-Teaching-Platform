@@ -309,7 +309,6 @@ body .app-shell[data-code-surface] .app-content > .codelab-page { width: 100%; m
 .codelab-pet-slot { position: absolute; top: 6px; right: 18px; width: 44px; height: 44px; pointer-events: none; }
 body .app-shell[data-code-surface] .companion-dock[data-minimized="true"] { width: 44px; }
 body .app-shell[data-code-surface] .companion-dock[data-minimized="true"] .companion-toggle { width: 44px; height: 44px; min-height: 44px; padding: 2px; margin: 0; }
-body .app-shell[data-code-surface] .companion-dock[data-minimized="true"] .conv-pet-head { width: 36px !important; height: 36px !important; }
 
 .codelab-bank { gap: 10px; }
 .codelab-bank :is(button, input, select) { line-height: 1.35; }

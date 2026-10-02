@@ -58,7 +58,7 @@
   box-shadow: 0 4px 14px #2021241c;
 }
 .companion-dock[data-minimized="true"] .companion-toggle:focus-visible {
-  outline: 3px solid var(--sl-focus);
+  outline: 1px solid var(--sl-focus);
   outline-offset: 2px;
 }
 .companion-dock[data-minimized="true"] .conv-pet-head {
@@ -118,7 +118,7 @@ body .companion-panel-tools .companion-pin[aria-pressed="true"] svg { fill: curr
 .companion-resize--sw { bottom: 0; left: 0; cursor: nesw-resize; }
 body .companion-panel .companion-resize--se { bottom: 0; right: 0; display: grid; place-items: center; min-height: 24px; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--sl-text-muted); cursor: nwse-resize; }
 body .companion-panel .companion-resize--se:not(:disabled):hover { background: transparent; color: var(--sl-primary-ink, #725300); }
-.companion-resize--se:focus-visible { outline: 2px solid var(--sl-focus, #725300); outline-offset: -3px; }
+.companion-resize--se:focus-visible { outline: 1px solid var(--sl-focus, #9c8140); outline-offset: -1px; }
 .companion-panel[data-adjusting="true"] { user-select: none; }
 @container companion (max-width: 390px) {
   body .companion-panel .companion-panel-header { padding: 8px; gap: 4px; }

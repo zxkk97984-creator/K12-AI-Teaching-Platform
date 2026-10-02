@@ -22,7 +22,7 @@
   --sl-space-5: 24px;
   --sl-space-6: 32px;
   --sl-text-2xl: clamp(26px, 3vw, 36px);
-  --sl-focus: #25272a;
+  --sl-focus: #9c8140;
   font-family: var(--sl-font-family);
   color: var(--sl-text);
   background: var(--sl-bg);
@@ -90,8 +90,8 @@ label {
   color: var(--sl-text-muted);
 }
 :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
-  outline: 2px solid var(--sl-focus);
-  outline-offset: 3px;
+  outline: 1px solid var(--sl-focus);
+  outline-offset: 2px;
 }
 .eyebrow {
   font-size: 11px;
@@ -538,7 +538,7 @@ label {
   --sl-primary-ink: #25272a;
   --sl-primary-soft: #fff4d2;
   --sl-border: 1px solid #e7e7e5;
-  --sl-focus: #5c6062;
+  --sl-focus: #9c8140;
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

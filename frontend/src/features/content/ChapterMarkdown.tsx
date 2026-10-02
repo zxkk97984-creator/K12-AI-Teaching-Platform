@@ -12,6 +12,10 @@ export const ChapterMarkdown = memo(function ChapterMarkdown({ text }: { text: s
     remarkPlugins={remarkPlugins}
     rehypePlugins={[[rehypeKatex, { trust: false, strict: "ignore", throwOnError: false }]]}
     components={{
+      p: ({ children, node }) => {
+        const hasOptions = node?.children.some((child) => child.type === "text" && /(?:^|\n)[A-D][.．、)]\s/.test(child.value));
+        return <p className={hasOptions ? "chapter-choice-options" : undefined}>{children}</p>;
+      },
       h1: ({ children }) => <h3>{children}</h3>,
       h2: ({ children }) => <h3>{children}</h3>,
       a: ({ href, children }) => <a href={href} target={/^https?:/.test(href ?? "") ? "_blank" : undefined} rel="noreferrer">{children}</a>,

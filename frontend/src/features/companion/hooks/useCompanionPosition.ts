@@ -89,7 +89,8 @@ export function useCompanionPosition(userId: string, parkingTarget?: string, avo
     const slot = document.querySelector(parkingTarget);
     if (slot) observer.observe(slot);
     const mutations = new MutationObserver(update);
-    if (avoidSelectors) mutations.observe(document.body, {childList: true, subtree: true, attributes: true, attributeFilter: ["class", "data-panel-open", "data-interactive-focused"]});
+    // CodeLab's controls mount after its lazy bundle and data arrive.
+    mutations.observe(document.body, {childList: true, subtree: true, ...(avoidSelectors ? {attributes: true, attributeFilter: ["class", "data-panel-open", "data-interactive-focused"]} : {})});
     window.addEventListener("resize", update);
     return () => { observer.disconnect(); mutations.disconnect(); repark.current = () => {}; window.removeEventListener("resize", update); };
   }, [parkingTarget, key, avoidSelectors]);

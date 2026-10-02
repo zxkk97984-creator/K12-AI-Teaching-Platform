@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useNavigate } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -11,6 +11,7 @@ import { spriteFrames } from "./types";
 import { CompanionSprite } from "./components/CompanionSprite";
 import { Companion } from "./components/Companion";
 import { LearningTeacherProvider } from "./LearningTeacherContext";
+import { useCompanionPosition } from "./hooks/useCompanionPosition";
 
 function LeaveChat() {
   const navigate = useNavigate();
@@ -22,6 +23,30 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("reused companion assets and bounds", () => {
+  it("parks a saved avatar away from CodeLab controls that load after the shell", async () => {
+    vi.stubGlobal("innerWidth", 1542);
+    vi.stubGlobal("innerHeight", 718);
+    vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+    const storageKey = "k12:companion:late-code-controls:position:v1";
+    localStorage.setItem(storageKey, JSON.stringify({ x: 1100, y: 150, manual: true }));
+    const slot = document.createElement("span");
+    slot.className = "codelab-pet-slot";
+    slot.getBoundingClientRect = () => new DOMRect(1478, 6, 44, 44);
+    const filters = document.createElement("section");
+    filters.className = "codelab-filters";
+    filters.getBoundingClientRect = () => new DOMRect(200, 130, 1200, 50);
+    document.body.append(slot);
+    try {
+      const { result } = renderHook(() => useCompanionPosition("late-code-controls", ".codelab-pet-slot"));
+      expect(result.current.position).toEqual({ x: 1100, y: 150 });
+      act(() => document.body.append(filters));
+      await waitFor(() => expect(result.current.position).toEqual({ x: 1478, y: 6 }));
+    } finally {
+      slot.remove();
+      filters.remove();
+      localStorage.removeItem(storageKey);
+    }
+  });
   it("keeps every animation inside all six sheets", () => {
     expect(COMPANION_PETS).toHaveLength(6);
     for (const pet of COMPANION_PETS)

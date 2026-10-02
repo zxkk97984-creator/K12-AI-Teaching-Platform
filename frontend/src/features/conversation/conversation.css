@@ -378,7 +378,7 @@ body .conv-quiz-entry :is(.conv-quiz-trigger,.conv-quiz-link) { display:inline-f
 .conv-quiz-dialog-hint { margin:0; color:var(--sl-text-muted); font-size:13px; line-height:1.6; }
 .conv-quiz-dialog label { display:grid; min-width:0; gap:7px; font-size:13px; }
 .conv-quiz-dialog :is(input,select) { box-sizing:border-box; width:100%; min-width:0; min-height:44px; padding:9px 10px; border:var(--sl-border, 1px solid #d9d8d1); border-radius:8px; color:var(--sl-text); background:var(--sl-surface); font:inherit; font-size:14px; }
-.conv-quiz-dialog :is(input,select):focus-visible { outline:2px solid #e6ddb9; outline-offset:2px; border-color:#b5a16b; }
+.conv-quiz-dialog :is(input,select):focus-visible { outline:1px solid var(--sl-focus); outline-offset:2px; border-color:var(--sl-focus); }
 .conv-quiz-dialog .conv-quiz-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
 .conv-quiz-dialog form > footer { display:flex; justify-content:flex-end; gap:8px; padding-top:4px; }
 .conv-quiz-dialog footer button { min-height:40px; padding:8px 14px; }

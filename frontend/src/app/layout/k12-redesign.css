@@ -58,7 +58,7 @@
   --sl-primary:#25272a; --sl-primary-ink:#181a1d; --sl-primary-soft:#f3f3f1;
   --k12-prompt-hover-bg:#f5f5f4; --k12-prompt-hover-border:#d4d5d2;
   --k12-composer-surface:#f7f7f6; --k12-composer-border:#dededb;
-  --sl-border-color:#e2e2df; --sl-border:1px solid var(--sl-border-color); --sl-focus:#555a5d;
+  --sl-border-color:#e2e2df; --sl-border:1px solid var(--sl-border-color); --sl-focus:#9c8140; --sl-focus-soft:#9c814018;
   --sl-radius-sm:8px; --sl-radius-md:12px; --sl-radius-lg:16px;
   --sl-shadow-card:none; --sl-shadow-soft:0 4px 16px #20212408;
   --k12-success:#176443; --k12-danger:#b42318; --k12-warning:#805400;
@@ -87,7 +87,7 @@ label { color:var(--sl-text-muted); font-size:14px; }
 h1,h2,h3 { font-family:var(--k12-font); color:var(--sl-text); line-height:1.35; letter-spacing:-.02em; overflow-wrap:anywhere; }
 h1 { font-size:clamp(24px,2.5vw,32px); font-weight:650; } h2 { font-size:24px; } h3 { font-size:20px; }
 p { overflow-wrap:anywhere; } svg { flex-shrink:0; }
-:where(a,button,input,textarea,select,summary,[tabindex]):focus-visible { outline:3px solid var(--sl-focus); outline-offset:4px; }
+:where(a,button,input,textarea,select,summary,[tabindex]):focus-visible { outline:1px solid var(--sl-focus); outline-offset:2px; }
 .eyebrow,.practice-eyebrow,.growth-eyebrow { font-size:14px; letter-spacing:.04em; color:var(--sl-primary); font-weight:600; }
 body .app-shell { display:flex; min-height:100dvh; height:auto; background:var(--sl-bg); }
 body .app-sidebar { width:var(--k12-sidebar); min-width:var(--k12-sidebar); height:100dvh; padding:32px 16px 16px; background:var(--sl-surface); backdrop-filter:none; border-right:var(--sl-border); gap:0; box-shadow:none; }
@@ -655,8 +655,8 @@ body .app-content--conversation .conv-composer {
   transition:border-color .15s,box-shadow .15s;
 }
 body .app-content--conversation .conv-composer:focus-within {
-  border-color:#666b6d;
-  box-shadow:0 0 0 3px #666b6d24,0 4px 18px #2021240d;
+  border-color:var(--sl-focus);
+  box-shadow:0 0 0 1px var(--sl-focus-soft),0 4px 18px #2021240d;
 }
 body .app-content--conversation .conv-composer-heading .k12-composer-label {
   color:var(--sl-text);

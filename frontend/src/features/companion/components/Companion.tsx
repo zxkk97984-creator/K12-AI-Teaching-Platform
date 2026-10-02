@@ -225,7 +225,7 @@ export function Companion({ userId }: { userId: string }) {
           }}
         >
           {minimized ? (
-            <CompanionHeadAvatar pet={pet} size={54} />
+            <CompanionHeadAvatar pet={pet} size={codeSurface ? 36 : 54} />
           ) : interactiveSurface ? (
             <CompanionSprite petId={pet.id} state={position.movement ?? state} size={54} />
           ) : (
