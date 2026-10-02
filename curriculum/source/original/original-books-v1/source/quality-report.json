@@ -1,0 +1,595 @@
+{
+  "schema_version": "k12.book.quality.v1",
+  "package_id": "k12-original-books-v1",
+  "book_count": 6,
+  "chapter_count": 72,
+  "answer_file_count": 72,
+  "total_body_han_chars": 311590,
+  "chapters": [
+    {
+      "chapter_id": "primary-computing-ch01",
+      "body_han_chars": 4079,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch02",
+      "body_han_chars": 4151,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch03",
+      "body_han_chars": 4675,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch04",
+      "body_han_chars": 4279,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch05",
+      "body_han_chars": 3848,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch06",
+      "body_han_chars": 3802,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch07",
+      "body_han_chars": 3969,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch08",
+      "body_han_chars": 3890,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch09",
+      "body_han_chars": 4189,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch10",
+      "body_han_chars": 4190,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch11",
+      "body_han_chars": 4676,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-computing-ch12",
+      "body_han_chars": 4829,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch01",
+      "body_han_chars": 4659,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch02",
+      "body_han_chars": 3870,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch03",
+      "body_han_chars": 4465,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch04",
+      "body_han_chars": 4309,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch05",
+      "body_han_chars": 4940,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch06",
+      "body_han_chars": 4643,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch07",
+      "body_han_chars": 4497,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch08",
+      "body_han_chars": 4371,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch09",
+      "body_han_chars": 4729,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch10",
+      "body_han_chars": 4572,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch11",
+      "body_han_chars": 4728,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "primary-ai-ch12",
+      "body_han_chars": 4889,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch01",
+      "body_han_chars": 4170,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch02",
+      "body_han_chars": 3817,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch03",
+      "body_han_chars": 3403,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch04",
+      "body_han_chars": 4398,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch05",
+      "body_han_chars": 3348,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch06",
+      "body_han_chars": 3461,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch07",
+      "body_han_chars": 3353,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch08",
+      "body_han_chars": 4062,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch09",
+      "body_han_chars": 3746,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch10",
+      "body_han_chars": 4433,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch11",
+      "body_han_chars": 4181,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-python-ch12",
+      "body_han_chars": 4740,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch01",
+      "body_han_chars": 4867,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch02",
+      "body_han_chars": 4933,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch03",
+      "body_han_chars": 5178,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch04",
+      "body_han_chars": 4516,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch05",
+      "body_han_chars": 4642,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch06",
+      "body_han_chars": 5479,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch07",
+      "body_han_chars": 5028,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch08",
+      "body_han_chars": 4736,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch09",
+      "body_han_chars": 5199,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch10",
+      "body_han_chars": 4585,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch11",
+      "body_han_chars": 4846,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "junior-ai-data-ch12",
+      "body_han_chars": 4693,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch01",
+      "body_han_chars": 3447,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch02",
+      "body_han_chars": 3106,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch03",
+      "body_han_chars": 3528,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch04",
+      "body_han_chars": 3721,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch05",
+      "body_han_chars": 3373,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch06",
+      "body_han_chars": 4268,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch07",
+      "body_han_chars": 3518,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch08",
+      "body_han_chars": 3648,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch09",
+      "body_han_chars": 3955,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch10",
+      "body_han_chars": 3761,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch11",
+      "body_han_chars": 3935,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-algorithms-ch12",
+      "body_han_chars": 4291,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch01",
+      "body_han_chars": 4383,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch02",
+      "body_han_chars": 4607,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch03",
+      "body_han_chars": 4991,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch04",
+      "body_han_chars": 5138,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch05",
+      "body_han_chars": 4259,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch06",
+      "body_han_chars": 4384,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch07",
+      "body_han_chars": 4544,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch08",
+      "body_han_chars": 4381,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch09",
+      "body_han_chars": 4420,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch10",
+      "body_han_chars": 4723,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch11",
+      "body_han_chars": 5681,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    },
+    {
+      "chapter_id": "senior-ai-ch12",
+      "body_han_chars": 4465,
+      "exercise_count": 6,
+      "all_required_headings_present": true,
+      "answer_ids_match": true,
+      "code_examples_checked": true
+    }
+  ],
+  "issues": [
+    "全书为 AI 辅助原创、未经教师人工教学审校；编排顺序、练习难度与课堂适用性均未在真实教学中验证。",
+    "小学两本按一个学段（PRIMARY 1-6）编写，小学低段与高段的实际分层映射由接收系统完成，本书未按低/高段分别设定篇幅与难度下限。",
+    "所有示例数据均为合成数据，用于说明方法，不代表任何真实人群的统计特征；书中未使用、也未声称使用任何真实个人数据。",
+    "书中出现的一切评估指标（准确率、精确率、召回率、误差等）都附带了数据范围、划分方式与阈值的条件，均为在合成数据上实际计算所得；本包不宣称任何模型在真实场景下的性能。",
+    "senior-ai 涉及 numpy / scikit-learn / TensorFlow 的段落已在正文中标注为需要外部环境，并写出包名；这些代码未在本生成环境中执行（环境仅使用 Python 3.12 标准库）。未经标注的示例代码均已实际运行核对输出。",
+    "书中「延伸阅读」引用的是官方文档或权威机构页面，用于核对概念，不代表相关机构对本书内容的认可；也未引用任何具体的书籍页码、DOI 或实验结果。",
+    "全部 35 个引用链接在生成环境中通过 HTTP 请求核验可达（均返回 200）。链接的长期可用性由来源方维护，本包不保证持续可访问。"
+  ]
+}

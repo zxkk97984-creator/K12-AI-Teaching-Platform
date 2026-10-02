@@ -10,6 +10,8 @@ export type LearningItem = {
   resource_type?: string | null;
   stage?: string | null;
   chapter_count?: number | null;
+  is_textbook?: boolean;
+  body_han_chars?: number | null;
   content_notice?: string | null;
   is_test_fixture?: boolean;
   available?: boolean;

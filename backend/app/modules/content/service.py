@@ -113,7 +113,11 @@ def _summary(
         publication_status=PublicationStatus(review_state.publication_status),
         review_status=ReviewStatus(review_state.review_status),
         is_test_fixture=release.is_test_fixture,
-        content_notice=_notice(release.is_test_fixture, release.local_demo_visible),
+        content_notice=(
+            "原创教材 · AI 辅助创作，未经人工教学审校"
+            if course.textbook
+            else _notice(release.is_test_fixture, release.local_demo_visible)
+        ),
     )
 
 
@@ -193,6 +197,7 @@ async def visible_courses(db: AsyncSession, viewer: ViewerScope) -> list[CourseS
             title=course.title,
             topic=course.topic,
             description=course.description,
+            textbook=course.textbook,
             chapters=grouped[course.id],
         )
         for course in rows
@@ -217,6 +222,7 @@ async def visible_course(
         title=course.title,
         topic=course.topic,
         description=course.description,
+        textbook=course.textbook,
         chapters=chapters,
     )
 

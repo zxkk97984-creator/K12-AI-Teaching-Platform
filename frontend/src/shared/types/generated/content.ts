@@ -284,6 +284,13 @@ export interface components {
             grade_max?: number | null;
             /** Chapter Count */
             chapter_count?: number | null;
+            /**
+             * Is Textbook
+             * @default false
+             */
+            is_textbook: boolean;
+            /** Body Han Chars */
+            body_han_chars?: number | null;
             /** Target Version */
             target_version?: string | null;
             /**
@@ -478,6 +485,7 @@ export interface components {
             description: string;
             /** Chapters */
             chapters: components["schemas"]["ChapterSummaryDTO"][];
+            textbook?: components["schemas"]["TextbookInfo"] | null;
         };
         /** ExampleSpec */
         ExampleSpec: {
@@ -584,6 +592,13 @@ export interface components {
             grade_max?: number | null;
             /** Chapter Count */
             chapter_count?: number | null;
+            /**
+             * Is Textbook
+             * @default false
+             */
+            is_textbook: boolean;
+            /** Body Han Chars */
+            body_han_chars?: number | null;
             /** Target Version */
             target_version?: string | null;
             /**
@@ -895,6 +910,44 @@ export interface components {
          * @enum {string}
          */
         Stage: "PRIMARY_LOWER" | "PRIMARY_UPPER" | "JUNIOR" | "SENIOR";
+        /**
+         * TextbookInfo
+         * @description Student-safe book metadata. Reference answers never belong here.
+         */
+        TextbookInfo: {
+            /** Book Id */
+            book_id: string;
+            /**
+             * Stage Group
+             * @enum {string}
+             */
+            stage_group: "PRIMARY" | "JUNIOR" | "SENIOR";
+            /**
+             * Language
+             * @constant
+             */
+            language: "zh-CN";
+            /**
+             * Ai Assisted
+             * @constant
+             */
+            ai_assisted: true;
+            /**
+             * Review Status
+             * @constant
+             */
+            review_status: "UNREVIEWED";
+            /** Chapter Count */
+            chapter_count: number;
+            /** Body Han Chars */
+            body_han_chars: number;
+            /** Prerequisites */
+            prerequisites: string[];
+            /** Learning Outcomes */
+            learning_outcomes: string[];
+            /** Preface */
+            preface: string;
+        };
         /**
          * UnknownBlockDTO
          * @description Controlled placeholder for a stored block that no longer validates.

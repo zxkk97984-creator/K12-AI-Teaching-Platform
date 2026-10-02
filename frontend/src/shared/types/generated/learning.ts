@@ -1005,6 +1005,13 @@ export interface components {
             grade_max?: number | null;
             /** Chapter Count */
             chapter_count?: number | null;
+            /**
+             * Is Textbook
+             * @default false
+             */
+            is_textbook: boolean;
+            /** Body Han Chars */
+            body_han_chars?: number | null;
             /** Target Version */
             target_version?: string | null;
             /**
@@ -1714,6 +1721,13 @@ export interface components {
             grade_max?: number | null;
             /** Chapter Count */
             chapter_count?: number | null;
+            /**
+             * Is Textbook
+             * @default false
+             */
+            is_textbook: boolean;
+            /** Body Han Chars */
+            body_han_chars?: number | null;
             /** Target Version */
             target_version?: string | null;
             /**

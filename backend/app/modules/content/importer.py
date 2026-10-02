@@ -172,6 +172,8 @@ async def build_plan(db: AsyncSession, package: LoadedPackage) -> ImportPlan:
                 course.title != item.course.title
                 or course.topic != item.course.topic
                 or course.description != item.course.description
+                or course.textbook
+                != (item.course.textbook.model_dump(mode="json") if item.course.textbook else None)
             ):
                 raise CourseConflict(
                     f"course {item.course.stable_slug} exists with different metadata"
@@ -301,6 +303,11 @@ async def _apply_plan(db: AsyncSession, plan: ImportPlan) -> None:
                 title=item.chapter.course.title,
                 topic=item.chapter.course.topic,
                 description=item.chapter.course.description,
+                textbook=(
+                    item.chapter.course.textbook.model_dump(mode="json")
+                    if item.chapter.course.textbook
+                    else None
+                ),
             )
             db.add(course)
             await db.flush()

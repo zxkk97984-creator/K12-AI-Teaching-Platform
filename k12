@@ -222,6 +222,9 @@ run_setup() {
       uv run --locked python -m app.scripts.import_content import \
         --release-dir ../curriculum/source/imported/computing-ai-md-v1 --apply \
         --mirror-dir ../curriculum/releases
+      uv run --locked python -m app.scripts.import_content import \
+        --release-dir ../curriculum/source/original/original-books-v1 --apply \
+        --mirror-dir ../curriculum/releases
     fi
     uv run --locked python -m app.modules.codelab.importer --catalog-root ../curriculum/code-tasks
     if [ "${APP_ENV:-development}" != production ] \

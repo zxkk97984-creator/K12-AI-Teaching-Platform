@@ -121,6 +121,13 @@ def manifest_hash_for(release: ReleaseSpec, chapters: tuple[LoadedChapter, ...])
     }
     if release.local_demo_visible:
         payload["local_demo_visible"] = True
+    textbooks = {
+        chapter.course.stable_slug: chapter.course.textbook.model_dump(mode="json")
+        for chapter in chapters
+        if chapter.course.textbook is not None
+    }
+    if textbooks:
+        payload["textbooks"] = textbooks
     return sha256_text(canonical_json(payload))
 
 

@@ -89,6 +89,8 @@ class LearningItemDTO(BaseModel):
     grade_min: int | None = None
     grade_max: int | None = None
     chapter_count: int | None = None
+    is_textbook: bool = False
+    body_han_chars: int | None = None
     target_version: str | None = None
     is_test_fixture: bool = False
     content_notice: str | None = None
@@ -334,6 +336,8 @@ async def _resolve_visible_target(
             "slug": item.slug,
             "stage": viewer.stage.value if viewer.stage is not None else None,
             "chapter_count": len(item.chapters),
+            "is_textbook": item.textbook is not None,
+            "body_han_chars": item.textbook.body_han_chars if item.textbook else None,
             "target_version": None,
             "is_test_fixture": any(chapter.is_test_fixture for chapter in item.chapters),
             "content_notice": next(
@@ -489,6 +493,8 @@ async def _catalog_items(
                 "slug": course.slug,
                 "stage": viewer.stage.value if viewer.stage is not None else None,
                 "chapter_count": len(course.chapters),
+                "is_textbook": course.textbook is not None,
+                "body_han_chars": course.textbook.body_han_chars if course.textbook else None,
                 "is_test_fixture": any(ch.is_test_fixture for ch in course.chapters),
                 "content_notice": next(
                     (ch.content_notice for ch in course.chapters if ch.content_notice), None

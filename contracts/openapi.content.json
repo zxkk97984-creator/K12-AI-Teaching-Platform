@@ -1546,6 +1546,22 @@
             ],
             "title": "Chapter Count"
           },
+          "is_textbook": {
+            "type": "boolean",
+            "title": "Is Textbook",
+            "default": false
+          },
+          "body_han_chars": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Han Chars"
+          },
           "target_version": {
             "anyOf": [
               {
@@ -2080,6 +2096,16 @@
             },
             "type": "array",
             "title": "Chapters"
+          },
+          "textbook": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TextbookInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -2429,6 +2455,22 @@
               }
             ],
             "title": "Chapter Count"
+          },
+          "is_textbook": {
+            "type": "boolean",
+            "title": "Is Textbook",
+            "default": false
+          },
+          "body_han_chars": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Han Chars"
           },
           "target_version": {
             "anyOf": [
@@ -3317,6 +3359,96 @@
           "SENIOR"
         ],
         "title": "Stage"
+      },
+      "TextbookInfo": {
+        "properties": {
+          "book_id": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "title": "Book Id"
+          },
+          "stage_group": {
+            "type": "string",
+            "enum": [
+              "PRIMARY",
+              "JUNIOR",
+              "SENIOR"
+            ],
+            "title": "Stage Group"
+          },
+          "language": {
+            "type": "string",
+            "const": "zh-CN",
+            "title": "Language"
+          },
+          "ai_assisted": {
+            "type": "boolean",
+            "const": true,
+            "title": "Ai Assisted"
+          },
+          "review_status": {
+            "type": "string",
+            "const": "UNREVIEWED",
+            "title": "Review Status"
+          },
+          "chapter_count": {
+            "type": "integer",
+            "maximum": 64.0,
+            "minimum": 1.0,
+            "title": "Chapter Count"
+          },
+          "body_han_chars": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Body Han Chars"
+          },
+          "prerequisites": {
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 2
+            },
+            "type": "array",
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Prerequisites"
+          },
+          "learning_outcomes": {
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 2
+            },
+            "type": "array",
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Learning Outcomes"
+          },
+          "preface": {
+            "type": "string",
+            "maxLength": 12000,
+            "minLength": 100,
+            "title": "Preface"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "book_id",
+          "stage_group",
+          "language",
+          "ai_assisted",
+          "review_status",
+          "chapter_count",
+          "body_han_chars",
+          "prerequisites",
+          "learning_outcomes",
+          "preface"
+        ],
+        "title": "TextbookInfo",
+        "description": "Student-safe book metadata. Reference answers never belong here."
       },
       "UnknownBlockDTO": {
         "properties": {

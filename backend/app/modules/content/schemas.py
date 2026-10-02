@@ -188,6 +188,21 @@ class ChapterSpec(StrictModel):
         return self
 
 
+class TextbookInfo(StrictModel):
+    """Student-safe book metadata. Reference answers never belong here."""
+
+    book_id: Slug
+    stage_group: Literal["PRIMARY", "JUNIOR", "SENIOR"]
+    language: Literal["zh-CN"]
+    ai_assisted: Literal[True]
+    review_status: Literal["UNREVIEWED"]
+    chapter_count: int = Field(ge=1, le=64)
+    body_han_chars: int = Field(ge=1)
+    prerequisites: list[ShortText] = Field(min_length=1, max_length=12)
+    learning_outcomes: list[ShortText] = Field(min_length=1, max_length=12)
+    preface: Annotated[str, StringConstraints(min_length=100, max_length=12000)]
+
+
 class CourseSpec(StrictModel):
     schema_version: str
     stable_slug: Slug
@@ -198,6 +213,7 @@ class CourseSpec(StrictModel):
     ]
     knowledge_points: list[KnowledgePointSpec] = Field(min_length=1, max_length=64)
     chapters: list[ChapterSpec] = Field(min_length=1, max_length=64)
+    textbook: TextbookInfo | None = None
 
     @model_validator(mode="after")
     def validate_course(self) -> CourseSpec:
@@ -288,6 +304,7 @@ class CourseSummaryDTO(StrictModel):
     topic: str
     description: str
     chapters: list[ChapterSummaryDTO]
+    textbook: TextbookInfo | None = None
 
 
 class RenderedBlock(BlockSpec):

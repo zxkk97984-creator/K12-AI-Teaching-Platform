@@ -6272,6 +6272,22 @@
             ],
             "title": "Chapter Count"
           },
+          "is_textbook": {
+            "type": "boolean",
+            "title": "Is Textbook",
+            "default": false
+          },
+          "body_han_chars": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Han Chars"
+          },
           "target_version": {
             "anyOf": [
               {
@@ -8345,6 +8361,22 @@
               }
             ],
             "title": "Chapter Count"
+          },
+          "is_textbook": {
+            "type": "boolean",
+            "title": "Is Textbook",
+            "default": false
+          },
+          "body_han_chars": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Han Chars"
           },
           "target_version": {
             "anyOf": [

@@ -71,11 +71,12 @@ export function ResourceLibraryPage() {
   const stories = (filter === "ALL" || filter === "PICTUREBOOK") ? picturebooks.filter((book) =>
     matches(`${book.title} ${book.subtitle} ${book.topic}`),
   ) : [];
-  const filtered = items.filter((item) => filter === "ALL" || item.kind === filter);
+  const filtered = items.filter((item) => filter === "ALL" || (filter === "BOOK" ? item.is_textbook : item.kind === filter && !item.is_textbook));
   const unavailable = filtered.filter((item) => item.available === false);
   const teaching = filtered.filter((item) => !item.is_test_fixture && item.available !== false);
   const examples = filtered.filter((item) => item.is_test_fixture && item.available !== false);
-  const courses = teaching.filter((item) => item.kind === "COURSE");
+  const textbooks = teaching.filter((item) => item.is_textbook);
+  const courses = teaching.filter((item) => item.kind === "COURSE" && !item.is_textbook);
   const materials = teaching.filter((item) => item.kind !== "COURSE");
   const count = books.length + stories.length + teaching.length + (showExamples ? examples.length : 0);
   const heading = stage === "PRIMARY_LOWER" ? "绘本书库" : stage === "JUNIOR" ? "学科资料" : stage === "SENIOR" ? "专题资料" : "学习书库";
@@ -94,10 +95,11 @@ export function ResourceLibraryPage() {
 
   function itemCard(item: LearningItem) {
     return <article className="library-book-card" key={`${item.kind}:${item.id}`}>
-      <BookCover label={item.kind === "COURSE" ? "讲义" : "资料"} tone={item.is_test_fixture ? "example" : "course"} />
+      <BookCover label={item.is_textbook ? "原创教材" : item.kind === "COURSE" ? "讲义" : "资料"} tone={item.is_test_fixture ? "example" : item.is_textbook ? "book" : "course"} />
       <div className="library-book-copy">
-        <p className="library-item-meta">{labels[item.kind]}{item.is_test_fixture ? " · 合成演示" : ""}{item.chapter_count != null ? ` · ${item.chapter_count} 个可读章节` : ""}</p>
-        <h3><a href={item.route}>{item.title}</a></h3><p>{item.description}</p>
+        <p className="library-item-meta">{item.is_textbook ? "原创教材" : labels[item.kind]}{item.is_test_fixture ? " · 合成演示" : ""}{item.chapter_count != null ? ` · ${item.chapter_count} 个可读章节` : ""}{item.body_han_chars ? ` · 正文 ${(item.body_han_chars / 10000).toFixed(1)} 万字` : ""}</p>
+        <h3><a href={item.route}>{item.title}</a></h3><p className="library-book-description">{item.description}</p>
+        {item.is_textbook ? <p className="library-book-provenance">AI 辅助原创 · 未经人工教学审校</p> : null}
         {item.available === false ? <p className="library-unavailable">{item.unavailable_reason || "内容暂不可用"}</p> : null}
         <div className="library-card-actions">
           <a href={item.route}>{item.kind === "COURSE" ? "查看目录" : item.kind === "ANIMATION" ? "观看讲解" : "打开资料"}<span aria-hidden="true"> →</span></a>
@@ -114,7 +116,7 @@ export function ResourceLibraryPage() {
         <label><span className="library-search-label">搜索学习内容</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索书名、课程或知识点" /></label>
         <button type="submit" disabled={loading}>搜索</button>
       </form>
-      <div className="library-filter-line"><div className="od-library-filters" role="group" aria-label="内容类型">{(Object.keys(labels) as Filter[]).filter((kind) => (kind !== "PICTUREBOOK" || picturebooks.length > 0) && (kind !== "BOOK" || stage === "JUNIOR" || stage === "SENIOR")).map((kind) => <button key={kind} type="button" aria-pressed={filter === kind} onClick={() => setFilter(kind)}>{labels[kind]}</button>)}</div>
+      <div className="library-filter-line"><div className="od-library-filters" role="group" aria-label="内容类型">{(Object.keys(labels) as Filter[]).filter((kind) => (kind !== "PICTUREBOOK" || picturebooks.length > 0) && (kind !== "BOOK" || Boolean(stage))).map((kind) => <button key={kind} type="button" aria-pressed={filter === kind} onClick={() => setFilter(kind)}>{labels[kind]}</button>)}</div>
         <label className="library-example-switch"><input type="checkbox" checked={showExamples} onChange={(event) => setShowExamples(event.target.checked)} />显示演示内容</label>
       </div>
     </div>
@@ -124,7 +126,8 @@ export function ResourceLibraryPage() {
     {error ? <div role="alert" className="od-library-error">{error} <button type="button" onClick={() => setRefresh((n) => n + 1)}>重试</button></div> : null}
     {!loading && !error && count === 0 ? <div className="od-library-empty"><h2>没有找到匹配内容</h2><p>试试更短的关键词，或查看其他内容类型。</p><button type="button" onClick={() => { setQuery(""); setApplied(""); setFilter("ALL"); }}>清除筛选</button></div> : null}
     {!loading ? <>
-      <LibrarySection title="专题教材" description="按完整目录组织的内置教材，可连续阅读。" count={books.length}>
+      <LibrarySection title="专题教材" description="原创教材与内置教材均可按目录连续阅读，来源见各书说明。" count={textbooks.length + books.length}>
+        {textbooks.map(itemCard)}
         {books.map((book) => <article className="library-book-card" key={book.slug}><BookCover label={book.topic} /><div className="library-book-copy"><p className="library-item-meta">内置教材 · {book.chapters.length} 章 · {book.level}</p><h3><a href={`/books/${book.slug}`}>{book.title}</a></h3><p>{book.description}</p><div className="library-card-actions"><a href={`/books/${book.slug}`}>开始阅读<span aria-hidden="true"> →</span></a></div></div></article>)}
       </LibrarySection>
       <LibrarySection title="故事阅读" description="从有趣的故事中观察、提问和思考。" count={stories.length}>

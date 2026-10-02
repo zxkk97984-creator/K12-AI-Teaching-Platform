@@ -1,0 +1,133 @@
+{
+  "schema_version": "k12.book.answers.v1",
+  "book_id": "junior-python",
+  "chapter_id": "junior-python-ch08",
+  "answers": [
+    {
+      "question_id": "Q01",
+      "type": "SINGLE_CHOICE",
+      "correct_options": [
+        "B"
+      ],
+      "reference_answer": "正确答案是 B：def greet(): 然后 greet()。",
+      "explanation": "定义函数要用 def，函数名后面跟一对括号和一个冒号；调用函数要写函数名加括号。选项 A 的问题是调用时只写了名字没有写括号——那样得到的是函数本身这个值，而不是执行它的结果，程序不会报错但什么也不会发生，这是新手很容易犯的错误。选项 C 的 def greet: 缺少了函数名后面的括号，会报语法错误。选项 D 把顺序颠倒了，而且语法也不对。记住一句话：定义时有冒号没括号不行，调用时有名字没括号也不行。",
+      "rubric": [
+        {
+          "criterion": "选出 B",
+          "points": 6
+        },
+        {
+          "criterion": "能说明调用时必须写括号",
+          "points": 4
+        }
+      ]
+    },
+    {
+      "question_id": "Q02",
+      "type": "SINGLE_CHOICE",
+      "correct_options": [
+        "B"
+      ],
+      "reference_answer": "正确答案是 B，result 的值是 None。",
+      "explanation": "show 函数里只有 print(x * 2)，没有 return 语句。在 Python 里，一个函数如果没有写 return，或者写了 return 但没有跟任何值，它返回的都是 None。所以 result = show(5) 执行时会先打印出 10（这是 print 的效果），然后把这个函数的返回值 None 赋给 result。所以屏幕上会看到 10，而 result 的值是 None。选项 A 把“打印出来的内容”和“函数返回的值”混为一谈了，它们完全不是一回事。选项 C 和 D 都不对。本章反复强调这一点：print 是显示给人看，return 是交给程序继续用。",
+      "rubric": [
+        {
+          "criterion": "选出 B",
+          "points": 6
+        },
+        {
+          "criterion": "能说明没有 return 的函数返回 None",
+          "points": 4
+        }
+      ]
+    },
+    {
+      "question_id": "Q03",
+      "type": "SHORT_ANSWER",
+      "correct_options": [],
+      "reference_answer": "print 的作用是把内容显示给人看，程序的执行结果里会多出一行文字，但这个值不会回到调用它的地方；return 的作用是把一个值交回给调用处，可以被赋值给变量、参与后续运算，或者传给别的函数。举例说明：写一个函数 def double(x): print(x * 2)，然后写 result = double(5)。执行时屏幕上会显示 10，但 result 的值是 None（因为函数没有 return）。如果后面写 total = result + 1，就会报 TypeError，因为 None 不能和整数相加。这就是只 print 不 return 带来的麻烦：看起来结果出来了，但你拿不到它，没法继续用。所以：只需要把东西显示给人看的时候用 print，比如输出最终报告；需要把结果拿去继续计算、或者交给别的地方使用时，必须用 return。很多函数两者都有——先用 return 把结果交出去，在调用处用 print 显示。",
+      "explanation": "这道题要求说明区别、举例说明麻烦所在、以及各自的适用场合。举例部分要真的写出后续使用会报错，才能体现“麻烦”在哪里。第三部分的判断标准是“结果需不需要继续用”：需要就用 return。常见错误是只说“print 打印、return 返回”，没有说清这两者在使用上的后果差异。另一个常见错误是把“用 return 代替 print”绝对化，其实两者各有用途，最终显示给人看的时候还是要 print。",
+      "rubric": [
+        {
+          "criterion": "说明 print 显示、return 交给程序",
+          "points": 4
+        },
+        {
+          "criterion": "举例说明只有 print 时后续使用会出错",
+          "points": 3
+        },
+        {
+          "criterion": "说明各自的适用场合",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "question_id": "Q04",
+      "type": "SHORT_ANSWER",
+      "correct_options": [],
+      "reference_answer": "报的错误是 NameError: name 'count' is not defined，出错在最后一行 print(count)。原因是作用域：count 是在函数 count_above 里面赋值的，所以它是局部变量，只在函数执行期间存在。函数一结束，这个变量就消失了，外面的 print(count) 找不到这个名字，于是报 NameError。两种修改办法：第一种（推荐），让函数把值返回出去，在调用处接收并打印，也就是 result = count_above([88, 95, 79, 62]) 然后 print(result)；如果还需要平均值，可以让函数返回两个值 return avg, count，调用处写成 avg, count = count_above(...)。第二种，在函数里用 global count 声明，这样 count 变成全局变量，外面就能访问了。更推荐第一种，因为第二种把变量暴露给整个程序，任何地方都能改它，一旦出错很难追查是哪里改的；而且用过全局变量以后，函数的行为就不再只取决于它的参数，测试和理解都会变难。",
+      "explanation": "这道题要求说出错误类型、用作用域解释原因、给出两种修改办法并说明偏好。作用域的解释要说到“函数里赋值的变量是局部的，函数结束就消失”。两种办法分别是返回值传递和 global 声明。第三部分要求说明偏好及理由，理由应当指向“可变范围”和“可追踪性”——这正是本章建议少用 global 的原因。常见错误是只说“要加 global”，没有给出返回值这种更推荐的做法；或者把错误说成 TypeError。",
+      "rubric": [
+        {
+          "criterion": "说出 NameError 并指出出错位置",
+          "points": 2
+        },
+        {
+          "criterion": "用作用域解释局部变量不可见",
+          "points": 3
+        },
+        {
+          "criterion": "写出两种修改办法",
+          "points": 3
+        },
+        {
+          "criterion": "说明更推荐哪一种及理由",
+          "points": 2
+        }
+      ]
+    },
+    {
+      "question_id": "Q05",
+      "type": "PRACTICE",
+      "correct_options": [],
+      "reference_answer": "函数定义是：def describe_score(score): 然后依次判断——if score >= 90: return \"优秀\"；elif score >= 80: return \"良好\"；elif score >= 60: return \"及格\"；else: return \"需要努力\"。判断结果：95 分返回优秀；90 分返回优秀（因为条件是大于等于 90，包含 90 本身）；85 分返回良好；60 分返回及格（大于等于 60 成立）；59 分返回需要努力（三个条件都不满足，落到 else）。90 和 59 这两个边界很关键：90 正好在“优秀”的下界上，因为用了 >= 所以属于优秀；59 比“及格”的下界 60 少 1，所以落到 else。100 分的判断过程是：100 大于等于 90 成立，返回优秀。0 分的判断过程是：三个条件都不成立，返回需要努力。",
+      "explanation": "这道题考查多分支判断和 return 的配合。五个手算结果都要对得上，其中 90 和 59 是边界值，必须测到。第三问要求说明这两个边界分别落在哪一档、为什么——这考查对 >= 和 > 区别的理解。最后一问要求判断 100 和 0 这两个极端值，能答对说明学生对条件覆盖范围有完整的认识。常见错误是把 90 判成良好（用 > 而不是 >=）；或者把 59 判成及格（边界算错）。函数必须用 return 而不是 print，这也是完成判据明确要求的。",
+      "rubric": [
+        {
+          "criterion": "五个分数的判断结果全部正确",
+          "points": 5
+        },
+        {
+          "criterion": "说明 90 与 59 两个边界落在哪一档及原因",
+          "points": 3
+        },
+        {
+          "criterion": "说明 100 分与 0 分的结果",
+          "points": 2
+        }
+      ]
+    },
+    {
+      "question_id": "Q06",
+      "type": "PRACTICE",
+      "correct_options": [],
+      "reference_answer": "函数定义是：def analyse(numbers): 开头先判断 if not numbers: return None, None, None。否则计算 lowest = min(numbers)、highest = max(numbers)、avg = round(sum(numbers) / len(numbers), 2)，然后 return lowest, highest, avg。调用处写 low, high, avg = analyse([88, 95, 79, 62])，然后用 f-string 输出，比如 print(f\"最低 {low}，最高 {high}，平均 {avg:.2f}\")。对 [88, 95, 79, 62] 的结果：最低 62、最高 95、平均是 324 除以 4 等于 81.0。空列表的情况返回三个 None，输出时不会报错，但显示的是 None，所以调用处最好先判断 if low is None 再决定是否输出。空列表不能直接算平均值，是因为平均值要除以元素个数，空列表的元素个数是 0，除以 0 会报 ZeroDivisionError。",
+      "explanation": "这道题考查多返回值函数和空输入的边界处理。三个手算结果 62、95、81.0 要对得上。空列表返回三个 None 是题目指定的行为，要确保真的返回了三个 None 而不是报错或返回一个 None。最后一问是本题的核心：空列表不能求平均是因为分母为 0，会报 ZeroDivisionError。能指出这一点说明学生理解了求平均这个运算的前提条件。常见错误是空列表时直接计算导致程序崩溃；或者返回 None 后调用处没有判断就格式化输出，那样会报另一种错。",
+      "rubric": [
+        {
+          "criterion": "函数返回三个值且调用处正确接收",
+          "points": 5
+        },
+        {
+          "criterion": "三个结果与手算一致（62、95、81.0）",
+          "points": 3
+        },
+        {
+          "criterion": "空列表返回三个 None 且说明为何不能算平均",
+          "points": 2
+        }
+      ]
+    }
+  ]
+}

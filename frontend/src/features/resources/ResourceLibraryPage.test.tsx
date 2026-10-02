@@ -18,6 +18,22 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 
 describe("reading library", () => {
+  it("classifies imported textbooks separately from lectures and keeps their real chapter counts", async () => {
+    vi.mocked(api.listCatalog).mockResolvedValueOnce({ items: [
+      { kind: "COURSE", id: "book", title: "数据结构与算法实践", description: "一部完整教材。", route: "/courses/book", chapter_count: 12, is_textbook: true, body_han_chars: 44551 },
+      { kind: "COURSE", id: "lecture", title: "算法课堂讲义", description: "课堂阅读材料。", route: "/courses/lecture", chapter_count: 6 },
+    ], total: 2, limit: 100, offset: 0 });
+    render(<ResourceLibraryPage />);
+    const bookHeading = await screen.findByRole("heading", { name: "数据结构与算法实践" });
+    expect(bookHeading.closest("section")?.getAttribute("aria-label")).toBe("专题教材");
+    expect(screen.getByText(/12 个可读章节 · 正文 4.5 万字/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "课程讲义" }));
+    expect(screen.queryByRole("heading", { name: "数据结构与算法实践" })).toBeNull();
+    expect(screen.getByRole("heading", { name: "算法课堂讲义" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "专题教材" }));
+    expect(screen.queryByRole("heading", { name: "算法课堂讲义" })).toBeNull();
+    expect(screen.getByRole("heading", { name: "数据结构与算法实践" })).toBeTruthy();
+  });
   it("never advertises a missing file as an openable teaching material", async () => {
     vi.mocked(api.listCatalog).mockResolvedValueOnce({ items: [
       { kind: "RESOURCE", id: "missing", title: "缺失的资料", description: "文件已不存在", route: "/resources/missing", available: false, unavailable_reason: "RESOURCE_FILE_MISSING", is_test_fixture: false },

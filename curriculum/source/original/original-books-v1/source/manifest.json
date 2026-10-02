@@ -1,0 +1,2607 @@
+{
+  "schema_version": "k12.book.source.v1",
+  "package_id": "k12-original-books-v1",
+  "language": "zh-CN",
+  "content_kind": "ORIGINAL_TEXTBOOK",
+  "ai_assisted": true,
+  "review_status": "UNREVIEWED",
+  "books": [
+    {
+      "book_id": "primary-computing",
+      "title": "数字世界与计算思维",
+      "stage_group": "PRIMARY",
+      "grade_min": 1,
+      "grade_max": 6,
+      "description": "本书面向小学一至六年级，用身边的生活场景带孩子认识计算机、信息与数据，并逐步建立计算思维。全书从“计算机能做什么”出发，经过数据表示、文件管理、指令与步骤，进入分解、模式识别、条件判断与循环四个核心思想，再学习编码、简单算法和网络安全，最后用一个完整的综合实践把全书画成一张图。书中的活动大多不需要电脑，用卡片、纸条和身体动作就能完成，让低年级学生也能理解抽象概念。读完本书，学生能够把一件复杂的事情拆成小步骤并讲清顺序，能够读懂和修改简单的程序块，也能在网络上保护自己的信息。",
+      "prerequisites": [
+        "认识常用汉字并能读懂短句",
+        "无需任何编程基础"
+      ],
+      "learning_outcomes": [
+        "说出计算机的基本组成和它擅长、不擅长的事情",
+        "区分信息、数据与载体，并举例说明同一信息的不同表示",
+        "把一件日常任务拆解成有先后顺序的步骤并写下来",
+        "在生活现象中找出重复的模式并用它预测下一步",
+        "用条件判断和循环描述简单的重复与选择过程",
+        "读懂并修改由顺序、条件、循环组成的简单程序",
+        "说出三条以上保护个人信息和账号安全的做法",
+        "独立完成一个使用前文全部知识的综合小项目"
+      ],
+      "preface_path": "books/primary-computing/preface.md",
+      "chapters": [
+        {
+          "chapter_id": "primary-computing-ch01",
+          "order": 1,
+          "title": "认识数字世界",
+          "objectives": [
+            "说出计算机能做什么、不能做什么",
+            "举出身边三种以上使用计算机的设备",
+            "区分“会计算的机器”和“会思考的人”"
+          ],
+          "prerequisite_chapter_ids": [],
+          "estimated_minutes": 30,
+          "markdown_path": "books/primary-computing/chapters/01.md",
+          "answers_path": "answers/primary-computing/01.json",
+          "knowledge_points": [
+            "计算机的基本组成",
+            "输入与输出",
+            "计算机擅长的任务",
+            "计算机不擅长的任务"
+          ],
+          "references": [
+            {
+              "title": "Scratch 创意编程社区",
+              "url": "https://scratch.mit.edu/ideas",
+              "purpose": "核对积木式编程中顺序、循环与条件积木的官方说明"
+            },
+            {
+              "title": "Code.org 计算机科学课程库",
+              "url": "https://code.org/curriculum",
+              "purpose": "核对小学阶段计算机科学概念的教学顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch02",
+          "order": 2,
+          "title": "信息和数据",
+          "objectives": [
+            "区分信息、数据与它们的载体",
+            "把同一个信息用两种方式表示出来",
+            "说明为什么计算机只认识数字也能处理文字和图片"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch01"
+          ],
+          "estimated_minutes": 35,
+          "markdown_path": "books/primary-computing/chapters/02.md",
+          "answers_path": "answers/primary-computing/02.json",
+          "knowledge_points": [
+            "信息与数据的区别",
+            "数据需要载体",
+            "用数字表示文字",
+            "用数字表示图像与声音"
+          ],
+          "references": [
+            {
+              "title": "Unicode 标准",
+              "url": "https://www.unicode.org/standard/standard.html",
+              "purpose": "核对字符编码与码位的权威定义"
+            },
+            {
+              "title": "CS Unplugged 不插电计算机科学",
+              "url": "https://csunplugged.org/en/",
+              "purpose": "核对不插电活动如何呈现二进制、排序与搜索概念"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch03",
+          "order": 3,
+          "title": "文件和文件夹",
+          "objectives": [
+            "说明文件名的组成和作用",
+            "按规则给文件命名并归类",
+            "独立把一组杂乱文件整理进文件夹"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch02"
+          ],
+          "estimated_minutes": 35,
+          "markdown_path": "books/primary-computing/chapters/03.md",
+          "answers_path": "answers/primary-computing/03.json",
+          "knowledge_points": [
+            "什么是文件",
+            "文件名的组成",
+            "文件夹的层级结构",
+            "命名与归类的好习惯"
+          ],
+          "references": [
+            {
+              "title": "中华人民共和国教育部",
+              "url": "https://www.moe.gov.cn/",
+              "purpose": "核对面向中小学的信息技术与网络安全教育要求"
+            },
+            {
+              "title": "Code.org 计算机科学课程库",
+              "url": "https://code.org/curriculum",
+              "purpose": "核对小学阶段计算机科学概念的教学顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch04",
+          "order": 4,
+          "title": "一步一步来：指令与步骤",
+          "objectives": [
+            "把一件日常事情写成有序步骤",
+            "发现步骤顺序颠倒后的后果",
+            "按指令单准确完成同伴给出的任务"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch03"
+          ],
+          "estimated_minutes": 35,
+          "markdown_path": "books/primary-computing/chapters/04.md",
+          "answers_path": "answers/primary-computing/04.json",
+          "knowledge_points": [
+            "指令与执行者",
+            "顺序的重要性",
+            "步骤要具体到可执行",
+            "检查与修正步骤"
+          ],
+          "references": [
+            {
+              "title": "CS Unplugged 不插电计算机科学",
+              "url": "https://csunplugged.org/en/",
+              "purpose": "核对不插电活动如何呈现二进制、排序与搜索概念"
+            },
+            {
+              "title": "Scratch 创意编程社区",
+              "url": "https://scratch.mit.edu/ideas",
+              "purpose": "核对积木式编程中顺序、循环与条件积木的官方说明"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch05",
+          "order": 5,
+          "title": "拆开大问题：分解",
+          "objectives": [
+            "把一个大任务拆成三个以上小任务",
+            "说明分解为什么能让问题变简单",
+            "为拆出的每个小任务排出先后顺序"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch04"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-computing/chapters/05.md",
+          "answers_path": "answers/primary-computing/05.json",
+          "knowledge_points": [
+            "什么是分解",
+            "分解的判断标准",
+            "分解后的排序",
+            "分解到什么程度算合适"
+          ],
+          "references": [
+            {
+              "title": "CS Unplugged 不插电计算机科学",
+              "url": "https://csunplugged.org/en/",
+              "purpose": "核对不插电活动如何呈现二进制、排序与搜索概念"
+            },
+            {
+              "title": "Code.org 计算机科学课程库",
+              "url": "https://code.org/curriculum",
+              "purpose": "核对小学阶段计算机科学概念的教学顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch06",
+          "order": 6,
+          "title": "找规律：模式识别",
+          "objectives": [
+            "在图形和数字序列中找出重复规律",
+            "用找到的规律预测下一项",
+            "说明规律可以帮助我们少做重复劳动"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch05"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-computing/chapters/06.md",
+          "answers_path": "answers/primary-computing/06.json",
+          "knowledge_points": [
+            "什么是模式",
+            "图形中的模式",
+            "数字中的模式",
+            "用模式做预测"
+          ],
+          "references": [
+            {
+              "title": "CS Unplugged 不插电计算机科学",
+              "url": "https://csunplugged.org/en/",
+              "purpose": "核对不插电活动如何呈现二进制、排序与搜索概念"
+            },
+            {
+              "title": "可汗学院算法课程",
+              "url": "https://www.khanacademy.org/computing/computer-science/algorithms",
+              "purpose": "核对外排序、递归与图的基本讲解"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch07",
+          "order": 7,
+          "title": "如果……就……：条件判断",
+          "objectives": [
+            "用“如果……就……”描述生活中的选择",
+            "读懂包含条件分支的简单流程",
+            "为流程补上遗漏的判断条件"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch06"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-computing/chapters/07.md",
+          "answers_path": "answers/primary-computing/07.json",
+          "knowledge_points": [
+            "条件判断的含义",
+            "条件与结果",
+            "多个条件并列",
+            "条件的边界情况"
+          ],
+          "references": [
+            {
+              "title": "Scratch 创意编程社区",
+              "url": "https://scratch.mit.edu/ideas",
+              "purpose": "核对积木式编程中顺序、循环与条件积木的官方说明"
+            },
+            {
+              "title": "Code.org 计算机科学课程库",
+              "url": "https://code.org/curriculum",
+              "purpose": "核对小学阶段计算机科学概念的教学顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch08",
+          "order": 8,
+          "title": "重复做：循环",
+          "objectives": [
+            "发现生活中重复出现的动作",
+            "用循环把重复步骤写得简短",
+            "判断一段重复该用几次循环表示"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch07"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-computing/chapters/08.md",
+          "answers_path": "answers/primary-computing/08.json",
+          "knowledge_points": [
+            "循环的含义",
+            "循环的重复次数",
+            "循环里的变化量",
+            "循环与顺序的配合"
+          ],
+          "references": [
+            {
+              "title": "Scratch 创意编程社区",
+              "url": "https://scratch.mit.edu/ideas",
+              "purpose": "核对积木式编程中顺序、循环与条件积木的官方说明"
+            },
+            {
+              "title": "CS Unplugged 不插电计算机科学",
+              "url": "https://csunplugged.org/en/",
+              "purpose": "核对不插电活动如何呈现二进制、排序与搜索概念"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch09",
+          "order": 9,
+          "title": "给信息加密：编码",
+          "objectives": [
+            "说明编码是把信息换成另一种表示",
+            "用简单规则对文字编码和解码",
+            "说明密码为什么比编码更安全"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch08"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-computing/chapters/09.md",
+          "answers_path": "answers/primary-computing/09.json",
+          "knowledge_points": [
+            "编码与解码",
+            "替换式编码",
+            "编码与加密的区别",
+            "编码在生活中的应用"
+          ],
+          "references": [
+            {
+              "title": "Unicode 标准",
+              "url": "https://www.unicode.org/standard/standard.html",
+              "purpose": "核对字符编码与码位的权威定义"
+            },
+            {
+              "title": "OWASP Top 10 应用安全风险",
+              "url": "https://owasp.org/www-project-top-ten/",
+              "purpose": "核对口令、注入与常见安全风险的分类"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch10",
+          "order": 10,
+          "title": "简单的算法",
+          "objectives": [
+            "说出算法是解决问题的明确步骤",
+            "比较两个算法哪个更省步骤",
+            "用自然语言或流程图写下一个简单算法"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch09"
+          ],
+          "estimated_minutes": 45,
+          "markdown_path": "books/primary-computing/chapters/10.md",
+          "answers_path": "answers/primary-computing/10.json",
+          "knowledge_points": [
+            "什么是算法",
+            "算法的输入与输出",
+            "比较算法的好坏",
+            "把算法写清楚"
+          ],
+          "references": [
+            {
+              "title": "可汗学院算法课程",
+              "url": "https://www.khanacademy.org/computing/computer-science/algorithms",
+              "purpose": "核对外排序、递归与图的基本讲解"
+            },
+            {
+              "title": "可汗学院排序算法专题",
+              "url": "https://www.khanacademy.org/computing/computer-science/algorithms/sorting-algorithms/a/sorting",
+              "purpose": "核对排序算法的比较与交换过程图示"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch11",
+          "order": 11,
+          "title": "在网络上保护自己",
+          "objectives": [
+            "说出三条保护个人信息的具体做法",
+            "识别可疑链接和陌生人的请求",
+            "遇到不舒服的网络内容时知道该找谁"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch10"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-computing/chapters/11.md",
+          "answers_path": "answers/primary-computing/11.json",
+          "knowledge_points": [
+            "个人信息包括什么",
+            "账号与口令安全",
+            "识别可疑信息",
+            "遇到问题怎么办"
+          ],
+          "references": [
+            {
+              "title": "CISA 网络安全与基础设施安全局",
+              "url": "https://www.cisa.gov/",
+              "purpose": "核对面向公众的账号与网络安全建议"
+            },
+            {
+              "title": "NIST 网络安全框架",
+              "url": "https://www.nist.gov/cyberframework",
+              "purpose": "核对网络安全防护的基本概念与分类"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-computing-ch12",
+          "order": 12,
+          "title": "综合实践：设计一个班级小助手",
+          "objectives": [
+            "综合运用分解、条件与循环设计一个完整方案",
+            "按步骤完成作品并演示给同伴",
+            "根据同伴反馈改进自己的方案"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-computing-ch07",
+            "primary-computing-ch09"
+          ],
+          "estimated_minutes": 60,
+          "markdown_path": "books/primary-computing/chapters/12.md",
+          "answers_path": "answers/primary-computing/12.json",
+          "knowledge_points": [
+            "从需求到方案",
+            "用前文知识画出流程",
+            "测试与改进",
+            "向他人讲解作品"
+          ],
+          "references": [
+            {
+              "title": "Code.org 计算机科学课程库",
+              "url": "https://code.org/curriculum",
+              "purpose": "核对小学阶段计算机科学概念的教学顺序"
+            },
+            {
+              "title": "Scratch 创意编程社区",
+              "url": "https://scratch.mit.edu/ideas",
+              "purpose": "核对积木式编程中顺序、循环与条件积木的官方说明"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "book_id": "primary-ai",
+      "title": "和人工智能一起探索",
+      "stage_group": "PRIMARY",
+      "grade_min": 1,
+      "grade_max": 6,
+      "description": "本书面向小学一至六年级，用孩子熟悉的生活例子说明人工智能是什么、能做什么、以及为什么它会出错。全书从“人工智能和普通程序有什么不同”开始，依次讲解机器如何感知、如何通过样例和标签学会分类，再讲到训练与使用的关系、错误与偏差的来源。后半部分重点放在人与机器的协作方式：怎样提问、怎样核验机器给出的信息、怎样保护自己的隐私，以及怎样负责任地使用这些工具。书中始终把人工智能描述为从数据中找规律的系统，不把它说成有感情或不会犯错的对象，帮助学生在使用中保持判断力。最后一章用综合实践把全书方法串起来。",
+      "prerequisites": [
+        "认识常用汉字并能读懂短句",
+        "无需任何编程基础",
+        "了解基本的网络安全常识更佳"
+      ],
+      "learning_outcomes": [
+        "说出人工智能与普通程序在做事方式上的区别",
+        "举例说明机器如何通过样例和标签学会分类",
+        "解释同一件事为什么机器会给出错误结果",
+        "用清楚、具体的方式向人工智能工具提出问题",
+        "对机器给出的信息做两步以上的核验",
+        "说出三条在使用人工智能工具时保护隐私的做法",
+        "分辨哪些场景适合请人工智能帮忙、哪些不适合",
+        "完成一个以人工智能为主题的综合探究并汇报"
+      ],
+      "preface_path": "books/primary-ai/preface.md",
+      "chapters": [
+        {
+          "chapter_id": "primary-ai-ch01",
+          "order": 1,
+          "title": "人工智能就在身边",
+          "objectives": [
+            "举出身边三个用到人工智能的例子",
+            "说出人工智能和普通程序的区别",
+            "说明人工智能不是有感情的人"
+          ],
+          "prerequisite_chapter_ids": [],
+          "estimated_minutes": 35,
+          "markdown_path": "books/primary-ai/chapters/01.md",
+          "answers_path": "answers/primary-ai/01.json",
+          "knowledge_points": [
+            "人工智能是什么",
+            "普通程序与人工程序的区别",
+            "身边的智能应用",
+            "人工智能的边界"
+          ],
+          "references": [
+            {
+              "title": "OECD 人工智能原则",
+              "url": "https://oecd.ai/en/ai-principles",
+              "purpose": "核对负责任使用人工智能的原则性说明"
+            },
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch02",
+          "order": 2,
+          "title": "机器怎样看见和听见",
+          "objectives": [
+            "说明机器把图片和声音变成数字的过程",
+            "举例说明传感器的作用",
+            "说出机器“看见”和人的看见有什么不同"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch01"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-ai/chapters/02.md",
+          "answers_path": "answers/primary-ai/02.json",
+          "knowledge_points": [
+            "感知的含义",
+            "图片变成数字",
+            "声音变成数字",
+            "传感器的作用"
+          ],
+          "references": [
+            {
+              "title": "Unicode 标准",
+              "url": "https://www.unicode.org/standard/standard.html",
+              "purpose": "核对字符编码与码位的权威定义"
+            },
+            {
+              "title": "NumPy 用户指南",
+              "url": "https://numpy.org/doc/stable/user/",
+              "purpose": "核对数组运算与广播规则"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch03",
+          "order": 3,
+          "title": "学会分类：样例和标签",
+          "objectives": [
+            "说明样例和标签在分类中的作用",
+            "给一组物品贴标签并说出依据",
+            "发现标签不一致会带来什么问题"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch02"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-ai/chapters/03.md",
+          "answers_path": "answers/primary-ai/03.json",
+          "knowledge_points": [
+            "分类的含义",
+            "样例是什么",
+            "标签是什么",
+            "标签要一致"
+          ],
+          "references": [
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            },
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch04",
+          "order": 4,
+          "title": "机器是怎么学会的",
+          "objectives": [
+            "说明训练就是看很多样例找规律",
+            "说出训练和使用是两个阶段",
+            "举例说明样例越多不一定越好"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch03"
+          ],
+          "estimated_minutes": 45,
+          "markdown_path": "books/primary-ai/chapters/04.md",
+          "answers_path": "answers/primary-ai/04.json",
+          "knowledge_points": [
+            "训练的含义",
+            "从样例中找规律",
+            "训练与使用的区别",
+            "样例质量比数量更重要"
+          ],
+          "references": [
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            },
+            {
+              "title": "TensorFlow 图像分类教程",
+              "url": "https://www.tensorflow.org/tutorials/keras/classification",
+              "purpose": "核对分类网络的训练与评估步骤"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch05",
+          "order": 5,
+          "title": "机器也会出错",
+          "objectives": [
+            "说出机器出错的三种原因",
+            "用具体例子说明出错后该怎么办",
+            "说明为什么不能完全相信机器的判断"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch04"
+          ],
+          "estimated_minutes": 45,
+          "markdown_path": "books/primary-ai/chapters/05.md",
+          "answers_path": "answers/primary-ai/05.json",
+          "knowledge_points": [
+            "错误从哪里来",
+            "没见过的样例",
+            "相似但不同的东西",
+            "出错后的处理"
+          ],
+          "references": [
+            {
+              "title": "NIST 人工智能风险管理框架",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+              "purpose": "核对人工智能偏差、风险与治理的权威表述"
+            },
+            {
+              "title": "scikit-learn 模型评估文档",
+              "url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+              "purpose": "核对准确率、精确率、召回率与混淆矩阵的定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch06",
+          "order": 6,
+          "title": "偏见从哪里来",
+          "objectives": [
+            "说明数据不全面会导致偏见",
+            "举出一个数据不平衡的例子",
+            "说出减少偏见的两个办法"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch05"
+          ],
+          "estimated_minutes": 45,
+          "markdown_path": "books/primary-ai/chapters/06.md",
+          "answers_path": "answers/primary-ai/06.json",
+          "knowledge_points": [
+            "偏见是什么",
+            "数据不全面",
+            "数据不平衡",
+            "让结果更公平的做法"
+          ],
+          "references": [
+            {
+              "title": "NIST 人工智能风险管理框架",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+              "purpose": "核对人工智能偏差、风险与治理的权威表述"
+            },
+            {
+              "title": "UNICEF 儿童与人工智能政策指南",
+              "url": "https://www.unicef.org/globalinsight/reports/policy-guidance-ai-children",
+              "purpose": "核对面向儿童的隐私与人工智能保护建议"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch07",
+          "order": 7,
+          "title": "和人工智能一起做事",
+          "objectives": [
+            "说出人和机器各自擅长的部分",
+            "把一件任务合理地分给人和机器",
+            "说明为什么最终决定要由人来做"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch06"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-ai/chapters/07.md",
+          "answers_path": "answers/primary-ai/07.json",
+          "knowledge_points": [
+            "人机协作的含义",
+            "人擅长的部分",
+            "机器擅长的部分",
+            "由人做决定"
+          ],
+          "references": [
+            {
+              "title": "OECD 人工智能原则",
+              "url": "https://oecd.ai/en/ai-principles",
+              "purpose": "核对负责任使用人工智能的原则性说明"
+            },
+            {
+              "title": "UNICEF 儿童与人工智能政策指南",
+              "url": "https://www.unicef.org/globalinsight/reports/policy-guidance-ai-children",
+              "purpose": "核对面向儿童的隐私与人工智能保护建议"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch08",
+          "order": 8,
+          "title": "怎样问得清楚",
+          "objectives": [
+            "把模糊的问题改成具体的问题",
+            "补充条件让问题更容易回答",
+            "说明追问为什么能提高回答质量"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch07"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-ai/chapters/08.md",
+          "answers_path": "answers/primary-ai/08.json",
+          "knowledge_points": [
+            "提问为什么重要",
+            "把问题说具体",
+            "补充条件和背景",
+            "继续追问"
+          ],
+          "references": [
+            {
+              "title": "OECD 人工智能原则",
+              "url": "https://oecd.ai/en/ai-principles",
+              "purpose": "核对负责任使用人工智能的原则性说明"
+            },
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch09",
+          "order": 9,
+          "title": "核验机器给出的信息",
+          "objectives": [
+            "说出核验信息的三个步骤",
+            "找出信息中可疑的地方",
+            "用第二个来源确认同一件事"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch08"
+          ],
+          "estimated_minutes": 45,
+          "markdown_path": "books/primary-ai/chapters/09.md",
+          "answers_path": "answers/primary-ai/09.json",
+          "knowledge_points": [
+            "为什么要核验",
+            "找来源",
+            "交叉验证",
+            "记下不确定的部分"
+          ],
+          "references": [
+            {
+              "title": "CISA 网络安全与基础设施安全局",
+              "url": "https://www.cisa.gov/",
+              "purpose": "核对面向公众的账号与网络安全建议"
+            },
+            {
+              "title": "NIST 人工智能风险管理框架",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+              "purpose": "核对人工智能偏差、风险与治理的权威表述"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch10",
+          "order": 10,
+          "title": "保护自己的信息",
+          "objectives": [
+            "说出哪些信息属于个人隐私",
+            "判断哪些内容不该告诉智能工具",
+            "说明为什么照片和位置信息要谨慎"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch09"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-ai/chapters/10.md",
+          "answers_path": "answers/primary-ai/10.json",
+          "knowledge_points": [
+            "什么是个人信息",
+            "不该输入的内容",
+            "照片与位置",
+            "家长和老师的帮助"
+          ],
+          "references": [
+            {
+              "title": "UNICEF 儿童与人工智能政策指南",
+              "url": "https://www.unicef.org/globalinsight/reports/policy-guidance-ai-children",
+              "purpose": "核对面向儿童的隐私与人工智能保护建议"
+            },
+            {
+              "title": "CISA 网络安全与基础设施安全局",
+              "url": "https://www.cisa.gov/",
+              "purpose": "核对面向公众的账号与网络安全建议"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch11",
+          "order": 11,
+          "title": "负责任地使用人工智能",
+          "objectives": [
+            "说出使用人工智能工具的三条规则",
+            "判断抄用机器答案为什么不合适",
+            "说明怎样在使用中保持自己的思考"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch10"
+          ],
+          "estimated_minutes": 40,
+          "markdown_path": "books/primary-ai/chapters/11.md",
+          "answers_path": "answers/primary-ai/11.json",
+          "knowledge_points": [
+            "诚实使用",
+            "自己先想再问",
+            "说明自己用了工具",
+            "不伤害他人"
+          ],
+          "references": [
+            {
+              "title": "OECD 人工智能原则",
+              "url": "https://oecd.ai/en/ai-principles",
+              "purpose": "核对负责任使用人工智能的原则性说明"
+            },
+            {
+              "title": "NIST 人工智能风险管理框架",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+              "purpose": "核对人工智能偏差、风险与治理的权威表述"
+            }
+          ]
+        },
+        {
+          "chapter_id": "primary-ai-ch12",
+          "order": 12,
+          "title": "综合实践：做一份人工智能小调查",
+          "objectives": [
+            "设计一个可以调查的小问题",
+            "收集并整理调查到的样例",
+            "向同伴说明自己的发现和不确定的地方"
+          ],
+          "prerequisite_chapter_ids": [
+            "primary-ai-ch05",
+            "primary-ai-ch09"
+          ],
+          "estimated_minutes": 60,
+          "markdown_path": "books/primary-ai/chapters/12.md",
+          "answers_path": "answers/primary-ai/12.json",
+          "knowledge_points": [
+            "确定调查问题",
+            "收集样例与贴标签",
+            "整理与发现问题",
+            "汇报与反思"
+          ],
+          "references": [
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            },
+            {
+              "title": "NIST 人工智能风险管理框架",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+              "purpose": "核对人工智能偏差、风险与治理的权威表述"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "book_id": "junior-python",
+      "title": "Python 编程与问题解决",
+      "stage_group": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "description": "本书面向初中七至九年级，用可运行的短程序系统讲解 Python 编程与问题解决方法。全书从环境安装和第一个程序开始，依次覆盖变量与数据类型、字符串处理、条件分支、循环、列表、字典、函数、文件读写与异常处理，再专门用一章讲调试方法，最后落到简单算法和综合项目。每章的程序都能在 Python 3.12 标准库环境下直接运行，配有预期输出，便于对照检查。书中强调先想清楚再动手、出错后按步骤排查的习惯，不假定读者已接入任何在线判题系统。读完本书，学生能够独立写出解决实际小问题的程序，并具备继续学习数据结构与算法的基础。",
+      "prerequisites": [
+        "能进行四则运算并理解负数与小数",
+        "会使用键盘输入和文件管理",
+        "无需编程基础"
+      ],
+      "learning_outcomes": [
+        "独立安装并运行 Python 解释器，执行和修改程序文件",
+        "使用变量、数值、字符串与布尔类型表达和转换数据",
+        "用条件分支和循环控制程序的执行流程",
+        "使用列表和字典组织多个数据并做增删查改",
+        "把重复逻辑封装成函数并正确传递参数与返回值",
+        "读写文本文件并处理常见的异常情况",
+        "用打印中间结果和阅读报错信息的方法定位缺陷",
+        "完成一个综合项目并说明其中的设计取舍"
+      ],
+      "preface_path": "books/junior-python/preface.md",
+      "chapters": [
+        {
+          "chapter_id": "junior-python-ch01",
+          "order": 1,
+          "title": "开始写程序",
+          "objectives": [
+            "安装并运行 Python 解释器",
+            "写出并运行第一个程序",
+            "说明程序、源代码与解释器的关系"
+          ],
+          "prerequisite_chapter_ids": [],
+          "estimated_minutes": 45,
+          "markdown_path": "books/junior-python/chapters/01.md",
+          "answers_path": "answers/junior-python/01.json",
+          "knowledge_points": [
+            "安装 Python 与编辑器",
+            "第一个程序",
+            "源代码与解释器",
+            "报错信息怎么看"
+          ],
+          "references": [
+            {
+              "title": "Python 官方入门指南",
+              "url": "https://www.python.org/about/gettingstarted/",
+              "purpose": "核对解释器安装与运行方式的官方步骤"
+            },
+            {
+              "title": "Python 3 语言参考",
+              "url": "https://docs.python.org/3/reference/",
+              "purpose": "核对表达式、语句与作用域的语言定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch02",
+          "order": 2,
+          "title": "变量和数据类型",
+          "objectives": [
+            "用变量保存数据并重新赋值",
+            "区分整数、浮点数、字符串与布尔值",
+            "用类型转换解决输入输出的类型问题"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch01"
+          ],
+          "estimated_minutes": 50,
+          "markdown_path": "books/junior-python/chapters/02.md",
+          "answers_path": "answers/junior-python/02.json",
+          "knowledge_points": [
+            "变量的含义",
+            "四种基本类型",
+            "类型转换",
+            "命名规范"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "PEP 8 代码风格指南",
+              "url": "https://peps.python.org/pep-0008/",
+              "purpose": "核对命名、缩进与代码排版规范"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch03",
+          "order": 3,
+          "title": "处理文本：字符串",
+          "objectives": [
+            "用索引和切片取出字符串的一部分",
+            "用常用方法处理文本",
+            "用格式化把变量嵌入文本"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch02"
+          ],
+          "estimated_minutes": 50,
+          "markdown_path": "books/junior-python/chapters/03.md",
+          "answers_path": "answers/junior-python/03.json",
+          "knowledge_points": [
+            "字符串与索引",
+            "切片",
+            "常用字符串方法",
+            "格式化输出"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch04",
+          "order": 4,
+          "title": "让程序做选择：条件分支",
+          "objectives": [
+            "写出包含 if、elif、else 的分支结构",
+            "用比较和逻辑运算符组合条件",
+            "处理条件判断的边界情况"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch03"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-python/chapters/04.md",
+          "answers_path": "answers/junior-python/04.json",
+          "knowledge_points": [
+            "布尔表达式",
+            "if 语句",
+            "多分支与嵌套",
+            "边界与常见错误"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "PEP 8 代码风格指南",
+              "url": "https://peps.python.org/pep-0008/",
+              "purpose": "核对命名、缩进与代码排版规范"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch05",
+          "order": 5,
+          "title": "重复执行：循环",
+          "objectives": [
+            "用 for 循环遍历序列",
+            "用 while 循环处理未知次数的重复",
+            "在循环中正确使用 break 与 continue"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch04"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-python/chapters/05.md",
+          "answers_path": "answers/junior-python/05.json",
+          "knowledge_points": [
+            "for 循环",
+            "range 的用法",
+            "while 循环",
+            "循环控制语句"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch06",
+          "order": 6,
+          "title": "组织数据：列表",
+          "objectives": [
+            "创建列表并按下标访问元素",
+            "对列表做增删改查和排序",
+            "用列表存放一组相关数据并遍历处理"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch05"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-python/chapters/06.md",
+          "answers_path": "answers/junior-python/06.json",
+          "knowledge_points": [
+            "列表的创建与索引",
+            "增删改查",
+            "排序与统计",
+            "嵌套列表"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch07",
+          "order": 7,
+          "title": "用字典查找数据",
+          "objectives": [
+            "创建字典并按关键字取值",
+            "安全地读取可能不存在的键",
+            "用字典统计一组数据出现的次数"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch06"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-python/chapters/07.md",
+          "answers_path": "answers/junior-python/07.json",
+          "knowledge_points": [
+            "字典的键值对",
+            "增删改查",
+            "安全取值",
+            "用字典做统计"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch08",
+          "order": 8,
+          "title": "把代码打包：函数",
+          "objectives": [
+            "定义并调用带参数和返回值的函数",
+            "说明局部变量与全局变量的区别",
+            "把重复代码改写成函数"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch07"
+          ],
+          "estimated_minutes": 60,
+          "markdown_path": "books/junior-python/chapters/08.md",
+          "answers_path": "answers/junior-python/08.json",
+          "knowledge_points": [
+            "为什么要用函数",
+            "参数与返回值",
+            "作用域",
+            "默认参数与文档字符串"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "PEP 8 代码风格指南",
+              "url": "https://peps.python.org/pep-0008/",
+              "purpose": "核对命名、缩进与代码排版规范"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch09",
+          "order": 9,
+          "title": "文件与异常",
+          "objectives": [
+            "读写文本文件并正确关闭",
+            "用 with 语句管理文件资源",
+            "用 try 捕获并处理常见异常"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch08"
+          ],
+          "estimated_minutes": 60,
+          "markdown_path": "books/junior-python/chapters/09.md",
+          "answers_path": "answers/junior-python/09.json",
+          "knowledge_points": [
+            "打开与读写文件",
+            "with 语句",
+            "异常的类型",
+            "try 与 except"
+          ],
+          "references": [
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            },
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch10",
+          "order": 10,
+          "title": "找出程序中的错误",
+          "objectives": [
+            "区分语法错误、运行错误与逻辑错误",
+            "用打印中间结果的方法定位问题",
+            "读懂常见报错信息并做出修改"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch09"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-python/chapters/10.md",
+          "answers_path": "answers/junior-python/10.json",
+          "knowledge_points": [
+            "三类错误的区别",
+            "读报错信息",
+            "打印调试法",
+            "逐步缩小范围"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "PEP 8 代码风格指南",
+              "url": "https://peps.python.org/pep-0008/",
+              "purpose": "核对命名、缩进与代码排版规范"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch11",
+          "order": 11,
+          "title": "简单算法",
+          "objectives": [
+            "用代码实现查找与排序的基本算法",
+            "比较两种查找方式的步骤多少",
+            "说明算法复杂度随数据量增长的变化"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch10"
+          ],
+          "estimated_minutes": 60,
+          "markdown_path": "books/junior-python/chapters/11.md",
+          "answers_path": "answers/junior-python/11.json",
+          "knowledge_points": [
+            "遍历查找",
+            "二分查找的前提",
+            "选择排序",
+            "算法的快慢比较"
+          ],
+          "references": [
+            {
+              "title": "可汗学院排序算法专题",
+              "url": "https://www.khanacademy.org/computing/computer-science/algorithms/sorting-algorithms/a/sorting",
+              "purpose": "核对排序算法的比较与交换过程图示"
+            },
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-python-ch12",
+          "order": 12,
+          "title": "综合项目：班级成绩分析器",
+          "objectives": [
+            "综合运用列表、字典、函数与文件读写",
+            "设计数据的存储结构",
+            "测试程序并处理异常输入"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-python-ch08",
+            "junior-python-ch11"
+          ],
+          "estimated_minutes": 70,
+          "markdown_path": "books/junior-python/chapters/12.md",
+          "answers_path": "answers/junior-python/12.json",
+          "knowledge_points": [
+            "项目需求分析",
+            "设计数据结构",
+            "分步实现与测试",
+            "展示与改进"
+          ],
+          "references": [
+            {
+              "title": "Python 3 官方语言教程",
+              "url": "https://docs.python.org/3/tutorial/",
+              "purpose": "核对语法、数据类型与标准库用法的官方表述"
+            },
+            {
+              "title": "PEP 8 代码风格指南",
+              "url": "https://peps.python.org/pep-0008/",
+              "purpose": "核对命名、缩进与代码排版规范"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "book_id": "junior-ai-data",
+      "title": "从数据到人工智能",
+      "stage_group": "JUNIOR",
+      "grade_min": 7,
+      "grade_max": 9,
+      "description": "本书面向初中七至九年级，讲清从原始数据到人工智能模型的完整链路。全书从一个可以回答的问题出发，依次讲解数据的采集、清洗、统计与可视化，再进入特征与标签、训练集与测试集的划分、分类与预测、模型评估，最后讨论偏差与隐私，并完成一个综合实验。书中使用可复制的小型合成数据集，字段和单位都写清楚，配套的 Python 代码只依赖标准库和明确标注版本的第三方库。重点不在调参，而在于让学生理解每一步为什么要做、做错了会怎样，尤其是数据泄漏和凭空宣称准确率这两种常见问题。读完本书，学生能够独立完成一次小规模的数据分析并诚实报告结果。",
+      "prerequisites": [
+        "会写包含循环、列表与函数的 Python 程序",
+        "理解百分数与平均数",
+        "会使用电子表格软件更佳"
+      ],
+      "learning_outcomes": [
+        "把模糊的疑问改写成一个可以用数据回答的问题",
+        "采集并整理小规模数据，登记字段与单位",
+        "处理缺失值、重复值和明显异常的数据",
+        "用统计量和图表描述一组数据的分布",
+        "区分特征与标签，并正确划分训练集与测试集",
+        "训练简单的分类模型并对新数据做出预测",
+        "用混淆矩阵和准确率评估模型并说明其局限",
+        "识别数据偏差与隐私风险并给出应对办法"
+      ],
+      "preface_path": "books/junior-ai-data/preface.md",
+      "chapters": [
+        {
+          "chapter_id": "junior-ai-data-ch01",
+          "order": 1,
+          "title": "从问题到数据",
+          "objectives": [
+            "把生活疑问改写成可回答的数据问题",
+            "说明数据能回答什么、不能回答什么",
+            "为一组数据登记字段与单位"
+          ],
+          "prerequisite_chapter_ids": [],
+          "estimated_minutes": 50,
+          "markdown_path": "books/junior-ai-data/chapters/01.md",
+          "answers_path": "answers/junior-ai-data/01.json",
+          "knowledge_points": [
+            "提出可回答的问题",
+            "数据的类型",
+            "字段与单位",
+            "数据的局限"
+          ],
+          "references": [
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            },
+            {
+              "title": "Kaggle Learn 数据科学微课程",
+              "url": "https://www.kaggle.com/learn",
+              "purpose": "核对数据处理与建模的入门教学顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch02",
+          "order": 2,
+          "title": "采集数据",
+          "objectives": [
+            "设计一份不收集敏感信息的问卷",
+            "用表格记录数据并保持格式一致",
+            "说明样本偏差是怎么产生的"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch01"
+          ],
+          "estimated_minutes": 50,
+          "markdown_path": "books/junior-ai-data/chapters/02.md",
+          "answers_path": "answers/junior-ai-data/02.json",
+          "knowledge_points": [
+            "问卷设计",
+            "记录与编码",
+            "样本与总体",
+            "样本偏差"
+          ],
+          "references": [
+            {
+              "title": "Kaggle Learn 数据科学微课程",
+              "url": "https://www.kaggle.com/learn",
+              "purpose": "核对数据处理与建模的入门教学顺序"
+            },
+            {
+              "title": "NIST 人工智能风险管理框架",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+              "purpose": "核对人工智能偏差、风险与治理的权威表述"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch03",
+          "order": 3,
+          "title": "清洗数据",
+          "objectives": [
+            "找出缺失值、重复值和异常值",
+            "用合理的方法处理每一类问题",
+            "说明随意填补缺失值会带来什么后果"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch02"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-ai-data/chapters/03.md",
+          "answers_path": "answers/junior-ai-data/03.json",
+          "knowledge_points": [
+            "缺失值",
+            "重复记录",
+            "异常值",
+            "清洗的记录与取舍"
+          ],
+          "references": [
+            {
+              "title": "pandas 用户指南",
+              "url": "https://pandas.pydata.org/docs/user_guide/index.html",
+              "purpose": "核对数据框、缺失值与分组聚合的官方用法"
+            },
+            {
+              "title": "pandas 十分钟入门",
+              "url": "https://pandas.pydata.org/docs/user_guide/10min.html",
+              "purpose": "核对数据框创建与筛选的最小示例"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch04",
+          "order": 4,
+          "title": "用统计描述数据",
+          "objectives": [
+            "计算平均数、中位数与众数并比较",
+            "用极差和标准差描述离散程度",
+            "说明平均数为什么会骗人"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch03"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-ai-data/chapters/04.md",
+          "answers_path": "answers/junior-ai-data/04.json",
+          "knowledge_points": [
+            "集中趋势",
+            "离散程度",
+            "分布的形状",
+            "统计量的选择"
+          ],
+          "references": [
+            {
+              "title": "pandas 用户指南",
+              "url": "https://pandas.pydata.org/docs/user_guide/index.html",
+              "purpose": "核对数据框、缺失值与分组聚合的官方用法"
+            },
+            {
+              "title": "NumPy 用户指南",
+              "url": "https://numpy.org/doc/stable/user/",
+              "purpose": "核对数组运算与广播规则"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch05",
+          "order": 5,
+          "title": "把数据画出来",
+          "objectives": [
+            "按数据类型选择合适的图表",
+            "用代码绘制并读懂柱状图与折线图",
+            "识别图表中误导人的画法"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch04"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-ai-data/chapters/05.md",
+          "answers_path": "answers/junior-ai-data/05.json",
+          "knowledge_points": [
+            "图表类型的选择",
+            "柱状图与折线图",
+            "散点图",
+            "坐标轴与比例"
+          ],
+          "references": [
+            {
+              "title": "Matplotlib 教程",
+              "url": "https://matplotlib.org/stable/tutorials/index.html",
+              "purpose": "核对绘图函数与坐标轴设置的写法"
+            },
+            {
+              "title": "pandas 用户指南",
+              "url": "https://pandas.pydata.org/docs/user_guide/index.html",
+              "purpose": "核对数据框、缺失值与分组聚合的官方用法"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch06",
+          "order": 6,
+          "title": "特征和标签",
+          "objectives": [
+            "区分特征与标签",
+            "把文字类别转换成数值",
+            "说明选错特征会怎样"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch05"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-ai-data/chapters/06.md",
+          "answers_path": "answers/junior-ai-data/06.json",
+          "knowledge_points": [
+            "特征与标签的定义",
+            "数值特征与类别特征",
+            "特征编码",
+            "特征选择的依据"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            },
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch07",
+          "order": 7,
+          "title": "训练集和测试集",
+          "objectives": [
+            "按比例划分训练集与测试集",
+            "说明为什么不能拿测试集调参",
+            "识别数据泄漏的常见形式"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch06"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-ai-data/chapters/07.md",
+          "answers_path": "answers/junior-ai-data/07.json",
+          "knowledge_points": [
+            "为什么要划分",
+            "划分的方法",
+            "数据泄漏",
+            "验证集的作用"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 交叉验证文档",
+              "url": "https://scikit-learn.org/stable/modules/cross_validation.html",
+              "purpose": "核对训练集、验证集与测试集的正确划分方式"
+            },
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch08",
+          "order": 8,
+          "title": "让机器学会分类",
+          "objectives": [
+            "用近邻方法对新样本分类",
+            "说明距离如何影响分类结果",
+            "解释 k 值变化对结果的影响"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch07"
+          ],
+          "estimated_minutes": 60,
+          "markdown_path": "books/junior-ai-data/chapters/08.md",
+          "answers_path": "answers/junior-ai-data/08.json",
+          "knowledge_points": [
+            "分类任务",
+            "距离的度量",
+            "k 近邻方法",
+            "k 值的选择"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            },
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch09",
+          "order": 9,
+          "title": "用模型做预测",
+          "objectives": [
+            "用训练好的模型预测新数据",
+            "说明预测结果为什么会有误差",
+            "区分预测置信与预测正确"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch08"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-ai-data/chapters/09.md",
+          "answers_path": "answers/junior-ai-data/09.json",
+          "knowledge_points": [
+            "预测的流程",
+            "误差的来源",
+            "概率与阈值",
+            "预测的使用边界"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            },
+            {
+              "title": "Google 机器学习速成课程：线性回归",
+              "url": "https://developers.google.com/machine-learning/crash-course/linear-regression",
+              "purpose": "核对线性模型的损失函数与梯度下降说明"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch10",
+          "order": 10,
+          "title": "评估模型的好坏",
+          "objectives": [
+            "用混淆矩阵计算准确率、精确率与召回率",
+            "说明只看准确率会漏掉什么",
+            "根据任务目标选择合适的指标"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch09"
+          ],
+          "estimated_minutes": 60,
+          "markdown_path": "books/junior-ai-data/chapters/10.md",
+          "answers_path": "answers/junior-ai-data/10.json",
+          "knowledge_points": [
+            "准确率的局限",
+            "混淆矩阵",
+            "精确率与召回率",
+            "指标的选择"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 模型评估文档",
+              "url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+              "purpose": "核对准确率、精确率、召回率与混淆矩阵的定义"
+            },
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch11",
+          "order": 11,
+          "title": "偏差与隐私",
+          "objectives": [
+            "说出数据偏差的三种来源",
+            "说明收集和使用数据时的隐私底线",
+            "为一个数据集写出使用注意事项"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch10"
+          ],
+          "estimated_minutes": 55,
+          "markdown_path": "books/junior-ai-data/chapters/11.md",
+          "answers_path": "answers/junior-ai-data/11.json",
+          "knowledge_points": [
+            "偏差的来源",
+            "代表性不足",
+            "个人信息保护",
+            "数据使用的边界"
+          ],
+          "references": [
+            {
+              "title": "NIST 人工智能风险管理框架",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+              "purpose": "核对人工智能偏差、风险与治理的权威表述"
+            },
+            {
+              "title": "UNICEF 儿童与人工智能政策指南",
+              "url": "https://www.unicef.org/globalinsight/reports/policy-guidance-ai-children",
+              "purpose": "核对面向儿童的隐私与人工智能保护建议"
+            }
+          ]
+        },
+        {
+          "chapter_id": "junior-ai-data-ch12",
+          "order": 12,
+          "title": "综合实验：校园小数据研究",
+          "objectives": [
+            "独立完成从提问到评估的完整流程",
+            "记录每一步的处理与取舍",
+            "诚实地报告结果中的不确定部分"
+          ],
+          "prerequisite_chapter_ids": [
+            "junior-ai-data-ch09",
+            "junior-ai-data-ch11"
+          ],
+          "estimated_minutes": 75,
+          "markdown_path": "books/junior-ai-data/chapters/12.md",
+          "answers_path": "answers/junior-ai-data/12.json",
+          "knowledge_points": [
+            "确定研究问题",
+            "采集与清洗",
+            "建模与评估",
+            "撰写研究报告"
+          ],
+          "references": [
+            {
+              "title": "Kaggle Learn 数据科学微课程",
+              "url": "https://www.kaggle.com/learn",
+              "purpose": "核对数据处理与建模的入门教学顺序"
+            },
+            {
+              "title": "scikit-learn 模型评估文档",
+              "url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+              "purpose": "核对准确率、精确率、召回率与混淆矩阵的定义"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "book_id": "senior-algorithms",
+      "title": "数据结构与算法实践",
+      "stage_group": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "description": "本书面向高中十至十二年级，系统讲解数据结构与算法的原理、实现和取舍。全书从时间与空间复杂度出发，依次覆盖数组与字符串、栈与队列、哈希表与集合、搜索、排序、递归、树、图，再进入贪心与动态规划两类算法设计方法，最后完成一个综合项目。每个算法都给出适用条件、边界输入的处理、复杂度分析和实现代码，代码以 Python 3.12标准库为主。书中不回避难度，但坚持把“为什么这样设计”“什么情况下会退化”讲清楚，而不是堆砌术语或只给结论。读完本书，学生能够根据问题特征选择合适的数据结构，分析方案的代价，并写出经得起边界测试的程序。",
+      "prerequisites": [
+        "能熟练编写含函数、列表与字典的 Python 程序",
+        "理解指数与对数",
+        "会使用递归思想更佳"
+      ],
+      "learning_outcomes": [
+        "用大 O 记号分析算法的时间与空间复杂度",
+        "为具体问题选择数组、栈、队列、哈希表等合适的结构",
+        "实现并比较线性查找、二分查找等搜索方法",
+        "实现常见排序算法并说明各自的稳定性与代价",
+        "用递归分解问题并写出正确的基线条件",
+        "遍历二叉树与图，并按场景选择深度或广度优先",
+        "判断一个问题适合用贪心还是动态规划求解",
+        "完成一个综合项目并对其做边界与复杂度分析"
+      ],
+      "preface_path": "books/senior-algorithms/preface.md",
+      "chapters": [
+        {
+          "chapter_id": "senior-algorithms-ch01",
+          "order": 1,
+          "title": "复杂度和算法分析",
+          "objectives": [
+            "用大 O 记号描述算法增长趋势",
+            "分析一段代码的时间复杂度",
+            "区分最好、最坏与平均情况"
+          ],
+          "prerequisite_chapter_ids": [],
+          "estimated_minutes": 60,
+          "markdown_path": "books/senior-algorithms/chapters/01.md",
+          "answers_path": "answers/senior-algorithms/01.json",
+          "knowledge_points": [
+            "算法的代价",
+            "大 O 记号",
+            "常见复杂度量级",
+            "空间复杂度与取舍"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "cppreference 标准算法库",
+              "url": "https://en.cppreference.com/w/cpp/algorithm",
+              "purpose": "对照排序与查找算法的标准定义与复杂度"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch02",
+          "order": 2,
+          "title": "数组和字符串",
+          "objectives": [
+            "说明数组的连续存储带来的性能特点",
+            "实现数组的插入、删除与查找",
+            "用双指针技巧解决子数组问题"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch01"
+          ],
+          "estimated_minutes": 65,
+          "markdown_path": "books/senior-algorithms/chapters/02.md",
+          "answers_path": "answers/senior-algorithms/02.json",
+          "knowledge_points": [
+            "连续存储的代价",
+            "下标访问与越界",
+            "插入与删除",
+            "双指针技巧"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch03",
+          "order": 3,
+          "title": "栈和队列",
+          "objectives": [
+            "说明后进先出与先进先出的区别",
+            "用列表实现栈和队列",
+            "识别适合用栈或队列解决的问题"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch02"
+          ],
+          "estimated_minutes": 65,
+          "markdown_path": "books/senior-algorithms/chapters/03.md",
+          "answers_path": "answers/senior-algorithms/03.json",
+          "knowledge_points": [
+            "栈的原理",
+            "队列的原理",
+            "用数组实现",
+            "典型应用场景"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch04",
+          "order": 4,
+          "title": "字典、集合与哈希",
+          "objectives": [
+            "说明哈希表如何实现平均常数时间查找",
+            "处理哈希冲突",
+            "识别哈希最坏情况退化的条件"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch03"
+          ],
+          "estimated_minutes": 70,
+          "markdown_path": "books/senior-algorithms/chapters/04.md",
+          "answers_path": "answers/senior-algorithms/04.json",
+          "knowledge_points": [
+            "哈希函数",
+            "冲突处理",
+            "平均与最坏情况",
+            "集合与字典的应用"
+          ],
+          "references": [
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            },
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch05",
+          "order": 5,
+          "title": "搜索：从线性到二分",
+          "objectives": [
+            "实现线性查找与二分查找",
+            "说明二分查找的前提与边界处理",
+            "在答案空间上做二分"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch04"
+          ],
+          "estimated_minutes": 70,
+          "markdown_path": "books/senior-algorithms/chapters/05.md",
+          "answers_path": "answers/senior-algorithms/05.json",
+          "knowledge_points": [
+            "线性查找",
+            "二分查找的前提",
+            "边界的处理",
+            "二分答案"
+          ],
+          "references": [
+            {
+              "title": "可汗学院算法课程",
+              "url": "https://www.khanacademy.org/computing/computer-science/algorithms",
+              "purpose": "核对外排序、递归与图的基本讲解"
+            },
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch06",
+          "order": 6,
+          "title": "排序算法",
+          "objectives": [
+            "实现冒泡、插入、归并与快速排序",
+            "说明各算法的复杂度与稳定性",
+            "根据数据特征选择合适的排序方法"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch05"
+          ],
+          "estimated_minutes": 75,
+          "markdown_path": "books/senior-algorithms/chapters/06.md",
+          "answers_path": "answers/senior-algorithms/06.json",
+          "knowledge_points": [
+            "比较排序的下界",
+            "简单排序算法",
+            "分治排序",
+            "稳定性与选择"
+          ],
+          "references": [
+            {
+              "title": "可汗学院排序算法专题",
+              "url": "https://www.khanacademy.org/computing/computer-science/algorithms/sorting-algorithms/a/sorting",
+              "purpose": "核对排序算法的比较与交换过程图示"
+            },
+            {
+              "title": "cppreference 标准算法库",
+              "url": "https://en.cppreference.com/w/cpp/algorithm",
+              "purpose": "对照排序与查找算法的标准定义与复杂度"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch07",
+          "order": 7,
+          "title": "递归与分治",
+          "objectives": [
+            "写出含基线条件的递归函数",
+            "分析递归的调用栈与复杂度",
+            "用分治把问题拆成子问题"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch06"
+          ],
+          "estimated_minutes": 70,
+          "markdown_path": "books/senior-algorithms/chapters/07.md",
+          "answers_path": "answers/senior-algorithms/07.json",
+          "knowledge_points": [
+            "递归的两个要素",
+            "调用栈",
+            "递归树与复杂度",
+            "分治策略"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "可汗学院算法课程",
+              "url": "https://www.khanacademy.org/computing/computer-science/algorithms",
+              "purpose": "核对外排序、递归与图的基本讲解"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch08",
+          "order": 8,
+          "title": "树与二叉树",
+          "objectives": [
+            "实现二叉树的遍历",
+            "说明二叉搜索树的性质与退化",
+            "用堆维护最值"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch07"
+          ],
+          "estimated_minutes": 75,
+          "markdown_path": "books/senior-algorithms/chapters/08.md",
+          "answers_path": "answers/senior-algorithms/08.json",
+          "knowledge_points": [
+            "树的结构",
+            "二叉树的遍历",
+            "二叉搜索树",
+            "堆与优先队列"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "cppreference 标准算法库",
+              "url": "https://en.cppreference.com/w/cpp/algorithm",
+              "purpose": "对照排序与查找算法的标准定义与复杂度"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch09",
+          "order": 9,
+          "title": "图与图的遍历",
+          "objectives": [
+            "用邻接表与邻接矩阵表示图",
+            "实现深度优先与广度优先遍历",
+            "用拓扑排序处理依赖关系"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch08"
+          ],
+          "estimated_minutes": 80,
+          "markdown_path": "books/senior-algorithms/chapters/09.md",
+          "answers_path": "answers/senior-algorithms/09.json",
+          "knowledge_points": [
+            "图的表示",
+            "深度优先遍历",
+            "广度优先遍历",
+            "拓扑排序与最短路径初步"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "可汗学院算法课程",
+              "url": "https://www.khanacademy.org/computing/computer-science/algorithms",
+              "purpose": "核对外排序、递归与图的基本讲解"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch10",
+          "order": 10,
+          "title": "贪心算法",
+          "objectives": [
+            "说明贪心选择成立的条件",
+            "为区间调度问题设计贪心策略",
+            "举出贪心失效的反例"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch09"
+          ],
+          "estimated_minutes": 75,
+          "markdown_path": "books/senior-algorithms/chapters/10.md",
+          "answers_path": "answers/senior-algorithms/10.json",
+          "knowledge_points": [
+            "贪心的思想",
+            "局部最优与全局最优",
+            "区间调度",
+            "贪心失效的反例"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "cppreference 标准算法库",
+              "url": "https://en.cppreference.com/w/cpp/algorithm",
+              "purpose": "对照排序与查找算法的标准定义与复杂度"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch11",
+          "order": 11,
+          "title": "动态规划",
+          "objectives": [
+            "写出状态与转移方程",
+            "用记忆化与自底向上两种方式实现",
+            "区分动态规划与贪心的适用条件"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch10"
+          ],
+          "estimated_minutes": 85,
+          "markdown_path": "books/senior-algorithms/chapters/11.md",
+          "answers_path": "answers/senior-algorithms/11.json",
+          "knowledge_points": [
+            "重叠子问题",
+            "状态与转移",
+            "记忆化与制表",
+            "空间优化与取舍"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "cppreference 标准算法库",
+              "url": "https://en.cppreference.com/w/cpp/algorithm",
+              "purpose": "对照排序与查找算法的标准定义与复杂度"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-algorithms-ch12",
+          "order": 12,
+          "title": "综合项目：一个可扩展的行程规划器",
+          "objectives": [
+            "综合运用图、堆与动态规划",
+            "为方案写出复杂度分析",
+            "用边界输入检验程序的正确性"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-algorithms-ch08",
+            "senior-algorithms-ch11"
+          ],
+          "estimated_minutes": 90,
+          "markdown_path": "books/senior-algorithms/chapters/12.md",
+          "answers_path": "answers/senior-algorithms/12.json",
+          "knowledge_points": [
+            "问题建模",
+            "选择数据结构",
+            "实现与测试",
+            "复杂度分析与改进"
+          ],
+          "references": [
+            {
+              "title": "MIT OCW 6.006 算法导论",
+              "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+              "purpose": "对照复杂度与数据结构的讲授顺序"
+            },
+            {
+              "title": "Python 3 标准库参考",
+              "url": "https://docs.python.org/3/library/",
+              "purpose": "核对标准库模块的名称、参数与返回行为"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "book_id": "senior-ai",
+      "title": "机器学习原理与应用",
+      "stage_group": "SENIOR",
+      "grade_min": 10,
+      "grade_max": 12,
+      "description": "本书面向高中十至十二年级，讲清机器学习的基本原理、适用条件和误差来源。全书从学习问题的形式化定义开始，补齐必要的数学工具，再依次讲解特征工程、数据划分、线性预测与分类、树模型、聚类、神经网络直觉、模型评估与过拟合，最后讨论生成式人工智能与责任。书中坚持把训练集、验证集、测试集的用途分清，明确禁止数据泄漏，不在没有依据时宣称准确率。数学部分给出可代入的数值算例并逐项核对，代码部分以Python 为主并注明第三方库的版本要求。读完本书，学生能够把一个现实问题转化为机器学习任务，选择合适的模型与评估指标，并诚实说明结果的局限。",
+      "prerequisites": [
+        "掌握 Python 编程与列表、字典的使用",
+        "理解函数、斜率与向量的基本概念",
+        "了解平均数与标准差"
+      ],
+      "learning_outcomes": [
+        "把现实问题表述为监督或无监督的学习任务",
+        "用向量、矩阵和导数描述模型与损失函数",
+        "构造并筛选特征，避免数据泄漏",
+        "正确划分训练集、验证集与测试集",
+        "实现并用库训练线性回归与逻辑回归模型",
+        "解释决策树、随机森林与聚类的基本原理",
+        "说明神经网络前向传播与梯度下降的直觉",
+        "选择合适的评估指标并诊断过拟合与欠拟合"
+      ],
+      "preface_path": "books/senior-ai/preface.md",
+      "chapters": [
+        {
+          "chapter_id": "senior-ai-ch01",
+          "order": 1,
+          "title": "机器学习解决什么问题",
+          "objectives": [
+            "区分监督学习与无监督学习",
+            "把现实问题表述为学习任务",
+            "说明机器学习不适合解决哪些问题"
+          ],
+          "prerequisite_chapter_ids": [],
+          "estimated_minutes": 60,
+          "markdown_path": "books/senior-ai/chapters/01.md",
+          "answers_path": "answers/senior-ai/01.json",
+          "knowledge_points": [
+            "从规则到学习",
+            "监督学习",
+            "无监督学习",
+            "问题的边界"
+          ],
+          "references": [
+            {
+              "title": "Google 机器学习速成课程",
+              "url": "https://developers.google.com/machine-learning/crash-course",
+              "purpose": "核对机器学习核心概念的入门表述"
+            },
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch02",
+          "order": 2,
+          "title": "必要的数学工具",
+          "objectives": [
+            "用向量和矩阵表示数据",
+            "计算向量的点积与距离",
+            "用导数说明损失函数下降的方向"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch01"
+          ],
+          "estimated_minutes": 70,
+          "markdown_path": "books/senior-ai/chapters/02.md",
+          "answers_path": "answers/senior-ai/02.json",
+          "knowledge_points": [
+            "向量与矩阵",
+            "距离与相似度",
+            "函数与导数",
+            "概率的基本概念"
+          ],
+          "references": [
+            {
+              "title": "NumPy 用户指南",
+              "url": "https://numpy.org/doc/stable/user/",
+              "purpose": "核对数组运算与广播规则"
+            },
+            {
+              "title": "Google 机器学习速成课程：线性回归",
+              "url": "https://developers.google.com/machine-learning/crash-course/linear-regression",
+              "purpose": "核对线性模型的损失函数与梯度下降说明"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch03",
+          "order": 3,
+          "title": "特征工程",
+          "objectives": [
+            "把原始数据转换成数值特征",
+            "对特征做标准化与归一化",
+            "识别并处理数据泄漏"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch02"
+          ],
+          "estimated_minutes": 70,
+          "markdown_path": "books/senior-ai/chapters/03.md",
+          "answers_path": "answers/senior-ai/03.json",
+          "knowledge_points": [
+            "特征的类型",
+            "编码与缩放",
+            "特征组合与选择",
+            "数据泄漏的识别"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            },
+            {
+              "title": "Kaggle Learn 数据科学微课程",
+              "url": "https://www.kaggle.com/learn",
+              "purpose": "核对数据处理与建模的入门教学顺序"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch04",
+          "order": 4,
+          "title": "划分数据",
+          "objectives": [
+            "正确划分训练集、验证集与测试集",
+            "使用交叉验证估计泛化能力",
+            "说明各数据集的用途不可混用"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch03"
+          ],
+          "estimated_minutes": 65,
+          "markdown_path": "books/senior-ai/chapters/04.md",
+          "answers_path": "answers/senior-ai/04.json",
+          "knowledge_points": [
+            "三个数据集的分工",
+            "留出法与交叉验证",
+            "分布偏移",
+            "划分的常见错误"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 交叉验证文档",
+              "url": "https://scikit-learn.org/stable/modules/cross_validation.html",
+              "purpose": "核对训练集、验证集与测试集的正确划分方式"
+            },
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch05",
+          "order": 5,
+          "title": "线性回归",
+          "objectives": [
+            "写出线性模型与均方误差",
+            "用梯度下降求解参数",
+            "解释正则化如何抑制过拟合"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch04"
+          ],
+          "estimated_minutes": 75,
+          "markdown_path": "books/senior-ai/chapters/05.md",
+          "answers_path": "answers/senior-ai/05.json",
+          "knowledge_points": [
+            "线性模型的形式",
+            "损失函数",
+            "梯度下降",
+            "正则化"
+          ],
+          "references": [
+            {
+              "title": "Google 机器学习速成课程：线性回归",
+              "url": "https://developers.google.com/machine-learning/crash-course/linear-regression",
+              "purpose": "核对线性模型的损失函数与梯度下降说明"
+            },
+            {
+              "title": "scikit-learn 线性模型文档",
+              "url": "https://scikit-learn.org/stable/modules/linear_model.html",
+              "purpose": "核对线性回归与正则化的数学定义与参数"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch06",
+          "order": 6,
+          "title": "分类与逻辑回归",
+          "objectives": [
+            "说明逻辑回归如何输出概率",
+            "用阈值把概率转成类别",
+            "解释精确率与召回率的取舍"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch05"
+          ],
+          "estimated_minutes": 75,
+          "markdown_path": "books/senior-ai/chapters/06.md",
+          "answers_path": "answers/senior-ai/06.json",
+          "knowledge_points": [
+            "分类与概率",
+            "sigmoid 函数",
+            "决策阈值",
+            "类别不平衡"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 线性模型文档",
+              "url": "https://scikit-learn.org/stable/modules/linear_model.html",
+              "purpose": "核对线性回归与正则化的数学定义与参数"
+            },
+            {
+              "title": "scikit-learn 模型评估文档",
+              "url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+              "purpose": "核对准确率、精确率、召回率与混淆矩阵的定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch07",
+          "order": 7,
+          "title": "决策树与集成方法",
+          "objectives": [
+            "说明决策树如何选择划分特征",
+            "用信息增益或基尼指数理解划分",
+            "解释随机森林为什么更稳定"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch06"
+          ],
+          "estimated_minutes": 75,
+          "markdown_path": "books/senior-ai/chapters/07.md",
+          "answers_path": "answers/senior-ai/07.json",
+          "knowledge_points": [
+            "决策树的划分准则",
+            "剪枝与深度控制",
+            "集成与随机森林",
+            "特征重要性"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 决策树文档",
+              "url": "https://scikit-learn.org/stable/modules/tree.html",
+              "purpose": "核对决策树的划分准则与剪枝参数"
+            },
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch08",
+          "order": 8,
+          "title": "聚类",
+          "objectives": [
+            "用 k 均值把数据分组",
+            "说明簇数选择的依据",
+            "评估聚类结果的好坏"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch07"
+          ],
+          "estimated_minutes": 70,
+          "markdown_path": "books/senior-ai/chapters/08.md",
+          "answers_path": "answers/senior-ai/08.json",
+          "knowledge_points": [
+            "无监督的任务",
+            "k 均值算法",
+            "簇数的选择",
+            "聚类的评估"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 聚类文档",
+              "url": "https://scikit-learn.org/stable/modules/clustering.html",
+              "purpose": "核对聚类算法与轮廓系数的定义"
+            },
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch09",
+          "order": 9,
+          "title": "神经网络的直觉",
+          "objectives": [
+            "说明神经元如何加权求和并激活",
+            "描述前向传播与反向传播的流程",
+            "解释为什么深层网络需要非线性"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch08"
+          ],
+          "estimated_minutes": 80,
+          "markdown_path": "books/senior-ai/chapters/09.md",
+          "answers_path": "answers/senior-ai/09.json",
+          "knowledge_points": [
+            "神经元与激活函数",
+            "前向传播",
+            "损失与反向传播",
+            "深度与非线性"
+          ],
+          "references": [
+            {
+              "title": "TensorFlow 官方教程",
+              "url": "https://www.tensorflow.org/tutorials",
+              "purpose": "核对神经网络训练流程的官方实现说明"
+            },
+            {
+              "title": "TensorFlow 图像分类教程",
+              "url": "https://www.tensorflow.org/tutorials/keras/classification",
+              "purpose": "核对分类网络的训练与评估步骤"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch10",
+          "order": 10,
+          "title": "评估与过拟合",
+          "objectives": [
+            "区分过拟合与欠拟合",
+            "用学习曲线诊断模型",
+            "选择合适的评估指标"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch09"
+          ],
+          "estimated_minutes": 75,
+          "markdown_path": "books/senior-ai/chapters/10.md",
+          "answers_path": "answers/senior-ai/10.json",
+          "knowledge_points": [
+            "偏差与方差的权衡",
+            "学习曲线",
+            "正则化与早停",
+            "指标的选择"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 模型评估文档",
+              "url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+              "purpose": "核对准确率、精确率、召回率与混淆矩阵的定义"
+            },
+            {
+              "title": "scikit-learn 交叉验证文档",
+              "url": "https://scikit-learn.org/stable/modules/cross_validation.html",
+              "purpose": "核对训练集、验证集与测试集的正确划分方式"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch11",
+          "order": 11,
+          "title": "生成式人工智能与责任",
+          "objectives": [
+            "说明生成式模型的基本工作方式",
+            "指出生成内容的可靠性风险",
+            "说出使用人工智能时的责任边界"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch10"
+          ],
+          "estimated_minutes": 70,
+          "markdown_path": "books/senior-ai/chapters/11.md",
+          "answers_path": "answers/senior-ai/11.json",
+          "knowledge_points": [
+            "生成式模型的工作原理",
+            "幻觉与事实核查",
+            "隐私与版权",
+            "责任与披露"
+          ],
+          "references": [
+            {
+              "title": "NIST 人工智能风险管理框架",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+              "purpose": "核对人工智能偏差、风险与治理的权威表述"
+            },
+            {
+              "title": "OECD 人工智能原则",
+              "url": "https://oecd.ai/en/ai-principles",
+              "purpose": "核对负责任使用人工智能的原则性说明"
+            }
+          ]
+        },
+        {
+          "chapter_id": "senior-ai-ch12",
+          "order": 12,
+          "title": "综合项目：一个诚实的预测系统",
+          "objectives": [
+            "完整走完从问题到评估的流程",
+            "写清数据划分与评估协议",
+            "在报告中标注局限与失败案例"
+          ],
+          "prerequisite_chapter_ids": [
+            "senior-ai-ch09",
+            "senior-ai-ch11"
+          ],
+          "estimated_minutes": 90,
+          "markdown_path": "books/senior-ai/chapters/12.md",
+          "answers_path": "answers/senior-ai/12.json",
+          "knowledge_points": [
+            "问题定义",
+            "数据与特征",
+            "建模与调参",
+            "评估与报告"
+          ],
+          "references": [
+            {
+              "title": "scikit-learn 用户指南",
+              "url": "https://scikit-learn.org/stable/user_guide.html",
+              "purpose": "核对训练测试划分与模型接口的官方定义"
+            },
+            {
+              "title": "scikit-learn 模型评估文档",
+              "url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+              "purpose": "核对准确率、精确率、召回率与混淆矩阵的定义"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

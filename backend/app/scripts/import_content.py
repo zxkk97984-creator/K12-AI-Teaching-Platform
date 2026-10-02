@@ -34,6 +34,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.config import Settings
 from app.core.database import get_engine
+from app.modules.content.book_import import convert_books, validate_books
 from app.modules.content.importer import ContentImportError, import_package
 from app.modules.content.legacy import convert_course
 from app.modules.content.markdown_import import convert_markdown
@@ -106,6 +107,13 @@ def main(argv: list[str] | None = None) -> int:
     markdown.add_argument("--source-dir", type=Path, required=True)
     markdown.add_argument("--output-dir", type=Path, required=True)
 
+    books = sub.add_parser("books", help="validate or convert original textbook exchange data")
+    books.add_argument("--source-dir", type=Path, required=True)
+    books.add_argument("--zip", type=Path, default=None)
+    books.add_argument(
+        "--output-dir", type=Path, default=None, help="omit for read-only validation"
+    )
+
     convert = sub.add_parser("convert", help="convert legacy chapters into source files")
     convert.add_argument("--course-file", action="append", default=None)
     convert.add_argument("--release-dir", default=None)
@@ -125,6 +133,18 @@ def main(argv: list[str] | None = None) -> int:
     importer.set_defaults(handler=None)
 
     args = parser.parse_args(argv)
+    if args.command == "books":
+        try:
+            result = (
+                convert_books(args.source_dir, args.output_dir, args.zip)
+                if args.output_dir
+                else validate_books(args.source_dir, args.zip).report()
+            )
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        except (PackageValidationError, OSError, ValueError) as exc:
+            print(f"BOOK VALIDATION FAILED: {exc}", file=sys.stderr)
+            return 2
     if args.command == "convert-md":
         print(json.dumps(convert_markdown(args.source_dir, args.output_dir), ensure_ascii=False))
         return 0
