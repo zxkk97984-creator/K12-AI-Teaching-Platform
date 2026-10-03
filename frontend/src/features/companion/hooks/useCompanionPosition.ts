@@ -15,10 +15,10 @@ import {
 } from "../lib/geometry";
 import type { CompanionAiState } from "../types";
 
-function clampCompact(x: number, y: number): Point {
+function clampCompact(x: number, y: number, size = 44, minimumTop = 8): Point {
   return {
-    x: Math.max(12, Math.min(x, window.innerWidth - 56)),
-    y: Math.max(8, Math.min(y, window.innerHeight - (window.innerWidth < 768 ? 132 : 56))),
+    x: Math.max(12, Math.min(x, window.innerWidth - size - 12)),
+    y: Math.max(minimumTop, Math.min(y, window.innerHeight - (window.innerWidth < 768 ? 132 : 56))),
   };
 }
 
@@ -31,7 +31,7 @@ export function useCompanionPosition(userId: string, parkingTarget?: string, avo
       const p = JSON.parse(localStorage.getItem(key) ?? "null");
       if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) {
         manuallyPlaced.current = p.manual !== false;
-        if (parkingTarget) return clampCompact(p.x, p.y);
+        if (parkingTarget) return clampCompact(p.x, p.y, avoidSelectors ? 48 : 44);
         return p.viewport && Number.isFinite(p.viewport.width) && Number.isFinite(p.viewport.height)
           ? remapDockPosition(p, p.viewport)
           : clampDock(p.x, p.y);
@@ -46,9 +46,11 @@ export function useCompanionPosition(userId: string, parkingTarget?: string, avo
   const current = useRef(position);
   const [parkingPosition, setParkingPosition] = useState<Point | null>(null);
   const [parked, setParked] = useState(false);
-  const effectivePosition = parkingTarget && parked && parkingPosition ? parkingPosition : position;
+  const effectivePosition = parkingTarget && parked && parkingPosition
+    ? clampCompact(parkingPosition.x, parkingPosition.y, avoidSelectors ? 48 : 44, 0)
+    : parkingTarget ? position : clampDock(position.x, position.y);
   const clampPosition = (x: number, y: number): Point => parkingTarget
-    ? clampCompact(x, y)
+    ? clampCompact(x, y, avoidSelectors ? 48 : 44)
     : clampDock(x, y);
   const previousViewport = useRef({ width: window.innerWidth, height: window.innerHeight });
   const drag = useRef<{
@@ -72,36 +74,38 @@ export function useCompanionPosition(userId: string, parkingTarget?: string, avo
     if (!parkingTarget) { setParked(false); move(clampDock(current.current.x, current.current.y)); return; }
     const update = () => {
       const slot = document.querySelector(parkingTarget);
-      if (!slot) return;
+      if (!slot) { setParked(false); return; }
       const bounds = slot.getBoundingClientRect();
-      if (!bounds.width) return;
+      if (!bounds.width) { setParked(false); return; }
       setParkingPosition(previous => previous?.x === bounds.left && previous.y === bounds.top ? previous : { x: bounds.left, y: bounds.top });
       const p = current.current;
       const intersectsControls = [...document.querySelectorAll(avoidSelectors ?? ".codelab-workspace-toolbar, .codelab-editor, .codelab-result-panel, .codelab-workspace-actions, .codelab-filters, .codelab-bank-heading, .codelab-task-list")].some((element) => {
         const r = element.getBoundingClientRect();
-        return r.width > 0 && r.height > 0 && p.x < r.right && p.x + (avoidSelectors ? 64 : 44) > r.left && p.y < r.bottom && p.y + (avoidSelectors ? 64 : 44) > r.top;
+        return r.width > 0 && r.height > 0 && p.x < r.right && p.x + (avoidSelectors ? 48 : 44) > r.left && p.y < r.bottom && p.y + (avoidSelectors ? 48 : 44) > r.top;
       });
       setParked(!manuallyPlaced.current || intersectsControls);
     };
     repark.current = update;
     update();
-    const observer = new ResizeObserver(update);
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
     const slot = document.querySelector(parkingTarget);
-    if (slot) observer.observe(slot);
+    if (slot) observer?.observe(slot);
     const mutations = new MutationObserver(update);
     // CodeLab's controls mount after its lazy bundle and data arrive.
     mutations.observe(document.body, {childList: true, subtree: true, ...(avoidSelectors ? {attributes: true, attributeFilter: ["class", "data-panel-open", "data-interactive-focused"]} : {})});
     window.addEventListener("resize", update);
-    return () => { observer.disconnect(); mutations.disconnect(); repark.current = () => {}; window.removeEventListener("resize", update); };
+    window.addEventListener("scroll", update, { passive: true, capture: true });
+    return () => { observer?.disconnect(); mutations.disconnect(); repark.current = () => {}; window.removeEventListener("resize", update); window.removeEventListener("scroll", update, true); };
   }, [parkingTarget, key, avoidSelectors]);
   useEffect(() => {
     const resize = () => {
-      move(parkingTarget ? clampCompact(current.current.x, current.current.y) : remapDockPosition(current.current, previousViewport.current), manuallyPlaced.current);
+      move(parkingTarget ? clampCompact(current.current.x, current.current.y, avoidSelectors ? 48 : 44) : remapDockPosition(current.current, previousViewport.current), manuallyPlaced.current);
       previousViewport.current = { width: window.innerWidth, height: window.innerHeight };
+      repark.current();
     };
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
-  }, [key, parkingTarget]);
+  }, [key, parkingTarget, avoidSelectors]);
   const pointerDown = (event: PointerEvent<HTMLButtonElement>) => {
     if (event.button !== 0) return;
     drag.current = {

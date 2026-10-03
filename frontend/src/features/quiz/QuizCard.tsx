@@ -38,9 +38,9 @@ function textFor(question: QuizQuestionDTO, key: unknown): string {
   return item ? item.text : asString;
 }
 
-function describeCorrectAnswer(question: QuizQuestionDTO, answer: unknown): string {
+export function describeQuizAnswer(question: QuizQuestionDTO, answer: unknown): string {
   if (question.type === "TRUE_FALSE") {
-    return answer === true ? "对" : answer === false ? "错" : "（服务器未给出）";
+    return answer === true ? "对" : answer === false ? "错" : "暂无参考答案";
   }
   if (question.type === "ORDERING" && Array.isArray(answer)) {
     return answer.map((key) => textFor(question, key)).join(" → ");
@@ -62,7 +62,6 @@ export function QuizCard({
   error,
 }: Props) {
   const groupName = useId();
-  const hintId = useId();
   const [orderNote, setOrderNote] = useState<string | null>(null);
   const rowRefs = useRef<Record<string, HTMLLIElement | null>>({});
 
@@ -97,9 +96,10 @@ export function QuizCard({
    * which is exactly what the frozen T16 scoring contract accepts. */
   function choiceControl(key: string, text: string, emits: QuizAnswer) {
     return (
-      <label className="quiz-choice" key={key} data-testid={`choice-${key}`}>
+      <label className="quiz-choice" key={key} data-testid={`choice-${key}`} data-answer-state={feedback?.correct_answer === emits ? "correct" : (typeof emits === "boolean" ? value === emits : value === key) ? feedback?.is_correct === false ? "incorrect" : "selected" : "idle"}>
         <input
           type="radio"
+          aria-label={text}
           name={groupName}
           value={key}
           checked={typeof emits === "boolean" ? value === emits : value === key}
@@ -107,6 +107,7 @@ export function QuizCard({
           onChange={() => onChange(emits)}
         />
         <span>{text}</span>
+        {feedback?.correct_answer === emits ? <small>✓ 正确答案</small> : (typeof emits === "boolean" ? value === emits : value === key) ? <small>{feedback?.is_correct === false ? "✗ 你的选择" : "你的选择"}</small> : null}
       </label>
     );
   }
@@ -121,17 +122,8 @@ export function QuizCard({
           {question.stem}
         </h2>
         <p className="quiz-card__meta" data-testid="quiz-attempts">
-          服务器记录：已作答 {question.attempts_used} 次，最多 {question.max_attempts} 次
+          已作答 {question.attempts_used} 次 · 剩余 {attemptsLeft} 次机会
         </p>
-        {question.source_refs.length > 0 ? (
-          <ul className="quiz-card__sources" aria-label="题目来源">
-            {question.source_refs.map((ref) => (
-              <li key={`${ref.source_id}:${ref.locator}`}>
-                {ref.source_id.startsWith("conversation:") ? "本段 AI 教师讲解" : ref.source_id.startsWith("chapter:") ? "课程章节内容" : "学习资料"}
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </header>
 
       <div className="quiz-card__answer">
@@ -195,7 +187,7 @@ export function QuizCard({
               })}
             </ol>
             <p className="quiz-card__note" data-testid="order-note" aria-live="polite">
-              {orderNote ?? "排好后点「提交答案」，顺序由服务器判定。"}
+              {orderNote ?? "排好后点「提交答案」。"}
             </p>
           </>
         ) : null}
@@ -217,16 +209,17 @@ export function QuizCard({
         ) : null}
       </div>
 
-      <div className="quiz-card__tools">
+      {!disabled ? <div className="quiz-card__tools">
         <button
           type="button"
+          className="secondary"
           data-testid="quiz-hint"
           onClick={onHint}
           disabled={locked || hintsLeft <= 0 || question.hints_used >= question.hint_limit}
         >
           {question.hints_used >= question.hint_limit
             ? "提示已用完"
-            : `看提示（服务器记录 ${question.hints_used}/${question.hint_limit}）`}
+            : hintPending ? "正在获取提示…" : `看提示（剩余 ${hintsLeft} 次）`}
         </button>
         {canAnswerAgain ? (
           <button
@@ -238,10 +231,9 @@ export function QuizCard({
             {submitting ? "正在提交…" : answered ? "再提交一次" : "提交答案"}
           </button>
         ) : null}
-      </div>
-      <p className="quiz-card__note" id={hintId}>
-        判分、提示次数和作答次数都由服务器决定，本页不会自己判对错。
-      </p>
+      </div> : null}
+
+      {question.source_refs.length > 0 ? <details className="quiz-card__source-details"><summary>题目来源</summary><ul className="quiz-card__sources" aria-label="题目来源">{question.source_refs.map(ref => <li key={`${ref.source_id}:${ref.locator}`}>{ref.source_id.startsWith("conversation:") ? "本段 AI 教师讲解" : ref.source_id.startsWith("chapter:") ? "课程章节内容" : "学习资料"}</li>)}</ul></details> : null}
 
       {question.hints.length > 0 ? (
         <section className="quiz-hints" aria-label="已释放的提示" data-testid="quiz-hints">
@@ -272,11 +264,11 @@ export function QuizCard({
         >
           <p className="quiz-feedback__verdict" data-testid="quiz-verdict">
             <span aria-hidden="true">{feedback.is_correct ? "✓" : "✗"}</span>{" "}
-            {feedback.is_correct ? "答对了（服务器判定）" : "这次没答对（服务器判定）"}
+            {feedback.is_correct ? "答对了！" : "这次没答对，再看看解析。"}
           </p>
           {!feedback.is_correct ? (
             <p data-testid="quiz-correct-answer">
-              正确答案：{describeCorrectAnswer(question, feedback.correct_answer)}
+              正确答案：{describeQuizAnswer(question, feedback.correct_answer)}
             </p>
           ) : null}
           <p data-testid="quiz-explanation">{feedback.explanation}</p>
@@ -286,7 +278,7 @@ export function QuizCard({
               ? `，还可以再试 ${attemptsLeft} 次`
               : ""}
             {!feedback.is_correct && !canAnswerAgain
-              ? "；本组练习已经结束，可以回课堂或再做一组。"
+              ? "；本组练习已结束，可以查看结果或再练一次。"
               : ""}
           </p>
         </section>

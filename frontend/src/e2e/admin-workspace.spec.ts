@@ -426,7 +426,9 @@ test("desktop and narrow workspaces have one active nav and no overflow or runti
   ]) {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(path);
-    await expect(page.locator("main h1")).toBeVisible();
+    await expect(page.locator(".app-topbar h1")).toHaveCount(1);
+    await expect(page.locator("main h1")).toHaveCount(0);
+    await expect(page.locator("main").getByText(/^正在.*…$/)).toHaveCount(0);
     const activeCount = path === "/admin/authoring" ? 0 : 1;
     await expect(
       page.locator('.app-sidebar-nav a[aria-current="page"]'),

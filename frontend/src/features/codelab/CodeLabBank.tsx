@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { StatePanel } from "../../shared/ui/state";
 import { CodeLabBackButton } from "./CodeLabBackButton";
 import type { CodeTask } from "./types";
@@ -84,14 +85,11 @@ export function CodeLabBank({
   onPrevious,
 }: Props) {
   const pageCount = Math.max(1, Math.ceil(total / limit));
-  const title = stage === "JUNIOR" ? "编程入门" : "编程与算法练习";
+  const title = stage === "JUNIOR" ? "编程入门" : "编程实践";
 
   return (
     <main className="codelab-page codelab-bank" data-testid="codelab-page">
-      <header className="codelab-bank-heading">
-        <h1>{title}</h1>
-        <CodeLabBackButton onClick={onPrevious} />
-      </header>
+      <PageHeading title={title} />
 
       <nav className="codelab-tabs" aria-label="编程练习页面">
         <button type="button" aria-current={tab === "bank" ? "page" : undefined} onClick={() => onTab("bank")}>全部题目</button>
@@ -103,6 +101,7 @@ export function CodeLabBank({
         <form className="codelab-search" onSubmit={(event) => { event.preventDefault(); onSearch(); }}>
           <label className="sr-only" htmlFor="codelab-search-input">搜索题目、编号或知识点</label>
           <div>
+            <CodeLabBackButton onClick={onPrevious} />
             <input
               id="codelab-search-input"
               type="search"
@@ -133,13 +132,12 @@ export function CodeLabBank({
               {Object.entries(PROGRESS_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </label>
-          <button type="button" className="secondary" onClick={onClear} disabled={loading}>清除筛选</button>
         </div>
       </section>
 
       <div className="codelab-list-heading">
-        <h2>{tab === "favorites" ? "我的收藏" : "题库"}</h2>
-        <span aria-live="polite">共 {total} 道题</span>
+
+        <span aria-live="polite">共 {total} 道题</span><button type="button" className="secondary" onClick={onClear} disabled={loading}>清除筛选</button>
       </div>
 
       {loading ? <StatePanel tone="loading" title="正在读取题库" description="正在读取当前学段的真实编程任务。" /> : null}
@@ -174,12 +172,12 @@ export function CodeLabBank({
                 {task.progress.best_score !== null ? <small>最高 {task.progress.best_score} / 70</small> : null}
               </div>
               <div className="codelab-task-copy">
-                <h3><button className="codelab-title-link" type="button" onClick={() => onOpenTask(task)}>{task.title}</button></h3>
-                <div className="codelab-task-meta">
+                <h3><button className="codelab-title-link" type="button" aria-label={task.title} onClick={() => onOpenTask(task)}><span>{task.title}</span>
+                <span className="codelab-task-meta">
                   <span>{CATEGORY_LABELS[task.catalog.category ?? ""] ?? "未分类"}</span>
                   {task.catalog.tags.slice(0, 2).map((tag) => <span key={tag} title={tag}>{tag}</span>)}
                   {task.is_test_fixture ? <span className="codelab-fixture-label">合成练习</span> : null}
-                </div>
+                </span></button></h3>
               </div>
               <span className="codelab-difficulty">{DIFFICULTY_LABELS[task.catalog.difficulty ?? ""] ?? "未标注"}</span>
               <div className="codelab-task-actions">

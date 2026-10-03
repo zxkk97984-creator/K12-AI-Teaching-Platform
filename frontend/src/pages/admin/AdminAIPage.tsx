@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { useEffect, useState } from "react";
 import { memoryRequest } from "../../features/growth/memory-api";
 import { useEditingRegistration } from "../../app/editing/EditingGuard";
@@ -409,12 +410,9 @@ export function AdminAIPage() {
   }
   return (
     <main className="admin-resources admin-ai">
-      <header className="admin-page-header">
-        <div>
-          <h1>AI 教师与能力</h1>
-          <p>管理教师分工、学段路由和 Knodo 能力关联。</p>
-        </div>
-      </header>
+      <PageHeading title="AI 教师与能力">
+
+      </PageHeading>
       <div className="admin-ai-savebar">
         <div>
           <strong>

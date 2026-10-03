@@ -6,6 +6,8 @@ import { getContinue, getHistory, getStudentContent, listCatalog } from "../stud
 import { listQuizSummaries } from "../quiz/api";
 import { listInteractive } from "../interactive/api";
 import { listCodeTasks } from "../codelab/api";
+import { getNextStep } from "../learning-next/api";
+import type { NextStepDTO } from "../learning-next/types";
 import { WorkbenchShell } from "./WorkbenchShell";
 import { WorkbenchPage } from "../../pages/workbench/WorkbenchPage";
 import type { MeResponse, Stage } from "../identity/types";
@@ -20,6 +22,7 @@ vi.mock("../study/api", () => ({
 vi.mock("../quiz/api", () => ({ listQuizSummaries: vi.fn() }));
 vi.mock("../interactive/api", () => ({ listInteractive: vi.fn() }));
 vi.mock("../codelab/api", () => ({ listCodeTasks: vi.fn() }));
+vi.mock("../learning-next/api", () => ({ getNextStep: vi.fn(), refreshNextStep: vi.fn() }));
 
 function studentMe(stage: Stage | null = "JUNIOR"): MeResponse {
   return {
@@ -30,6 +33,10 @@ function studentMe(stage: Stage | null = "JUNIOR"): MeResponse {
 }
 
 beforeEach(() => {
+  vi.mocked(getNextStep).mockReset().mockResolvedValue({
+    primary: { kind: "NO_CONTENT", title: "暂无学习建议", reason: "先从课程开始", action: {} },
+    alternatives: [], needs_projection: false,
+  } as unknown as NextStepDTO);
   vi.mocked(getMe).mockReset();
   vi.mocked(listCatalog).mockReset().mockResolvedValue({ items: [], total: 0, limit: 12, offset: 0 });
   vi.mocked(getHistory).mockReset().mockResolvedValue({ items: [], total: 0 } as never);
@@ -50,7 +57,7 @@ function renderHome(me = studentMe()) {
 describe("new student home", () => {
   it("uses its own layout and honest empty state", async () => {
     renderHome();
-    expect(await screen.findByRole("heading", { name: "理解之后，再向前一步" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "学习首页" })).toBeTruthy();
     expect(screen.getByText(/从一次小尝试开始/)).toBeTruthy();
     expect(screen.getByTestId("workbench-shell").classList.contains("study-page")).toBe(false);
     expect(screen.queryByText("在线编程")).toBeNull();
@@ -61,6 +68,13 @@ describe("new student home", () => {
     renderHome();
     expect((await screen.findAllByRole("link", { name: /继续练习/ }))[0]).toHaveProperty("href", expect.stringContaining("/practice/sessions/quiz-1"));
     expect(screen.getAllByText(/已作答 1 \/ 3 题/).length).toBeGreaterThan(0);
+  });
+
+  it("acknowledges completed practice instead of claiming there is no learning history", async () => {
+    vi.mocked(listQuizSummaries).mockResolvedValue({ items: [{ id: "completed-quiz", chapter_id: null, title: "已完成练习", status: "COMPLETED", progress: { answered: 1, correct: 0, total: 1 }, created_at: "2026-10-03T00:00:00Z", completed_at: "2026-10-03T00:01:00Z" }], total: 1 });
+    renderHome();
+    expect(await screen.findByText(/练习和阅读记录已保存/)).toBeTruthy();
+    expect(screen.queryByText(/还没有学习记录/)).toBeNull();
   });
 
   it("renders stage-matched versioned picturebooks from the server", async () => {
@@ -78,6 +92,7 @@ describe("new student home", () => {
   ] as const)("shows a distinct %s learning path", async (stage, heading) => {
     vi.mocked(getStudentContent).mockResolvedValue({ stage, picturebooks: [], guided_animation: null });
     vi.mocked(listInteractive).mockResolvedValue({ stage, items: [] });
+    vi.mocked(listQuizSummaries).mockResolvedValue({ items: [{ id: "stage-quiz", chapter_id: null, title: "已有个人题组", status: "ACTIVE", progress: { answered: 0, correct: 0, total: 1 }, created_at: "2026-10-03T00:00:00Z", completed_at: null }], total: 1 });
     renderHome(studentMe(stage));
     expect(await screen.findByRole("region", { name: heading })).toBeTruthy();
     expect(screen.getByRole("heading", { name: heading })).toBeTruthy();

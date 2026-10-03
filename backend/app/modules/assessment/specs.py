@@ -78,7 +78,7 @@ def conversation_material(snapshot: dict[str, Any]) -> ChapterMaterial:
             {
                 "source_id": f"conversation:{message_id}",
                 "revision": "1",
-                "locator": "validated-assistant-message",
+                "locator": snapshot.get("locator", "validated-assistant-message"),
                 "text": snapshot["text"][:MAX_CONTEXT_TEXT],
             },
         ),
@@ -244,9 +244,23 @@ def build_designer_request(
     chosen_difficulty = difficulty or DEFAULT_DESIGN_DIFFICULTY
     if chosen_difficulty not in policy.allowed_difficulties:  # pragma: no cover - bands allow EASY
         raise DesignerRequestInvalid("默认难度不在策略允许范围内", code="DIFFICULTY_NOT_ALLOWED")
-    chosen_count = question_count or policy.max_quiz_questions
-    if chosen_count < 1 or chosen_count > policy.max_quiz_questions:
-        raise DesignerRequestInvalid("题量超过当前学段策略上限", code="COUNT_NOT_ALLOWED")
+    # The model wire contract is one batch, independent of the student's total.
+    chosen_count = (
+        question_count
+        if question_count is not None
+        else {
+            "PRIMARY_LOWER": 1,
+            "PRIMARY_UPPER": 2,
+            "JUNIOR": 3,
+            "SENIOR": 3,
+        }[material.stage]
+    )
+    if (
+        isinstance(chosen_count, bool)
+        or not isinstance(chosen_count, int)
+        or not 1 <= chosen_count <= 5
+    ):
+        raise DesignerRequestInvalid("单批题量必须为 1–5 题", code="COUNT_NOT_ALLOWED")
 
     # Objective ids stay human-meaningful (the learner's real objective text)
     # and are truncated to the schema bound; opaque local ids are only a

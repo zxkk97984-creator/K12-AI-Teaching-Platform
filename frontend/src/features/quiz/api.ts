@@ -22,7 +22,9 @@ export type StudentGenerationJob = {
   quiz_session_id: string | null;
   source_conversation_id?: string | null;
   source_message_id?: string | null;
-  request_summary?: { topic?: string };
+  chapter_id?: string | null;
+  fixture?: boolean;
+  request_summary?: { topic?: string; count?: number; generated_count?: number; chapter_id?: string | null };
 };
 export type ConversationQuizOptions = {
   stage: string;
@@ -159,6 +161,21 @@ export function getQuizGenerationJob(jobId: string): Promise<{
 
 export function listConversationQuizJobs(conversationId: string): Promise<{ items: StudentGenerationJob[] }> {
   return request(`${API_BASE}/quiz-generation-jobs?conversation_id=${encodeURIComponent(conversationId)}`);
+}
+
+export function generateCompanionQuiz(input: {
+  conversationId: string; message: string; scene: import("../conversation/types").SceneSnapshot;
+  count: number; topic?: string; difficulty: string; idempotencyKey: string;
+}): Promise<{ job: StudentGenerationJob; quiz: QuizSessionDTO | null }> {
+  return request(`${API_BASE}/quiz-generation-jobs`, { method: "POST", body: JSON.stringify({
+    conversation_id: input.conversationId, student_request: input.message,
+    scene: input.scene, ordinary_question_count: input.count,
+    knowledge_point: input.topic, difficulty: input.difficulty, idempotency_key: input.idempotencyKey,
+  }) }, true);
+}
+
+export function retryQuizGeneration(jobId: string): Promise<{ job: StudentGenerationJob }> {
+  return request(`${API_BASE}/quiz-generation-jobs/${encodeURIComponent(jobId)}/retry`, { method: "POST" }, true);
 }
 export function getConversationQuizOptions(): Promise<ConversationQuizOptions> {
   return request(`${API_BASE}/quiz-options/conversation`);

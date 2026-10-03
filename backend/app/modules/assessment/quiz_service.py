@@ -216,8 +216,8 @@ async def create_quiz_session(
 ) -> QuizSession:
     if profile is None or not profile.stage:
         raise QuizRequestRejected("请先完成学段设置再开始练习", code="STAGE_REQUIRED")
-    if source_conversation_id is not None:
-        if chapter_id is not None or revision_id is not None or draft_id is None:
+    if chapter_id is None and source_conversation_id is not None:
+        if revision_id is not None or draft_id is None:
             raise QuizRequestRejected("会话练习来源无效")
         revision = SimpleNamespace(id=None, stage=profile.stage)
         knowledge_points: list[str] = []

@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { useEffect, useState } from "react";
 import { CompanionPetPicker } from "../../features/companion/CompanionPetPicker";
 import { getCompanionPet, type CompanionPetId } from "../../features/companion/lib/sprite";
@@ -8,7 +9,7 @@ import {
   ApiError, deleteAvatar, getMe, logout, patchPreferences, patchProfile, uploadAvatar,
 } from "../../features/identity/api";
 import {
-  gradeLabel, gradeOption, STYLES, TEACHER_STYLES, VOICE_OPTIONS,
+  gradeOption, STYLES, TEACHER_STYLES, VOICE_OPTIONS,
   type MeResponse, type PreferredStyle, type TeacherStyle, type VoicePreference,
 } from "../../features/identity/types";
 import { navigate } from "../../features/identity/session";
@@ -160,22 +161,19 @@ export function SettingsPage() {
   }
 
   if (!me) return <main className="settings-loading" role="status">{error || "正在读取学习设置…"}</main>;
-  if (me.user.role === "admin") return <main className="settings-page settings-page--admin"><h1>管理员账号</h1><p>当前登录账号：{me.user.username}</p><button type="button" onClick={() => void signOut()}>退出登录</button></main>;
+  if (me.user.role === "admin") return <main className="settings-page settings-page--admin"><PageHeading title="管理员账号" /><p>当前登录账号：{me.user.username}</p><button type="button" onClick={() => void signOut()}>退出登录</button></main>;
   if (!me.profile?.onboarding_completed) { navigate("/onboarding"); return null; }
 
   const displayName = me.profile.nickname || me.user.username;
   const selectedPet = getCompanionPet(companionPetId);
   const petChanged = companionPetId !== me.preferences?.companion_pet_id;
   return <main className="settings-page" data-testid="settings-page">
-    <header className="settings-intro">
-      <div><p className="settings-eyebrow">个人设置 / MY SPACE</p><h1>设置你的学习空间</h1><p>选好年级，让霜铃把合适的内容放在你面前。头像与昵称会同步到左侧导航。</p><a className="settings-pet-shortcut" href="#settings-companion-title">选择桌宠形象 ↓</a></div>
-      <span className="settings-current-grade">{gradeLabel(me.profile.grade)}</span>
-    </header>
+    <PageHeading title="学习设置"><a className="settings-pet-shortcut" href="#settings-companion-title">桌宠形象</a></PageHeading>
 
     <div className="settings-grid">
       <div className="settings-main-column">
         <section className="settings-panel settings-profile" aria-labelledby="settings-profile-title">
-          <div className="settings-section-head"><span className="settings-index">01</span><div><h2 id="settings-profile-title">个人资料</h2><p>用你喜欢的名字和头像开始学习。</p></div></div>
+          <div className="settings-section-head"><span className="settings-index">01</span><div><h2 id="settings-profile-title">个人资料</h2></div></div>
           <div className="settings-avatar-row">
             <AccountAvatar me={me} size="large" />
             <div className="settings-avatar-copy"><strong>{displayName}</strong><span>支持 PNG、JPG、WebP；最大 2 MB。图片会裁成正方形。</span><div className="settings-avatar-actions">

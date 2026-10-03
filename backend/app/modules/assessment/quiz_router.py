@@ -50,6 +50,7 @@ from app.modules.identity.dependencies import SessionContext, csrf_dependency, r
 from app.modules.identity.models import LearnerProfile
 from app.modules.learning.policy import build_policy
 from app.modules.teaching.models import ConversationMessage, LessonSession
+from app.modules.teaching.schemas import SceneSnapshot
 
 router = APIRouter(tags=["assessment"])
 
@@ -174,10 +175,12 @@ class StudentGenerationCreate(BaseModel):
     chapter_revision: int | None = Field(default=None, ge=1)
     knowledge_point_ids: list[str] | None = None
     idempotency_key: str = Field(pattern=_IDEMPOTENCY_PATTERN)
-    ordinary_question_count: int | None = Field(default=None, ge=1, le=5)
+    ordinary_question_count: int | None = Field(default=None, ge=1, le=20, strict=True)
     ordinary_question_types: list[str] | None = None
     difficulty: str | None = None
     coding_task_refs: list[dict[str, Any] | str] | None = None
+    student_request: str | None = Field(default=None, min_length=1, max_length=8000)
+    scene: SceneSnapshot | None = None
 
 
 class QuizDraftRequest(BaseModel):
@@ -330,6 +333,29 @@ async def create_student_generation(
     )
     if profile is None or not profile.stage:
         raise HTTPException(status_code=409, detail="STAGE_REQUIRED: 请先完成学段设置")
+    if body.student_request is not None:
+        from app.modules.assessment.companion_generation import enqueue_companion_quiz
+
+        try:
+            job = await enqueue_companion_quiz(
+                db,
+                body=body,
+                profile=profile,
+                owner=context.user,
+                settings=request.app.state.settings,
+            )
+        except ValueError as exc:
+            await db.rollback()
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if job.status == "QUEUED" and request.app.state.settings.assessment_autorun:
+            from app.modules.assessment.service import execute_student_generation
+
+            asyncio.create_task(
+                execute_student_generation(
+                    request.app.state.settings, request.app.state.gateway, job.id
+                )
+            )
+        return {"job": _job_public(job), "quiz": None}
     if body.conversation_id is not None:
         if body.chapter_id is not None or body.message_id is None or not body.knowledge_point:
             raise HTTPException(status_code=422, detail="会话出题需要教师消息和知识点")
@@ -557,6 +583,39 @@ async def list_student_generation_jobs(
     return {"items": [_job_public(job) for job in jobs], "total": len(jobs)}
 
 
+@router.post("/quiz-generation-jobs/{job_id}/retry", dependencies=[Depends(csrf_dependency)])
+async def retry_student_generation(
+    job_id: uuid.UUID,
+    request: Request,
+    context: SessionContext = Depends(require_student),
+    db: AsyncSession = Depends(get_session),
+):
+    job = await db.scalar(
+        select(GenerationJob)
+        .where(
+            GenerationJob.id == job_id,
+            GenerationJob.owner_user_id == context.user.id,
+            GenerationJob.purpose == "STUDENT",
+        )
+        .with_for_update()
+    )
+    if job is None:
+        raise HTTPException(status_code=404, detail="出题任务不存在")
+    if job.status in ("FAILED", "REJECTED"):
+        job.status = "QUEUED"
+        job.error_code = job.error_detail = job.lease_token = None
+        await db.commit()
+        if request.app.state.settings.assessment_autorun:
+            from app.modules.assessment.service import execute_student_generation
+
+            asyncio.create_task(
+                execute_student_generation(
+                    request.app.state.settings, request.app.state.gateway, job.id
+                )
+            )
+    return {"job": _job_public(job)}
+
+
 @router.get("/quiz-generation-jobs/{job_id}")
 async def read_student_generation_job(
     job_id: uuid.UUID,
@@ -643,6 +702,7 @@ async def _public_with_state(db: AsyncSession, *, quiz: QuizSession) -> dict[str
             .order_by(QuizAnswerDraft.updated_at)
         )
     )
+    public["draft_id"] = str(quiz.draft_id) if quiz.draft_id else None
     public["current_position"] = quiz.current_position
     code_rows = await db.execute(
         select(CodeRun.question_id, CodeRun.correctness_status)
@@ -852,15 +912,20 @@ async def list_quiz_sessions(
             limit=limit,
             offset=offset,
         )
-    rows = list(await db.scalars(statement.order_by(QuizSession.created_at.desc()).limit(100)))
+    rows = (
+        await db.execute(
+            statement.with_only_columns(QuizSession, Chapter.title)
+            .outerjoin(Chapter, Chapter.id == QuizSession.chapter_id)
+            .order_by(QuizSession.created_at.desc(), QuizSession.id.desc())
+            .limit(100)
+        )
+    ).all()
     items: list[dict[str, Any]] = []
-    for quiz in rows:
+    for quiz, chapter_title in rows:
         snapshot = await session_snapshot(db, session=quiz)
         public = await _public_with_state(db, quiz=quiz)
         public["title"] = (
-            f"章节练习 · {str(quiz.chapter_id)[:8]}"
-            if quiz.chapter_id
-            else f"{quiz.source_title} · 趣味练习"
+            f"{chapter_title} · 章节练习" if chapter_title else f"{quiz.source_title} · 趣味练习"
         )
         public["has_code"] = any(question.type == "CODE" for question in snapshot["questions"])
         items.append(public)
@@ -1218,6 +1283,7 @@ async def read_quiz_result(
     dependencies=[Depends(csrf_dependency)],
 )
 async def answer_question(
+    request: Request,
     session_id: uuid.UUID,
     question_id: uuid.UUID,
     body: AnswerCreate,
@@ -1237,7 +1303,7 @@ async def answer_question(
     except QuizRequestRejected as caught:
         _raise(caught)
     snapshot = await session_snapshot(db, session=quiz)
-    return {
+    response = {
         "outcome": outcome.outcome,
         "is_correct": outcome.is_correct,
         "attempts_used": outcome.attempts_used,
@@ -1251,6 +1317,24 @@ async def answer_question(
             "total": quiz.question_count,
         },
     }
+
+    if outcome.outcome in {"CORRECT", "INCORRECT"}:
+        # The answer is already committed. A recommendation failure must not
+        # turn a saved, graded answer into a failed submission.
+        from app.modules.recommendation.service import refresh_snapshot
+
+        try:
+            await refresh_snapshot(
+                db, owner_user_id=context.user.id, settings=request.app.state.settings
+            )
+        except Exception:
+            import logging
+
+            await db.rollback()
+            logging.getLogger(__name__).warning(
+                "Recommendation refresh after answer failed", exc_info=True
+            )
+    return response
 
 
 @router.post(

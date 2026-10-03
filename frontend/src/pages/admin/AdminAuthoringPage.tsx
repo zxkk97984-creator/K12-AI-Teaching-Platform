@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ApiError } from "../../features/identity/api";
@@ -389,15 +390,12 @@ export function AdminAuthoringPage() {
 
   return (
     <main className="admin-authoring" data-testid="admin-authoring">
-      <header className="admin-page-header">
-        <div>
-          <h1>教学包历史</h1>
-          <p>查看已有任务、结果与发布记录。当前暂缓新增教学包生成。</p>
-        </div>
+      <PageHeading title="教学包历史">
+
         {generationEnabled && <button type="button" disabled={busy} onClick={() => setCreating(true)}>
           新建草稿任务
         </button>}
-      </header>
+      </PageHeading>
       {notice ? (
         <p
           className="admin-authoring__status"

@@ -60,6 +60,7 @@ class Settings(BaseSettings):
     # Bot Chat streams may spend much longer than a non-streaming operation.
     # This is one bounded attempt, never an automatic retry.
     knodo_stream_timeout_seconds: float = Field(default=300.0, ge=30.0, le=600.0)
+    knodo_designer_timeout_seconds: float = Field(default=300.0, ge=30.0, le=600.0)
     gateway_max_output_bytes: int = Field(default=262144, ge=1024, le=4194304)
     teaching_autorun: bool = True  # API schedules the in-process worker per run
     authoring_autorun: bool = True  # API schedules the in-process Designer worker per job

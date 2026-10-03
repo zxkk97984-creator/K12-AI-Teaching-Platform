@@ -46,12 +46,12 @@ async function request<T>(path: string, init: RequestInit = {}, mutation = false
 export function listResources(options?: {
   chapterRevisionId?: string;
   kind?: ResourceKind;
-}): Promise<ResourceList> {
+}, signal?: AbortSignal): Promise<ResourceList> {
   const params = new URLSearchParams();
   if (options?.chapterRevisionId) params.set("chapter_revision_id", options.chapterRevisionId);
   if (options?.kind) params.set("kind", options.kind);
   const query = params.toString();
-  return request<ResourceList>(`${API_BASE}/resources${query ? `?${query}` : ""}`);
+  return request<ResourceList>(`${API_BASE}/resources${query ? `?${query}` : ""}`, { signal });
 }
 
 export function getResource(resourceId: string): Promise<ResourceSummary> {

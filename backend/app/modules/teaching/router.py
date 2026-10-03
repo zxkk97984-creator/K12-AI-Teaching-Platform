@@ -20,7 +20,11 @@ from app.modules.identity.dependencies import SessionContext, csrf_dependency, r
 from app.modules.identity.models import LearnerProfile
 from app.modules.learning.policy import LearningPolicyError
 from app.modules.learning.service import ensure_policy_snapshot, evidence_summary, snapshot_for
-from app.modules.learning.study_content import bind_interactive_scene, bind_scene
+from app.modules.learning.study_content import (
+    bind_interactive_scene,
+    bind_scene,
+    chapter_scene_context,
+)
 from app.modules.teaching.models import (
     TERMINAL_RUN_STATUSES,
     AgentRun,
@@ -307,6 +311,15 @@ async def create_lesson_turn(
             if scene and scene.get("content_kind") == "INTERACTIVE"
             else bind_scene(scene, stage=session.stage)
         )
+        page_context = await chapter_scene_context(
+            db, scene=scene, profile=profile, settings=request.app.state.settings
+        )
+        if page_context:
+            scene = {
+                **scene,
+                "chapter_title": page_context["chapter"]["title"],
+                "chapter_revision": int(page_context["curriculum_revision"].rsplit(":", 1)[-1]),
+            }
         run, created = await create_turn(
             db,
             user=context.user,
@@ -386,6 +399,15 @@ async def create_conversation_message(
             if scene and scene.get("content_kind") == "INTERACTIVE"
             else bind_scene(scene, stage=session.stage)
         )
+        page_context = await chapter_scene_context(
+            db, scene=scene, profile=profile, settings=request.app.state.settings
+        )
+        if page_context:
+            scene = {
+                **scene,
+                "chapter_title": page_context["chapter"]["title"],
+                "chapter_revision": int(page_context["curriculum_revision"].rsplit(":", 1)[-1]),
+            }
         run, created = await create_turn(
             db,
             user=context.user,

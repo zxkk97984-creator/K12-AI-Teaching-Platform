@@ -5,6 +5,7 @@ import { createLazyPage } from "../../../app/routing/lazyPage";
 import { useConversation } from "../../conversation/ConversationProvider";
 import { CompanionHeadAvatar } from "../CompanionAvatar";
 import { useCompanionPosition } from "../hooks/useCompanionPosition";
+import { useCompanionDisplayMode, type CompanionDisplayMode } from "../hooks/useCompanionDisplayMode";
 import { useCompanionPanel, type PanelGesture } from "../hooks/useCompanionPanel";
 import { COMPANION_PETS } from "../lib/sprite";
 import type { CompanionAiState } from "../types";
@@ -22,29 +23,29 @@ const ConversationCompactOptions = createLazyPage(() => import("../../conversati
 export function Companion({ userId }: { userId: string }) {
   const [pet, selectPet] = useCompanionPet(userId);
   const [open, setOpen] = useState(false);
-  const [minimized, setMinimized] = useState(false);
+  const [displayMode, setDisplayMode] = useCompanionDisplayMode(userId);
+  const minimized = displayMode === "compact";
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [petError, setPetError] = useState("");
   const [narration, setNarration] = useState<{ speaking: boolean; subtitle: string }>({ speaking: false, subtitle: "" });
-  const [narrowViewport, setNarrowViewport] = useState(() => window.innerWidth <= 767);
   const dock = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLElement>(null);
   const location = useLocation();
   const previousPath = useRef(location.pathname);
-  const conversationSurface = ["/conversations", "/lessons"].includes(location.pathname);
   const codeSurface = location.pathname === "/code";
   const interactiveSurface = location.pathname.startsWith("/interactive/");
+  const headerSurface = !interactiveSurface && !codeSurface;
+  const compactAtHeader = minimized && headerSurface;
   const learningTeacher = useLearningTeacher();
   const [learningContext, setLearningContext] = useState("");
 
-  const position = useCompanionPosition(userId, codeSurface ? ".codelab-pet-slot" : undefined);
+  const position = useCompanionPosition(userId, minimized ? codeSurface ? ".codelab-pet-slot" : headerSurface ? ".app-pet-slot" : undefined : undefined, compactAtHeader ? ".app-sidebar, .k12-mobile-nav, .k12-mobile-settings, [data-pet-avoid], .page-toolbar, .history-records, .practice-session, .practice-detail-header, .od-library-tools, .interactive-filters, .interactive-card, .library-book-card, .settings-panel, .memory-tabs, .app-topbar-title, .app-topbar-account, .conv-composer, .conv-quick-prompts" : undefined);
   const panelPosition = useCompanionPanel(open, dock, position.position);
   const { rect } = panelPosition;
   const panelPointerEvents = { onPointerMove: panelPosition.pointerMove, onPointerUp: panelPosition.pointerEnd, onPointerCancel: panelPosition.pointerEnd, onLostPointerCapture: panelPosition.pointerEnd };
   const { controller, run, sending, draft, error } = useConversation();
-  const autoMinimized = useRef(false);
-  const minimizedBeforeAuto = useRef(false);
+  useEffect(() => { void controller.initialize(); }, [controller]);
   const chapterId = location.pathname.startsWith("/chapters/")
     ? location.pathname.split("/")[2]
     : undefined;
@@ -65,6 +66,8 @@ export function Companion({ userId }: { userId: string }) {
       }
       if (context) {
         controller.setPageContext({
+          chapter_id:context.chapter_id ?? context.chapterId, chapter_title:context.chapter_title, chapter_revision:context.chapter_revision,
+          content_block_id:context.content_block_id,
           page_type: context.page_type,
           visible_section: context.visible_section?.slice(0, 200),
           selected_text: context.selected_text?.slice(0, 4000),
@@ -80,31 +83,21 @@ export function Companion({ userId }: { userId: string }) {
           interactive_scene_id: context.interactive_scene_id,
           interactive_prompt_id: context.interactive_prompt_id,
         });
-        if (context.conversationId) {
+        if (context.conversationId && !controller.getSnapshot().detail) {
           void controller.select(context.conversationId).then(() => {
             if (context.suggestedQuestion && !controller.getSnapshot().draft.trim())
               controller.setDraft(context.suggestedQuestion);
           });
           setOpen(true);
-          setMinimized(false);
           setOptionsOpen(false);
           return;
         }
-        const activeChapter = controller.getSnapshot().detail?.chapter_id;
-        const needsNewSession = context.chapterId
-          ? activeChapter !== context.chapterId
-          : Boolean(activeChapter);
-        if (needsNewSession) {
-          void controller.start(context.chapterId).then(() => {
-            if (context.suggestedQuestion && !controller.getSnapshot().draft.trim())
-              controller.setDraft(context.suggestedQuestion);
-          });
-        } else if (context.suggestedQuestion && !controller.getSnapshot().draft.trim()) {
+        // Page context changes within one free conversation.
+        if (context.suggestedQuestion && !controller.getSnapshot().draft.trim())
           controller.setDraft(context.suggestedQuestion);
-        }
+
       }
       setOpen(true);
-      setMinimized(false);
       setOptionsOpen(false);
     };
     window.addEventListener("companion:open", show);
@@ -123,28 +116,9 @@ export function Companion({ userId }: { userId: string }) {
   useEffect(() => {
     if (previousPath.current === location.pathname) return;
     previousPath.current = location.pathname;
-    if (!pinned) setOpen(false);
+    // Keep the dialogue visible and continuous during navigation.
     setOptionsOpen(false);
   }, [location.pathname, pinned]);
-  useEffect(() => {
-    const update = () => setNarrowViewport(window.innerWidth <= 767);
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-  const readingSurface = location.pathname === "/resources" || location.pathname.startsWith("/books/");
-  const mobileConversation = narrowViewport && location.pathname.startsWith("/conversations");
-  useEffect(() => {
-    const shouldMinimize = readingSurface || mobileConversation || narrowViewport || codeSurface;
-    if (shouldMinimize && !autoMinimized.current) {
-      minimizedBeforeAuto.current = minimized;
-      autoMinimized.current = true;
-    }
-    if (shouldMinimize && !open && !minimized) setMinimized(true);
-    if (!shouldMinimize && autoMinimized.current) {
-      autoMinimized.current = false;
-      setMinimized(minimizedBeforeAuto.current);
-    }
-  }, [interactiveSurface, readingSurface, mobileConversation, narrowViewport, codeSurface, open, minimized]);
   const hasRect = Boolean(rect);
   useEffect(() => {
     const element = panel.current;
@@ -187,7 +161,8 @@ export function Companion({ userId }: { userId: string }) {
       <div
         className="companion-dock"
         data-testid="companion-dock"
-        data-minimized={minimized || interactiveSurface || conversationSurface}
+        data-compact={compactAtHeader}
+        data-minimized={minimized}
         style={{
           left: position.position.x,
           top: position.position.y,
@@ -197,14 +172,14 @@ export function Companion({ userId }: { userId: string }) {
           "--codelab-pet-top": `${position.position.y}px`,
         } as CSSProperties}
       >
-        {!minimized && !interactiveSurface && !conversationSurface ? (
+        {!minimized ? (
           <button
+            type="button"
             className="companion-minimize"
-            aria-label="最小化桌宠"
+            aria-label="缩小桌宠"
+            title="缩成头像"
             onClick={() => {
-              setMinimized(true);
-              setOpen(false);
-              setOptionsOpen(false);
+              setDisplayMode("compact");
             }}
           >
             −
@@ -224,16 +199,13 @@ export function Companion({ userId }: { userId: string }) {
           onClick={() => {
             if (!position.wasDragged()) {
               if (interactiveSurface && !open) setLearningContext(learningTeacher.beforeOpen() ?? "");
-              if (!interactiveSurface) setMinimized(false);
               if (open) setOptionsOpen(false);
               setOpen((v) => !v);
             }
           }}
         >
-          {minimized || conversationSurface ? (
-            <CompanionHeadAvatar pet={pet} size={codeSurface ? 36 : 54} />
-          ) : interactiveSurface ? (
-            <CompanionSprite petId={pet.id} state={position.movement ?? state} size={54} />
+          {minimized ? (
+            <CompanionHeadAvatar pet={pet} size={codeSurface ? 36 : headerSurface ? 38 : 54} />
           ) : (
             <>
               <CompanionSprite
@@ -273,6 +245,7 @@ export function Companion({ userId }: { userId: string }) {
           </header>
           {interactiveSurface && learningContext ? <p className="companion-learning-context">结合：{learningContext}</p> : null}
           <div id="companion-extra-options" className="companion-extra-options" hidden={!optionsOpen} style={optionsOpen ? undefined : { display: "none" }}>
+            {optionsOpen ? <label className="companion-picker companion-display-picker">桌宠显示<select aria-label="桌宠显示方式" value={displayMode} onChange={event => setDisplayMode(event.target.value as CompanionDisplayMode)}><option value="compact">头像模式</option><option value="full">全身形象</option></select></label> : null}
             {optionsOpen ? <ConversationCompactOptions chapterId={chapterId} onSelect={() => setOptionsOpen(false)} partnerSettings={<><label className="companion-picker">选择学习伙伴<select value={pet.id} onChange={(event) => { setPetError(""); void selectPet(event.target.value).then(() => setOptionsOpen(false)).catch((caught) => setPetError(caught instanceof Error ? caught.message : "桌宠选择未保存")); }}>{COMPANION_PETS.map((p) => <option key={p.id} value={p.id}>{p.displayName}</option>)}</select></label>{petError && <p role="alert">{petError}</p>}</>} /> : null}
           </div>
           <ConversationContent chapterId={chapterId} compact learningWorkspace={interactiveSurface} beforeSend={interactiveSurface ? learningTeacher.beforeSend : undefined} />

@@ -354,6 +354,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/quiz-generation-jobs/{job_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry Student Generation */
+        post: operations["retry_student_generation_api_v1_quiz_generation_jobs__job_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quiz-generation-jobs/{job_id}": {
         parameters: {
             query?: never;
@@ -2140,6 +2157,8 @@ export interface components {
             id: string;
             /** Run Id */
             run_id?: string | null;
+            /** Source Label */
+            source_label?: string | null;
             /** Role */
             role: string;
             /** Content Markdown */
@@ -2386,6 +2405,8 @@ export interface components {
              * Format: uuid
              */
             session_id: string;
+            /** Source Label */
+            source_label?: string | null;
             /** Operation */
             operation: string;
             /** Status */
@@ -2440,6 +2461,8 @@ export interface components {
             chapter_id?: string | null;
             /** Chapter Title */
             chapter_title?: string | null;
+            /** Chapter Revision */
+            chapter_revision?: number | null;
             /** Content Block Id */
             content_block_id?: string | null;
             /** Visible Section */
@@ -2447,7 +2470,7 @@ export interface components {
             /** Selected Text */
             selected_text?: string | null;
             /** Content Kind */
-            content_kind?: ("PICTUREBOOK" | "GUIDED_ANIMATION" | "INTERACTIVE") | null;
+            content_kind?: ("PICTUREBOOK" | "GUIDED_ANIMATION" | "INTERACTIVE" | "BOOK") | null;
             /** Content Id */
             content_id?: string | null;
             /** Content Version */
@@ -2636,6 +2659,9 @@ export interface components {
             coding_task_refs?: ({
                 [key: string]: unknown;
             } | string)[] | null;
+            /** Student Request */
+            student_request?: string | null;
+            scene?: components["schemas"]["SceneSnapshot"] | null;
         };
         /** TaskAction */
         TaskAction: {
@@ -3641,6 +3667,43 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_student_generation_api_v1_quiz_generation_jobs__job_id__retry_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                Origin?: string | null;
+                "X-CSRF-Token"?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: {
+                sl_csrf?: string | null;
+                sl_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

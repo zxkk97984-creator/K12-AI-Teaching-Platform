@@ -732,7 +732,7 @@ body .app-shell:not(.prototype-app) .auth-card.wide {
   box-shadow: none;
 }
 body .app-shell:not(.prototype-app) .auth-shell {
-  min-height: calc(100dvh - 88px);
+  min-height: calc(100dvh - var(--app-header-height));
   padding: 48px 16px 80px;
   place-items: start center;
 }

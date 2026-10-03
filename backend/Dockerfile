@@ -13,6 +13,7 @@ COPY backend/.venv/lib/python3.12/site-packages /opt/python-site
 WORKDIR /app
 COPY backend ./backend
 COPY curriculum ./curriculum
+COPY frontend/src/features/books/content ./frontend/src/features/books/content
 COPY contracts ./contracts
 COPY platform ./platform
 COPY runner ./runner

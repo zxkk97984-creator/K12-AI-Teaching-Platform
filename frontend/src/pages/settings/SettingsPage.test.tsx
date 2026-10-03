@@ -42,7 +42,7 @@ it("saves nickname, exact grade, matching stage and teacher style", async () => 
     preferences: { ...updatedProfile.preferences!, teacher_style: "SOCRATIC", profile_revision: 2 },
   });
   render(<SettingsPage />);
-  await screen.findByRole("heading", { name: "设置你的学习空间" });
+  await screen.findByRole("heading", { name: "学习设置" });
   fireEvent.change(screen.getByLabelText(/昵称/), { target: { value: "小星" } });
   fireEvent.click(screen.getByRole("radio", { name: "高一" }));
   fireEvent.change(screen.getByLabelText("教师风格"), { target: { value: "SOCRATIC" } });
@@ -52,7 +52,7 @@ it("saves nickname, exact grade, matching stage and teacher style", async () => 
     base_revision: 1, teacher_style: "SOCRATIC", preferred_style: "EXAMPLE",
   })));
   expect(await screen.findByText(/已保存到当前账号/)).toBeTruthy();
-  expect(document.querySelector(".settings-current-grade")?.textContent).toBe("高一");
+  expect((screen.getByRole("radio", { name: "高一" }) as HTMLInputElement).checked).toBe(true);
 });
 
 it("keeps a changed teacher style visible when saving fails", async () => {
@@ -98,7 +98,7 @@ it("shows server-confirmed avatar and allows account-level removal", async () =>
   const upload = vi.spyOn(identityApi, "uploadAvatar").mockResolvedValue(withAvatar);
   const remove = vi.spyOn(identityApi, "deleteAvatar").mockResolvedValue(me);
   render(<SettingsPage />);
-  await screen.findByRole("heading", { name: "设置你的学习空间" });
+  await screen.findByRole("heading", { name: "学习设置" });
   fireEvent.change(document.querySelector("#settings-avatar-file")!, { target: { files: [new File(["png"], "portrait.png", { type: "image/png" })] } });
   await waitFor(() => expect(upload).toHaveBeenCalledOnce());
   expect(await screen.findByText("头像已保存到当前账号。")).toBeTruthy();

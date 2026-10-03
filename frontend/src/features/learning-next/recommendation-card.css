@@ -1,0 +1,12 @@
+.home-recommendation { margin: 0 0 12px; padding: 16px; border: 1px solid #e2d6af; border-radius: 12px; background: #fffcf3; }
+.home-recommendation header,.home-recommendation header>div,.home-recommendation-main,.home-recommendation-alternative { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.home-recommendation header { flex-wrap: wrap; margin-bottom: 8px; }
+.home-recommendation h2 { margin: 0; font-size: 20px; }
+.home-recommendation h3 { margin: 8px 0; font-size: 22px; line-height: 1.4; }
+.home-recommendation p { margin: 0; color: var(--od-muted); line-height: 1.7; overflow-wrap: anywhere; }
+.home-recommendation header a,.home-recommendation header button { font-size: 14px; min-height: 44px; display: inline-flex; align-items: center; }
+.home-recommendation-kind { font-size: 13px; color: #785b13; }
+.od-home .home-recommendation-action { flex-shrink: 0; padding: 12px 18px; background: #202124; color: white; border-radius: 8px; }
+.home-recommendation-alternative { border-top: 1px solid #e2d6af; margin-top: 12px; padding-top: 12px; font-size: 14px; }
+.home-recommendation-alternative a { flex-shrink: 0; min-height: 44px; display: inline-flex; align-items: center; }
+@media (max-width: 767px) { .home-recommendation { padding: 16px; } .home-recommendation-main,.home-recommendation-alternative { align-items: flex-start; flex-direction: column; } .home-recommendation h3 { font-size: 20px; } }

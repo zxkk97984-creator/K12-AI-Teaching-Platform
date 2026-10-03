@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PageHeading } from "../../app/layout/pageChrome";
 import "./content.css";
 
 export function ContentLayout({
@@ -18,15 +19,15 @@ export function ContentLayout({
   rail?: ReactNode;
   aside?: ReactNode;
   children: ReactNode;
-  variant?: "default" | "reading";
+  variant?: "default" | "reading" | "catalog";
   className?: string;
   eyebrow?: string;
 }) {
   return (
     <main className={`content-page content-page--${variant} ${className}`}>
-      <header className="content-page__header">
+      {variant === "catalog" ? <PageHeading title={title}>{toolbar}</PageHeading> : <header className="content-page__header">
         <div className="content-page__heading">
-          {variant === "reading" ? <a className="reader-library-back" href="/resources">← 返回资料库</a> : <p className="eyebrow">{eyebrow}</p>}
+          {variant === "reading" ? <a className="reader-library-back" href="/resources">← 返回资料库</a> : eyebrow !== "霜铃 · 课程" ? <p className="eyebrow">{eyebrow}</p> : null}
           {variant === "reading" ? <p className="reader-course-name">{title}</p> : <h1 className="content-page__title">{title}</h1>}
           {subtitle ? <p className="content-page__subtitle">{subtitle}</p> : null}
         </div>
@@ -36,7 +37,7 @@ export function ContentLayout({
             返回工作台
           </a> : null}
         </div>
-      </header>
+      </header>}
       <div
         className="content-page__body"
         data-has-rail={rail ? "true" : "false"}

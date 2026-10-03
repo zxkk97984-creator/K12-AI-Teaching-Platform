@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import {
   useCallback,
   useEffect,
@@ -635,12 +636,8 @@ export function AdminResourcesPage() {
 
   return (
     <main className="admin-resources" data-testid="admin-resources">
-      <header className="admin-page-header">
-        <div>
-          <p className="admin-eyebrow">内容管理 / 资源</p>
-          <h1>资源管理</h1>
-          <p>登记、补传、审校与发布课程资源。</p>
-        </div>
+      <PageHeading title="资源管理">
+
         <div className="admin-header-actions">
           <span className="admin-page-count">
             {data
@@ -651,7 +648,7 @@ export function AdminResourcesPage() {
             新增资源
           </button>
         </div>
-      </header>
+      </PageHeading>
 
       {notice ? (
         <p className="admin-notice" data-testid="admin-status" role="status">

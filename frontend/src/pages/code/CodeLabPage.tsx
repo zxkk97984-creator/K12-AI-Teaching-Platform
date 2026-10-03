@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ApiError } from "../../features/identity/api";
+import { useLearningPageContext } from "../../features/companion/useLearningPageContext";
 import { useAccount } from "../../features/identity/AccountContext";
 import {
   favoriteCodeTask,
@@ -93,6 +94,13 @@ export function CodeLabPage() {
   const [workspaceError, setWorkspaceError] = useState("");
   const [runnerAvailable, setRunnerAvailable] = useState(false);
   const [runnerReason, setRunnerReason] = useState("正在检查真实 runner…");
+  useLearningPageContext(workspaceTask ? { page_type:"codelab",activity_type:"code",
+    task_id:workspaceTask.task_id,task_revision:workspaceTask.revision,
+    visible_section:workspaceTask.title,selected_text:(workspaceDraft?.code ?? workspaceTask.description).slice(0,4000),
+    code_hash:workspaceDraft?.code_hash } : null, () => {
+      const code = document.querySelector<HTMLElement>(".codelab-editor .cm-content")?.innerText;
+      return code ? { selected_text:code.slice(0,4000), code_hash:code === workspaceDraft?.code ? workspaceDraft.code_hash : undefined } : {};
+  });
   const loadedWorkspaceKey = useMemo(
     () => `${stage ?? ""}:${userId}:${taskId ?? ""}:${revisionParam ?? "latest"}`,
     [revisionParam, stage, taskId, userId],

@@ -15,7 +15,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
-from app.modules.content.service import viewer_scope_from_profile
+from app.modules.content.service import viewer_scope_from_profile, visible_chapter_detail
 from app.modules.identity.models import LearnerProfile
 from app.modules.interactive.service import InteractiveError, owned_session
 
@@ -51,6 +51,10 @@ def bind_scene(scene: dict[str, Any] | None, *, stage: str) -> dict[str, Any] | 
     if not scene:
         return scene
     kind = scene.get("content_kind")
+    if kind == "BOOK":
+        from app.modules.learning.study_books import bind_book_scene
+
+        return bind_book_scene(scene)
     if kind not in {"PICTUREBOOK", "GUIDED_ANIMATION"}:
         return scene
     index = scene.get("section_index")
@@ -82,6 +86,39 @@ def bind_scene(scene: dict[str, Any] | None, *, stage: str) -> dict[str, Any] | 
         "selected_text": item["steps"][index],
         "knowledge_points": [item["topic"]],
     }
+
+
+async def chapter_scene_context(db, *, scene, profile, settings):
+    """Resolve chapter text from the server, never from client prose or answers."""
+    if not scene or not scene.get("chapter_id"):
+        return None
+    try:
+        chapter_id = uuid.UUID(scene["chapter_id"])
+    except ValueError as exc:
+        raise ValueError("章节引用无效") from exc
+    chapter = await visible_chapter_detail(
+        db,
+        chapter_id=chapter_id,
+        viewer=viewer_scope_from_profile(profile, settings),
+        revision=scene.get("chapter_revision"),
+    )
+    if chapter is None:
+        raise ValueError("章节对当前学段不可用")
+    block_id = scene.get("content_block_id")
+    if block_id and not any(block.block_id == block_id for block in chapter.blocks):
+        raise ValueError("当前章节没有该段落，请刷新后提问")
+    from app.modules.teaching.context import build_session_context
+
+    return build_session_context(
+        chapter_slug=chapter.chapter_slug,
+        chapter_id=str(chapter.chapter_id),
+        chapter_title=chapter.title,
+        revision_number=chapter.revision,
+        revision_id=str(chapter.revision_id),
+        stage=chapter.stage,
+        objectives=chapter.objectives,
+        blocks=[block.model_dump(mode="json") for block in chapter.blocks],
+    )
 
 
 async def bind_interactive_scene(

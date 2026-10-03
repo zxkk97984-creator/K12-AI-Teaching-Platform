@@ -2,6 +2,8 @@ import { listCourses } from "../content/api";
 import { ApiError } from "../identity/api";
 import type { ChapterSummaryDTO } from "../content/types";
 import * as api from "./api";
+import { generateCompanionQuiz, listConversationQuizJobs, retryQuizGeneration, type StudentGenerationJob } from "../quiz/api";
+import { practiceIntent } from "./practiceIntent";
 import type { RunDTO, SceneSnapshot, SessionDetail, SessionSummary } from "./types";
 
 export const isTerminal = (run: RunDTO) =>
@@ -14,7 +16,11 @@ export const STATUS_TEXT: Record<RunDTO["status"], string> = {
   CANCELLED: "已取消",
   STALE: "结果已过期，请重新选择课程",
 };
+export type PracticeRequest = { message: string; scene: SceneSnapshot; count: number | null; topic?: string; key: string; submitted?: { count: number; difficulty: string } };
 export interface ConversationState {
+  reference: string | null;
+  quizRequest: PracticeRequest | null;
+  quizJobs: StudentGenerationJob[];
   sessions: SessionSummary[];
   chapters: ChapterSummaryDTO[];
   detail: SessionDetail | null;
@@ -27,6 +33,9 @@ export interface ConversationState {
   error: string | null;
 }
 const initial = (): ConversationState => ({
+  reference: null,
+  quizRequest: null,
+  quizJobs: [],
   sessions: [],
   chapters: [],
   detail: null,
@@ -41,7 +50,11 @@ const initial = (): ConversationState => ({
 
 /** One owner-scoped controller, one run subscription; no conversation content in storage. */
 export class ConversationController {
+  constructor(private ownerId?: string, private stage?: string) {}
   private state = initial();
+  private quizTimer: ReturnType<typeof setTimeout> | null = null;
+  private pageReader: (() => Partial<SceneSnapshot>) | null = null;
+  private storageKey() { return this.ownerId ? `k12:companion-session:${this.ownerId}` : null; }
   private freshReplyRuns = new Set<string>();
   private narratedReplies = new Set<string>();
   claimReplyNarration = (run: RunDTO) => {
@@ -80,41 +93,85 @@ export class ConversationController {
       error: error instanceof Error ? error.message : "请求失败，请重试",
     });
   }
-  private sceneSnapshot(detail: SessionDetail): SceneSnapshot {
+  sceneSnapshot(detail: SessionDetail | null = this.state.detail): SceneSnapshot {
     const route = `${window.location.pathname}${window.location.search}`.slice(0, 240);
-    const pageType = window.location.pathname.startsWith("/code")
-      ? "codelab"
-      : window.location.pathname.startsWith("/practice")
-        ? "practice"
-        : window.location.pathname.startsWith("/chapters/")
-          ? "chapter_reader"
-          : "conversation";
-    const selected = window.getSelection?.()?.toString().trim().slice(0, 4000) || null;
-    const pageContext = this.pageContext?.route === route ? this.pageContext : null;
+    const registered = this.pageReader?.();
+    const explicit = this.pageContext?.route === route ? this.pageContext : null;
+    const context = registered || explicit ? { ...registered,...explicit } : null;
     return {
-      route,
-      page_type: pageContext?.page_type ?? pageType,
-      chapter_id: detail.chapter_id,
-      chapter_title: detail.chapter_title,
-      selected_text: pageContext?.selected_text ?? selected,
-      content_kind: pageContext?.content_kind,
-      content_id: pageContext?.content_id,
-      content_version: pageContext?.content_version,
-      section_index: pageContext?.section_index,
-      visible_section: pageContext?.visible_section,
-      knowledge_points: pageContext?.knowledge_points,
-      quiz_session_id: pageContext?.quiz_session_id,
-      question_id: pageContext?.question_id,
-      interactive_session_id: pageContext?.interactive_session_id,
-      interactive_scene_id: pageContext?.interactive_scene_id,
-      interactive_prompt_id: pageContext?.interactive_prompt_id,
-      activity_type: pageContext?.activity_type ?? pageType,
+      route, page_type: context?.page_type ?? "conversation",
+      ...context,
+      chapter_id: context?.chapter_id ?? (context ? null : detail?.chapter_id),
+      chapter_title: context?.chapter_title ?? (context ? null : detail?.chapter_title),
+      selected_text: context?.selected_text ?? window.getSelection?.()?.toString().trim().slice(0,4000) ?? null,
     };
   }
+  registerPageContext = (reader: () => Partial<SceneSnapshot>) => {
+    this.pageReader = reader;
+    this.patch({ reference: reader().chapter_title ?? reader().visible_section ?? null });
+    return () => {
+      if (this.pageReader === reader) {
+        this.pageReader = null;
+        this.patch({ reference: null });
+      }
+    };
+  };
   setPageContext = (context: Partial<SceneSnapshot> | null) => {
-    this.pageContext = context
-      ? { ...context, route: `${window.location.pathname}${window.location.search}`.slice(0, 240) }
-      : null;
+    this.pageContext = context ? { ...Object.fromEntries(Object.entries(context).filter(([,value]) => value !== undefined)), route: `${window.location.pathname}${window.location.search}`.slice(0,240) } : null;
+    this.patch({ reference: context?.chapter_title ?? context?.visible_section ?? this.pageReader?.().chapter_title ?? this.pageReader?.().visible_section ?? null });
+  };
+  preparePractice = (message = this.state.draft.trim() || "请根据当前内容生成练习", topic?: string) => {
+    const intent = practiceIntent(message);
+    const scene = this.sceneSnapshot();
+    const reading = this.pageReader?.();
+    if (/(?:本章|这章|当前章节)/.test(message) && reading?.chapter_id) Object.assign(scene, reading, {quiz_session_id:undefined,question_id:undefined});
+    this.patch({ quizRequest: { message, scene, count: intent?.count ?? null,
+      topic: topic ?? intent?.topic, key: `quiz-${crypto.randomUUID()}` }, error: null });
+  };
+  setPracticeCount = (count: number) => { if (this.state.quizRequest) this.patch({quizRequest:{...this.state.quizRequest,count}}); };
+  dismissPractice = () => this.patch({ quizRequest: null });
+  beginQuiz = async (count: number, difficulty = "EASY") => {
+    let request = this.state.quizRequest;
+    if (!request || this.state.sending) return;
+    if (!Number.isInteger(count) || count < 1 || count > 20) {
+      this.patch({ error: "请选择 1–20 的整数题数", quizRequest: { ...request, count } });
+      return;
+    }
+    if (request.submitted && (request.submitted.count !== count || request.submitted.difficulty !== difficulty)) request = { ...request, key:`quiz-${crypto.randomUUID()}` };
+    request = { ...request,submitted:{ count,difficulty } };
+    let id = this.state.detail?.id;
+    if (!id || (this.state.detail?.conversation_type ?? this.state.detail?.type) !== "FREE") id = await this.start();
+    if (!id) return;
+    const epoch = this.epoch;
+    this.patch({ sending: true, error: null });
+    try {
+      const result = await generateCompanionQuiz({
+        conversationId: id, message: request.message, scene: request.scene,
+        count, difficulty, idempotencyKey: request.key,
+        topic: request.topic ?? (!request.scene.chapter_id ? (request.scene.knowledge_points?.[0] ?? request.scene.visible_section?.slice(0,160) ?? undefined) : undefined),
+      });
+      if (epoch !== this.epoch) return;
+      this.patch({ quizRequest: null, draft: this.state.draft.trim() === request.message ? "" : this.state.draft, quizJobs: [result.job,...this.state.quizJobs.filter(job => job.id !== result.job.id)] });
+      await this.refresh(id, epoch);
+      await this.refreshQuizJobs();
+    } catch (error) { if (epoch === this.epoch) { this.patch({ quizRequest: request, draft: this.state.draft || request.message }); this.fail(error); } }
+    finally { if (epoch === this.epoch) this.patch({ sending: false }); }
+  };
+  refreshQuizJobs = async () => {
+    const id = this.state.detail?.id, epoch = this.epoch;
+    if (!id) return;
+    if (this.quizTimer) clearTimeout(this.quizTimer);
+    try {
+      const result = await listConversationQuizJobs(id);
+      if (epoch !== this.epoch || this.state.detail?.id !== id) return;
+      this.patch({ quizJobs: result.items });
+      if (result.items.some(job => ["QUEUED","RUNNING"].includes(job.status)))
+        this.quizTimer = setTimeout(() => void this.refreshQuizJobs(), 2000);
+    } catch { if (!this.disposed) this.quizTimer = setTimeout(() => void this.refreshQuizJobs(), 5000); }
+  };
+  retryQuiz = async (id: string) => {
+    try { await retryQuizGeneration(id); await this.refreshQuizJobs(); }
+    catch (error) { this.fail(error); }
   };
   setDraft = (draft: string) => this.patch({ draft });
   initialize = async () => {
@@ -134,6 +191,9 @@ export class ConversationController {
         ? { chapters: courses.value.items.flatMap((c) => c.chapters) }
         : {}),
     });
+    const stored = this.storageKey() ? localStorage.getItem(this.storageKey()!) : null;
+    if (stored && sessions.status === "fulfilled" && sessions.value.some(item => item.id === stored && !item.archived_at && (!this.stage || item.stage === this.stage)))
+      await this.select(stored);
     if (sessions.status === "rejected" || courses.status === "rejected") {
       this.initialized = false;
       this.fail(
@@ -154,7 +214,7 @@ export class ConversationController {
     this.selectingId = id;
     const epoch = this.epoch,
       selection = ++this.selection;
-    this.patch({ detail: null, draft: "", selecting: true, error: null });
+    this.patch({ detail: null, draft: "", selecting: true, error: null, quizJobs: [], quizRequest: null });
     try {
       const detail = await api.getSession(id);
       // A refreshed page has no in-memory run. Recover the accepted run from
@@ -172,6 +232,8 @@ export class ConversationController {
       if (epoch === this.epoch && selection === this.selection) {
         this.selectingId = null;
         this.patch({ detail, selecting: Boolean(restoreError) });
+        if (this.storageKey()) localStorage.setItem(this.storageKey()!, detail.id);
+        void this.refreshQuizJobs();
         if (activeRun && (!this.state.run || isTerminal(this.state.run))) this.follow(activeRun);
         if (restoreError) this.fail(restoreError);
       }
@@ -188,7 +250,11 @@ export class ConversationController {
     const epoch = this.epoch;
     this.patch({ selecting: true, error: null });
     try {
-      const session = await api.createSession(chapterId, idempotencyKey);
+      const session = await api.createSession(undefined, idempotencyKey);
+      if (chapterId) {
+        const chapter = this.state.chapters.find(item => item.chapter_id === chapterId);
+        this.setPageContext({ page_type: "chapter_reader", chapter_id: chapterId, chapter_title: chapter?.title, chapter_revision: chapter?.revision });
+      }
       if (epoch !== this.epoch) return;
       this.patch({
         sessions: [
@@ -307,6 +373,12 @@ export class ConversationController {
     const { detail, draft, sending, selecting, run } = this.state;
     if (!draft.trim() || sending || selecting || (run && !isTerminal(run)))
       return;
+    const intent = practiceIntent(draft);
+    if (intent) {
+      this.preparePractice(draft);
+      if (intent.count !== null) await this.beginQuiz(intent.count);
+      return;
+    }
     // A free conversation can start directly from the empty state. Creating
     // the session first keeps the existing turn/run lifecycle and means the
     // first question is persisted exactly like subsequent turns.
@@ -339,8 +411,9 @@ export class ConversationController {
       );
       if (epoch !== this.epoch) return;
       this.pending = null;
+      if (this.pageContext?.activity_type === "quiz") this.setPageContext(null);
       this.patch({
-        ...(this.state.detail?.id === detail.id ? { draft: "" } : {}),
+        ...(this.state.detail?.id === detail.id ? { draft: this.state.draft.trim() === message ? "" : this.state.draft } : {}),
         sending: false,
       });
       if (!result.run.idempotent_replay) this.freshReplyRuns.add(result.run.id);
@@ -414,6 +487,9 @@ export class ConversationController {
   };
   dispose = () => {
     this.disposed = true;
+    if (this.quizTimer) clearTimeout(this.quizTimer);
+    this.quizTimer = null;
+    this.pageReader = null;
     this.epoch++;
     this.followVersion++;
     this.selection++;

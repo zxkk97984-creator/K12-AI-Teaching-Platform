@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "../identity/api";
 import { navigate } from "../identity/session";
@@ -73,7 +74,7 @@ export function NextStepPage() {
         next.projection
           ? next.projection.created
             ? "已按最新记录整理出新的下一步建议。"
-            : "记录没有变化，建议保持不变（重复整理不会重复创建）。"
+            : "已按当前记录更新建议，复用已有快照（重复整理不会重复创建）。"
           : "已整理。",
       );
     } catch (caught) {
@@ -138,7 +139,7 @@ export function NextStepPage() {
 
   const renderItem = (item: NextStepItem, options: { primary: boolean }) => {
     const feedback = feedbackFor(item, body?.feedback ?? []);
-    const href = actionHref(item);
+    const href = actionHref(item, "/learn/next");
     return (
       <section
         className={options.primary ? "next-card next-card-primary" : "next-card"}
@@ -159,6 +160,7 @@ export function NextStepPage() {
           )}
         </p>
         <h2 data-testid="next-title">{item.title}</h2>
+        {item.action.quiz_title ? <p>练习：{item.action.quiz_title}</p> : null}
         <p data-testid="next-reason">{item.reason}</p>
         <p className="next-muted" data-testid="next-source">
           依据来源：
@@ -244,13 +246,7 @@ export function NextStepPage() {
 
   return (
     <main className="next-page" data-testid="next-page">
-      <header className="next-header">
-        <p className="next-eyebrow">下一步</p>
-        <h1>现在做什么最合适</h1>
-        <p className="next-muted" data-testid="next-notice">
-          课堂和这里用的是同一个下一步决策；建议会随真实作答、完成状态和你的偏好变化。
-        </p>
-      </header>
+      <PageHeading title="学习建议" />
 
       {error ? (
         <p className="next-error" role="alert" data-testid="next-error">

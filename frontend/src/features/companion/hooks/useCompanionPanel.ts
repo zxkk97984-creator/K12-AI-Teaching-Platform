@@ -16,7 +16,8 @@ export function useCompanionPanel(open: boolean, dock: RefObject<HTMLButtonEleme
     };
     update();
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.visualViewport?.addEventListener("resize", update);
+    return () => { window.removeEventListener("resize", update); window.visualViewport?.removeEventListener("resize", update); };
   }, [open, dock, position.x, position.y]);
 
   const pointerDown = (event: PointerEvent<HTMLElement>, kind: PanelGesture) => {

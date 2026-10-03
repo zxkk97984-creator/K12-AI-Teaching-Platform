@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 /** Student animation page (T21).
  *
  * The catalogue comes from the server-side filtered API, so unpublished,
@@ -12,6 +13,7 @@ import { navigate } from "../identity/session";
 import { newOpenEventId, recordOpen } from "../study/api";
 import { AnimationPlayer } from "./AnimationPlayer";
 import { GuidedAnimation } from "./GuidedAnimation";
+import { useLearningPageContext } from "../companion/useLearningPageContext";
 import { useAccount } from "../identity/AccountContext";
 import { AnimationInputError, stepsForSpec } from "./templates";
 import { listAnimations, requestAnimationSpec } from "./api";
@@ -135,14 +137,10 @@ export function AnimationPage() {
     }
   }, [spec]);
 
+  useLearningPageContext(selected ? { page_type:"animation",activity_type:"animation",visible_section:selected.title, selected_text:selected.title } : null);
   return (
     <main className="animation-page" data-testid="animation-page">
-      <header className="animation-header">
-        <h1>教学动画</h1>
-        <p>
-          先用当前学段的四步示例观察知识点；已发布的算法动画仍由服务端提供定义与参数校验。
-        </p>
-      </header>
+      {routeId ? <header className="animation-header"><h1>{selected?.title ?? "动画讲解"}</h1></header> : <PageHeading title="动画讲解" />}
       {stage ? <GuidedAnimation stage={stage} /> : null}
 
       {error ? (

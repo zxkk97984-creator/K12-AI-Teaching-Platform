@@ -237,7 +237,7 @@ async def test_null_grade_still_produces_policy(content_session, test_settings: 
         policy = entered.json()["policy"]
         assert policy["stage"] == "JUNIOR"
         assert policy["grade"] is None  # never invented
-        assert policy["max_quiz_questions"] == 3
+        assert policy["max_quiz_questions"] == 20
         assert "HARD" not in policy["allowed_difficulties"]
         assert policy["allowed_difficulties"][-1] == "MEDIUM"
 
@@ -490,7 +490,7 @@ async def test_stage_switch_stales_old_run_and_new_lesson_uses_new_policy(
         opened = await _event(client, new_session_id, "ENTER")
         assert opened.status_code == 200, opened.text
         assert opened.json()["policy"]["stage"] == "JUNIOR"
-        assert opened.json()["policy"]["max_quiz_questions"] == 3
+        assert opened.json()["policy"]["max_quiz_questions"] == 20
         assert opened.json()["run"]["id"] != old_run
 
     await content_session.rollback()

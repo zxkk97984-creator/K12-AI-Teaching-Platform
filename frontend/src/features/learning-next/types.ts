@@ -30,6 +30,11 @@ export type NextStepItem = {
     chapter_id?: string;
     phase?: string;
     objective_id?: string;
+    quiz_session_id?: string | null;
+    question_position?: number | null;
+    quiz_status?: "ACTIVE" | "COMPLETED" | null;
+    quiz_answered?: number;
+    quiz_title?: string;
   };
   rule_version: string;
   thresholds_version: string;
@@ -97,16 +102,17 @@ export const KIND_LABEL: Record<NextStepKind, string> = {
   ALL_IGNORED: "已忽略全部",
 };
 
-export function actionHref(item: NextStepItem): string | null {
+export function actionHref(item: NextStepItem, returnTo?: string): string | null {
   const action = item.action ?? {};
   if (action.type === "OPEN_LESSON" && action.session_id) {
-    return `/lessons?session=${action.session_id}`;
+    return action.chapter_id ? `/chapters/${encodeURIComponent(action.chapter_id)}?assistant=chat` : `/conversations?session=${encodeURIComponent(action.session_id)}`;
   }
   if (action.type === "OPEN_CHAPTER" && action.chapter_id) {
-    return `/chapters/${action.chapter_id}`;
+    return `/chapters/${encodeURIComponent(action.chapter_id)}`;
   }
-  if (action.type === "OPEN_PRACTICE") {
-    return "/lessons";
+  if (action.type === "OPEN_PRACTICE" && action.quiz_session_id) {
+    const position = action.question_position ?? 0;
+    return `/practice/sessions/${encodeURIComponent(action.quiz_session_id)}?q=${Number.isInteger(position) && position >= 0 ? position : 0}${returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ""}`;
   }
   return null;
 }
@@ -118,7 +124,8 @@ export function actionLabel(item: NextStepItem): string {
     case "OPEN_CHAPTER":
       return "打开这一章";
     case "OPEN_PRACTICE":
-      return "去课堂练一练";
+      return item.action.quiz_status === "COMPLETED" ? "查看结果与解析"
+        : item.action.quiz_status === "ACTIVE" ? item.action.quiz_answered ? "继续练习" : "开始练习" : "查看练习";
     default:
       return "查看";
   }

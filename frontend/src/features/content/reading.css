@@ -4,12 +4,12 @@ body .app-shell:not(.prototype-app) .content-page.content-page--reading {
 }
 .content-page--reading .content-page__header { align-items: center; justify-content: flex-start; gap: 16px 28px; padding-bottom: 16px; border-bottom: 1px solid #e5e5e1; }
 .content-page--reading .content-page__heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; }
-.reader-library-back { color: var(--sl-text-muted, #5c6062); text-decoration: none; font-size: 14px; min-height: 40px; display: inline-flex; align-items: center; }
+.reader-library-back { color: var(--sl-text-muted, #5c6062); text-decoration: none; font-size: 14px; min-height: 44px; display: inline-flex; align-items: center; }
 .reader-library-back:hover { text-decoration: underline; }
 .reader-course-name { margin: 0; font-size: 15px; font-weight: 650; }
 .content-page--reading .content-page__actions { gap: 10px; }
 .content-page--reading .content-page__actions button, .reader-selection-bar button {
-  min-height: 38px; padding: 7px 12px; border: 1px solid #dedfd9; border-radius: 7px;
+  min-height: 44px; padding: 7px 12px; border: 1px solid #dedfd9; border-radius: 7px;
   background: #fff; color: var(--sl-text, #25272a); font: inherit; font-size: 13px; cursor: pointer;
 }
 .content-page--reading .content-page__actions button:disabled { opacity: .4; cursor: default; }
@@ -22,7 +22,7 @@ body .app-shell:not(.prototype-app) .content-page.content-page--reading {
 .reader-narration-heading h2 { margin: 0; font-size: 16px; }
 .reader-narration-heading > span { font-size: 12px; color: var(--sl-text-muted, #5c6062); }
 .reader-narration-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.reader-narration-controls button, .reader-narration-controls select { min-height: 40px; padding: 8px 12px; border: 1px solid #dedfd9; border-radius: 7px; background: #fff; color: var(--sl-text, #25272a); font: inherit; font-size: 13px; }
+.reader-narration-controls button, .reader-narration-controls select { min-height: 44px; padding: 8px 12px; border: 1px solid #dedfd9; border-radius: 7px; background: #fff; color: var(--sl-text, #25272a); font: inherit; font-size: 13px; }
 .reader-narration-controls button { cursor: pointer; }
 .reader-narration-controls button:disabled { opacity: .4; cursor: default; }
 .reader-narration-controls .reader-narration-play { background: #fff1bd; border-color: #e5d59a; color: #57461b; font-weight: 650; }

@@ -6,9 +6,9 @@
 .book-reader-heading {
   display: grid;
   justify-items: start;
-  gap: 12px;
-  margin-bottom: 28px;
-  padding-bottom: 24px;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--sl-border-color, #e7e7e5);
 }
 .book-reader-back {
@@ -74,7 +74,7 @@
   list-style: none;
 }
 .book-reader-toc a {
-  min-height: 40px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   padding: 6px 8px;

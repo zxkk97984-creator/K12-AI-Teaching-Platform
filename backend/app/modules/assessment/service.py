@@ -234,6 +234,9 @@ async def enqueue_student_generation(
     objective_ids: list[str] | None = None,
     knowledge_point_ids: list[str] | None = None,
     coding_task_refs: list[dict | str] | None = None,
+    conversation_id: uuid.UUID | None = None,
+    message_id: uuid.UUID | None = None,
+    student_request_hash: str | None = None,
 ) -> GenerationJob:
     """Persist one owner-scoped student request without calling Knodo.
 
@@ -248,6 +251,9 @@ async def enqueue_student_generation(
         else await load_chapter_material(db, chapter_id=chapter_id)
     )
     request_config = {
+        "student_request_hash": student_request_hash,
+        "source_conversation_id": str(conversation_id) if conversation_id else None,
+        "source_message_id": str(message_id) if message_id else None,
         "chapter_id": str(material.chapter_id),
         "chapter_revision_id": str(material.revision_id),
         "chapter_revision": material.revision_number,
@@ -283,6 +289,8 @@ async def enqueue_student_generation(
     job = GenerationJob(
         owner_user_id=requester.id,
         designer_session_id=designer_session.id,
+        source_conversation_id=conversation_id,
+        source_message_id=message_id,
         chapter_id=material.chapter_id,
         revision_id=material.revision_id,
         operation=Operation.QUIZ_DRAFT.value,
@@ -491,61 +499,48 @@ async def execute_student_generation(
             if settings.gateway_mode == "fixture" and material.release_is_test_fixture
             else None
         )
-        request, expectation = build_designer_request(
-            material,
-            request_id=request_id,
-            allowance=allowance,
-            question_count=config.get("question_count"),
-            difficulty=config.get("difficulty"),
-            question_types=config.get("question_types") or None,
-            objective_ids=config.get("objective_ids") or None,
-        )
         if requester is None:
             job.status = "FAILED"
             job.error_code = "OWNER_NOT_FOUND"
             await db.commit()
             return "FAILED"
 
-        target_options = await target_arguments(
-            db,
-            Operation.QUIZ_DRAFT,
-            request,
-            require_route=getattr(gateway, "mode", None) == "knodo",
-        )
+    from app.modules.assessment.batches import generate_batches
 
     try:
-        result = await gateway.invoke(Operation.QUIZ_DRAFT, request, **target_options)
+        validated = await generate_batches(
+            factory,
+            settings=settings,
+            gateway=gateway,
+            job_id=job_id,
+            token=token,
+            material=material,
+            allowance=allowance,
+        )
+        failure = None
+    except QuizDraftRejected as exc:
+        validated = None
+        failure = ("REJECTED", exc.code, exc.detail)
+    except AssessmentError as exc:
+        validated = None
+        failure = ("FAILED", exc.code, exc.detail)
     except Exception:
-        result = None
+        validated = None
+        failure = ("FAILED", "GATEWAY_FAILED", "上游请求失败，请重试补齐剩余题目")
 
     async with factory() as db:
-        job = await db.scalar(select(GenerationJob).where(GenerationJob.id == job_id))
+        job = await db.scalar(
+            select(GenerationJob).where(GenerationJob.id == job_id).with_for_update()
+        )
         if job is None or job.status != "RUNNING" or job.lease_token != token:
             return "STALE"
-        if result is None or result.status is not GatewayStatus.OK or result.output is None:
-            job.status = "FAILED"
-            job.error_code = (
-                result.error.reason_code
-                if result and result.error is not None
-                else "GATEWAY_FAILED"
-            )
-            job.error_detail = (
-                result.error.message if result and result.error is not None else "上游请求失败"
-            )
+        if validated is None:
+            if failure is None:
+                return "STALE"
+            job.status, job.error_code, job.error_detail = failure
             job.lease_token = None
             await db.commit()
-            return "FAILED"
-        job.gateway_invocation_id = result.invocation_id
-        job.usage = result.usage.model_dump(mode="json")
-        try:
-            validated = validate_quiz_draft(result.output, expectation=expectation)
-        except QuizDraftRejected as exc:
-            job.status = "REJECTED"
-            job.error_code = exc.code
-            job.error_detail = exc.detail
-            job.lease_token = None
-            await db.commit()
-            return "REJECTED"
+            return job.status
         draft = QuizDraft(
             job_id=job.id,
             owner_user_id=job.owner_user_id,
@@ -557,7 +552,7 @@ async def execute_student_generation(
             request_id=request_id,
             status="AUTO_VALIDATED",
             origin=_origin(settings),
-            difficulty=expectation.difficulty,
+            difficulty=validated.payload["difficulty"],
             question_count=validated.count,
             question_types=[question["type"] for question in validated.questions],
             validation_passed=True,

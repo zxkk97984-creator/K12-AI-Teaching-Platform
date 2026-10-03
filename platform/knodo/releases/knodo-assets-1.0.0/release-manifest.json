@@ -71,13 +71,13 @@
       "name": "designer-v1.zip",
       "kind": "bot_system_prompt",
       "source_path": "platform/knodo/designer/v1",
-      "sha256": "96af0d54b5e42246688b50d60601464bd31a7a0036a255be52fa810985aac793",
-      "bytes": 4919,
+      "sha256": "a5e3214cf43a00b722664437a18a4ae2954098d99912b495a3c8e9e883f866f9",
+      "bytes": 5450,
       "entries": [
         {
           "name": "designer/v1/README.md",
-          "sha256": "6c80a8001f0684433569697f5c143250d6b95bd4f9997d359873753a12ca028f",
-          "bytes": 1157
+          "sha256": "96f881b57574ce0845329a6a2878fb0973217c939ac3bada8e3799e4a7eaa245",
+          "bytes": 1790
         },
         {
           "name": "designer/v1/bot-profile.json",
@@ -96,8 +96,8 @@
         },
         {
           "name": "designer/v1/system-prompt.md",
-          "sha256": "e97af64c0a74e48715f876b00b4c381fec090411a1760a8528f774486da9e88b",
-          "bytes": 2166
+          "sha256": "9649826b1a8a2ac83ed61dc757309c3b30456b8ffe7689e213d099e77914c2cb",
+          "bytes": 2426
         }
       ]
     },
@@ -367,7 +367,7 @@
   ],
   "deployment_manifest": {
     "path": "deployment-manifest.json",
-    "sha256": "356b93bce33551f92784119cad71255982eaa9cb0c0c186fec73006727952bd5"
+    "sha256": "1240a60bf4e959a7b9883a0ea121584912f095c934a6b7a34e8a0695089f1cd5"
   },
   "bundle_summary": {
     "bundle_kind": "TEST_FIXTURE_BUNDLE",

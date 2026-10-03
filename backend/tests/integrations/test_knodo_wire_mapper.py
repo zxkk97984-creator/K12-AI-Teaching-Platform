@@ -140,7 +140,9 @@ async def test_first_turn_maps_only_documented_fields_and_fixed_role_target(
     if operation is Operation.QUIZ_DRAFT:
         assert "question_key" in wire_content
         assert "correct_answer" in wire_content
-        assert "hints必须是字符串数组" in wire_content
+        assert "hints必须是恰好3条的字符串数组" in wire_content
+        assert "ORDERING必须使用items:" in wire_content
+        assert "RESPONSE_SCHEMA_JSON:" in wire_content
         assert 'options必须是[{"key":"A","text":"..."}]对象数组' in wire_content
         assert "不得输出question_id" in wire_content
     assert "model" not in sent.payload

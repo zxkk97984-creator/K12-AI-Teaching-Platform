@@ -67,9 +67,8 @@ export function OnboardingPage() {
   return (
     <main className="auth-shell od-preferences">
       <section className="auth-card wide">
-        <p className="eyebrow">从适合你的内容开始</p>
         <h1>你现在读几年级？</h1>
-        <p className="muted">选好具体年级，霜铃会自动匹配适合你的阅读、练习和讲解入口。</p>
+        <p className="muted">选择年级后，系统会匹配相应学段的内容。</p>
         <form onSubmit={submit}>
           <GradePicker value={grade} onChange={(value) => setGrade(value)} name="onboarding-grade" />
           <label>偏好讲解方式<select value={style} onChange={(e) => setStyle(e.target.value as PreferredStyle)}>{STYLES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>

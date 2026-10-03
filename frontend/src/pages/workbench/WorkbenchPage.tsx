@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { ErrorState, LoadingState, StatePanel } from "../../shared/ui/state";
 import { WorkbenchShell } from "../../features/workbench/WorkbenchShell";
 import { useWorkbenchSession } from "../../features/workbench/useWorkbenchSession";
@@ -58,10 +57,6 @@ function NeedsStage() {
 
 export function WorkbenchPage() {
   const { state, reload } = useWorkbenchSession();
-
-  useEffect(() => {
-    document.title = "教学工作台 · 霜铃 K12";
-  }, []);
 
   if (state.kind === "loading") {
     return (

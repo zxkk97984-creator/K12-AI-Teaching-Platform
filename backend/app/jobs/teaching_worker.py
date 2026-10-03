@@ -147,6 +147,20 @@ async def execute_run(
                 "learner context projection failed; continuing without it", exc_info=True
             )
         context = dict(session.context)
+        if isinstance(run.scene_snapshot, dict) and run.scene_snapshot.get("chapter_id"):
+            from app.modules.learning.study_content import chapter_scene_context
+
+            try:
+                page_context = await chapter_scene_context(
+                    db, scene=run.scene_snapshot, profile=profile, settings=settings
+                )
+            except ValueError:
+                return await finalize_run(
+                    db, run_id=run_id, lease_token=token, error_category="SOURCE_UNAVAILABLE"
+                )
+            if page_context:
+                context = page_context
+
         allowance = session.fixture_allowance
         student_input = await _student_input(db, run)
         if isinstance(run.scene_snapshot, dict) and run.scene_snapshot.get("quiz_session_id"):
@@ -164,6 +178,17 @@ async def execute_run(
                         QuizSession.stage == session.stage,
                     )
                 )
+                if quiz is not None:
+                    from app.modules.assessment.feedback_context import released_question_feedback
+
+                    released = await released_question_feedback(
+                        db,
+                        session_id=quiz.id,
+                        owner_id=session.owner_user_id,
+                        question_id=run.scene_snapshot.get("question_id"),
+                    )
+                    if released:
+                        student_input = f"{released}\n\n{student_input}"[:8000]
                 if quiz is not None and quiz.status == "COMPLETED":
                     questions = list(
                         await db.scalars(
@@ -248,6 +273,12 @@ async def execute_run(
             )
         selected_target = runtime_context.target
         continuation_scope = runtime_context.continuation_scope
+        if (
+            continuation_scope
+            and isinstance(run.scene_snapshot, dict)
+            and run.scene_snapshot.get("chapter_id")
+        ):
+            continuation_scope += "|chapter=" + context["curriculum_revision"]
         personal_items = runtime_context.personal_items
         remote_conversation_id = (
             await reusable_remote_conversation(

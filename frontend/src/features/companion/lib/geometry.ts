@@ -2,8 +2,8 @@
 
 export const DOCK_WIDTH = 140;
 export const DOCK_HEIGHT = 168;
-export const PANEL_WIDTH = 380;
-export const PANEL_HEIGHT = 440;
+export const PANEL_WIDTH = 480;
+export const PANEL_HEIGHT = 660;
 export const PANEL_GAP = 16;
 export const PANEL_MOBILE_BREAKPOINT = 720;
 export const DOCK_DRAG_THRESHOLD = 5;
@@ -29,9 +29,14 @@ export interface PanelRect {
 }
 
 /** Keep a manually moved/resized chat usable when the viewport changes. */
+function panelViewportHeight(): number {
+  return Math.min(window.innerHeight, window.visualViewport?.height ?? window.innerHeight);
+}
+
 export function clampPanel(rect: PanelRect): PanelRect {
+  const viewportHeight = panelViewportHeight();
   const maxWidth = Math.max(1, window.innerWidth - 32);
-  const maxHeight = Math.max(1, window.innerHeight - (window.innerWidth <= PANEL_MOBILE_BREAKPOINT ? 92 : 32));
+  const maxHeight = Math.max(1, viewportHeight - (window.innerWidth <= PANEL_MOBILE_BREAKPOINT ? 92 : 32));
   const width = Math.min(maxWidth, Math.max(Math.min(320, maxWidth), rect.width));
   const height = Math.min(maxHeight, Math.max(Math.min(320, maxHeight), rect.height));
   return {
@@ -96,11 +101,12 @@ export function remapDockPosition(position: Point, previous: ViewportSize): Poin
 export function placePanel(dockRect: DOMRect): PanelRect {
   const width = Math.min(PANEL_WIDTH, window.innerWidth - 32);
   // T18 §5.2：移动端底部抽屉避开底部导航/safe-area（组件层以 paddingBottom 补 inset）。
-  const height = Math.min(PANEL_HEIGHT, window.innerHeight - 100);
+  const viewportHeight = panelViewportHeight();
+  const height = Math.min(PANEL_HEIGHT, Math.max(1, viewportHeight - 100));
   if (window.innerWidth <= PANEL_MOBILE_BREAKPOINT) {
     return {
       left: 16,
-      top: Math.max(16, window.innerHeight - height - 76),
+      top: Math.max(16, viewportHeight - height - 76),
       width,
       height,
     };
@@ -117,7 +123,7 @@ export function placePanel(dockRect: DOMRect): PanelRect {
     left = Math.max(16, window.innerWidth - width - 16);
   }
   if (top < 76) top = 76;
-  if (top + height > window.innerHeight - 16)
-    top = window.innerHeight - height - 16;
+  if (top + height > viewportHeight - 16)
+    top = viewportHeight - height - 16;
   return { left, top, width, height };
 }

@@ -6,12 +6,14 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { useAccount } from "../identity/AccountContext";
 import { ConversationController } from "./controller";
 export const ConversationContext = createContext<ConversationController | null>(
   null,
 );
 export function ConversationProvider({ children }: { children: ReactNode }) {
-  const [controller] = useState(() => new ConversationController());
+  const account = useAccount();
+  const [controller] = useState(() => new ConversationController(account?.user.id, account?.profile?.stage ?? undefined));
   useLayoutEffect(() => {
     controller.activate();
     return () => controller.dispose();

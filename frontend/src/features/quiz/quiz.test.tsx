@@ -11,6 +11,7 @@ vi.mock("../identity/api", async () => {
 vi.mock("../content/api", () => ({ getChapter: vi.fn() }));
 vi.mock("./api", () => ({
   createQuizSession: vi.fn(),
+  repeatQuizSession: vi.fn(),
   getQuizSession: vi.fn(),
   submitQuizAnswer: vi.fn(),
   requestQuizHint: vi.fn(),
@@ -168,15 +169,14 @@ afterEach(() => {
 });
 
 describe("practice entry (T17 J1/J8)", () => {
-  it("stores favorites through the owner-scoped API and filters history", async () => {
-    vi.mocked(api.listQuizSessions).mockResolvedValue({ items: [session({ is_favorite: false, title: "合成练习" })], total: 1 });
-    renderPractice("");
-    expect(await screen.findByText("合成练习")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "收藏" }));
+  it("stores favorites for the actual record through the owner-scoped API", async () => {
+    cacheQuiz(USER_A);
+    vi.mocked(api.getQuizSession).mockResolvedValue(session());
+    renderPractice(`?chapter=${CHAPTER}`);
+    const button = await screen.findByRole("button", { name: "收藏这次记录" });
+    fireEvent.click(button);
     await waitFor(() => expect(api.setQuizFavorite).toHaveBeenCalledWith(QUIZ, true));
-    expect(await screen.findByRole("button", { name: "取消收藏" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "已收藏" }));
-    await waitFor(() => expect(api.listQuizSessions).toHaveBeenCalledWith(undefined, true));
+    expect(await screen.findByRole("button", { name: "已收藏 · 取消" })).toBeTruthy();
   });
 
   it("saves draft revisions sequentially and waits before leaving", async () => {
@@ -193,14 +193,12 @@ describe("practice entry (T17 J1/J8)", () => {
     fireEvent.click(screen.getByText("先看再判断"));
     await waitFor(() => expect(api.saveQuizDraft).toHaveBeenCalledWith(QUIZ, Q1, "A", 4));
     fireEvent.click(screen.getByTestId("quiz-save-exit"));
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith("/practice?tab=history"));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith("/history"));
   });
-  it("routes a direct visit to history and a real chapter selection", async () => {
+  it("offers a stable catalogue fallback without creating a session", async () => {
     renderPractice("");
-    expect(await screen.findByTestId("practice-history")).toBeTruthy();
-    expect(screen.getByRole("link", { name: /去学习书库选择章节/ }).getAttribute("href")).toBe("/resources?type=course");
-    fireEvent.click(screen.getByRole("button", { name: "开始练习" }));
-    expect(await screen.findByTestId("practice-choose-chapter")).toBeTruthy();
+    expect(await screen.findByTestId("practice-starter")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "去找练习 →" }).getAttribute("href")).toBe("/practice");
     expect(api.createQuizSession).not.toHaveBeenCalled();
   });
   it("does not create anything on a plain visit", async () => {
@@ -449,7 +447,7 @@ describe("server-driven answers (T17 J2/J3/J6)", () => {
 
     renderPractice(`?session=${LESSON}&chapter=${CHAPTER}&start=1`);
     await screen.findByTestId("practice-session");
-    expect(screen.getByTestId("quiz-hint").textContent).toContain("1/3");
+    expect(screen.getByTestId("quiz-hint").textContent).toContain("剩余 2 次");
     fireEvent.click(screen.getByTestId("quiz-hint"));
     await waitFor(() => expect(api.requestQuizHint).toHaveBeenCalledTimes(1));
     expect(api.requestQuizHint).toHaveBeenCalledWith(QUIZ, Q1, 2, expect.any(String));
@@ -549,11 +547,13 @@ describe("results and review (T17 J4/J11)", () => {
       notice: "复习建议依据本地真实作答证据；未经过教学效果官方验证。",
     });
 
-    renderPractice(`?session=${LESSON}&chapter=${CHAPTER}`);
+    const view = renderPractice(`?session=${LESSON}&chapter=${CHAPTER}`);
     const result = await screen.findByTestId("quiz-result");
     expect(result.textContent).toContain("答对 0 题");
-    expect(screen.getByTestId("quiz-result-summary").textContent).toContain("作答 1 / 1 题");
-    expect((await screen.findByTestId("quiz-result-stats")).textContent).toContain("0%");
+    expect(screen.getByTestId("quiz-result-summary").textContent).toContain("本次完成 1 题");
+    expect(screen.queryByTestId("quiz-result-stats")).toBeNull();
+    await screen.findByText("先看再判断才是对的。");
+    expect(screen.queryByTestId("quiz-question")).toBeNull();
     expect(result.textContent).toContain("先看再判断才是对的");
 
     const body = document.body.textContent ?? "";
@@ -562,13 +562,19 @@ describe("results and review (T17 J4/J11)", () => {
     }
 
     const item = await screen.findByTestId("quiz-review-item");
-    expect(item.textContent).toContain("obj-1");
-    expect(item.textContent).toContain("AI 草稿（同目标，未审校）");
-    expect(item.textContent).toContain("effect_verified=false");
-    expect(item.querySelector("a")?.getAttribute("href")).toBe(`/chapters/${CHAPTER}`);
+    expect(item.textContent).toContain("第 1 题");
+    expect(item.textContent).toContain("同知识点");
+    expect(screen.getByTestId("quiz-back-lesson").getAttribute("href")).toBe(`/conversations?session=${LESSON}`);
+    // Changing from the legacy chapter entry to the saved result URL must
+    // reload its review, rather than retaining a stale "already loaded" flag.
+    view.rerender(<PracticePage pathname={`/practice/sessions/${QUIZ}`} search={`?view=result&session=${LESSON}&q=0`} />);
+    await waitFor(() => expect(api.getQuizReview).toHaveBeenCalledTimes(2));
+    expect((await screen.findByTestId("quiz-review-item")).textContent).toContain("同知识点");
+    fireEvent.click(screen.getByRole("button", { name: "收藏这次记录" }));
+    await screen.findByRole("button", { name: "已收藏 · 取消" });
+    expect(api.getQuizReview).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId("quiz-review-item")).toBeTruthy();
 
-    fireEvent.click(screen.getByTestId("quiz-back-lesson"));
-    expect(navigate).toHaveBeenCalledWith(`/lessons?session=${LESSON}`);
   });
 
   it("does not promise another try when the finished session used one attempt", async () => {
@@ -600,14 +606,15 @@ describe("results and review (T17 J4/J11)", () => {
     renderPractice(`?session=${LESSON}&chapter=${CHAPTER}`);
     await screen.findByTestId("quiz-result");
     expect(screen.queryByTestId("quiz-submit")).toBeNull();
-    expect(screen.getByTestId("quiz-feedback").textContent).toContain("本组练习已经结束");
-    expect(screen.getByTestId("quiz-feedback").textContent).not.toContain("还可以再试");
+    expect(screen.queryByTestId("quiz-feedback")).toBeNull();
+    expect(screen.queryByTestId("quiz-hint")).toBeNull();
+    expect(screen.getByTestId("quiz-again")).toBeTruthy();
   });
 
   it("starts another set only after an explicit click", async () => {
     cacheQuiz(USER_A);
     vi.mocked(api.getQuizSession).mockResolvedValue(completed());
-    vi.mocked(api.createQuizSession).mockResolvedValue(
+    vi.mocked(api.repeatQuizSession).mockResolvedValue(
       session({ id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb" }),
     );
 
@@ -615,10 +622,11 @@ describe("results and review (T17 J4/J11)", () => {
     await screen.findByTestId("quiz-result");
     expect(api.createQuizSession).not.toHaveBeenCalled();
 
+    expect(api.repeatQuizSession).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("quiz-again"));
-    await waitFor(() => expect(api.createQuizSession).toHaveBeenCalledTimes(1));
-    expect(
-      window.localStorage.getItem(CACHE_KEY)?.includes("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-    ).toBe(true);
+    await waitFor(() => expect(api.repeatQuizSession).toHaveBeenCalledWith(QUIZ));
+    expect(api.createQuizSession).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith("/practice/sessions/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+
   });
 });

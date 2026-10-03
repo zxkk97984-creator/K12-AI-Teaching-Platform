@@ -14,14 +14,14 @@ const apiPort = Number(process.env.QA_API_PORT ?? 18081);
 if (!Number.isInteger(apiPort) || apiPort < 1024 || apiPort > 65535) throw new Error("Invalid QA_API_PORT");
 export default defineConfig({
   testDir: "./src/e2e",
-  outputDir: "test-results/playwright-ui",
-  testMatch: ["ui-reuse.spec.ts", "codelab-ui.spec.ts", "ai-memory-ui.spec.ts", "admin-workspace.spec.ts", "choice-inputs.spec.ts", "page-loading.spec.ts", "browser-voice.spec.ts"],
+  outputDir: process.env.UI_E2E_OUTPUT_DIR ?? "test-results/playwright-ui",
+  testMatch: ["companion-learning.spec.ts","ui-reuse.spec.ts", "codelab-ui.spec.ts", "ai-memory-ui.spec.ts", "admin-workspace.spec.ts", "choice-inputs.spec.ts", "page-loading.spec.ts", "browser-voice.spec.ts", "practice-ui.spec.ts", "page-density.spec.ts", "content-form.spec.ts"],
   timeout: 30000,
   workers: 1,
   retries: 0,
   reporter: [
     ["line"],
-    ["json", { outputFile: "test-results/ui-reuse-report.json" }],
+    ["json", { outputFile: process.env.UI_E2E_REPORT_FILE ?? "test-results/ui-reuse-report.json" }],
   ],
   // Every /api/** call is intercepted by the fixture, which fails closed on
   // unmatched routes, so this suite never reaches the live backend or Knodo.

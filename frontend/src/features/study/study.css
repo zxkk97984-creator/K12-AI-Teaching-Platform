@@ -256,9 +256,6 @@
   color: var(--sl-primary, #25272a);
   text-decoration: none;
 }
-body .app-shell[data-reading-surface="true"] .companion-dock[data-minimized="true"] {
-  display: none;
-}
 @media (max-width: 700px) {
   .study-page {
     padding: 20px 0 40px;

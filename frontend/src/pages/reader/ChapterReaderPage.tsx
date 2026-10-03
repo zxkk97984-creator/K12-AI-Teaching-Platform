@@ -5,6 +5,7 @@ import { useReader } from "../../features/content/useReader";
 import { getCourse } from "../../features/content/api";
 import type { CourseSummaryDTO } from "../../features/content/types";
 import { ErrorState, LoadingState } from "../../shared/ui/state";
+import { useLearningPageContext } from "../../features/companion/useLearningPageContext";
 import { openCompanion } from "../../features/companion/openCompanion";
 import { InteractiveLearningLinks } from "../../features/interactive/InteractiveLearningLinks";
 import { useAccount } from "../../features/identity/AccountContext";
@@ -29,6 +30,23 @@ export function ChapterReaderPage() {
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const { state, resume, context, contextError, selectText, recordPosition } = useReader(chapterId, revision);
   const account = useAccount();
+  useLearningPageContext(state.kind === "ready" ? {
+    page_type: "chapter_reader", activity_type: "reading", chapter_id: chapterId,
+    chapter_title: state.chapter.title, chapter_revision: state.chapter.revision,
+    visible_section: state.chapter.title,
+  } : null, () => {
+    const candidates = Array.from(documentRef.current?.querySelectorAll<HTMLElement>("h2,h3,p,pre") ?? [])
+      .filter(node => !node.closest('[data-narration-exclude="true"]'));
+    const visible = candidates.filter(node => { const bounds = node.getBoundingClientRect(); return bounds.bottom > 70 && bounds.top < window.innerHeight * 0.7; });
+    const heading = candidates.filter(node => /^H[23]$/.test(node.tagName) && node.getBoundingClientRect().top < window.innerHeight * 0.7).at(-1);
+    const selection = window.getSelection();
+    const anchor = selection?.anchorNode;
+    const element = anchor instanceof Element ? anchor : anchor?.parentElement;
+    const selected = element?.closest('[data-narration-exclude="true"]') ? "" : selection?.toString().trim();
+    return { visible_section: (heading?.textContent || (state.kind === "ready" ? state.chapter.title : "")).slice(0,200),
+      content_block_id:context?.blockId ?? visible.map(node => node.closest('[data-block-id]')?.getAttribute('data-block-id')).find(Boolean),
+      selected_text: (context?.selectedText || selected || visible.map(node => node.textContent).join("\n")).slice(0,4000) };
+  });
   const answerScope = `${account?.user.id}:${chapterId}:${state.kind === "ready" ? state.chapter.revision_id : ""}`;
   const [answerSelection, setAnswerSelection] = useState<{ scope: string; blockId: string | null; text: string } | null>(null);
   const selectedAnswer = answerSelection?.scope === answerScope ? answerSelection : null;
@@ -56,6 +74,16 @@ export function ChapterReaderPage() {
     return () => { active = false; };
   }, [courseId, directoryAttempt]);
 
+  useEffect(() => {
+    if (state.kind !== "ready") return;
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("assistant");
+    if (!requested) return;
+    params.delete("assistant");
+    window.history.replaceState(null,"",`${window.location.pathname}${params.size ? `?${params}` : ""}${window.location.hash}`);
+    openCompanion({ page_type:"chapter_reader", chapterId, chapter_title:state.chapter.title,
+      chapter_revision:state.chapter.revision, suggestedQuestion:requested === "practice" ? "请根据本章生成练习" : undefined });
+  }, [state.kind, chapterId]);
   if (state.kind === "loading") return <ContentLayout title="章节"><LoadingState label="正在读取章节…" /></ContentLayout>;
   if (state.kind === "error") return <ContentLayout title="章节" toolbar={<a className="content-link" href="/resources">返回资料库</a>}>
     <ErrorState title={state.status === 404 ? "章节不可用" : "暂时无法打开章节"} message={state.status === 404 ? "这个章节未发布、已撤回，或不属于你的学段。" : state.message} requestId={state.requestId} />
@@ -68,6 +96,7 @@ export function ChapterReaderPage() {
   const currentIndex = chapters.findIndex((item) => item.chapter_id === chapterId);
   const askTeacher = () => openCompanion({
     page_type: "chapter_reader", activity_type: "reading", chapterId,
+    chapter_revision: chapter.revision, chapter_title: chapter.title,
     visible_section: chapter.title,
     selected_text: context?.selectedText || window.getSelection()?.toString().trim().slice(0, 4000) || undefined,
     suggestedQuestion: `我正在阅读「${chapter.title}」，请帮我讲讲这里的内容。`,
@@ -124,7 +153,7 @@ export function ChapterReaderPage() {
     {selectedAnswer ? <div className="reader-selection-bar" aria-live="polite"><span>已选中参考答案文字，可以手动朗读。</span><button type="button" onClick={readSelection}>朗读这段</button></div> : context ? <div className="reader-selection-bar" data-testid="reader-aside" aria-live="polite"><span>已选中 {context.selectedChars} 字，可以朗读或向老师提问。</span><div className="reader-selection-actions"><button type="button" onClick={readSelection}>朗读这段</button><button type="button" onClick={askTeacher}>解释这段内容</button></div></div> : null}
     {contextError ? <p className="form-error" role="alert">{contextError}</p> : null}
     <div className="reader-learning-links"><InteractiveLearningLinks revisionIds={[chapter.revision_id]} /></div>
-    <div className="reader-study-actions" data-testid="practice-slot"><div><h2>学完这一章</h2><p>进入课堂，继续讲解、检查理解和练习。</p></div><a href={`/study/lesson?chapter=${chapterId}`}>进入本章课堂 →</a></div>
+
     <nav className="reader-page-turn" aria-label="章节翻页">
       {prev ? <a href={`/chapters/${prev.chapter_id}`} data-testid="prev-chapter"><span>← 上一章</span><strong>{prev.title}</strong></a> : <a href={`/courses/${chapter.course_id}`}><span>课程目录</span><strong>查看全部可读章节</strong></a>}
       {next ? <a href={`/chapters/${next.chapter_id}`} data-testid="next-chapter"><span>下一章 →</span><strong>{next.title}</strong></a> : <a href="/resources"><span>已到本课程末章</span><strong>返回资料库 →</strong></a>}

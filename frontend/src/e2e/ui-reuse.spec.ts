@@ -24,13 +24,11 @@ test("home course previews stay compact with long introductions", async ({ page 
       lines: element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight),
     }));
     expect(previewSize.clipped).toBe(true);
-    expect(previewSize.lines).toBeCloseTo(3, 2);
+    expect(previewSize.lines).toBeCloseTo(2, 2);
     for (const card of await cards.all()) {
       expect((await card.boundingBox())!.height).toBeLessThan(260);
       await expect(card.getByRole("link", { name: "打开内容 →" })).toBeVisible();
     }
-    const pathPreview = page.locator(".od-stage-path-grid article").first().locator("p");
-    expect(await pathPreview.evaluate((element) => element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight))).toBeLessThanOrEqual(3.01);
     await fits(page);
     if (width === 1440) await page.locator(".od-home-resources").screenshot({ path: "test-results/home-compact-preview-desktop.png" });
   }
@@ -51,8 +49,8 @@ for (const viewport of [{ width: 1542, height: 718 }, { width: 320, height: 820 
     const input = panel.getByLabel("想对老师说什么");
     await expect(input).toBeVisible();
     const bounds = (await panel.boundingBox())!;
-    expect(bounds.width).toBeLessThanOrEqual(380);
-    expect(bounds.height).toBeLessThanOrEqual(440);
+    expect(bounds.width).toBeLessThanOrEqual(480);
+    expect(bounds.height).toBeLessThanOrEqual(660);
     expect((await composer.boundingBox())!.height).toBeLessThanOrEqual(76);
     await expect(composer.locator(".conv-composer-context, .conv-composer-heading, .conv-composer-hint")).toHaveCount(0);
     await expect(composer.getByTestId("voice-input")).toBeVisible();
@@ -79,7 +77,7 @@ for (const viewport of [{ width: 1542, height: 718 }, { width: 320, height: 820 
   });
 }
 
-test("companion history stays a simple list and practice settings open in a separate dialog", async ({ page }) => {
+test("companion history stays a simple list and practice settings stay inline", async ({ page }) => {
   const state = await fixture(page);
   const longTitle = "请用生活中的例子解释 Python 条件判断和循环有什么区别，并帮我整理学习顺序";
   state.sessions = [{ ...session, title: longTitle, message_count: 2 }, ...["分数与披萨", "自动记忆合成验证", "认识身边的 AI", "一步一步读懂代码", "复习昨天的问题", "为什么会下雨"].map((title, index) => ({ ...session, id: `history-${index}`, title, message_count: 2 }))];
@@ -140,45 +138,20 @@ test("companion history stays a simple list and practice settings open in a sepa
   const trigger = entry.getByRole("button", { name: "生成小练习", exact: true });
   await page.screenshot({ path: "test-results/companion-practice-entry-desktop.png", animations: "disabled" });
   await trigger.click();
-  const dialog = page.getByRole("dialog", { name: "生成小练习", exact: true });
-  await expect(dialog).toBeVisible();
-  await expect(dialog.getByLabel("练习知识点")).toBeFocused();
-  await dialog.getByLabel("练习知识点").fill("Python 条件判断");
-  await dialog.getByLabel("题目数量").selectOption("3");
-  await dialog.getByLabel("练习难度").selectOption("MEDIUM");
-  await page.screenshot({ path: "test-results/companion-practice-settings-desktop.png", animations: "disabled" });
-  await dialog.getByRole("button", { name: "关闭练习设置" }).click();
-  await expect(dialog).toHaveCount(0);
-  await expect(trigger).toBeFocused();
-  await expect(panel).toBeVisible();
-
-  for (const width of [390, 320]) {
-    await page.setViewportSize({ width, height: 844 });
-    await more.click();
-    await expect(panel.getByTestId("history-item")).toHaveCount(7);
+  const settings = entry;
+  await expect(page.getByRole("dialog",{name:"生成小练习",exact:true})).toHaveCount(0);
+  await settings.getByLabel("练习知识点").fill("Python 条件判断");
+  await settings.getByLabel("自定义题数").fill("10");
+  await settings.getByRole("combobox",{name:"难度",exact:true}).selectOption("MEDIUM");
+  for (const width of [1366,390,320]) {
+    await page.setViewportSize({width,height:844});
+    await expect(settings.getByRole("button",{name:"开始生成"})).toBeVisible();
     await fits(page);
-    await page.screenshot({ path: `test-results/companion-history-list-${width}.png`, animations: "disabled" });
-    await more.click();
-    await trigger.click();
-    await expect(dialog.getByLabel("题目数量")).toHaveValue("3");
-    await expect(dialog.getByLabel("练习难度")).toHaveValue("MEDIUM");
-    const bounds = (await dialog.boundingBox())!;
-    expect(bounds.x).toBeGreaterThanOrEqual(0);
-    expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
-    await expect(dialog.getByRole("button", { name: "开始生成" })).toBeInViewport();
-    await page.screenshot({ path: `test-results/companion-practice-settings-${width}.png`, animations: "disabled" });
-    await dialog.getByLabel("练习知识点").press("Escape");
-    await expect(dialog).toHaveCount(0);
-    await expect(panel).toBeVisible();
+    await page.screenshot({path:`test-results/companion-practice-inline-settings-${width}.png`,animations:"disabled"});
   }
-  await trigger.click();
-  await dialog.getByRole("button", { name: "开始生成" }).click();
-  await expect(dialog).toHaveCount(0);
-  expect(submitted).toMatchObject({ conversation_id: session.id, message_id: "quiz-reply-ui", knowledge_point: "Python 条件判断", ordinary_question_count: 3, difficulty: "MEDIUM" });
-  await expect(entry.getByRole("button", { name: "正在生成练习…" })).toBeDisabled();
-  job!.status = "SUCCEEDED";
-  job!.quiz_session_id = "generated-practice-ui";
-  await expect(entry.getByRole("link", { name: "打开小练习" })).toHaveAttribute("href", "/practice/sessions/generated-practice-ui", { timeout: 7000 });
+  await settings.getByRole("button",{name:"开始生成"}).click();
+  await expect.poll(() => submitted).toMatchObject({conversation_id:session.id,message_id:"quiz-reply-ui",knowledge_point:"Python 条件判断",ordinary_question_count:10,difficulty:"MEDIUM"});
+  await expect(panel.getByTestId("quiz-generation-progress")).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -196,7 +169,7 @@ test("companion formats Markdown and supports pinning, moving and resizing withi
   page.on("console", (message) => { if (message.type() === "error" || message.type() === "warning") errors.push(message.text()); });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`/conversations?session=${session.id}`);
-  await expect(page).toHaveTitle("对话学习 · K12学习平台");
+  await expect(page).toHaveTitle(`${session.chapter_title} · K12学习平台`);
   await page.getByRole("button", { name: "打开霜铃学习助手" }).click();
   const panel = page.locator("#companion-panel");
   await expect(panel.getByRole("heading", { name: "这一章的学习路线" })).toBeVisible();
@@ -224,11 +197,11 @@ test("companion formats Markdown and supports pinning, moving and resizing withi
   const header = (await panel.locator("header").boundingBox())!;
   await page.mouse.move(header.x + 30, header.y + 30);
   await page.mouse.down();
-  await page.mouse.move(header.x - 120, header.y - 170, { steps: 12 });
+  await page.mouse.move(header.x - 120, header.y + 200, { steps: 12 });
   await page.mouse.up();
   const moved = (await panel.boundingBox())!;
   expect(moved.x).toBeLessThan(beforeMove.x - 100);
-  expect(moved.y).toBeLessThan(beforeMove.y - 100);
+  expect(moved.y).toBeGreaterThan(beforeMove.y + 100);
 
   const grip = (await panel.getByRole("button", { name: "调整对话窗口大小" }).boundingBox())!;
   await page.mouse.move(grip.x + 12, grip.y + 12);
@@ -237,7 +210,8 @@ test("companion formats Markdown and supports pinning, moving and resizing withi
   await page.mouse.up();
   const resized = (await panel.boundingBox())!;
   expect(resized.width).toBeGreaterThan(moved.width + 100);
-  expect(resized.height).toBeGreaterThan(moved.height + 100);
+  expect(resized.height).toBeGreaterThanOrEqual(moved.height);
+  expect(resized.y + resized.height).toBeLessThanOrEqual(884);
   await expect(panel.getByTestId("send-turn")).toBeVisible();
   await page.screenshot({ path: "test-results/companion-pinned-resized-desktop.png", animations: "disabled" });
 
@@ -282,12 +256,12 @@ test("companion formats Markdown and supports pinning, moving and resizing withi
 });
 
 test("four stages keep their own home, navigation and content after refresh", async ({ page }) => {
-  const state = await fixture(page);
+  const state = await fixture(page, { interactive: true });
   for (const [stage, grade, gradeName, heading, library, practice, teacher, count] of [
-    ["PRIMARY_LOWER", 2, "二年级", "今天，想发现什么？", "绘本书库", "趣味练习", "AI 老师", 6],
-    ["PRIMARY_UPPER", 5, "五年级", "让好奇心，带你向前一步", "学习书库", "趣味练习", "AI 老师", 6],
-    ["JUNIOR", 8, "初二", "理解之后，再向前一步", "学科资料", "专项练习", "AI 教师", 7],
-    ["SENIOR", 11, "高二", "从理解，到独立解决问题", "专题资料", "巩固训练", "AI 教师", 7],
+    ["PRIMARY_LOWER", 2, "二年级", "学习首页", "绘本书库", "趣味练习", "AI 老师", 7],
+    ["PRIMARY_UPPER", 5, "五年级", "学习首页", "学习书库", "趣味练习", "AI 老师", 7],
+    ["JUNIOR", 8, "初二", "学习首页", "学科资料", "趣味练习", "AI 教师", 8],
+    ["SENIOR", 11, "高二", "学习首页", "专题资料", "趣味练习", "AI 教师", 8],
   ] as const) {
     await page.goto("/settings");
     await page.locator(`input[name="grade"][value="${grade}"]`).check();
@@ -303,6 +277,7 @@ test("four stages keep their own home, navigation and content after refresh", as
     await expect(page.locator(".app-sidebar-nav a")).toHaveCount(count);
     await expect(page.locator('.app-sidebar-nav a[href="/resources"]')).toHaveText(library);
     await expect(page.locator('.app-sidebar-nav a[href="/practice"]')).toHaveText(practice);
+    await expect(page.locator('.app-sidebar-nav a[href="/history"]')).toHaveText("历史记录");
     await expect(page.locator('.app-sidebar-nav a[href="/conversations"]')).toHaveText(teacher);
     await expect(page.locator('.app-sidebar-nav a[href="/code"]')).toHaveCount(stage.startsWith("PRIMARY") ? 0 : 1);
     await expect(page.locator(".k12-mobile-nav a")).toHaveCount(5);
@@ -315,19 +290,19 @@ test("four stages keep their own home, navigation and content after refresh", as
 });
 
 test("animation catalog stays about lessons while games live in practice", async ({ page }) => {
-  await fixture(page, { stage: "PRIMARY_LOWER" });
+  await fixture(page, { stage: "PRIMARY_LOWER", interactive: true });
   await page.goto("/animations");
   await expect(page.getByRole("heading", { name: "动画讲解" })).toBeVisible();
   await expect(page.getByRole("button", { name: "趣味小游戏" })).toHaveCount(0);
   await page.goto("/practice");
-  await expect(page.getByRole("link", { name: "互动小游戏" })).toBeVisible();
+  await expect(page.locator(".practice-game-card")).toHaveCount(1);
 });
 
 test("full chat stays centered even with a floating companion", async ({ page }) => {
   await fixture(page, { stage: "PRIMARY_LOWER" });
   await page.setViewportSize({ width: 1597, height: 745 });
   await page.goto("/conversations");
-  await expect(page.getByRole("heading", { name: "今天想学什么？" })).toBeVisible();
+  await expect(page.locator(".conv-quick-prompts")).toBeVisible();
   const geometry = await page.evaluate(() => {
     const center = (selector: string) => {
       const rect = document.querySelector(selector)!.getBoundingClientRect();
@@ -335,7 +310,7 @@ test("full chat stays centered even with a floating companion", async ({ page })
     };
     return {
       canvas: center(".app-content--conversation"),
-      welcome: center(".conv-welcome"),
+      welcome: center(".conv-quick-prompts"),
       composer: center(".conv-composer"),
     };
   });
@@ -395,7 +370,7 @@ test("SDK iframe merges rapid checkpoints and restores only confirmed state", as
   const state = await fixture(page, { stage: "PRIMARY_LOWER", interactive: true });
   await page.goto("/practice");
   await page.getByRole("heading", { name: "SDK 技术校验" }).waitFor();
-  await page.locator(".interactive-card").getByRole("link", { name: /开始学习/ }).click();
+  await page.locator(".practice-game-card").getByRole("link", { name: /开始游戏/ }).click();
   await page.getByRole("button", { name: "开始学习" }).click();
   const frame = page.frameLocator('iframe[title="SDK 技术校验"]');
   await expect(frame.locator("#level")).toHaveText("恢复关卡：1");
@@ -407,10 +382,10 @@ test("SDK iframe merges rapid checkpoints and restores only confirmed state", as
   await page.getByRole("button", { name: "继续学习" }).click();
   await expect(frame.locator("#level")).toHaveText("恢复关卡：3");
   await frame.locator("#finish").click();
-  await expect(page.getByText(/游戏上报得分 8/)).toBeVisible();
+  await expect(page.getByText(/小游戏记录得分：8/)).toBeVisible();
   expect(state.interactiveWrites).toBe(2);
   await page.reload();
-  await expect(page.getByRole("heading", { name: "本次活动已完成" })).toBeVisible();
+  await expect(page.getByTestId("interactive-record")).toBeVisible();
   await expect(page.locator('iframe[title="SDK 技术校验"]')).toHaveCount(0);
 });
 
@@ -510,7 +485,7 @@ for (const width of [320, 390, 768, 1440]) {
     await fixture(page, { stage: "PRIMARY_LOWER", rich: true });
     await page.setViewportSize({ width, height: 850 });
     await page.goto("/workbench");
-    await expect(page.getByRole("heading", { name: "今天，想发现什么？" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "学习首页" })).toBeVisible();
     await expect(page.getByText("乌鸦喝水")).toBeVisible();
     await fits(page);
     await page.getByRole("button", { name: "打开霜铃学习助手" }).click();
@@ -525,7 +500,7 @@ for (const width of [320, 390, 768, 1440]) {
     for (const [route, testId] of [
       ["/resources", "resource-center"], ["/picturebooks/crow", "picturebook-reader"],
       ["/animations", "interactive-catalog"], ["/conversations", "conversation-page"],
-      ["/practice", "interactive-catalog"], ["/growth", "growth-page"],
+      ["/practice", "practice-hub"], ["/growth", "growth-page"],
     ] as const) {
       await page.goto(route);
       await expect(page.getByTestId(testId)).toBeVisible();
@@ -613,7 +588,7 @@ test("settings exposes all six companions and the saved pet follows the student"
   await page.setViewportSize({ width: 320, height: 760 });
   await page.goto("/settings");
   await expect(page.getByRole("group", { name: "选择桌宠形象" }).getByRole("radio")).toHaveCount(6);
-  await page.getByRole("link", { name: /选择桌宠形象/ }).click();
+  await page.getByRole("link", { name: "桌宠形象", exact: true }).click();
   await expect(page.getByRole("heading", { name: "桌宠形象" })).toBeInViewport();
   await fits(page);
 });
@@ -683,7 +658,7 @@ test("settings save action remains unobstructed from 320 to 1440 pixels", async 
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 760 });
     await page.goto("/settings");
-    await expect(page.getByRole("heading", { name: "设置你的学习空间" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "学习设置" })).toBeVisible();
     await fits(page);
     const reachable = await page.getByRole("button", { name: "保存设置" }).evaluate((button) => {
       const rect = button.getBoundingClientRect();
@@ -705,7 +680,7 @@ test("login and onboarding save the selected grade and stage", async ({ page }) 
   await page.getByRole("radio", { name: "四年级" }).check();
   await page.getByRole("button", { name: /完成设置/ }).click();
   await expect(page).toHaveURL(/\/workbench/);
-  await expect(page.getByRole("heading", { name: "让好奇心，带你向前一步" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "学习首页" })).toBeVisible();
   expect(state.account.profile.stage).toBe("PRIMARY_UPPER");
   expect(state.account.profile.grade).toBe(4);
 });
@@ -777,7 +752,8 @@ test("library separates textbooks from lectures and only reveals demo data on re
   await page.setViewportSize({ width: 1542, height: 718 });
   await page.goto("/resources");
   await expect(page.getByRole("region", { name: "专题教材" })).toBeVisible();
-  expect(await page.locator(".od-library-intro").evaluate((el) => getComputedStyle(el).display)).toBe("flex");
+  await expect(page.locator("main h1,.od-library-intro")).toHaveCount(0);
+  await expect(page.locator(".app-topbar h1")).toHaveText("专题资料");
   expect(await page.locator(".library-book-grid").first().evaluate((el) => getComputedStyle(el).display)).toBe("grid");
   expect((await page.locator(".library-cover").first().boundingBox())!.height).toBeGreaterThan(100);
   await expect(page.getByRole("region", { name: "演示内容", exact: true })).toHaveCount(0);
@@ -810,7 +786,7 @@ test("chapter reading gives the article most space and supports focus, font size
   await page.goto("/chapters/chapter-ui");
   await expect(page.getByTestId("chapter-reader")).toBeVisible();
   await expect(page.locator("h1")).toHaveCount(1);
-  await expect(page.getByRole("link", { name: "进入本章课堂" })).toHaveAttribute("href", "/study/lesson?chapter=chapter-ui");
+  await expect(page.getByRole("link", { name:"进入本章课堂" })).toHaveCount(0);
   await expect(page.locator(".reader-navigation li")).toHaveCount(1);
   const before = await page.getByTestId("chapter-reader").boundingBox();
   expect(before!.width).toBeGreaterThan(750);

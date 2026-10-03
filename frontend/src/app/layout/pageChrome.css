@@ -1,0 +1,80 @@
+/* The shell owns page insets and module titles. Feature CSS owns its content. */
+body .app-shell:not(.prototype-app) .app-topbar { flex-wrap: nowrap; height: var(--app-header-height); min-height: var(--app-header-height); gap: 12px; padding-block: 8px; }
+body .app-shell:not(.prototype-app) .app-topbar .app-topbar-page-title { font-size: 22px; line-height: 1.3; margin: 0; }
+body .app-shell:not(.prototype-app) .app-topbar-title { flex: 1; }
+body .app-shell:not(.prototype-app) #page-content { padding: 16px 24px 48px; }
+body .app-shell:not(.prototype-app)[data-page-layout="catalog"] #page-content > :is(main,.od-home),
+body .app-shell:not(.prototype-app)[data-page-layout="detail"] #page-content > main { padding-top: 0; padding-inline: 0; margin-top: 0; }
+body .app-shell:not(.prototype-app)[data-page-layout="catalog"] #page-content > main { width: 100%; max-width: none; }
+body .app-shell:not(.prototype-app)[data-page-layout="workspace"] #page-content { padding: 0; }
+.page-inline-heading h1 { margin: 0 0 12px; font-size: 24px; }
+.page-heading-actions { display: flex; align-items: center; gap: 8px; }
+.page-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; min-height: 44px; }
+.app-pet-slot { flex: none; width: 48px; height: 48px; pointer-events: none; }
+body .app-shell:not(.prototype-app) .companion-dock[data-compact="true"] { width: 48px; max-width: 48px; top: var(--interactive-pet-top) !important; bottom: auto !important; transform: none; }
+body .app-shell:not(.prototype-app) .companion-dock[data-compact="true"] .companion-toggle { width: 48px; height: 48px; min-height: 48px; margin: 0; }
+body .app-shell:not(.prototype-app) .companion-dock[data-compact="true"] .companion-toggle > span { margin: 0; }
+body .app-shell:not(.prototype-app)[data-page-layout="catalog"] :is(.admin-page-header,.memory-page-heading,.study-heading,.codelab-bank-heading) { margin: 0 0 12px; padding: 0; min-height: 0; }
+body .app-shell:not(.prototype-app) :is(.admin-header-actions,.admin-page-header button,.page-heading-actions button) { min-height: 44px; }
+@media (max-width: 767px) {
+  body .app-shell:not(.prototype-app) #page-content { padding: 12px 16px calc(96px + env(safe-area-inset-bottom)); }
+  body .app-shell:not(.prototype-app) .app-topbar .app-topbar-page-title { font-size: 18px; }
+  body .app-shell:not(.prototype-app) .app-topbar-account { margin-left: 0; flex-wrap: nowrap; }
+  body .app-shell:not(.prototype-app) .app-topbar--conversation .app-pet-slot { display: none; }
+}
+
+body .app-shell:not(.prototype-app)[data-page-layout="catalog"] :is(.admin-ai-savebar,.admin-table-toolbar,.admin-interactive-toolbar,.admin-resource-toolbar) { margin-block: 8px; padding-block: 8px; }
+body .app-shell:not(.prototype-app)[data-page-layout="catalog"] :is(.admin-ai-card,.admin-resource-form,.admin-card,.admin-ai-section) { padding: 16px; }
+body .app-shell:not(.prototype-app)[data-page-layout="catalog"] :is(.growth-page,.next-page,.settings-page,.study-page) { gap: 12px; }
+body .app-shell:not(.prototype-app) .growth-page--document .growth-documents { padding: 16px 20px; }
+body .app-shell:not(.prototype-app) .growth-page--document .growth-document-toolbar { padding-bottom: 12px; }
+body .app-shell:not(.prototype-app) .settings-pet-shortcut { display:inline-flex; align-items:center; margin:0; min-height:44px; }
+body .app-shell:not(.prototype-app) .settings-avatar-row { padding-bottom:12px; gap:16px; }
+body .app-shell:not(.prototype-app) .interactive-filters label { min-width:120px; }
+body .app-shell:not(.prototype-app) .interactive-catalog .interactive-tabs { margin:0 0 8px; }
+body .app-shell:not(.prototype-app) .codelab-bank .codelab-tabs { margin-top:0; padding-bottom:8px; }
+body .app-shell:not(.prototype-app) .codelab-bank .codelab-filters { margin-block:8px; }
+
+/* Selection controls share states across pages. Their scoped colors outrank
+   the global filled-button hover rule and feature styles loaded later. */
+body :is(.app-shell:not(.prototype-app),.companion-panel) :is(
+  .od-library-filters,.k12-filters,.interactive-tabs,
+  .codelab-tabs,.codelab-mobile-panes,.practice-tabs,.practice-history-filters,
+  .practice-player-switch,.practice-count-presets,.library-card-actions,
+  [role="tablist"],.history-toolbar [role="group"]
+) > button {
+  background: var(--sl-surface, #fff);
+  color: var(--sl-text-muted, #575b60);
+  filter: none;
+}
+body :is(.app-shell:not(.prototype-app),.companion-panel) :is(
+  .od-library-filters,.k12-filters,.interactive-tabs,
+  .codelab-tabs,.codelab-mobile-panes,.practice-tabs,.practice-history-filters,
+  .practice-player-switch,.practice-count-presets,.library-card-actions,
+  [role="tablist"],.history-toolbar [role="group"]
+) > button:not(:disabled):not(:is([aria-pressed="true"],[aria-selected="true"],[aria-current="page"],[data-active="true"])):is(:hover,:focus-visible,:active) {
+  background: var(--sl-selection-hover-bg, #fff8e5);
+  color: var(--sl-text, #202124);
+}
+body :is(.app-shell:not(.prototype-app),.companion-panel) :is(
+  .od-library-filters,.k12-filters,.interactive-tabs,
+  .codelab-tabs,.codelab-mobile-panes,.practice-tabs,.practice-history-filters,
+  .practice-player-switch,.practice-count-presets,.library-card-actions,
+  [role="tablist"],.history-toolbar [role="group"]
+) > button:is([aria-pressed="true"],[aria-selected="true"],[aria-current="page"],[data-active="true"]) {
+  background: var(--sl-selection-bg, #fff4d2);
+  color: var(--sl-text, #202124);
+  font-weight: 650;
+}
+body :is(.app-shell:not(.prototype-app),.companion-panel) :is(
+  .od-library-filters,.k12-filters,.interactive-tabs,
+  .codelab-tabs,.codelab-mobile-panes,.practice-tabs,.practice-history-filters,
+  .practice-player-switch,.practice-count-presets,.library-card-actions,
+  [role="tablist"],.history-toolbar [role="group"]
+) > button:focus-visible {
+  outline: 2px solid var(--sl-focus, #9c8140);
+  outline-offset: 2px;
+}
+body .app-shell:not(.prototype-app) .page-heading-actions { margin-bottom:8px; }
+body .app-shell:not(.prototype-app) .conv-welcome-scroll { padding-top:16px; }
+body .app-shell:not(.prototype-app) .conv-prompt-section { margin-top:0; }

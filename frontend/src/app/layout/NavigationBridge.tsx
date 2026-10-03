@@ -41,7 +41,7 @@ export function NavigationBridge() {
       )
         return;
       if (
-        !/^\/(?:$|home$|workbench|study|login|onboarding|settings|courses|chapters|books|picturebooks|conversations|lessons|practice|growth|learn|resources|animations|code|admin)/.test(
+        !/^\/(?:$|home$|workbench|study|login|onboarding|settings|courses|chapters|books|picturebooks|conversations|lessons|practice|history|growth|learn|resources|animations|activities|interactive|more|code|admin)/.test(
           url.pathname,
         )
       )
@@ -53,27 +53,6 @@ export function NavigationBridge() {
     return () => document.removeEventListener("click", onClick);
   }, [navigate]);
   useEffect(() => {
-    const titles: Record<string, string> = {
-      workbench: "学习工作台",
-      study: "学习中心",
-      courses: "课程",
-      chapters: "章节阅读",
-      lessons: "课堂",
-      conversations: "对话学习",
-      practice: "练习",
-      growth: "个人记忆",
-      learn: "学习建议",
-      code: "编程实践",
-      resources: "学习资源",
-      books: "教材阅读",
-      picturebooks: "绘本阅读",
-      animations: "动画探索",
-      settings: "设置",
-      onboarding: "学习档案",
-      login: "登录",
-      admin: "教学管理",
-    };
-    document.title = `${titles[location.pathname.split("/")[1]] ?? "学习平台"} · K12学习平台`;
     window.scrollTo(0, 0);
     document
       .querySelector<HTMLElement>("#page-content")

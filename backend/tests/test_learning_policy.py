@@ -45,9 +45,9 @@ def test_stage_bands_produce_observable_downstream_differences():
     junior = _policy("JUNIOR", 7)
     senior = _policy("SENIOR", 12)
 
-    # quiz volume: 1 / 2 / 3 / 3
-    assert [lower.max_quiz_questions, upper.max_quiz_questions] == [1, 2]
-    assert junior.max_quiz_questions == senior.max_quiz_questions == 3
+    # All ages choose the total; age still controls types and presentation.
+    assert [lower.max_quiz_questions, upper.max_quiz_questions] == [20, 20]
+    assert junior.max_quiz_questions == senior.max_quiz_questions == 20
 
     # explanation length grows strictly across the four stages
     lengths = [
@@ -121,7 +121,7 @@ def test_unknown_stage_style_or_evidence_is_rejected():
 def test_null_grade_with_known_stage_still_policies():
     policy = _policy("JUNIOR", None)
     assert policy.grade is None
-    assert policy.max_quiz_questions == 3
+    assert policy.max_quiz_questions == 20
     assert policy.to_snapshot()["grade"] is None
 
 

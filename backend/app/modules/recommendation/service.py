@@ -15,7 +15,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,7 +24,7 @@ from app.modules.assessment.models import QuizSession
 from app.modules.content.models import ChapterReviewState
 from app.modules.content.service import viewer_scope_from_profile, visible_chapters
 from app.modules.identity.models import LearnerProfile
-from app.modules.learning.models import CORRECT_OUTCOMES, EvidenceItem, Observation
+from app.modules.learning.models import EvidenceItem
 from app.modules.learning.projection import needs_projection as evidence_needs_projection
 from app.modules.learning.projection import project_and_observe
 from app.modules.memory.service import derive_candidates, memory_context
@@ -33,11 +33,11 @@ from app.modules.recommendation.decision import (
     THRESHOLDS_VERSION,
     CandidateChapter,
     DecisionInputs,
-    LessonState,
-    ObjectiveState,
     decide_next_step,
     inputs_hash,
 )
+from app.modules.recommendation.evidence import objective_states
+from app.modules.recommendation.interests import personal_interest_terms
 from app.modules.recommendation.models import (
     RecommendationFeedback,
     RecommendationFeedbackEvent,
@@ -57,52 +57,63 @@ class FeedbackNotFound(Exception):
 
 
 async def _valid_evidence(
-    db: AsyncSession, *, owner_user_id: uuid.UUID, limit: int
+    db: AsyncSession, *, owner_user_id: uuid.UUID, stage: str, limit: int
 ) -> list[EvidenceItem]:
-    """Evidence whose backend source is still usable (withdrawn sources drop out)."""
+    """Only current-stage, owned sources participate; withdrawn quizzes drop out."""
 
     items = list(
         await db.scalars(
             select(EvidenceItem)
             .where(EvidenceItem.owner_user_id == owner_user_id)
-            .order_by(EvidenceItem.observed_at.desc())
+            .order_by(EvidenceItem.observed_at.desc(), EvidenceItem.id.desc())
             .limit(limit)
         )
     )
-    quiz_session_ids: set[uuid.UUID] = set()
-    for item in items:
-        raw = (item.source_ref or {}).get("quiz_session_id")
-        if isinstance(raw, str):
+
+    def referenced_ids(key):
+        ids = set()
+        for item in items:
+            raw = (item.source_ref or {}).get(key)
             try:
-                quiz_session_ids.add(uuid.UUID(raw))
-            except ValueError:  # pragma: no cover - defensive
-                continue
-    if not quiz_session_ids:
-        return items
-    withdrawn_rows = (
-        await db.execute(
+                ids.add(uuid.UUID(raw))
+            except (ValueError, TypeError, AttributeError):
+                pass
+        return ids
+
+    quiz_ids = set(
+        await db.scalars(
             select(QuizSession.id)
-            .join(ChapterReviewState, ChapterReviewState.revision_id == QuizSession.revision_id)
+            .outerjoin(
+                ChapterReviewState, ChapterReviewState.revision_id == QuizSession.revision_id
+            )
             .where(
-                QuizSession.id.in_(quiz_session_ids),
-                ChapterReviewState.publication_status == "WITHDRAWN",
+                QuizSession.id.in_(referenced_ids("quiz_session_id")),
+                QuizSession.owner_user_id == owner_user_id,
+                QuizSession.stage == stage,
+                or_(
+                    ChapterReviewState.publication_status.is_(None),
+                    ChapterReviewState.publication_status != "WITHDRAWN",
+                ),
             )
         )
-    ).all()
-    withdrawn = {row[0] for row in withdrawn_rows}
-    if not withdrawn:
-        return items
-    valid: list[EvidenceItem] = []
-    for item in items:
-        raw = (item.source_ref or {}).get("quiz_session_id")
-        try:
-            session_id = uuid.UUID(raw) if isinstance(raw, str) else None
-        except ValueError:  # pragma: no cover - defensive
-            session_id = None
-        if session_id in withdrawn:
-            continue
-        valid.append(item)
-    return valid
+    )
+    lesson_ids = set(
+        await db.scalars(
+            select(LessonSession.id).where(
+                LessonSession.id.in_(referenced_ids("lesson_session_id")),
+                LessonSession.owner_user_id == owner_user_id,
+                LessonSession.stage == stage,
+                LessonSession.archived_at.is_(None),
+            )
+        )
+    )
+    quiz_refs, lesson_refs = {str(i) for i in quiz_ids}, {str(i) for i in lesson_ids}
+    return [
+        item
+        for item in items
+        if (item.source_ref or {}).get("quiz_session_id") in quiz_refs
+        or (item.source_ref or {}).get("lesson_session_id") in lesson_refs
+    ]
 
 
 async def assemble_inputs(
@@ -113,67 +124,17 @@ async def assemble_inputs(
     if stage is None:
         return DecisionInputs(stage="UNKNOWN", grade=None, preferred_style="AUTO", real_answers=0)
 
-    lesson_row = await db.scalar(
-        select(LessonSession)
-        .where(
-            LessonSession.owner_user_id == owner_user_id,
-            LessonSession.lifecycle.in_(("ACTIVE", "PAUSED")),
-            LessonSession.phase != "COMPLETED",
-        )
-        .order_by(LessonSession.updated_at.desc())
-        .limit(1)
-    )
-    active_lesson = None
-    if lesson_row is not None:
-        chapter_title = str((lesson_row.context or {}).get("chapter", {}).get("title") or "这一节")
-        active_lesson = LessonState(
-            session_id=str(lesson_row.id),
-            chapter_id=str(lesson_row.chapter_id),
-            chapter_title=chapter_title,
-            phase=lesson_row.phase,
-            lifecycle=lesson_row.lifecycle,
-            policy_snapshot_id=(
-                str(lesson_row.policy_snapshot_id) if lesson_row.policy_snapshot_id else None
-            ),
-        )
-
-    items = await _valid_evidence(
-        db, owner_user_id=owner_user_id, limit=settings.recommendation_evidence_limit
-    )
-    answers = [item for item in items if item.source_kind == "QUIZ_ANSWERED"]
-    observation_rows = list(
-        await db.scalars(
-            select(Observation).where(
-                Observation.owner_user_id == owner_user_id, Observation.superseded_at.is_(None)
-            )
-        )
-    )
-    level_by_objective = {row.subject_key: row.level for row in observation_rows}
-    grouped: dict[str, list[EvidenceItem]] = {}
-    for item in answers:
-        if item.objective_id:
-            grouped.setdefault(item.objective_id, []).append(item)
-    objectives = tuple(
-        ObjectiveState(
-            objective_id=objective,
-            answered=len(rows),
-            incorrect=len([row for row in rows if row.outcome not in CORRECT_OUTCOMES]),
-            level=level_by_objective.get(objective, "EMERGING"),
-            last_incorrect_evidence_id=next(
-                (
-                    str(row.id)
-                    for row in sorted(rows, key=lambda entry: entry.observed_at, reverse=True)
-                    if row.outcome not in CORRECT_OUTCOMES
-                ),
-                None,
-            ),
-            evidence_ids=tuple(str(row.id) for row in rows),
-        )
-        for objective, rows in sorted(grouped.items())
-    )
-
     viewer = viewer_scope_from_profile(profile, settings)
     catalogue = await visible_chapters(db, viewer)
+    # Classroom phases are historical; recommendations follow real practice.
+    items = await _valid_evidence(
+        db, owner_user_id=owner_user_id, stage=stage, limit=settings.recommendation_evidence_limit
+    )
+    answers = [item for item in items if item.source_kind == "QUIZ_ANSWERED"]
+    objectives = await objective_states(
+        db, owner_user_id=owner_user_id, stage=stage, answers=answers
+    )
+
     candidates = tuple(
         CandidateChapter(
             chapter_id=str(row.chapter_id),
@@ -188,10 +149,11 @@ async def assemble_inputs(
 
     completed_rows = (
         await db.scalars(
-            select(LessonSession.chapter_id).where(
-                LessonSession.owner_user_id == owner_user_id,
-                LessonSession.lifecycle == "COMPLETED",
-                LessonSession.chapter_id.is_not(None),
+            select(QuizSession.chapter_id).where(
+                QuizSession.owner_user_id == owner_user_id,
+                QuizSession.status == "COMPLETED",
+                QuizSession.stage == stage,
+                QuizSession.chapter_id.is_not(None),
             )
         )
     ).all()
@@ -211,16 +173,19 @@ async def assemble_inputs(
 
     real_answers = len(answers)
     activity_items = [item for item in items if item.source_kind in HINT_OR_SKIP_KINDS]
+    personal_interests, interest_sources = await personal_interest_terms(
+        db, owner_user_id=owner_user_id, candidates=candidates
+    )
     return DecisionInputs(
         stage=stage,
         grade=profile.grade if profile else None,
         preferred_style=profile.preferred_style if profile else "AUTO",
-        interests=tuple(profile.interests or []) if profile else (),
-        active_lesson=active_lesson,
+        interests=tuple(dict.fromkeys([*(profile.interests or []), *personal_interests])),
+        active_lesson=None,
         objectives=objectives,
         candidates=candidates,
         completed_chapter_ids=completed,
-        active_memory_ids=tuple(item["id"] for item in memories),
+        active_memory_ids=tuple(item["id"] for item in memories) + interest_sources,
         real_answers=real_answers,
         hints_or_skips_only=real_answers == 0 and bool(activity_items),
         ignored_subjects=tuple(sorted(str(key) for key in ignored_rows)),
@@ -247,7 +212,10 @@ def _snapshot_dto(row: RecommendationSnapshot) -> dict[str, Any]:
 async def latest_snapshot(db: AsyncSession, *, owner_user_id: uuid.UUID):
     return await db.scalar(
         select(RecommendationSnapshot)
-        .where(RecommendationSnapshot.owner_user_id == owner_user_id)
+        .where(
+            RecommendationSnapshot.owner_user_id == owner_user_id,
+            RecommendationSnapshot.superseded_at.is_(None),
+        )
         .order_by(RecommendationSnapshot.source_revision.desc())
         .limit(1)
     )
@@ -307,6 +275,13 @@ async def refresh_snapshot(
     await derive_candidates(
         db, owner_user_id=owner_user_id, limit=settings.recommendation_evidence_limit
     )
+    # Serialize snapshot activation for one student. This also prevents two
+    # concurrent refreshes from allocating the same source revision.
+    await db.scalar(
+        select(LearnerProfile.user_id)
+        .where(LearnerProfile.user_id == owner_user_id)
+        .with_for_update()
+    )
     inputs = await assemble_inputs(db, owner_user_id=owner_user_id, settings=settings)
     decision = decide_next_step(inputs)
     digest = inputs_hash(inputs)
@@ -318,6 +293,13 @@ async def refresh_snapshot(
     )
     created = False
     row = existing
+    previous = await latest_snapshot(db, owner_user_id=owner_user_id)
+    if previous is not None and (existing is None or previous.id != existing.id):
+        previous.superseded_at = datetime.now(UTC)
+    if existing is not None:
+        # Restoring an interest/preference may reproduce an older input set.
+        # Reuse its immutable decision, and make it current again.
+        existing.superseded_at = None
     if existing is None:
         next_revision = (
             int(
@@ -330,9 +312,6 @@ async def refresh_snapshot(
             )
             + 1
         )
-        previous = await latest_snapshot(db, owner_user_id=owner_user_id)
-        if previous is not None:
-            previous.superseded_at = datetime.now(UTC)
         statement = (
             pg_insert(RecommendationSnapshot)
             .values(

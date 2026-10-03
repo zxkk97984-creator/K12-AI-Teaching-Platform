@@ -68,6 +68,7 @@ export type QuizProgress = { answered: number; correct: number; total: number };
 
 export type QuizSessionDTO = {
   id: string;
+  draft_id?: string | null;
   chapter_id: string | null;
   revision_id: string | null;
   source_conversation_id?: string | null;
@@ -197,3 +198,9 @@ export const DIFFICULTY_LABEL: Record<string, string> = {
   MEDIUM: "进阶",
   HARD: "挑战",
 };
+/** Chapter-backed history keeps the revision captured when its group was created. */
+export function quizChapterRevision(session: {chapter_id:string|null;curriculum_revision:string}): number | null {
+  if (!session.chapter_id) return null;
+  const revision = Number(session.curriculum_revision?.match(/:([1-9]\d*)$/)?.[1]);
+  return Number.isSafeInteger(revision) && revision > 0 ? revision : null;
+}

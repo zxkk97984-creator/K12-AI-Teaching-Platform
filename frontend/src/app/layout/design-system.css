@@ -12,12 +12,17 @@
   --sl-primary-ink: var(--sl-primary);
   --sl-border: 1px solid #e7e7e5;
   --sl-primary-soft: #fff4d2;
+  --sl-selection-bg: #fff4d2;
+  --sl-selection-hover-bg: #fff8e5;
   --sl-neutral-soft: #e7e7e5;
   --sl-radius-sm: 10px;
   --sl-radius-md: 14px;
   --sl-radius-lg: 18px;
   --sl-shadow-card: 0 2px 6px #17202f04;
   --sl-shadow-soft: 0 4px 14px #17202f08;
+  --app-header-height: 64px;
+  --sl-space-2: 8px;
+  --sl-space-3: 12px;
   --sl-space-4: 16px;
   --sl-space-5: 24px;
   --sl-space-6: 32px;

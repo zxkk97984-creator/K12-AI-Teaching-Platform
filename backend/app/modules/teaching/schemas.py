@@ -26,10 +26,11 @@ class SceneSnapshot(BaseModel):
     page_type: str = Field(default="", max_length=64)
     chapter_id: str | None = Field(default=None, max_length=80)
     chapter_title: str | None = Field(default=None, max_length=200)
+    chapter_revision: int | None = Field(default=None, ge=1, strict=True)
     content_block_id: str | None = Field(default=None, max_length=160)
     visible_section: str | None = Field(default=None, max_length=200)
     selected_text: str | None = Field(default=None, max_length=4000)
-    content_kind: Literal["PICTUREBOOK", "GUIDED_ANIMATION", "INTERACTIVE"] | None = None
+    content_kind: Literal["PICTUREBOOK", "GUIDED_ANIMATION", "INTERACTIVE", "BOOK"] | None = None
     content_id: str | None = Field(default=None, max_length=80)
     content_version: str | None = Field(default=None, max_length=80)
     section_index: int | None = Field(default=None, ge=0, le=1000)
@@ -96,6 +97,7 @@ class TeachingCardDTO(BaseModel):
 class MessageDTO(BaseModel):
     id: uuid.UUID
     run_id: uuid.UUID | None = None
+    source_label: str | None = None
     role: str
     content_markdown: str
     card: TeachingCardDTO | None
@@ -119,6 +121,7 @@ class TurnCreateRequest(BaseModel):
 class RunDTO(BaseModel):
     id: uuid.UUID
     session_id: uuid.UUID
+    source_label: str | None = None
     operation: str
     status: str
     attempt: int

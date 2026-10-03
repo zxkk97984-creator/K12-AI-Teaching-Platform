@@ -31,7 +31,7 @@ async function login(page: Page, stage: typeof stages[number]) {
 }
 
 async function ask(page: Page, surface: Locator, message: string): Promise<RunDTO> {
-  await surface.getByPlaceholder("输入你的问题…").fill(message);
+  await surface.getByLabel("想对老师说什么").fill(message);
   const accepted = page.waitForResponse(response => response.request().method() === "POST"
     && /\/api\/v1\/(conversations\/.+\/messages|lesson-sessions\/.+\/turns)$/.test(new URL(response.url()).pathname));
   await surface.getByTestId("send-turn").click();
@@ -83,6 +83,7 @@ async function submit(page: Page, outcome: "INCORRECT" | "CORRECT") {
 
 for (const stage of stages) test(`final learning flow: ${stage} reading, lesson, grading, lookup and refresh`, async ({ page }) => {
   test.setTimeout(180000);
+  page.setDefaultTimeout(12000);
   const pageErrors: string[] = [];
   page.on("pageerror", error => pageErrors.push(error.message));
   await mkdir("test-results/final-learning-flow", { recursive: true });
@@ -147,7 +148,8 @@ for (const stage of stages) test(`final learning flow: ${stage} reading, lesson,
   await expect(page.getByTestId("quiz-notice")).toContainText("未人工审校");
   const wrongIds: string[] = [];
   for (const [index, question] of initialQuiz.questions.entries()) {
-    await page.getByTestId(`goto-question-${index}`).click();
+    if (initialQuiz.questions.length > 1) await page.getByTestId(`goto-question-${index}`).click();
+    else await expect(page.getByTestId("quiz-prev")).toHaveCount(0);
     const hint = page.waitForResponse(response => response.request().method() === "POST"
       && new URL(response.url()).pathname.endsWith(`/questions/${question.id}/hints`));
     await page.getByTestId("quiz-hint").click();
@@ -170,6 +172,7 @@ for (const stage of stages) test(`final learning flow: ${stage} reading, lesson,
       }
     }
   }
+  await page.getByTestId("quiz-show-result").click();
   await expect(page.getByTestId("quiz-result")).toBeVisible();
   await expect(page.getByTestId("quiz-review-item")).toHaveCount(wrongIds.length);
   const stored = await get<QuizSessionDTO>(page, `/api/v1/quiz-sessions/${quizId}`);
@@ -197,7 +200,7 @@ for (const stage of stages) test(`final learning flow: ${stage} reading, lesson,
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 
   await page.getByTestId("quiz-back-lesson").click();
-  await expect(page).toHaveURL(new RegExp(`/lessons\\?session=${lessonId}`));
+  await expect(page).toHaveURL(new RegExp(`/(?:study/lesson|lessons)\\?session=${lessonId}`));
   await phase(page, "action-practice-done", "REFLECT");
   await phase(page, "action-reflect-done", "REFLECT");
   await phase(page, "action-complete", "COMPLETED");

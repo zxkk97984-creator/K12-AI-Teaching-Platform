@@ -33,9 +33,11 @@ export type SceneSnapshot = {
   page_type: string;
   chapter_id?: string | null;
   chapter_title?: string | null;
+  chapter_revision?: number | null;
+  content_block_id?: string | null;
   visible_section?: string | null;
   selected_text?: string | null;
-  content_kind?: "PICTUREBOOK" | "GUIDED_ANIMATION" | "INTERACTIVE" | null;
+  content_kind?: "PICTUREBOOK" | "GUIDED_ANIMATION" | "INTERACTIVE" | "BOOK" | null;
   content_id?: string | null;
   content_version?: string | null;
   section_index?: number | null;
@@ -70,6 +72,7 @@ export type MessageDTO = {
   id: string;
   /** Owning generation run; older fixture payloads may omit this field. */
   run_id?: string | null;
+  source_label?: string | null;
   role: "USER" | "ASSISTANT";
   content_markdown: string;
   card: CardDTO | null;
@@ -85,6 +88,7 @@ export type SessionDetail = SessionSummary & {
 export type RunDTO = {
   id: string;
   session_id: string;
+  source_label?: string | null;
   operation: string;
   status: RunStatus;
   attempt: number;

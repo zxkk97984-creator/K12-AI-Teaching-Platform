@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { useState, type KeyboardEvent } from "react";
 import { AutomaticMemory } from "./AutomaticMemory";
 import { MemoryDocuments } from "./MemoryDocuments";
@@ -19,15 +20,12 @@ export function GrowthPage() {
     document.getElementById("memory-tab-" + next)?.focus();
   };
   return <main className="growth-page growth-page--document" data-testid="growth-page">
-    <header className="memory-page-heading">
-      <div><h1>个人记忆</h1><p className="growth-muted">管理 AI 整理的记忆，也可以写下你希望它了解的内容。</p></div>
-      <button type="button" className="secondary" onClick={() => setSettingsOpen(true)}>记忆设置</button>
-    </header>
+    <PageHeading title="个人记忆"><button type="button" className="secondary" onClick={() => setSettingsOpen(true)}>记忆设置</button></PageHeading>
     <div className="memory-tabs" role="tablist" aria-label="记忆内容">
       {([ ["automatic", "自动记忆"], ["documents", "我写的内容"] ] as const).map(([value, label]) => <button key={value} id={"memory-tab-" + value} role="tab" aria-selected={tab === value} aria-controls={"memory-content-" + value} tabIndex={tab === value ? 0 : -1} onKeyDown={onTabKey} onClick={() => select(value)}>{label}</button>)}
     </div>
     <section id="memory-content-automatic" role="tabpanel" aria-labelledby="memory-tab-automatic" hidden={tab !== "automatic"}>
-      <AutomaticMemory settingsOpen={settingsOpen} onSettingsClose={() => setSettingsOpen(false)} />
+    <AutomaticMemory settingsOpen={settingsOpen} onSettingsClose={() => setSettingsOpen(false)} />
     </section>
     <section id="memory-content-documents" role="tabpanel" aria-labelledby="memory-tab-documents" hidden={tab !== "documents"}>
       <p className="growth-muted memory-document-intro">你写下的内容单独保存，自动整理不会覆盖这里的文字。</p>

@@ -1,5 +1,7 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useLearningPageContext } from "../companion/useLearningPageContext";
 import { openCompanion } from "../companion/openCompanion";
 import { getPicturebookProgress, getStudentContent, savePicturebookProgress, type StudentContent } from "../study/api";
 import { useAccount } from "../identity/AccountContext";
@@ -17,6 +19,8 @@ export function PicturebookPage() {
   const pageHeading = useRef<HTMLHeadingElement>(null);
   const book = content?.picturebooks.find((item) => item.id === storyId);
 
+  useLearningPageContext(book ? { page_type:"picturebook_reader", activity_type:"reading", content_kind:"PICTUREBOOK", content_id:book.id, content_version:book.version,
+    section_index:page, visible_section:`${book.title} · ${book.pages[page]?.title ?? ""}`, selected_text:book.pages[page]?.text, knowledge_points:[book.topic] } : null);
   useEffect(() => {
     let active = true;
     setContent(null);
@@ -74,7 +78,7 @@ export function PicturebookPage() {
   if (contentError) return <main className="picturebook-page" role="alert"><h1>绘本暂时无法打开</h1><p>{contentError}</p><button type="button" onClick={() => window.location.reload()}>重新加载</button></main>;
   if (!content) return <main className="picturebook-page" role="status">正在读取绘本内容…</main>;
   if (!storyId) return <main className="picturebook-page picturebook-library" data-testid="picturebook-library">
-    <header className="picturebook-heading"><a href="/resources">← 返回学习书库</a><p className="eyebrow">示例阅读</p><h1>绘本故事</h1><p>慢慢读，看一看，也问一问。</p></header>
+    <PageHeading title="绘本书库"><a href="/resources">← 返回学习书库</a></PageHeading>
     <div className="picturebook-grid">{content.picturebooks.map((item) => <article key={item.id} className="picturebook-card"><img src={item.image} alt={`${item.title}经典插图`} /><div><span>{item.topic} · 阅读示例</span><h2>{item.title}</h2><p>{item.subtitle}</p><a href={`/picturebooks/${item.id}`}>开始阅读 →</a></div></article>)}</div>
     {!content.picturebooks.length && <p>当前学段没有绘本；可以从学习书库打开课程和资料。</p>}
     <p className="picturebook-source">故事为示例改写；插图由 Milo Winter 为《The Æsop for Children》（1919）创作。</p>

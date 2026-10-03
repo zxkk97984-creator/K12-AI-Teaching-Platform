@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   adminCreateResource,
@@ -454,11 +455,8 @@ export function AdminInteractivePage() {
             : "";
   return (
     <main className="admin-interactive">
-      <header className="admin-page-header">
-        <div>
-          <h1>互动内容</h1>
-          <p>管理离线 HTML / ZIP、场景配置与版本，使用受限播放器核查内容。</p>
-        </div>
+      <PageHeading title="互动内容">
+
         <div className="admin-header-actions">
           <span className="admin-page-count">
             {loading ? "正在读取" : `${total} 项内容`}
@@ -470,7 +468,7 @@ export function AdminInteractivePage() {
               : ""}
           </button>
         </div>
-      </header>
+      </PageHeading>
       {error && (
         <p role="alert" className="admin-error">
           {error}

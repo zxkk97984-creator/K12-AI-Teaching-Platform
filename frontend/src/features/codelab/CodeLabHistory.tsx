@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import ReactMarkdown from "react-markdown";
 import { StatePanel } from "../../shared/ui/state";
 import { CodeEditor } from "./CodeEditor";
@@ -78,9 +79,7 @@ export function CodeLabHistory({
   const pageCount = Math.max(1, Math.ceil(total / limit));
   return (
     <main className="codelab-page" data-testid="codelab-history">
-      <header className="codelab-page-header">
-        <div><CodeLabBackButton onClick={onPrevious} /><p className="eyebrow">在线练习</p><h1>练习记录</h1><p className="codelab-muted">回看不同场景中的代码快照、运行结果和可信判分。</p></div>
-      </header>
+      <PageHeading title="编程练习记录" />
       <nav className="codelab-tabs" aria-label="编程练习页面">
         <button type="button" onClick={() => onTab("bank")}>全部题目</button>
         <button type="button" onClick={() => onTab("favorites")}>我的收藏</button>
@@ -89,7 +88,7 @@ export function CodeLabHistory({
       <section className="codelab-filters" aria-label="筛选练习记录">
         <form className="codelab-search" onSubmit={(event) => { event.preventDefault(); onSearch(); }}>
           <label htmlFor="codelab-history-search">搜索题目或编号</label>
-          <div><input id="codelab-history-search" type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="输入题目名称或稳定编号" maxLength={120} /><button type="submit" disabled={loading}>搜索</button></div>
+          <div><CodeLabBackButton onClick={onPrevious} /><input id="codelab-history-search" type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="输入题目名称或稳定编号" maxLength={120} /><button type="submit" disabled={loading}>搜索</button></div>
         </form>
       <div className="codelab-filter-grid">
           <label>操作类型
@@ -106,7 +105,7 @@ export function CodeLabHistory({
         </div>
         {taskFilter ? <p className="codelab-muted">当前只显示题目 {taskFilter} 的记录。</p> : null}
       </section>
-      <div className="codelab-list-heading"><h2>历史记录</h2><span aria-live="polite">共 {total} 条记录</span></div>
+      <div className="codelab-list-heading"><span aria-live="polite">共 {total} 条记录</span></div>
       {actionError ? <p className="codelab-error" role="alert">{actionError}</p> : null}
       {loading ? <StatePanel tone="loading" title="正在读取练习记录" /> : null}
       {error ? <StatePanel tone="error" title="练习记录暂时无法读取" description={error} action={<button type="button" className="secondary" onClick={onRetry}>重试</button>} /> : null}
@@ -153,7 +152,7 @@ export function CodeLabHistoryDetail({
       {error ? <StatePanel tone="error" title="历史记录无法读取" description={error} action={<button type="button" className="secondary" onClick={onBack}>返回记录</button>} /> : null}
       {run && detail ? (
         <div className="codelab-history-detail-grid">
-          <section className="codelab-panel"><p className="eyebrow">题目版本 r{detail.task_snapshot.revision}</p><h2>{detail.task_snapshot.title}</h2><p>{detail.task_snapshot.description}</p><p>函数入口：<code>{detail.task_snapshot.entrypoint}</code></p><p className="codelab-muted">{detail.source.scope_kind} · {new Date(run.created_at).toLocaleString()}</p><button type="button" className="secondary" onClick={() => void navigator.clipboard?.writeText(run.code)}>复制这次代码</button></section>
+          <section className="codelab-panel"><h2>题目 · r{detail.task_snapshot.revision}</h2><p>{detail.task_snapshot.description}</p><p>函数入口：<code>{detail.task_snapshot.entrypoint}</code></p><p className="codelab-muted">{detail.source.scope_kind} · {new Date(run.created_at).toLocaleString()}</p><button type="button" className="secondary" onClick={() => void navigator.clipboard?.writeText(run.code)}>复制这次代码</button></section>
           <section className="codelab-panel"><div className="codelab-panel-heading"><p className="eyebrow">当次代码</p><span>快照 {run.code_hash.slice(0, 12)}</span></div><CodeEditor value={run.code} onChange={() => undefined} readOnly ariaLabel={`${detail.task_snapshot.title} 的只读历史代码`} /></section>
           <section className="codelab-panel codelab-history-result-panel"><p className="eyebrow">{run.purpose === "EXAMPLE" ? "公开示例运行" : "正式判题"}</p><h2>{statusLabel(run.status)}</h2>{run.purpose === "GRADE" ? <p>可信判定：{run.correctness_status} · 得分 {run.deterministic_score == null ? "未形成分数" : `${run.deterministic_score} / 70`}</p> : <p>公开示例运行不会形成正式分数。</p>}{grade?.groups?.length ? <ul className="codelab-grade-groups">{grade.groups.map((group, index) => <li key={`${String(group.id)}-${index}`}>{String(group.name ?? group.id)}：{String(group.score ?? "—")} / {String(group.max_score ?? "—")}</li>)}</ul> : null}{run.feedback?.summary ? <div className="codelab-feedback"><h3>AI 建议 · {run.feedback.source === "KNODO" ? "Knodo" : "本地合成"}</h3><ReactMarkdown>{run.feedback.summary}</ReactMarkdown><p className="codelab-muted">AI 建议不改变可信成绩。</p></div> : null}{run.result?.observations?.map((item, index) => <details key={`${String(item.case_id)}-${index}`}><summary>测试结果 {index + 1}</summary><pre>{JSON.stringify(item, null, 2)}</pre></details>)}</section>
         </div>

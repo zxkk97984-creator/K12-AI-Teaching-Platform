@@ -33,13 +33,13 @@
 }
 .companion-minimize {
   position: absolute;
-  right: 8px;
+  right: 0;
   top: -4px;
   z-index: 1;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  min-height: 30px !important;
+  width: 44px;
+  height: 44px;
+  min-height: 44px !important;
   padding: 0;
   background: var(--sl-surface);
   color: var(--sl-text-muted);
@@ -155,6 +155,9 @@ body .companion-panel .conv-composer--compact .conv-input-line textarea { min-he
   font-size: 13px;
   padding: 7px 10px;
 }
+body .companion-panel .companion-display-picker { padding: 0 0 8px; margin-bottom: 8px; font-size: 14px; }
+body .companion-panel .companion-display-picker select { min-height: 44px; font-size: 14px; }
+body .companion-dock .companion-minimize:not(:disabled):is(:hover,:focus-visible) { background: var(--sl-selection-hover-bg, #fff8e5); color: var(--sl-text); }
 .companion-panel .conversation-content {
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -185,11 +188,8 @@ body .companion-panel .conv-composer--compact .conv-input-line textarea { min-he
   gap: 16px;
 }
 @media (max-width: 720px) {
-  .companion-dock {
-    transform: scale(.72);
-    transform-origin: right bottom;
-  }
-  .companion-dock[data-minimized="true"] {
+  .companion-dock { transform: none; }
+  .companion-dock[data-minimized="true"]:not([data-compact="true"]) {
     top: auto !important;
     left: auto !important;
     right: 12px;

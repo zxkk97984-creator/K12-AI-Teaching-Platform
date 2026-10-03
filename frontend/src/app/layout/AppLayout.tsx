@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ApiError, getMe } from "../../features/identity/api";
 import { AccountAvatar } from "../../features/identity/AccountAvatar";
 import { AccountProvider } from "../../features/identity/AccountContext";
@@ -10,6 +10,9 @@ import { listSessions, updateSession } from "../../features/conversation/api";
 import { Companion } from "../../features/companion/components/Companion";
 import { LearningTeacherProvider } from "../../features/companion/LearningTeacherContext";
 import { CompanionAvatarProvider } from "../../features/companion/CompanionAvatar";
+import { practiceReturn } from "../../pages/practice/navigation";
+import { PageChromeContext, routeChrome } from "./pageChrome";
+import "./pageChrome.css";
 import { EditingGuardProvider } from "../editing/EditingGuard";
 
 type NavigationItem = { path: string; label: string; mobileLabel: string; icon: string; end?: boolean };
@@ -19,20 +22,21 @@ function studentNavigation(stage: Stage | null | undefined, mobile = false): Nav
   const upper = stage === "PRIMARY_UPPER";
   const junior = stage === "JUNIOR";
   const book = lower ? "绘本书库" : upper ? "学习书库" : junior ? "学科资料" : "专题资料";
-  const practice = lower || upper ? "趣味练习" : junior ? "专项练习" : "巩固训练";
+  const practice = "趣味练习";
   const teacher = lower || upper ? "AI 老师" : "AI 教师";
   if (mobile) return [
     { path: "/workbench", label: "学习首页", mobileLabel: "首页", icon: "home", end: true },
     { path: "/resources", label: book, mobileLabel: "学习", icon: "book" },
-    { path: "/practice", label: practice, mobileLabel: "练习", icon: "practice" },
+    { path: "/practice", label: practice, mobileLabel: "小游戏", icon: "game" },
     { path: "/conversations", label: teacher, mobileLabel: "老师", icon: "chat" },
     { path: "/more", label: "更多", mobileLabel: "更多", icon: "resource" },
   ];
   return [
     { path: "/workbench", label: "学习首页", mobileLabel: "首页", icon: "home", end: true },
     { path: "/resources", label: book, mobileLabel: "学习", icon: "book" },
-    { path: lower || upper ? "/animations" : "/activities", label: lower || upper ? "动画讲解" : junior ? "互动探索" : "互动实验", mobileLabel: "互动", icon: "resource" },
-    { path: "/practice", label: practice, mobileLabel: "练习", icon: "practice" },
+    { path: lower || upper ? "/animations" : "/activities", label: lower || upper ? "动画讲解" : "动画与实验", mobileLabel: "互动", icon: "resource" },
+    { path: "/practice", label: practice, mobileLabel: "小游戏", icon: "game" },
+    { path: "/history", label: "历史记录", mobileLabel: "记录", icon: "history" },
     ...(!lower && !upper ? [{ path: "/code", label: junior ? "编程入门" : "编程实践", mobileLabel: "编程", icon: "code" }] : []),
     { path: "/conversations", label: teacher, mobileLabel: "老师", icon: "chat" },
     { path: "/growth", label: "个人记忆", mobileLabel: "记忆", icon: "memory" },
@@ -49,13 +53,28 @@ const ADMIN_NAV: NavigationItem[] = [
   { path: "/admin/resources/interactive", label: "互动内容", mobileLabel: "互动", icon: "interactive" },
 ];
 
-function studentSection(pathname: string, search = ""): string | null {
+function studentSection(pathname: string, search = "", stage?: Stage | null): string | null {
   if (pathname.startsWith("/workbench") || pathname === "/study" || pathname === "/learn") return "/workbench";
-  if (pathname.startsWith("/animations")) return "/animations";
+  if (pathname.startsWith("/animations")) return stage?.startsWith("PRIMARY") ? "/animations" : "/activities";
   if (pathname.startsWith("/activities")) return "/activities";
+  if (pathname === "/history") return "/history";
+  const returnTo = practiceReturn(new URLSearchParams(search).get("returnTo"));
+  if ((pathname.startsWith("/practice/sessions/") || pathname.startsWith("/interactive/")) && returnTo?.startsWith("/history")) return "/history";
+  const query = new URLSearchParams(search);
+  if (pathname.startsWith("/resources/") && ["animations", "activities"].includes(query.get("from") ?? "")) {
+    return query.get("from") === "animations" && stage?.startsWith("PRIMARY") ? "/animations" : "/activities";
+  }
+  if (pathname.startsWith("/practice/sessions/") || pathname === "/practice" && (query.has("chapter") || query.has("job"))) {
+    if (returnTo === "/practice") return "/practice";
+    if (returnTo?.startsWith("/workbench")) return "/workbench";
+    if (returnTo?.startsWith("/conversations")) return "/conversations";
+    if (returnTo && ["/study", "/chapters/", "/lessons"].some(path => returnTo.startsWith(path))) return "/resources";
+    return "/history";
+  }
   if (pathname.startsWith("/interactive")) {
     const from = new URLSearchParams(search).get("from");
-    return from === "practice" ? "/practice" : from === "animations" ? "/animations" : "/activities";
+    if (returnTo === "/resources" || from === "resources") return "/resources";
+    return from === "practice" ? "/practice" : from === "animations" && stage?.startsWith("PRIMARY") ? "/animations" : "/activities";
   }
   if (pathname.startsWith("/code")) return "/code";
   if (pathname.startsWith("/more")) return "/more";
@@ -82,6 +101,8 @@ function Icon({ name }: { name: string }) {
   if (name === "home") return <svg {...common}><path d="m3 10 9-7 9 7v10H3z" /><path d="M9 20v-7h6v7" /></svg>;
   if (name === "code") return <svg {...common}><path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 5l-4 14" /></svg>;
   if (name === "book") return <svg {...common}><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z" /><path d="M4 5.5v16A2.5 2.5 0 0 1 6.5 19H20" /><path d="M8 7h8M8 11h7" /></svg>;
+  if (name === "history") return <svg {...common}><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6M12 7v5l3 2" /></svg>;
+  if (name === "game") return <svg {...common}><path d="M7 8h10a4 4 0 0 1 4 4l1 6a2 2 0 0 1-3.4 1.8L16 17H8l-2.6 2.8A2 2 0 0 1 2 18l1-6a4 4 0 0 1 4-4Z" /><path d="M7 11v5m-2.5-2.5h5"/><circle cx="16" cy="12" r=".6"/><circle cx="18" cy="14" r=".6"/></svg>;
   if (name === "practice") return <svg {...common}><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M8 8h8M8 12h8M8 16h5" /><path d="m16.5 15.5 1.5 1.5-3 3-1.5.2.2-1.5z" /></svg>;
   if (name === "resource") return <svg {...common}><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z" /><path d="M4 5.5v15M8 7h8M8 11h8M8 15h5" /></svg>;
   if (name === "memory") return <svg {...common}><path d="M12 3.5 14 5l2.5-.1.9 2.3 2.1 1.3-.8 2.4.8 2.4-2.1 1.3-.9 2.3L14 17l-2 1.5L10 17l-2.5.1-.9-2.3-2.1-1.3.8-2.4-.8-2.4 2.1-1.3.9-2.3L10 5z" /><path d="m8.5 11.5 2.2 2.2 4.8-5" /></svg>;
@@ -173,7 +194,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 }
 
 function AccountLayout({ me, children }: { me: MeResponse; children: ReactNode }) {
-  return <AccountProvider me={me}><CompanionAvatarProvider userId={me.user.id}><ConversationProvider key={me.user.id}><LearningTeacherProvider><EditingGuardProvider><AccountFrame me={me}>{children}</AccountFrame></EditingGuardProvider></LearningTeacherProvider></ConversationProvider></CompanionAvatarProvider></AccountProvider>;
+  return <AccountProvider me={me}><CompanionAvatarProvider userId={me.user.id}><ConversationProvider key={`${me.user.id}:${me.profile?.stage ?? "unset"}`}><LearningTeacherProvider><EditingGuardProvider><AccountFrame me={me}>{children}</AccountFrame></EditingGuardProvider></LearningTeacherProvider></ConversationProvider></CompanionAvatarProvider></AccountProvider>;
 }
 
 function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode }) {
@@ -187,23 +208,17 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
   const adminPage = pathname.startsWith("/admin");
   const stage = me.profile?.stage;
   const items = adminPage ? ADMIN_NAV : studentNavigation(stage);
-  const currentSection = adminPage ? null : studentSection(pathname, search);
+  const currentSection = adminPage ? null : studentSection(pathname, search, stage);
   const mobileSection = (
-    (currentSection && ["/activities", "/animations", "/code", "/growth"].includes(currentSection))
+    (currentSection && ["/activities", "/animations", "/code", "/growth", "/history"].includes(currentSection))
     || pathname.startsWith("/settings")
   ) ? "/more" : currentSection;
-  const navTitle = adminPage ? "教学管理"
-    : pathname.startsWith("/conversations") ? items.find((item) => item.path === "/conversations")?.label ?? "AI 教师"
-    : pathname.startsWith("/chapters/") ? "章节学习"
-    : pathname.startsWith("/picturebooks") ? "绘本阅读"
-    : pathname.startsWith("/resources/") ? "资源详情"
-    : pathname.startsWith("/animations") ? "教学动画"
-    : pathname.startsWith("/activities") || pathname.startsWith("/interactive") ? "互动内容"
-    : pathname.startsWith("/code") ? "在线编程"
-    : pathname.startsWith("/more") ? "更多入口"
-    : pathname.startsWith("/growth") ? "个人记忆"
-    : pathname.startsWith("/settings") ? "学习设置"
-    : items.find((item) => item.path === currentSection)?.label ?? "学习平台";
+  const chrome = routeChrome(pathname, search, stage);
+  const [titleOverride, setTitleOverride] = useState<{ path: string; title: string | null } | null>(null);
+  const setPageTitle = useCallback((title: string | null) => setTitleOverride({ path: pathname, title }), [pathname]);
+  const navTitle = titleOverride?.path === pathname && titleOverride.title ? titleOverride.title : chrome.title;
+  const ownsTitle = chrome.layout === "catalog" || pathname.startsWith("/conversations");
+  const chromeContext = useMemo(() => ({ ownsTitle, setTitle: setPageTitle }), [ownsTitle, setPageTitle]);
   const conversationPage = pathname.startsWith("/conversations");
   const interactiveSurface = pathname.startsWith("/interactive/");
   const [interactiveFocused, setInteractiveFocused] = useState(false);
@@ -223,19 +238,20 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
   const activeTitle = conversationPage && activeConversation
     ? activeConversation.title ?? activeConversation.chapter_title ?? "新对话"
     : navTitle;
+  useEffect(() => { document.title = `${activeTitle} · K12学习平台`; }, [activeTitle]);
   const activeChapter = conversationPage ? activeConversation?.chapter_title ?? null : null;
   const closeMobile = () => setMobileNavOpen(false);
   const startConversation = () => { void controller.start().then((id) => { if (id) navigateTo(`/conversations?session=${id}`); }); };
 
   const readingSurface = pathname === "/resources" || pathname.startsWith("/books/");
-  return <div className="app-shell" data-stage={stage ?? ""} data-admin={adminPage} data-interactive-surface={interactiveSurface} data-interactive-focused={interactiveSurface && interactiveFocused} data-reading-surface={readingSurface} data-code-surface={codeSurface}>
+  return <PageChromeContext.Provider value={chromeContext}><div className="app-shell" data-page-layout={chrome.layout} data-stage={stage ?? ""} data-admin={adminPage} data-interactive-surface={interactiveSurface} data-interactive-focused={interactiveSurface && interactiveFocused} data-reading-surface={readingSurface} data-code-surface={codeSurface}>
     <a href="#page-content" className="skip-link">跳到主要内容</a>
     {adminPage ? <button type="button" className="app-mobile-toggle" aria-label={mobileNavOpen ? "关闭导航" : "打开导航"} aria-expanded={mobileNavOpen} onClick={() => setMobileNavOpen((value) => !value)}><Icon name="book" /></button> : <NavLink to="/settings" className="k12-mobile-settings" aria-label="打开学习设置"><Icon name="settings" /></NavLink>}
     {mobileNavOpen ? <button type="button" className="app-sidebar-backdrop" aria-label="关闭导航" onClick={closeMobile} /> : null}
     <aside className={`app-sidebar${mobileNavOpen ? " is-open" : ""}`} aria-label="平台导航">
       <a className="app-brand" href={admin ? "/admin/resources" : "/workbench"} onClick={closeMobile}><span className="app-brand-mark" aria-hidden="true"><img className="brand-symbol" src="/shuangling-brand.svg" width="40" height="40" alt="" /></span><span className="app-brand-copy"><strong>霜铃 K12</strong><small>让每个问题都有回应</small></span></a>
       <nav className="app-sidebar-nav" aria-label={adminPage ? "管理导航" : "学生导航"}>
-        {items.map((item) => <NavLink key={item.path} to={item.path} end={item.end} className={({ isActive }) => isActive || currentSection === item.path ? "active" : ""} onClick={closeMobile}><Icon name={item.icon} /><span>{item.label}</span></NavLink>)}
+        {items.map((item) => adminPage ? <NavLink key={item.path} to={item.path} end={item.end} className={({ isActive }) => isActive ? "active" : ""} onClick={closeMobile}><Icon name={item.icon} /><span>{item.label}</span></NavLink> : <Link key={item.path} to={item.path} className={currentSection === item.path ? "active" : ""} aria-current={currentSection === item.path ? "page" : undefined} onClick={closeMobile}><Icon name={item.icon} /><span>{item.label}</span></Link>)}
       </nav>
       {!adminPage ? <nav className="app-sidebar-secondary" aria-label="学习设置与管理入口">
         {!adminPage ? STUDENT_SIDEBAR_EXTRA.map((item) => <NavLink key={item.path} to={item.path} className={({ isActive }) => isActive ? "active" : ""} onClick={closeMobile}><Icon name={item.icon} /><span>{item.label}</span></NavLink>) : null}
@@ -248,11 +264,11 @@ function AccountFrame({ me, children }: { me: MeResponse; children: ReactNode })
     </aside>
     <div className={`app-main${conversationPage ? " app-main--conversation" : ""}`}>
       {codeSurface ? <span className="codelab-pet-slot" aria-hidden="true" /> : null}
-      <header className={`app-topbar${conversationPage ? " app-topbar--conversation" : ""}`}><div className="app-topbar-title"><p className="app-breadcrumb">{adminPage ? "管理端" : "我的学习"}</p>{conversationPage ? <h1 className="app-topbar-page-title">{activeTitle}</h1> : <p className="app-topbar-page-title">{activeTitle}</p>}</div>{activeChapter && activeChapter !== activeTitle ? <span className="conv-context-chip">当前参考：{activeChapter}</span> : null}<div className="app-topbar-account">{conversationPage ? <><button type="button" className="secondary" onClick={() => historyDialog.current?.showModal()}>对话记录</button><button type="button" onClick={startConversation}>新对话</button></> : <>{!adminPage ? <NavLink to="/conversations" className="k12-mobile-chat" aria-label="打开完整聊天界面"><Icon name="chat" /><span>聊天</span></NavLink> : null}<span className="app-stage-label">{adminPage ? "管理员" : gradeLabel(me.profile?.grade)}</span></>}</div></header>
+      <header className={`app-topbar${conversationPage ? " app-topbar--conversation" : ""}`}><div className="app-topbar-title">{ownsTitle ? <h1 id="app-page-title" className="app-topbar-page-title">{activeTitle}</h1> : <p className="app-topbar-page-title">{activeTitle}</p>}</div>{activeChapter && activeChapter !== activeTitle ? <span className="conv-context-chip">当前参考：{activeChapter}</span> : null}{!admin && !interactiveSurface && !codeSurface ? <span className="app-pet-slot" aria-hidden="true" /> : null}<div className="app-topbar-account">{conversationPage ? <><button type="button" className="secondary" onClick={() => historyDialog.current?.showModal()}>对话记录</button><button type="button" onClick={startConversation}>新对话</button></> : <>{!adminPage ? <NavLink to="/conversations" className="k12-mobile-chat" aria-label="打开完整聊天界面"><Icon name="chat" /><span>聊天</span></NavLink> : null}<span className="app-stage-label">{adminPage ? "管理员" : gradeLabel(me.profile?.grade)}</span></>}</div></header>
       <div id="page-content" className={`app-content${conversationPage ? " app-content--conversation" : ""}`} tabIndex={-1}>{adminPage && !admin ? <main><h1>仅管理员可访问</h1><a href="/conversations">返回学习平台</a></main> : children}</div>
     </div>
     {conversationPage ? <dialog ref={historyDialog} className="k12-history-dialog" onClick={(event) => { if (event.target === event.currentTarget) historyDialog.current?.close(); }}><div className="k12-dialog-heading"><h2>对话记录</h2><button type="button" className="secondary" aria-label="关闭对话记录" onClick={() => historyDialog.current?.close()}>关闭</button></div><GlobalConversationHistory onSelect={() => historyDialog.current?.close()} /></dialog> : null}
-    {!adminPage ? <nav className="k12-mobile-nav" aria-label="主要导航">{studentNavigation(stage, true).map((item) => <NavLink key={item.path} to={item.path} end={item.end} className={({ isActive }) => isActive || mobileSection === item.path ? "active" : ""}><Icon name={item.icon} /><span>{item.mobileLabel}</span></NavLink>)}</nav> : null}
-    {!admin && stage && pathname !== "/onboarding" && !adminPage ? <Companion userId={me.user.id} /> : null}
-  </div>;
+    {!adminPage ? <nav className="k12-mobile-nav" aria-label="主要导航">{studentNavigation(stage, true).map((item) => <Link key={item.path} to={item.path} className={mobileSection === item.path ? "active" : ""} aria-current={mobileSection === item.path ? "page" : undefined}><Icon name={item.icon} /><span>{item.mobileLabel}</span></Link>)}</nav> : null}
+    {!admin && !adminPage ? <Companion userId={me.user.id} /> : null}
+  </div></PageChromeContext.Provider>;
 }

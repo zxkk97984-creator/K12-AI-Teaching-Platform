@@ -42,7 +42,7 @@ class StageBand:
 
 STAGE_BANDS: dict[str, StageBand] = {
     "PRIMARY_LOWER": StageBand(
-        max_quiz_questions=1,
+        max_quiz_questions=20,
         difficulties=("EASY",),
         question_types=("SINGLE_CHOICE", "TRUE_FALSE"),
         max_explanation_chars=220,
@@ -50,7 +50,7 @@ STAGE_BANDS: dict[str, StageBand] = {
         scaffolding="WARM",
     ),
     "PRIMARY_UPPER": StageBand(
-        max_quiz_questions=2,
+        max_quiz_questions=20,
         difficulties=("EASY", "MEDIUM"),
         question_types=("SINGLE_CHOICE", "TRUE_FALSE", "ORDERING"),
         max_explanation_chars=320,
@@ -58,7 +58,7 @@ STAGE_BANDS: dict[str, StageBand] = {
         scaffolding="WARM",
     ),
     "JUNIOR": StageBand(
-        max_quiz_questions=3,
+        max_quiz_questions=20,
         difficulties=("EASY", "MEDIUM"),
         question_types=("SINGLE_CHOICE", "ORDERING"),
         max_explanation_chars=480,
@@ -66,7 +66,7 @@ STAGE_BANDS: dict[str, StageBand] = {
         scaffolding="GUIDED",
     ),
     "SENIOR": StageBand(
-        max_quiz_questions=3,
+        max_quiz_questions=20,
         difficulties=("EASY", "MEDIUM", "HARD"),
         question_types=("SINGLE_CHOICE", "ORDERING"),
         max_explanation_chars=640,

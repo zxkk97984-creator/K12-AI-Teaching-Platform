@@ -448,10 +448,7 @@ export function LessonPage() {
   return (
     <main className="lesson-page" data-testid="lesson-page">
       <header className="lesson-header">
-        <h1>课堂</h1>
-        <p className="lesson-muted">
-          阶段与生命周期分开记录：暂停不改变进度，跳过不会算作答对。
-        </p>
+        <h1>{chapters.find(item => item.chapter_id === chapterId)?.title ?? sessions.find(item => item.id === sessionId)?.chapter_title ?? "本次课堂"}</h1>
       </header>
       {error ? (
         <p className="lesson-error" role="alert" data-testid="lesson-error">

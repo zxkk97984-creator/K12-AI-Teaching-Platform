@@ -8,6 +8,11 @@ const markdown = '## 学习路线\n\n1. **为什么学 Python**：像英语一�
 const message: MessageDTO = { id: "markdown-test", role: "ASSISTANT", content_markdown: markdown, card: null, created_at: "2026-10-01T00:00:00Z" };
 
 describe("assistant Markdown", () => {
+  it("renders formulas while retaining a reply's original source", () => {
+    const {container} = render(<MessageView message={{...message,source_label:"原章节 · 第 2 版",content_markdown:"准确率：$\\frac{TP+TN}{N}$"}} />);
+    expect(container.querySelector(".katex")).toBeTruthy();
+    expect(screen.getByText("本条参考：原章节 · 第 2 版")).toBeTruthy();
+  });
   it("formats stored replies, cards and streaming drafts consistently", () => {
     for (const mode of ["message", "card", "streaming"]) {
       const { container, unmount } = render(mode === "streaming" ? <StreamingMessageView text={markdown} /> : <MessageView message={{ ...message, card: mode === "card" ? {

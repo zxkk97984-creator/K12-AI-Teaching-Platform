@@ -27,24 +27,16 @@ export function LoginPage() {
 
   return <main className="od-login">
     <div className="od-login-layout">
-      <section className="od-login-intro" aria-labelledby="login-title">
-        <p className="od-login-wordmark"><img src="/shuangling-brand.svg" width="32" height="32" alt="" />霜铃 K12</p>
-        <p className="od-login-kicker">继续你的学习</p>
-        <h1 id="login-title">回到你的<br />学习空间</h1>
-        <p className="od-login-lede">登录后进入学习首页，继续课程，也能找回书架里的内容。</p>
-        <p className="od-login-intro-note">让每个问题都有回应</p>
-      </section>
       <section className="od-login-panel" aria-labelledby="login-form-title">
-        <p className="od-login-kicker">账号入口 · 本地演示</p>
-        <h2 id="login-form-title">登录</h2>
-        <p className="od-login-panel-copy">使用已配置的演示账号继续。</p>
+        <p className="od-login-wordmark"><img src="/shuangling-brand.svg" width="32" height="32" alt="" />霜铃 K12</p>
+        <h1 id="login-form-title">登录</h1>
         <form onSubmit={(event) => void submit(event)}>
           {error && <p className="od-login-error" role="alert">{error}</p>}
           <label>用户名<input name="username" autoComplete="username" required value={username} onChange={(event) => setUsername(event.target.value)} /></label>
           <label>密码<input name="password" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} /></label>
           <button type="submit" disabled={busy}>{busy ? "正在登录…" : "登录并继续"}<span aria-hidden="true">→</span></button>
         </form>
-        <p className="od-login-privacy">本轮使用合成账户，不开放真实未成年人自助注册。登录由服务端验证，密码不会保存在浏览器。</p>
+        <p className="od-login-privacy">本轮使用合成账户，不开放真实未成年人自助注册。</p>
       </section>
     </div>
   </main>;

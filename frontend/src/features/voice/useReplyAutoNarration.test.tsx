@@ -20,7 +20,7 @@ function setup(me = account, alreadyComplete = false) {
     if(value.status !== "SUCCEEDED" || !value.card || !fresh) return false;
     fresh = false; return true;
   });
-  vi.spyOn(controller,"getSnapshot").mockImplementation(() => ({sessions:[],chapters:[],detail:{id:"s",messages:[]} as never,draft:"",run,loading:false,selecting:false,sending:false,transport:null,error:null}));
+  vi.spyOn(controller,"getSnapshot").mockImplementation(() => ({reference:null,quizRequest:null,quizJobs:[],sessions:[],chapters:[],detail:{id:"s",messages:[]} as never,draft:"",run,loading:false,selecting:false,sending:false,transport:null,error:null}));
   // Cache the snapshot exactly as useSyncExternalStore requires.
   const getter = controller.getSnapshot;
   let snapshot = getter();

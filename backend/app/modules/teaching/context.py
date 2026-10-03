@@ -270,8 +270,8 @@ def _limits_for(context: dict[str, Any], policy: dict[str, Any] | None) -> dict[
 
     limits = dict(context.get("limits", {}))
     if policy:
-        limits["max_quiz_questions"] = int(
-            policy.get("max_quiz_questions", limits.get("max_quiz_questions", 0))
+        limits["max_quiz_questions"] = min(
+            5, int(policy.get("max_quiz_questions", limits.get("max_quiz_questions", 0)))
         )
         limits["allowed_difficulties"] = list(
             policy.get("allowed_difficulties", limits.get("allowed_difficulties", ["EASY"]))

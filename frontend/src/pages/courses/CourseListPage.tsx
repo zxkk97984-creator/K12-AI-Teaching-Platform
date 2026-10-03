@@ -45,7 +45,7 @@ export function CourseListPage() {
   }, [attempt]);
 
   return (
-    <ContentLayout title="课程">
+    <ContentLayout title="课程目录" variant="catalog">
       {state.kind === "loading" ? <LoadingState label="正在读取课程目录…" /> : null}
       {state.kind === "error" ? (
         <ErrorState

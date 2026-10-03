@@ -447,7 +447,7 @@ CATEGORY_QUERY = {
 
 
 class KeywordMemoryRetriever:
-    async def retrieve(self, db, owner, query, limit=6):
+    async def retrieve(self, db, owner, query, limit=6, *, category=None):
         limit = min(max(int(limit), 0), 6)
         state = await state_for(db, owner, create=False)
         if not limit or (state and not state.use_enabled):
@@ -467,6 +467,8 @@ class KeywordMemoryRetriever:
             (PersonalMemoryItem.valid_until.is_(None))
             | (PersonalMemoryItem.valid_until > utcnow()),
         ]
+        if category is not None:
+            clauses.append(PersonalMemoryItem.category == category)
         # Filter in SQL before ranking, so recent unrelated rows cannot crowd out
         # an older relevant row beyond a fixed preselection window.
         if not profile_query:

@@ -18,14 +18,14 @@ const REVIEW_LABEL: Record<ResourceSummary["review_status"], string> = {
   HUMAN_APPROVED: "人工审校通过",
 };
 
-export function ResourceCard({ resource }: { resource: ResourceSummary }) {
+export function ResourceCard({ resource, showTitle = true }: { resource: ResourceSummary; showTitle?: boolean }) {
   const [ticket, setTicket] = useState<ResourceTicket | null>(null);
   const [error, setError] = useState<string | null>(null);
   const usable = usableVariants(resource);
   const source = usable.find((item) => item.variant === "SOURCE") ?? usable[0];
   const preview = usable.find((item) => item.variant === "PREVIEW");
   const missing = resource.variants.length > 0 && usable.length === 0;
-  if (resource.kind === "INTERACTIVE") return <article className="resource-card od-stack"><header><h3>{resource.title}</h3><p className="resource-kind">互动内容 · {resource.interactive_subject}</p></header><p>{resource.description}</p><a href={`/interactive/${resource.id}`}>打开互动内容 →</a></article>;
+  if (resource.kind === "INTERACTIVE") return <article className="resource-card od-stack"><header>{showTitle ? <h3>{resource.title}</h3> : null}<p className="resource-kind">互动内容 · {resource.interactive_subject}</p></header><p>{resource.description}</p><a href={`/interactive/${resource.id}`}>打开互动内容 →</a></article>;
 
   async function requestTicket() {
     setError(null);
@@ -43,7 +43,7 @@ export function ResourceCard({ resource }: { resource: ResourceSummary }) {
   return (
     <article className="resource-card od-stack" data-testid={`resource-card-${resource.id}`}>
       <header>
-        <h3>{resource.title}</h3>
+        {showTitle ? <h3>{resource.title}</h3> : null}
         <p className="resource-kind" data-testid="resource-kind">
           {KIND_LABEL[resource.kind]}
         </p>

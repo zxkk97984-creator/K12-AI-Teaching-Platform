@@ -78,6 +78,30 @@ def designer_payload(operation: Operation, request: dict[str, Any]) -> dict[str,
     payload["chapter_id"] = request["chapter_id"]
     payload["curriculum_revision"] = request["curriculum_revision"]
     payload["stage"] = request["stage"]
+    if operation is Operation.QUIZ_DRAFT and "-batch-" in request["request_id"]:
+        spec = request["quiz_spec"]
+        templates = {q["type"]: q for q in payload["questions"]}
+        types = [kind for kind in spec["question_types"] if kind in templates]
+        if not types:
+            types = ["SINGLE_CHOICE"]
+        questions = []
+        for index in range(spec["count"]):
+            question = copy.deepcopy(templates[types[index % len(types)]])
+            question["question_key"] = f"q{index + 1}"
+            question["stem"] = (
+                f"合成批次 {request['request_id'].rsplit('-batch-', 1)[-1]} 第 {index + 1} 题："
+                + question["stem"]
+            )
+            question["objective_id"] = request["objective_ids"][0]
+            question["source_refs"] = [
+                {
+                    key: request["knowledge_context"][0][key]
+                    for key in ("source_id", "revision", "locator")
+                }
+            ]
+            questions.append(question)
+        payload["questions"] = questions
+        payload["difficulty"] = spec["difficulty"]
     warnings = list(payload.get("warnings", []))
     payload["warnings"] = warnings + [FIXTURE_NOTICE]
     return payload

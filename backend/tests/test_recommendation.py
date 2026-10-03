@@ -159,14 +159,14 @@ async def test_read_is_pure_and_events_change_the_decision(
         assert answered.status_code == 200, answered.text
         assert answered.json()["is_correct"] is False
 
-        # Before the event-driven projection the read model says so honestly.
+        # The answer event now refreshes before returning; reads remain pure.
         pending = await _next_step(client)
-        assert pending["needs_projection"] is True
-        assert pending["cold_start"] is True
+        assert pending["needs_projection"] is False
+        assert pending["cold_start"] is False
 
         # A refresh is an event: it projects the evidence and stores the decision.
         refreshed = await _refresh(client)
-        assert refreshed["projection"]["created"] is True
+        assert refreshed["projection"]["created"] is False
         assert refreshed["snapshot_state"] == "CURRENT"
         assert refreshed["needs_refresh"] is False
         assert refreshed["primary"]["kind"] == "REVIEW_MISTAKE"
@@ -177,7 +177,7 @@ async def test_read_is_pure_and_events_change_the_decision(
         assert after_event["cold_start"] is False
         assert after_event["primary"]["kind"] == "REVIEW_MISTAKE"
         assert after_event["primary"]["evidence_ids"], after_event["primary"]
-        assert after_event["rule_version"] == "k12.recommendation.rule.v1"
+        assert after_event["rule_version"] == "k12.recommendation.rule.v2"
         assert after_event["effect_verified"] is False
 
         # README of the snapshot can be traced back to the original evidence.
@@ -186,7 +186,7 @@ async def test_read_is_pure_and_events_change_the_decision(
         assert detail.status_code == 200
         trace = detail.json()["trace"]
         assert trace["evidence_ids"], trace
-        assert trace["rule_version"] == "k12.recommendation.rule.v1"
+        assert trace["rule_version"] == "k12.recommendation.rule.v2"
 
         # Identical inputs must not create another snapshot (L6).
         again = await _refresh(client)
@@ -231,7 +231,9 @@ async def test_hints_and_skips_are_not_mastery_and_never_raise_difficulty(
 
 
 @pytest.mark.asyncio
-async def test_decision_matches_the_teaching_phase_state(content_session, test_settings: Settings):
+async def test_decision_does_not_depend_on_retired_classroom_phases(
+    content_session, test_settings: Settings
+):
     """L1: one decision — the lesson surface and /learn agree."""
 
     settings = teaching_settings(test_settings)
@@ -244,7 +246,7 @@ async def test_decision_matches_the_teaching_phase_state(content_session, test_s
     client = create_app_client(settings)
     async with client:
         await login(client, "t19.lesson", PASSWORD)
-        for phase, expected in (
+        for phase, _expected in (
             ("ORIENT", "开始这一节的讲解"),
             ("EXPLAIN", "看完讲解，进入检查"),
             ("CHECK", "完成本节的理解检查"),
@@ -255,16 +257,15 @@ async def test_decision_matches_the_teaching_phase_state(content_session, test_s
             session.lifecycle = "ACTIVE"
             await content_session.commit()
             body = await _next_step(client)
-            assert body["primary"]["kind"] == "CONTINUE_LESSON"
-            assert body["primary"]["title"] == expected
-            assert body["primary"]["action"]["type"] == "OPEN_LESSON"
-            assert body["primary"]["source"]["phase"] == phase
+            assert body["primary"]["kind"] == "START_COURSE"
+            assert body["primary"]["action"]["type"] == "OPEN_CHAPTER"
+            assert body["primary"]["action"]["chapter_id"] == str(revision.chapter_id)
 
         # Paused still wins over new content, with the honest continuation copy.
         session.lifecycle = "PAUSED"
         await content_session.commit()
         paused = await _next_step(client)
-        assert paused["primary"]["title"] == "继续之前暂停的这一节"
+        assert paused["primary"]["kind"] == "START_COURSE"
 
         # The same stored state drives the lesson API, so the two cannot disagree.
         phase_body = await client.get(f"/api/v1/lesson-sessions/{session.id}/phase")
@@ -299,7 +300,7 @@ async def test_withdrawn_evidence_and_disputed_memory_stop_participating(
         ).status_code == 200
 
         refreshed = await _refresh(client)
-        assert refreshed["primary"]["kind"] == "REVIEW_MISTAKE"
+        assert refreshed["primary"]["kind"] == "PRACTICE_WEAK"
 
         # The derived candidate must be *confirmed* by the student before it can
         # be part of any decision input (CANDIDATE is excluded by T18 design).
@@ -472,7 +473,7 @@ async def test_worker_recomputes_the_snapshot_on_a_run(content_session, test_set
     # Exactly one snapshot was produced by the event…
     assert await _count(content_session, RecommendationSnapshot) == 1
     stored = await content_session.scalar(select(RecommendationSnapshot))
-    assert stored.primary_item["kind"] == "CONTINUE_LESSON"
+    assert stored.primary_item["kind"] == "START_COURSE"
     assert stored.effect_verified is False
     # …and the run itself still owns the lesson session state it wrote.
     lesson = await content_session.scalar(

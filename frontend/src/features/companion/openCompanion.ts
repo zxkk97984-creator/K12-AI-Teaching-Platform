@@ -1,7 +1,7 @@
 import type { SceneSnapshot } from "../conversation/types";
 
 export type CompanionPageContext = Pick<SceneSnapshot,
-  "page_type" | "visible_section" | "selected_text" | "knowledge_points" |
+  "chapter_id" | "chapter_title" | "chapter_revision" | "content_block_id" | "page_type" | "visible_section" | "selected_text" | "knowledge_points" |
   "activity_type" | "quiz_session_id" | "question_id" |
   "content_kind" | "content_id" | "content_version" | "section_index" |
   "interactive_session_id" | "interactive_scene_id" | "interactive_prompt_id"

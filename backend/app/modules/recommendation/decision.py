@@ -6,11 +6,11 @@ phase/lifecycle). It is a pure function: given the same inputs it returns the
 same decision, so a page cannot tell the student "continue the quiz" while the
 lesson says something else.
 
-Design rules (``k12.recommendation.rule.v1`` — a local design rule, **not** a
+Design rules (``k12.recommendation.rule.v2`` — a local design rule, **not** a
 validated teaching effect):
 
-1. an unfinished lesson the student already owns wins;
-2. a real wrong answer that was never corrected wins over new content;
+1. a real wrong answer that was not subsequently corrected wins;
+2. otherwise continue an unfinished lesson the student already owns;
 3. otherwise keep practising an objective that is still forming;
 4. otherwise continue the course catalogue in order;
 5. cold start (no real evidence) starts from the catalogue and says so.
@@ -26,7 +26,7 @@ import json
 from dataclasses import dataclass
 from typing import Any
 
-RULE_VERSION = "k12.recommendation.rule.v1"
+RULE_VERSION = "k12.recommendation.rule.v2"
 THRESHOLDS_VERSION = "k12.recommendation.thresholds.v1"
 # These are local design rules; no teaching effect has been verified (QA20).
 EFFECT_VERIFIED = False
@@ -67,6 +67,12 @@ class ObjectiveState:
     level: str  # T18 observation level: EMERGING / CONSISTENT
     last_incorrect_evidence_id: str | None = None
     evidence_ids: tuple[str, ...] = ()
+    quiz_session_id: str | None = None
+    question_id: str | None = None
+    question_position: int | None = None
+    quiz_status: str | None = None
+    quiz_answered: int = 0
+    quiz_title: str = ""
 
 
 @dataclass(frozen=True)
@@ -123,7 +129,11 @@ def _item(
 def _weakest(objectives: tuple[ObjectiveState, ...]) -> ObjectiveState | None:
     """Deterministic: most wrong answers first, then objective id."""
 
-    with_answers = [item for item in objectives if item.answered > 0]
+    with_answers = [
+        item
+        for item in objectives
+        if item.answered > 0 and (item.incorrect > 0 or item.level != "CONSISTENT")
+    ]
     if not with_answers:
         return None
     return sorted(with_answers, key=lambda item: (-item.incorrect, item.objective_id))[0]
@@ -150,6 +160,18 @@ def _course_candidate(inputs: DecisionInputs) -> CandidateChapter | None:
     return None
 
 
+def _practice_action(objective: ObjectiveState) -> dict[str, Any]:
+    return {
+        "type": "OPEN_PRACTICE",
+        "objective_id": objective.objective_id,
+        "quiz_session_id": objective.quiz_session_id,
+        "question_position": objective.question_position,
+        "quiz_status": objective.quiz_status,
+        "quiz_answered": objective.quiz_answered,
+        "quiz_title": objective.quiz_title,
+    }
+
+
 def decide_next_step(inputs: DecisionInputs) -> dict[str, Any]:
     """Pure decision. Same inputs ⇒ same output, no I/O."""
 
@@ -157,7 +179,22 @@ def decide_next_step(inputs: DecisionInputs) -> dict[str, Any]:
     alternatives: list[dict[str, Any]] = []
 
     lesson = inputs.active_lesson
-    if lesson is not None and lesson.lifecycle in ("ACTIVE", "PAUSED"):
+    weak = _weakest(inputs.objectives)
+    if weak is not None and weak.incorrect > 0:
+        primary = _item(
+            kind=KIND_REVIEW_MISTAKE,
+            subject_key=f"objective:{weak.objective_id}",
+            title="先复盘错题，再练一次",
+            reason=f"这个目标有 {weak.incorrect} 道题最近一次仍答错，先看解析再练习。",
+            source={
+                "type": "OBJECTIVE",
+                "objective_id": weak.objective_id,
+                "question_id": weak.question_id,
+            },
+            evidence_ids=list(weak.evidence_ids),
+            action=_practice_action(weak),
+        )
+    elif lesson is not None and lesson.lifecycle in ("ACTIVE", "PAUSED"):
         advice = PHASE_ADVICE.get(lesson.phase, PHASE_ADVICE["ORIENT"])
         paused = lesson.lifecycle == "PAUSED"
         primary = _item(
@@ -184,21 +221,7 @@ def decide_next_step(inputs: DecisionInputs) -> dict[str, Any]:
             },
         )
     else:
-        weak = _weakest(inputs.objectives)
-        if weak is not None and weak.incorrect > 0 and weak.level != "CONSISTENT":
-            primary = _item(
-                kind=KIND_REVIEW_MISTAKE,
-                subject_key=f"objective:{weak.objective_id}",
-                title="先复盘错题，再做一组同类练习",
-                reason=(
-                    f"这个目标有 {weak.incorrect} 次真实答错、还没有完全改正；"
-                    "下一步先看解析再练，不会直接加难度。"
-                ),
-                source={"type": "OBJECTIVE", "objective_id": weak.objective_id},
-                evidence_ids=list(weak.evidence_ids),
-                action={"type": "OPEN_PRACTICE", "objective_id": weak.objective_id},
-            )
-        elif weak is not None and weak.level != "CONSISTENT":
+        if weak is not None and weak.level != "CONSISTENT":
             primary = _item(
                 kind=KIND_PRACTICE_WEAK,
                 subject_key=f"objective:{weak.objective_id}",
@@ -209,7 +232,7 @@ def decide_next_step(inputs: DecisionInputs) -> dict[str, Any]:
                 ),
                 source={"type": "OBJECTIVE", "objective_id": weak.objective_id},
                 evidence_ids=list(weak.evidence_ids),
-                action={"type": "OPEN_PRACTICE", "objective_id": weak.objective_id},
+                action=_practice_action(weak),
             )
         else:
             candidate = _course_candidate(inputs)
@@ -258,8 +281,8 @@ def decide_next_step(inputs: DecisionInputs) -> dict[str, Any]:
             _item(
                 kind=KIND_INTEREST_MATCH,
                 subject_key=f"chapter:{interest.chapter_id}",
-                title=f"和你写的兴趣有关：《{interest.title}》",
-                reason="匹配你填写的学习兴趣，属于可选内容，不会覆盖上面这一步。",
+                title=f"和你的兴趣有关：《{interest.title}》",
+                reason="匹配你设置或允许使用的个人兴趣，可作为下一步的备选。",
                 source={
                     "type": "CHAPTER",
                     "chapter_id": interest.chapter_id,
@@ -345,11 +368,25 @@ def inputs_hash(inputs: DecisionInputs) -> str:
                 "incorrect": item.incorrect,
                 "level": item.level,
                 "evidence_ids": sorted(item.evidence_ids),
+                "target": [
+                    item.quiz_session_id,
+                    item.question_id,
+                    item.question_position,
+                    item.quiz_status,
+                    item.quiz_answered,
+                    item.quiz_title,
+                ],
             }
             for item in sorted(inputs.objectives, key=lambda entry: entry.objective_id)
         ],
         "candidates": [
-            {"id": item.chapter_id, "order": item.order_index}
+            {
+                "id": item.chapter_id,
+                "order": item.order_index,
+                "title": item.title,
+                "course_title": item.course_title,
+                "knowledge_point_slugs": item.knowledge_point_slugs,
+            }
             for item in sorted(inputs.candidates, key=lambda entry: entry.chapter_id)
         ],
         "completed": sorted(inputs.completed_chapter_ids),

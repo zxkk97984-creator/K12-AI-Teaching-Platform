@@ -6,6 +6,8 @@ evals
 backend/tests
 frontend/docs
 frontend/src
+!frontend/src/features/books/content
+!frontend/src/features/books/content/*.md
 frontend/node_modules
 **/.venv
 !backend/.venv/

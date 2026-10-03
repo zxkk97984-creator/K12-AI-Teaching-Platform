@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ApiError } from "../identity/api";
 import { newOpenEventId, recordOpen } from "../study/api";
 import { getResource } from "./api";
 import { ResourceCard } from "./ResourceCard";
+import { useLearningPageContext } from "../companion/useLearningPageContext";
 import { openCompanion } from "../companion/openCompanion";
 import type { ResourceSummary } from "./types";
 import "./resources.css";
@@ -11,6 +12,9 @@ import "./resources.css";
 export function ResourceDetailPage() {
   const { resourceId = "" } = useParams();
   const navigate = useNavigate();
+  const from = new URLSearchParams(useLocation().search).get("from");
+  const returnPath = from === "animations" ? "/animations" : from === "activities" ? "/activities?purpose=LESSON" : "/resources";
+  const returnLabel = from === "animations" ? "动画讲解" : from === "activities" ? "动画与实验" : "资源中心";
   const [resource, setResource] = useState<ResourceSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,19 +54,20 @@ export function ResourceDetailPage() {
       .finally(() => {
         if (active) setLoading(false);
       });
-    return () => {
+  return () => {
       active = false;
     };
   }, [resourceId]);
 
+  useLearningPageContext(resource ? { page_type:"resource", activity_type:"reading", visible_section:resource.title, selected_text:resource.title } : null);
+
   return (
     <main className="resource-library resource-detail-page" data-testid="resource-detail">
       <header className="resource-library-header">
-        <button type="button" className="secondary" onClick={() => navigate("/resources")}>
-          ← 返回资源中心
+        <button type="button" className="secondary" onClick={() => navigate(returnPath)}>
+          ← 返回{returnLabel}
         </button>
         <h1>{resource?.title ?? "资源详情"}</h1>
-        <p>在这里阅读、预览或下载你有权访问的学习资料。</p>
         {resource ? <button type="button" className="secondary" onClick={() => openCompanion({
           page_type: "resource", activity_type: "reading", visible_section: resource.title,
           selected_text: window.getSelection()?.toString().trim().slice(0, 4000) || resource.title,
@@ -71,7 +76,7 @@ export function ResourceDetailPage() {
       </header>
       {loading ? <p role="status">正在读取资源…</p> : null}
       {error ? <p className="resource-error" role="alert">{error}</p> : null}
-      {resource ? <ResourceCard resource={resource} /> : null}
+      {resource ? <ResourceCard resource={resource} showTitle={false} /> : null}
     </main>
   );
 }

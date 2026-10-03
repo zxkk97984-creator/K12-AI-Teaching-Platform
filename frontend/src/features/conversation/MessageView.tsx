@@ -2,6 +2,9 @@ import { ReplyNarrationControl } from "../voice/ReplyNarrationControl";
 import { memo, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import type { CardDTO, MessageDTO } from "./types";
 import { LookupCards } from "./LookupCards";
 import { CompanionHeadAvatar, useCompanionName } from "../companion/CompanionAvatar";
@@ -59,12 +62,12 @@ function CardView({ card, onRetryLookup }: { card: CardDTO; onRetryLookup?: () =
   );
 }
 
-const markdownPlugins = [remarkGfm];
+const markdownPlugins = [remarkGfm,remarkMath];
 
 const SafeMarkdown = memo(function SafeMarkdown({ text }: { text: string }) {
   return (
     <div className="conv-card-text">
-      <ReactMarkdown remarkPlugins={markdownPlugins} skipHtml components={{
+      <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={[[rehypeKatex,{trust:false,strict:"ignore",throwOnError:false}]]} skipHtml components={{
         h1: ({ children }) => <h3>{children}</h3>,
         h2: ({ children }) => <h3>{children}</h3>,
         pre: ({ children }) => <pre className="conv-code-block">{children}</pre>,
@@ -91,15 +94,22 @@ export function MessageView({ message, extra, onRetryLookup }: { message: Messag
   };
   if (message.role === "USER") {
     return (
+      <>
       <li className="conv-message conv-message-user" data-testid="user-message">
         <strong className="sr-only">你</strong>
         <p>{message.content_markdown}</p>
       </li>
+      {extra ? <li className="conv-message conv-message-assistant">
+        <div className="conv-assistant-author"><CompanionHeadAvatar /><strong>{companionName}</strong></div>
+        {extra}
+      </li> : null}
+      </>
     );
   }
   return (
     <li className="conv-message conv-message-assistant">
       <div className="conv-assistant-author"><CompanionHeadAvatar /><strong>{companionName}</strong></div>
+      {message.source_label && <p className="conv-current-reference">本条参考：{message.source_label}</p>}
       {message.card ? (
         <CardView card={message.card} onRetryLookup={onRetryLookup} />
       ) : (

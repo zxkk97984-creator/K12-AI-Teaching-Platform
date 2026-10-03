@@ -25,9 +25,11 @@ for (const size of [{ width: 1542, height: 718 }, { width: 320, height: 820 }]) 
     const exit = page.getByRole("button", { name: "退出专注 Esc", exact: true });
     await expect(exit).toHaveAttribute("aria-pressed", "true");
     await expect(workspace).toHaveAttribute("data-focus-mode", "true");
-    for (const selector of [".app-sidebar", ".app-topbar", ".k12-mobile-nav", ".k12-mobile-settings", ".companion-dock", "#companion-panel"]) {
+    for (const selector of [".app-sidebar", ".app-topbar", ".k12-mobile-nav", ".k12-mobile-settings"]) {
       await expect(page.locator(selector)).toBeHidden();
     }
+    await expect(page.getByTestId("companion-dock")).toBeVisible();
+    await expect(page.locator("#companion-panel")).toBeVisible();
     await expect(page.locator(".cm-content")).toContainText("return x * 2");
     const editorAfter = (await page.getByTestId("codelab-editor").boundingBox())!;
     expect(editorAfter.height).toBeGreaterThan(editorBefore.height);
@@ -75,7 +77,7 @@ test("CodeLab catalogue, favourite, draft and compact workspace use only labelle
   await expect(firstPracticeButton).toHaveCSS("color", "rgb(255, 255, 255)");
   const favoritesTab = page.getByRole("button", { name: "我的收藏" });
   await favoritesTab.hover();
-  await expect(favoritesTab).toHaveCSS("background-color", "rgb(255, 244, 210)");
+  await expect(favoritesTab).toHaveCSS("background-color", "rgb(255, 248, 229)");
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);
   if (screenshotDir) await page.screenshot({ path: `${screenshotDir}/codelab-bank-1440.png`, fullPage: true });
   await expect(page.getByText("共 12 道题")).toBeVisible();

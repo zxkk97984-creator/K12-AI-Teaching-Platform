@@ -294,6 +294,15 @@ async def get_session_detail(
             .order_by(ConversationMessage.created_at, ConversationMessage.id)
         )
     ).all()
+    run_scenes = dict(
+        (
+            await db.execute(
+                select(AgentRun.id, AgentRun.scene_snapshot).where(
+                    AgentRun.session_id == session.id, AgentRun.owner_user_id == user.id
+                )
+            )
+        ).all()
+    )
     active_run_id = await db.scalar(
         select(AgentRun.id)
         .where(
@@ -327,6 +336,7 @@ async def get_session_detail(
             MessageDTO(
                 id=message.id,
                 run_id=message.run_id,
+                source_label=_scene_label(run_scenes.get(message.run_id)),
                 role=message.role,
                 content_markdown=message.content_markdown,
                 card=message.card,
@@ -335,6 +345,16 @@ async def get_session_detail(
             for message in messages
         ],
     )
+
+
+def _scene_label(scene):
+    if not scene:
+        return None
+    title = scene.get("chapter_title") or scene.get("visible_section")
+    if not title:
+        return None
+    revision = scene.get("chapter_revision")
+    return f"{title} · 第 {revision} 版" if revision else title
 
 
 async def update_session(
@@ -476,6 +496,7 @@ async def run_dto(db: AsyncSession, run: AgentRun, *, replay: bool = False) -> R
     return RunDTO(
         id=run.id,
         session_id=run.session_id,
+        source_label=_scene_label(run.scene_snapshot),
         operation=run.operation,
         status=run.status,
         attempt=run.attempt,

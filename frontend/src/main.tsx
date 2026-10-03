@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { pages } from "./app/routing/pages";
 const {
   Home, LoginPage, OnboardingPage, SettingsPage, WorkbenchPage, CourseListPage, CourseDetailPage,
-  ChapterReaderPage, ConversationRoutePage, LessonPage, StagePracticePage, GrowthPage, NextStepPage,
+  ChapterReaderPage, ConversationRoutePage, LessonPage, StagePracticePage, HistoryPage, GrowthPage, NextStepPage,
   ResourceDetailPage, AnimationPage, AdminResourcesPage, AdminAIPage, AdminAuthoringPage, StudyPage,
   PicturebookPage, ResourceLibraryPage, InteractiveCatalogPage, InteractivePlayerPage, AdminInteractivePage,
   MorePage, CodeLabPage, BookReaderPage,
@@ -26,6 +26,7 @@ function Page() {
   if (path.startsWith("/study/lesson")) return <LessonPage />;
   if (path === "/study") return <StudyPage />;
   if (path.startsWith("/lessons")) return <LessonPage />;
+  if (path === "/history") return <HistoryPage />;
   if (path.startsWith("/practice")) return <StagePracticePage />;
   if (path.startsWith("/growth")) return <GrowthPage />;
   if (path === "/learn") return <Navigate to="/study" replace />;
@@ -95,7 +96,7 @@ const ROUTE_PATHS = [
   "/", "/home", "/login", "/onboarding", "/conversations", "/study", "/study/lesson",
   "/resources", "/resources/:resourceId", "/courses", "/courses/:courseId", "/chapters/:chapterId",
   "/books/:bookSlug", "/picturebooks", "/picturebooks/:storyId",
-  "/practice", "/practice/sessions/:quizId", "/code", "/growth", "/settings", "/workbench",
+  "/practice", "/practice/sessions/:quizId", "/history", "/code", "/growth", "/settings", "/workbench",
   "/learn", "/learn/:path", "/animations", "/animations/:animationId", "/activities", "/interactive/:resourceId", "/more", "/lessons",
   "/admin", "/admin/ai", "/admin/resources", "/admin/resources/interactive", "/admin/authoring", "/status",
 ];

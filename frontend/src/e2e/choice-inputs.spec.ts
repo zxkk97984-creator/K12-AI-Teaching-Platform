@@ -1,7 +1,112 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { fixture, session } from "./ui-reuse-fixtures";
 import { expectCompactChoices } from "./choice-input-assertions";
 import type { QuizSessionDTO } from "../features/quiz/types";
+
+for (const stage of ["PRIMARY_LOWER","PRIMARY_UPPER","JUNIOR","SENIOR"]) {
+  test(`${stage} memory tabs use rounded highlights without bottom borders`,async({page})=>{
+    await fixture(page,{stage});
+    const errors:string[]=[];
+    page.on("pageerror",error=>errors.push(error.message));
+    await page.goto("/growth");
+    const tabs=page.getByRole("tablist",{name:"记忆内容",exact:true});
+    for (const width of [1440,768,390,320]) {
+      await page.setViewportSize({width,height:844});
+      await expect(tabs).toHaveCSS("border-bottom-style","none");
+      for(const label of ["我写的内容","自动记忆"]) {
+        const tab=tabs.getByRole("tab",{name:label,exact:true});
+        await tab.click();
+        await expect(tab).toHaveAttribute("aria-selected","true");
+        await expect(tab).toHaveCSS("background-color","rgb(255, 244, 210)");
+        await expect(tab).toHaveCSS("border-bottom-width","0px");
+        await expect(tab).toHaveCSS("border-radius","8px");
+        expect((await tab.boundingBox())!.height).toBeGreaterThanOrEqual(stage.startsWith("PRIMARY")?48:44);
+      }
+      expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await tabs.screenshot({path:`test-results/memory-tabs-${stage}-${width}.png`});
+    }
+    await tabs.getByRole("tab",{name:"自动记忆",exact:true}).press("ArrowRight");
+    const documents=tabs.getByRole("tab",{name:"我写的内容",exact:true});
+    await expect(documents).toHaveAttribute("aria-selected","true");
+    await expect(documents).toBeFocused();
+    await expect(documents).toHaveCSS("outline-style","solid");
+    expect(errors).toEqual([]);
+  });
+}
+
+async function expectSelectionStates(page: Page, group: Locator, attribute = "aria-pressed", selectedValue = "true") {
+  await expect(group).toBeVisible();
+  const buttons=group.locator(":scope > button");
+  const labels=await buttons.allTextContents();
+  expect(labels.length).toBeGreaterThanOrEqual(2);
+  for (const label of labels) {
+    const button=buttons.filter({hasText:new RegExp(`^${label.trim()}$`)});
+    await page.mouse.move(0,0);
+    const wasSelected=await button.getAttribute(attribute)===selectedValue;
+    await expect(button).toHaveCSS("background-color",wasSelected ? "rgb(255, 244, 210)" : "rgb(255, 255, 255)");
+    await button.hover();
+    await expect(button).toHaveCSS("background-color",wasSelected ? "rgb(255, 244, 210)" : "rgb(255, 248, 229)");
+    await expect(button).not.toHaveCSS("color","rgb(255, 255, 255)");
+    expect(await button.getAttribute(attribute)===selectedValue).toBe(wasSelected);
+    await button.press("Enter");
+    await expect(button).toHaveAttribute(attribute,selectedValue);
+    await page.mouse.move(0,0);
+    await expect(button).toHaveCSS("background-color","rgb(255, 244, 210)");
+    await expect(button).not.toHaveCSS("color","rgb(255, 255, 255)");
+    await button.hover();
+    await expect(button).toHaveCSS("background-color","rgb(255, 244, 210)");
+  }
+}
+
+for (const stage of ["PRIMARY_LOWER","PRIMARY_UPPER","JUNIOR","SENIOR"]) {
+  test(`${stage} selection controls stay light before hover and keep their selected highlight`, async ({page}) => {
+    test.setTimeout(60000);
+    const state=await fixture(page,{stage,rich:true,interactive:true,interactivePurpose:"LESSON"});
+    const errors:string[]=[];
+    page.on("pageerror",error=>errors.push(error.message));
+    for (const width of [1440,768,390,320]) {
+      await page.setViewportSize({width,height:844});
+      await page.goto("/resources");
+      const filters=page.getByRole("group",{name:"内容类型",exact:true});
+      await filters.locator('button[aria-pressed="false"]').first().hover();
+      await expect(filters.locator('button[aria-pressed="false"]').first()).toHaveCSS("background-color","rgb(255, 248, 229)");
+      await expectSelectionStates(page,filters);
+      // Reproduce the report: keep All selected while hovering another category.
+      await filters.getByRole("button",{name:"全部",exact:true}).press("Enter");
+      await expect(filters.getByRole("button",{name:"全部",exact:true})).toHaveAttribute("aria-pressed","true");
+      const bookFilter=filters.getByRole("button",{name:/教材|绘本/,exact:false}).first();
+      await bookFilter.hover();
+      await expect(bookFilter).toHaveCSS("background-color","rgb(255, 248, 229)");
+      await page.screenshot({path:`test-results/selection-library-${stage}-${width}.png`});
+      if(width===1440) await filters.screenshot({path:`test-results/selection-library-states-${stage}.png`});
+      expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.goto(stage.startsWith("PRIMARY") ? "/animations" : "/activities");
+      // /animations intentionally fixes the lesson type; the shared directory
+      // exposes the two purpose buttons for every stage.
+      if(stage.startsWith("PRIMARY")) await page.goto("/activities");
+      await expectSelectionStates(page,page.getByRole("group",{name:"互动内容用途",exact:true}));
+      await page.screenshot({path:`test-results/selection-interactive-${stage}-${width}.png`});
+      expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+    await page.goto("/growth");
+    await expectSelectionStates(page,page.getByRole("tablist",{name:"记忆内容",exact:true}),"aria-selected");
+    await page.screenshot({path:`test-results/selection-memory-${stage}-320.png`});
+    await page.goto("/code?tab=bank");
+    await expectSelectionStates(page,page.getByRole("navigation",{name:"编程练习页面",exact:true}),"aria-current","page");
+    await page.screenshot({path:`test-results/selection-code-${stage}-320.png`});
+    await page.goto("/chapters/chapter-ui");
+    await page.getByRole("button",{name:"问问老师",exact:true}).click();
+    const panel=page.locator("#companion-panel");
+    await panel.getByRole("button",{name:"更多学习操作",exact:true}).click();
+    await page.getByRole("menuitem",{name:/生成练习/}).click();
+    await expectSelectionStates(page,panel.getByRole("group",{name:"快捷题数",exact:true}));
+    await expect(panel.getByLabel("自定义题数",{exact:true})).toHaveValue("20");
+    await page.screenshot({path:`test-results/selection-companion-${stage}-320.png`});
+    await panel.getByRole("button",{name:"取消",exact:true}).click();
+    expect(state.starts).toBe(0);
+    expect(errors).toEqual([]);
+  });
+}
 
 test("native choices keep compact boxes in every stage and responsive library", async ({ page }) => {
   const state = await fixture(page);

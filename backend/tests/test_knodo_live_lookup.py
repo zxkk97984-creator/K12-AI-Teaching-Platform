@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import uuid
 from pathlib import Path
 
@@ -130,6 +131,16 @@ async def test_live_normal_reply_and_three_readonly_queries(
         async def observe(operation, payload, **kwargs):
             result = await original(operation, payload, **kwargs)
             raw_outputs.append(result.output)
+            reply = unwrap_final(result.output) or {}
+            print(
+                "REAL LOOKUP reply_length=",
+                len(reply.get("message_markdown", "")),
+                "reply_limit=",
+                payload.get("limits", {}).get("max_reply_chars"),
+                "prose_has_number_or_link=",
+                bool(re.search(r"[0-9]|https?://|\]\(", reply.get("message_markdown", ""))),
+                flush=True,
+            )
             calls.append(
                 (
                     result.mode,
@@ -184,11 +195,27 @@ async def test_live_normal_reply_and_three_readonly_queries(
             detail = (await client.get(f"/api/v1/conversations/{session_id}")).json()
             raw_response = unwrap_final(raw_outputs[-1])
             assert raw_response and raw_response.get("message_markdown")
+            if querying:
+                print(
+                    "REAL LOOKUP plan=",
+                    (raw_outputs[0] or {}).get("queries"),
+                    "card_states=",
+                    [
+                        (card.get("tool"), card.get("status"))
+                        for card in detail["messages"][-1].get("card", {}).get("lookup_cards", [])
+                    ],
+                    flush=True,
+                )
             assert (
                 detail["messages"][-1]["card"]["message_markdown"]
                 == raw_response["message_markdown"]
             )
             cards = detail["messages"][-1].get("card", {}).get("lookup_cards", [])
+            print(
+                "REAL LOOKUP cards=",
+                [(card.get("tool"), card.get("status")) for card in cards],
+                flush=True,
+            )
             assert all(call[0] == "knodo" and call[1] == "OK" for call in calls)
             if querying:
                 assert len(calls) == 2
@@ -196,7 +223,7 @@ async def test_live_normal_reply_and_three_readonly_queries(
                     "COURSE_SEARCH",
                     "WRONG_QUESTIONS",
                     "LEARNING_PROGRESS",
-                }
+                }, [(card.get("tool"), card.get("status")) for card in cards]
                 assert all(
                     any(card["tool"] == tool and card["status"] == "OK" for card in cards)
                     for tool in ["COURSE_SEARCH", "WRONG_QUESTIONS", "LEARNING_PROGRESS"]

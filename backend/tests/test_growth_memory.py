@@ -140,18 +140,19 @@ async def test_projection_is_deduplicated_and_traceable(content_session, test_se
         first = await _answer(client, quiz["id"], question_id, "A", "t18-dedup-1")
         assert first.status_code == 200, first.text
 
-        # Read-only API must not project anything by itself.
+        # Answer submission projects; the read-only API adds nothing.
+        count_after_answer = await _evidence_count(content_session)
         before = await client.get("/api/v1/growth/overview")
         assert before.status_code == 200
         body = before.json()
-        assert body["evidence_total"] == 0
-        assert body["needs_projection"] is True
-        assert body["observations"] == []
-        assert await _evidence_count(content_session) == 0
+        assert body["evidence_total"] == count_after_answer > 0
+        assert body["needs_projection"] is False
+        assert body["observations"]
+        assert await _evidence_count(content_session) == count_after_answer
 
         projected = await _project(client)
-        assert projected["projection"]["evidence"]["inserted"] >= 1
-        assert projected["evidence_total"] == projected["projection"]["evidence"]["inserted"]
+        assert projected["projection"]["evidence"]["inserted"] == 0
+        assert projected["evidence_total"] == count_after_answer
         assert projected["needs_projection"] is False
         assert projected["observations"], projected
 
@@ -218,7 +219,7 @@ async def test_observations_are_qualitative_versioned_and_never_percentages(
         assert observation["basis"]["correct"] == 1
         assert observation["basis"]["effect_verified"] is False
         assert "仍需观察" in observation["statement"] or "仍在形成" in observation["statement"]
-        assert observation["projection_revision"] == 1
+        assert observation["projection_revision"] == 2
         assert not any(fragment in observation["statement"] for fragment in ["%", "％"])
 
         # No mastery percentage / IQ / personality field anywhere in the body,
@@ -234,7 +235,7 @@ async def test_observations_are_qualitative_versioned_and_never_percentages(
         quiz2 = await _open_quiz(client, revision.chapter_id)
         await _answer(client, quiz2["id"], quiz2["questions"][0]["id"], "A", "t18-obs-3")
         after = await _project(client)
-        assert after["observations"][0]["projection_revision"] == 2
+        assert after["observations"][0]["projection_revision"] == 3
         rows = (
             await content_session.scalars(
                 select(Observation)
@@ -242,9 +243,10 @@ async def test_observations_are_qualitative_versioned_and_never_percentages(
                 .order_by(Observation.projection_revision)
             )
         ).all()
-        assert [row.projection_revision for row in rows] == [1, 2]
+        assert [row.projection_revision for row in rows] == [1, 2, 3]
         assert rows[0].superseded_at is not None
-        assert rows[1].superseded_at is None
+        assert rows[1].superseded_at is not None
+        assert rows[2].superseded_at is None
 
 
 @pytest.mark.asyncio
@@ -603,7 +605,9 @@ async def test_learner_context_only_injects_valid_evidence_and_active_memory(
         assert all(item["id"] != memory_id for item in final_request["evidence"])
 
 
-async def test_worker_projects_before_building_the_turn(content_session, test_settings: Settings):
+async def test_worker_projects_before_building_the_turn(
+    content_session, test_settings: Settings, monkeypatch
+):
     """A tutor run is an event that projects; a read never does (K3/K4)."""
 
     settings = teaching_settings(test_settings)
@@ -619,7 +623,14 @@ async def test_worker_projects_before_building_the_turn(content_session, test_se
     async with client:
         await login(client, "t18.worker", PASSWORD)
         quiz = await _open_quiz(client, revision.chapter_id)
-        await _answer(client, quiz["id"], quiz["questions"][0]["id"], "A", "t18-work-1")
+
+        # Reproduce a legacy/unprojected answer, so the worker's repair path is tested.
+        async def deferred(*args, **kwargs):
+            return None
+
+        with monkeypatch.context() as patch:
+            patch.setattr("app.modules.recommendation.service.refresh_snapshot", deferred)
+            await _answer(client, quiz["id"], quiz["questions"][0]["id"], "A", "t18-work-1")
         assert await _evidence_count(content_session) == 0
 
         session = await create_session(

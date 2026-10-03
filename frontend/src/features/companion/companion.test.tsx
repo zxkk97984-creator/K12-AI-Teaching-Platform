@@ -160,6 +160,13 @@ describe("reused companion assets and bounds", () => {
     const more = screen.getByRole("button", { name: "更多选项" });
     fireEvent.click(more);
     expect(more.getAttribute("aria-expanded")).toBe("true");
+    const display=screen.getByLabelText("桌宠显示方式");
+    fireEvent.change(display,{target:{value:"full"}});
+    expect(dock.getAttribute("data-minimized")).toBe("false");
+    expect(dock.querySelector(".companion-sprite")).toBeTruthy();
+    expect(screen.getByRole("dialog",{name:/对话面板/})).toBe(panel);
+    fireEvent.change(display,{target:{value:"compact"}});
+    expect(dock.getAttribute("data-minimized")).toBe("true");
     expect((await screen.findByRole("tab", { name: "对话记录" })).getAttribute("aria-selected")).toBe("true");
     expect(screen.queryByLabelText("选择学习伙伴")).toBeNull();
     expect(screen.getByTestId("history-item").textContent).toBe("之前的问题");

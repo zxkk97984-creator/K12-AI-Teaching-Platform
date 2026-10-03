@@ -35,8 +35,9 @@ const courses = createLazyPage(() => import("../../pages/courses/CourseListPage"
 const courseDetail = createLazyPage(() => import("../../pages/courses/CourseDetailPage").then(m => ({ default: m.CourseDetailPage })), "课程", IdleStagePreload);
 const chapter = createLazyPage(() => import("../../pages/reader/ChapterReaderPage").then(m => ({ default: m.ChapterReaderPage })), "章节", IdleStagePreload);
 const conversation = createLazyPage(() => import("../../features/conversation/ConversationPage").then(m => ({ default: m.ConversationRoutePage })), "AI 教师", IdleStagePreload);
-const lesson = createLazyPage(() => import("../../features/lesson/LessonPage").then(m => ({ default: m.LessonPage })), "章节课堂", IdleStagePreload);
+const lesson = createLazyPage(() => import("../../features/lesson/LegacyLearningEntry").then(m => ({ default: m.LegacyLearningEntry })), "章节课堂", IdleStagePreload);
 const practice = createLazyPage(() => import("../../pages/practice/StagePracticePage").then(m => ({ default: m.StagePracticePage })), "练习", IdleStagePreload);
+const history = createLazyPage(() => import("../../pages/practice/HistoryPage").then(m => ({ default: m.HistoryPage })), "历史记录", IdleStagePreload);
 const growth = createLazyPage(() => import("../../features/growth/GrowthPage").then(m => ({ default: m.GrowthPage })), "个人记忆", IdleStagePreload);
 const next = createLazyPage(() => import("../../features/learning-next/NextStepPage").then(m => ({ default: m.NextStepPage })), "下一步", IdleStagePreload);
 const resourceDetail = createLazyPage(() => import("../../features/resources/ResourceDetailPage").then(m => ({ default: m.ResourceDetailPage })), "学习资料", IdleStagePreload);
@@ -58,7 +59,7 @@ export const pages = {
   Home: home.Page, LoginPage: login.Page, OnboardingPage: onboarding.Page, SettingsPage: settings.Page,
   WorkbenchPage: workbench.Page, CourseListPage: courses.Page, CourseDetailPage: courseDetail.Page,
   ChapterReaderPage: chapter.Page, ConversationRoutePage: conversation.Page, LessonPage: lesson.Page,
-  StagePracticePage: practice.Page, GrowthPage: growth.Page, NextStepPage: next.Page,
+  StagePracticePage: practice.Page, HistoryPage: history.Page, GrowthPage: growth.Page, NextStepPage: next.Page,
   ResourceDetailPage: resourceDetail.Page, AnimationPage: animation.Page,
   AdminResourcesPage: adminResources.Page, AdminAIPage: adminAI.Page, AdminAuthoringPage: adminAuthoring.Page,
   StudyPage: study.Page, PicturebookPage: picturebook.Page, ResourceLibraryPage: resourceLibrary.Page,

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEditingRegistration } from "../../app/editing/EditingGuard";
 import { useAccount } from "../identity/AccountContext";
 import { patchPreferences } from "../identity/api";
+import { useLearningPageContext } from "../companion/useLearningPageContext";
 import { useConversation } from "../conversation/ConversationProvider";
 import { useLearningTeacher } from "../companion/LearningTeacherContext";
 import { getInteractive, getInteractiveDocument, getInteractiveSession, listInteractive, startInteractive, type InteractiveDetail, type InteractivePrompt, type InteractiveSession } from "./api";
@@ -11,10 +12,17 @@ import { CHANNEL, isObject, validatedMessage, type PlaybackStep, type WorkspaceC
 import { useLessonPlayback } from "./useLessonPlayback";
 import { ActivitySaveQueue, type ActivityPatch } from "./ActivitySaveQueue";
 import { NarrationControls } from "./LearningControls";
+import { practiceReturn, practiceDate } from "../../pages/practice/navigation";
+import { interactiveStatus } from "./presentation";
 import "./interactive.css";
 
 type CommandRequest = { resolve: () => void; reject: (error: Error) => void; timer: number; sceneId?: unknown; narrate: boolean };
 export function InteractivePlayerPage() {
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const requestedSessionId = query.get("session");
+  const recordView = query.get("view") === "record";
+  const returnTo = practiceReturn(query.get("returnTo"));
   const { resourceId = "" } = useParams();
   const navigate = useNavigate();
   const account = useAccount();
@@ -62,10 +70,17 @@ export function InteractivePlayerPage() {
   const commandRequests = useRef(new Map<string, CommandRequest>());
   const narrator = useNarration(prompt => `/api/v1/interactive/sessions/${sessionRef.current?.id}/audio/${encodeURIComponent(prompt.id)}`, `k12:interactive:voice:${account?.user.id}:v1`);
   const manifest = detail?.manifest;
-  const catalogRoute = detail?.resource.purpose === "GAME" ? "/practice" : detail?.resource.purpose === "LESSON" ? "/animations" : "/activities";
+  const catalogRoute = returnTo ?? (detail?.resource.purpose === "GAME" ? "/practice" : detail?.resource.purpose === "LESSON" ? "/animations" : "/activities");
   const currentScene = manifest?.scenes.find(item => item.id === sceneId) ?? manifest?.scenes[0];
   const prompts = manifest?.prompts.filter(item => item.scene_id === currentScene?.id) ?? [];
   const currentPrompt = prompts.find(item => item.id === promptId) ?? prompts.find(item => item.trigger === 'SCENE_ENTER') ?? prompts[0];
+  useLearningPageContext(manifest && sessionRef.current ? {
+    page_type:"INTERACTIVE", activity_type:detail?.resource.purpose, content_kind:"INTERACTIVE",
+    content_id:sessionRef.current.resource_id, content_version:sessionRef.current.revision_id,
+    interactive_session_id:sessionRef.current.id, interactive_scene_id:currentScene?.id,
+    interactive_prompt_id:currentPrompt?.id, visible_section:`${manifest.title} · ${currentScene?.title ?? ""}`,
+    knowledge_points:manifest.knowledge_points,
+  } : null);
   const post = useCallback((type: string, messageId: string, payload: unknown = null) => {
     const session = sessionRef.current;
     if (!session || !frame.current?.contentWindow) return;
@@ -102,12 +117,13 @@ export function InteractivePlayerPage() {
       if (!alive) return;
       setLatestRevisionId(content.revision_id);
       const recent = catalog.items.find(item => item.id === content.id);
-      const session = recent?.session_id && ['ACTIVE', 'COMPLETED'].includes(recent.activity_status)
+      const session = requestedSessionId ? (await getInteractiveSession(requestedSessionId, abort.signal)).session : recent?.session_id && ['ACTIVE', 'COMPLETED'].includes(recent.activity_status)
         ? (await getInteractiveSession(recent.session_id, abort.signal)).session
         : await startInteractive(content.id);
       if (!alive) return;
       const activity = await getInteractiveSession(session.id, abort.signal);
-      const document = session.status === 'ACTIVE' ? await getInteractiveDocument(session.id, abort.signal) : null;
+      if (activity.session.resource_id !== content.id) throw new Error('这条记录不属于当前活动。');
+      const document = session.status === 'ACTIVE' && !recordView ? await getInteractiveDocument(session.id, abort.signal) : null;
       if (!alive) return;
       if (activity.session.stage !== stage || (document && document.revision_id !== session.revision_id)) throw new Error('课件版本或学段已变化，请重新读取。');
       const position = activity.session.host_state?.playback_step;
@@ -124,7 +140,7 @@ export function InteractivePlayerPage() {
       for (const request of commandRequests.current.values()) { clearTimeout(request.timer); request.reject(new Error('活动已切换')); }
       commandRequests.current.clear();
     };
-  }, [resourceId, account?.user.id, stage, retryIndex, narrator.stop]);
+  }, [resourceId, requestedSessionId, recordView, account?.user.id, stage, retryIndex, narrator.stop]);
 
   useLayoutEffect(() => {
     if (!root.current) return;
@@ -339,7 +355,7 @@ export function InteractivePlayerPage() {
     if (commandBusy) return;
     const generation = instanceId.current;
     playback.stop(); narrator.stop(); setCommandBusy(true);
-    try { await flushCheckpoint(); if (!alivePage.current || generation !== instanceId.current) return; await startInteractive(resourceId, true); if (alivePage.current && generation === instanceId.current) setRetryIndex(value => value + 1); }
+    try { await flushCheckpoint(); if (!alivePage.current || generation !== instanceId.current) return; const fresh = await startInteractive(resourceId, true); if (alivePage.current && generation === instanceId.current) navigate(`/interactive/${resourceId}?session=${fresh.id}${returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ""}`); }
     catch (caught) { if (alivePage.current && generation === instanceId.current) setError(caught instanceof Error ? caught.message : '重新开始失败'); }
     finally { if (alivePage.current && generation === instanceId.current) setCommandBusy(false); }
   };
@@ -363,6 +379,16 @@ export function InteractivePlayerPage() {
 
   if (loading) return <main className="interactive-player" role="status">正在读取课件与账号中已保存的活动…</main>;
   if (!detail || !manifest) return <main className="interactive-player"><h1>内容暂时不可用</h1><p role="alert">{error || '无法读取上次进度，请重试。'}</p><button onClick={() => setRetryIndex(value => value + 1)}>重试</button><Link to={catalogRoute}>返回目录</Link></main>;
+  if (recordView || (!active && detail.resource.purpose === "GAME")) return <main className="interactive-player interactive-record" data-testid="interactive-record">
+    <header><Link to={catalogRoute}>← {returnTo?.startsWith("/history") ? "返回历史记录" : detail.resource.purpose === "GAME" ? "返回找练习" : "返回目录"}</Link><h1>{detail.resource.title}</h1></header>
+    <h2>{detail.session.status === "COMPLETED" ? "本次活动已完成" : detail.session.status === "ABANDONED" ? "本次活动已停止" : "活动记录"}</h2>
+    <p>{interactiveStatus(detail.session)} · {practiceDate(detail.session.updated_at ?? detail.session.created_at)}</p>
+    <p>本次停留在：{currentScene?.title ?? "开始环节"}</p>
+    {typeof detail.session.game_result?.score === "number" ? <p>小游戏记录得分：{detail.session.game_result.score}</p> : null}
+    <p>{manifest.summary}</p>
+    <div className="practice-actions">{active ? <Link className="practice-primary-link" to={`/interactive/${resourceId}?session=${detail.session.id}&view=activity${returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ""}`}>继续活动 →</Link> : <button type="button" disabled={commandBusy} onClick={() => void restart()}>重新体验</button>}<Link to={catalogRoute}>返回列表</Link></div>
+    {error ? <p role="alert">{error}</p> : null}
+  </main>;
   return <main ref={root} className={`interactive-player${focused ? ' is-focused' : ''}${drawer ? ' has-drawer' : ''}`} data-testid="interactive-player" data-panel-open={panelOpen} data-playback={playback.status} data-playback-step={playback.index}>
     <header className="interactive-player-header" data-pet-avoid><Link to={catalogRoute} onClick={event => { event.preventDefault(); void saveAndExit(); }}>← 返回</Link><div className="interactive-course-title"><h1>{detail.resource.title}</h1><div className="interactive-course-meta"><span>{currentScene?.title} · 环节 {sceneIndex + 1}/{manifest.scenes.length}</span>{detail.session.viewed_at ? <span className="interactive-status" data-testid="lesson-viewed">已看完 · 可继续实验</span> : null}<span className="interactive-status" role="status">{saveStatus === 'unsaved' ? '未保存 · 请重试' : checkpointDirty || saveStatus === 'saving' ? '正在保存…' : restored || saveStatus === 'saved' ? '已保存到账号' : '尚未记录操作'}</span></div></div><button ref={focusButton} type="button" className="secondary" aria-pressed={focused} onClick={toggleFocus}>{focused ? '退出专注' : '专注模式'}</button></header>
     <nav className="interactive-scene-nav" aria-label="课程环节" data-pet-avoid>

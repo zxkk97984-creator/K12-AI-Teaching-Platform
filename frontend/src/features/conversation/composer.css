@@ -1,0 +1,50 @@
+/* Scope the compact, icon-only controls independently of page button styles. */
+body .conversation-content .conv-composer.conv-composer--tools {
+  --composer-control-size:44px;
+  gap:6px;
+  border-radius:22px;
+}
+body .conversation-content .conv-composer--tools[data-stage^="PRIMARY"] { --composer-control-size:48px; }
+body .conversation-content .conv-composer--tools .conv-input-line { align-items:flex-end; gap:6px; }
+body .conversation-content .conv-composer--tools .conv-input-line textarea { min-height:44px; padding:10px 2px; font-size:16px; }
+body .conversation-content .conv-composer--tools .conv-compose-add,
+body .conversation-content .conv-composer--tools .conv-voice-button,
+body .conversation-content .conv-composer--tools .conv-composer-actions > .conv-send-icon {
+  display:grid;
+  place-items:center;
+  flex:0 0 var(--composer-control-size);
+  width:var(--composer-control-size);
+  min-width:var(--composer-control-size);
+  height:var(--composer-control-size);
+  min-height:var(--composer-control-size);
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  align-self:flex-end;
+  background:transparent;
+  color:var(--sl-text,#24272b);
+}
+body .conversation-content .conv-composer--tools .conv-compose-add { background:#f2f3f4; }
+body .conversation-content .conv-composer--tools .conv-compose-add[aria-expanded="true"] { background:var(--sl-primary-soft,#fff2c5); }
+body .conversation-content .conv-composer--tools .conv-composer-actions { gap:4px; }
+body .conversation-content .conv-composer--tools .conv-composer-actions > .conv-send-icon { background:#3478f6; color:#fff; }
+body .conversation-content .conv-composer--tools .conv-composer-actions > .conv-send-icon:disabled { background:#e8edf4; color:#99a5b5; }
+body .conversation-content .conv-composer--tools .conv-voice-button:disabled { background:transparent; color:#b4bac2; }
+body .conversation-content .conv-composer--tools .conv-voice-button[aria-pressed="true"] { background:#fff0f0; color:#c83f3f; }
+body .conversation-content .conv-composer--tools .conv-compose-add:not(:disabled):hover,
+body .conversation-content .conv-composer--tools .conv-voice-button:not(:disabled):hover { background:#edf0f3; }
+body .conversation-content .conv-composer--tools .conv-send-icon:not(:disabled):hover { background:#2468e6; }
+body .conversation-content .conv-composer--tools button:focus-visible { outline:2px solid var(--sl-focus,#3478f6); outline-offset:2px; }
+.conv-compose-menu[popover] { position:fixed; inset:auto; z-index:2147483647; margin:0; box-sizing:border-box; padding:8px; max-height:calc(100dvh - 24px); overflow-y:auto; border:1px solid #e3e5e8; border-radius:16px; background:var(--sl-surface,#fff); color:var(--sl-text,#24272b); box-shadow:0 8px 28px #1a263024; }
+.conv-compose-menu-context { margin:4px 10px 6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--sl-text-muted,#6b7280); font-size:12px; }
+.conv-compose-menu button { display:flex; align-items:center; gap:12px; width:100%; min-height:56px; padding:9px 10px; border:0; border-radius:10px; background:transparent; color:var(--sl-text,#24272b); text-align:left; font:inherit; font-size:14px; cursor:pointer; }
+/* Keep menu text dark when the global filled-button hover rule applies. */
+.conv-compose-menu button:not(:disabled):is(:hover,:focus-visible,:active) { background:var(--sl-primary-soft,#fff2c5); color:var(--sl-text,#24272b); }
+.conv-compose-menu button:focus-visible { outline:2px solid var(--sl-focus,#3478f6); outline-offset:-2px; }
+.conv-compose-menu button:disabled { color:#a4a9b1; cursor:not-allowed; }
+.conv-compose-menu button small { display:block; margin-top:3px; color:var(--sl-text-muted,#6b7280); font-size:12px; }
+.conv-compose-menu-icon { display:grid; place-items:center; width:32px; height:32px; border-radius:9px; color:#907129; background:#fff6dd; }
+.conv-compose-menu[data-stage^="PRIMARY"] button { min-height:62px; font-size:16px; }
+.conv-compose-menu[data-stage="SENIOR"] button { font-size:14px; }
+@media(max-width:390px) { body .conversation-content .conv-composer--tools .conv-input-line { gap:4px; } }

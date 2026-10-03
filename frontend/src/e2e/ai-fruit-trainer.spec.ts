@@ -64,7 +64,7 @@ test('AI game platform: catalog, failed save, restore, teacher, badge and accoun
   await page.request.post('/api/v1/interactive/sessions',{data:{resource_id:resource.id,restart:true},headers:{Origin:new URL(page.url()).origin,'X-CSRF-Token':csrf}});
   await page.goto('/practice');await expect(page.getByRole('heading',{name:'训练小小 AI·水果分类员',exact:true})).toBeVisible();
   await page.screenshot({path:`${evidence}/platform-catalog.png`});
-  await page.locator(`a[href="/interactive/${resource.id}?from=practice"]`).click();await page.getByRole('button',{name:'继续学习',exact:true}).or(page.getByRole('button',{name:'开始学习',exact:true})).click();
+  await page.locator(".practice-game-card").filter({hasText:resource.title}).getByRole("link",{name:/开始游戏|继续游戏/}).click();await page.getByRole('button',{name:'继续学习',exact:true}).or(page.getByRole('button',{name:'开始学习',exact:true})).click();
   const game=page.frameLocator('.interactive-stage iframe');await expect(game.locator('body')).toHaveClass(/embedded/);
   await expect(game.locator('#mission-title')).toHaveText('教机器人认水果');
   await page.screenshot({path:`${evidence}/platform-start.png`});
@@ -87,7 +87,7 @@ test('AI game platform: catalog, failed save, restore, teacher, badge and accoun
   expect(before.activity_status).toBe('ACTIVE');await game.locator('#finish').click();await expect(page.getByRole('heading',{name:'本次活动已完成'})).toBeVisible();
   const sessions=(await (await page.request.get('/api/v1/interactive/sessions')).json()).items;
   expect(sessions.find((session:{id:string})=>session.id===before.session_id)).toMatchObject({status:'COMPLETED',game_result:{score:3,maxScore:3,badge:'AI 小训练员'}});
-  await page.goto('/practice');await expect(page.locator('.interactive-card').filter({hasText:'训练小小 AI·水果分类员'})).toContainText('已完成');
+  await page.goto('/practice');await expect(page.locator('.practice-game-card').filter({hasText:'训练小小 AI·水果分类员'})).toContainText('已完成');
   await page.screenshot({path:`${evidence}/platform-completed.png`});expect(errors).toEqual([]);
 });
 

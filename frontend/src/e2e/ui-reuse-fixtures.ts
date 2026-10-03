@@ -145,8 +145,9 @@ export const courses = [
 ];
 export async function fixture(
   page: Page,
-  options: { admin?: boolean; empty?: boolean; stage?: string; rich?: boolean; interactive?: boolean; codeTasksCount?: number; codeRunnerAvailable?: boolean; codeCourseLink?: boolean } = {},
+  options: { admin?: boolean; empty?: boolean; stage?: string; rich?: boolean; interactive?: boolean; interactivePurpose?: "LESSON" | "GAME" | "EXPERIMENT"; codeTasksCount?: number; codeRunnerAvailable?: boolean; codeCourseLink?: boolean } = {},
 ) {
+  const uiManifest = { ...interactiveManifest, stage: options.stage ?? "PRIMARY_LOWER", purpose: options.interactivePurpose ?? "GAME" };
   const state = {
     code: "def double(x):\n    return x * 2\n",
     codeDraftRevision: 0,
@@ -172,7 +173,7 @@ export async function fixture(
     interactiveStarted: false,
     interactiveRevision: 0,
     interactiveState: {} as Record<string, unknown>,
-    interactiveStatus: "ACTIVE" as "ACTIVE" | "COMPLETED",
+    interactiveStatus: "ACTIVE" as "ACTIVE" | "COMPLETED" | "ABANDONED",
     interactiveWrites: 0,
     interactiveFailNext: false,
   };
@@ -282,7 +283,7 @@ export async function fixture(
     }
     const activity = () => ({
       id: "interactive-session-ui", resource_id: "interactive-ui", revision_id: "interactive-version-ui",
-      stage: "PRIMARY_LOWER", status: state.interactiveStatus,
+      stage: options.interactivePurpose ? state.account.profile.stage : "PRIMARY_LOWER", status: state.interactiveStatus,
       base_revision: state.interactiveRevision, current_scene_id: "main",
       game_state: state.interactiveState, host_state: {},
       game_result: state.interactiveStatus === "COMPLETED" ? { score: 8, maxScore: 10 } : null,
@@ -294,7 +295,7 @@ export async function fixture(
     if (path === "/api/v1/interactive/resources")
       return json({ items: options.interactive ? [{
         id: "interactive-ui", title: "SDK 技术校验", description: "浏览器通信验证",
-        purpose: "GAME", subject: "数学", stage: "PRIMARY_LOWER", grade_min: null,
+        purpose: uiManifest.purpose, subject: "数学", stage: options.interactivePurpose ? state.account.profile.stage : "PRIMARY_LOWER", grade_min: null,
         grade_max: null, knowledge_points: ["技术校验"], cover: null, revision: 1,
         capabilities: interactiveManifest.capabilities, is_test_fixture: true,
         activity_status: state.interactiveStarted ? state.interactiveStatus : "NOT_STARTED",
@@ -306,11 +307,11 @@ export async function fixture(
       return json({ items: options.interactive && state.interactiveStarted ? [activity()] : [] });
     }
     if (path === "/api/v1/interactive/resources/interactive-ui")
-      return json({ id: "interactive-ui", title: "SDK 技术校验", description: "浏览器通信验证", purpose: "GAME", subject: "数学", revision_id: "interactive-version-ui", revision: 1, manifest: interactiveManifest });
+      return json({ id: "interactive-ui", title: "SDK 技术校验", description: "浏览器通信验证", purpose: uiManifest.purpose, subject: "数学", revision_id: "interactive-version-ui", revision: 1, manifest: uiManifest });
     if (path === "/api/v1/interactive/sessions/interactive-session-ui")
-      return json({ session: activity(), resource: { id: "interactive-ui", title: "SDK 技术校验", purpose: "GAME", subject: "数学" }, manifest: interactiveManifest });
+      return json({ session: activity(), resource: { id: "interactive-ui", title: "SDK 技术校验", purpose: uiManifest.purpose, subject: "数学" }, manifest: uiManifest });
     if (path === "/api/v1/interactive/sessions/interactive-session-ui/document")
-      return json({ session_id: "interactive-session-ui", revision_id: "interactive-version-ui", document_html: interactiveDocument, manifest: interactiveManifest });
+      return json({ session_id: "interactive-session-ui", revision_id: "interactive-version-ui", document_html: interactiveDocument, manifest: uiManifest });
     if (path === "/api/v1/interactive/sessions/interactive-session-ui/checkpoint" || path === "/api/v1/interactive/sessions/interactive-session-ui/complete") {
       expect(request.headers()["x-csrf-token"]).toBe("synthetic-ui-csrf");
       const payload = request.postDataJSON();
@@ -543,6 +544,8 @@ export async function fixture(
         { id: "quiz-ui-1", chapter_id: "chapter-ui", title: "让机器学会分类", status: "ACTIVE", progress: { answered: 1, correct: 0, total: 3 }, created_at: "2026-09-23T08:00:00Z", completed_at: null },
         { id: "quiz-ui-2", chapter_id: "chapter-2", title: "温度转换器", status: "COMPLETED", progress: { answered: 3, correct: 2, total: 3 }, created_at: "2026-09-20T08:00:00Z", completed_at: "2026-09-20T08:15:00Z" },
       ] : [], total: options.rich && !options.empty && state.account.profile.stage === "JUNIOR" ? 2 : 0, limit: Number(url.searchParams.get("limit") ?? 3), offset: 0 });
+    if (path === "/api/v1/quiz-options/conversation") return json({ stage:state.account.profile.stage,max_question_count:20,allowed_difficulties:["EASY","MEDIUM"],allowed_question_types:["SINGLE_CHOICE"] });
+    if (path === "/api/v1/quiz-generation-jobs" && method === "GET") return json({ items:[],total:0 });
     if (path === "/api/v1/quiz-sessions" && method === "GET") return json({ items: [], total: 0 });
     if (path === "/api/v1/growth/personal-memory") return json({ settings: { auto_enabled: true, use_enabled: true, revision: 1 }, content_revision: 0, last_updated_at: null, items: [], summary_markdown: "", tasks: [], total: 0, offset: 0, has_more: false, notice: "合成记忆界面测试" });
     if (path === "/api/v1/growth/documents") {

@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { findStudyBook, type StudyBook } from "./catalog";
+import { useLearningPageContext } from "../companion/useLearningPageContext";
 import { openCompanion } from "../companion/openCompanion";
 import "./book-reader.css";
 
@@ -42,8 +43,18 @@ export function BookReaderPage() {
   const { bookSlug } = useParams();
   const navigate = useNavigate();
   const book = findStudyBook(bookSlug);
-  const [loaded, setLoaded] = useState<{ slug: string; markdown: string } | null>(null);
+  const [loaded, setLoaded] = useState<{ slug: string; markdown: string; version: string } | null>(null);
   const [failedSlug, setFailedSlug] = useState<string | null>(null);
+  useLearningPageContext(book && loaded?.slug === book.slug ? { page_type:"book_reader", activity_type:"reading", content_kind:"BOOK", content_id:book.slug, content_version:loaded.version,
+    visible_section:book.title, knowledge_points:[book.topic] } : null, () => {
+      const headings = Array.from(document.querySelectorAll<HTMLElement>(".book-reader-content h2"));
+      const heading = headings.filter(node => node.getBoundingClientRect().top < window.innerHeight / 2).at(-1) ?? headings[0];
+      const selected = window.getSelection()?.toString().trim();
+      let text = "";
+      let node = heading?.nextElementSibling;
+      while (node && node.tagName !== "H2" && text.length < 3500) { text += `${node.textContent ?? ""}\n`; node = node.nextElementSibling; }
+      return { section_index:Math.max(0,headings.indexOf(heading)), visible_section:[book?.title,heading?.textContent].filter(Boolean).join(" · ").slice(0,200), selected_text:(selected || text || book?.description || "").slice(0,4000) };
+  });
 
   useEffect(() => {
     if (!bookSlug || !findStudyBook(bookSlug)) return;
@@ -56,8 +67,10 @@ export function BookReaderPage() {
     setLoaded(null);
     setFailedSlug(null);
     void load()
-      .then(({ default: markdown }) => {
-        if (active) setLoaded({ slug: bookSlug, markdown });
+      .then(async ({ default: markdown }) => {
+        const digest = await crypto.subtle.digest("SHA-256",new TextEncoder().encode(markdown));
+        const version = Array.from(new Uint8Array(digest),byte => byte.toString(16).padStart(2,"0")).join("");
+        if (active) setLoaded({ slug: bookSlug, markdown, version });
       })
       .catch(() => {
         if (active) setFailedSlug(bookSlug);

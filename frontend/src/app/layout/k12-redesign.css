@@ -109,13 +109,13 @@ body .app-user-copy { display:grid; min-width:0; gap:4px; flex:1; }
 body .app-user-copy strong { font-size:14px; white-space:normal; overflow-wrap:anywhere; }
 body .app-user-copy small { font-size:12px; } body .app-logout { min-width:44px; font-size:14px; padding:8px; color:var(--sl-text-muted); }
 body .app-main { flex:1; min-width:0; min-height:100dvh; display:flex; flex-direction:column; }
-body .app-topbar { position:static; min-height:88px; padding:16px 40px; background:var(--sl-surface); backdrop-filter:none; border-bottom:var(--sl-border); gap:24px; }
+body .app-topbar { position:static; min-height:var(--app-header-height); padding:8px 24px; background:var(--sl-surface); backdrop-filter:none; border-bottom:var(--sl-border); gap:24px; }
 body .app-breadcrumb { font-size:12px; margin:0 0 4px; color:var(--sl-text-muted); }
 body .app-topbar .app-topbar-page-title { font-size:20px; margin:0; }
 body .app-topbar-title { min-width:0; }
 body .app-topbar-account { display:flex; flex-wrap:wrap; font-size:14px; gap:8px; }
 body .app-content { min-width:0; width:100%; max-width:1280px; margin:0 auto; padding:0 40px; height:auto; overflow:visible; flex:1; }
-body .app-content--conversation { display:flex; flex-direction:column; max-width:1200px; padding:0 32px 32px; min-height:calc(100dvh - 88px); }
+body .app-content--conversation { display:flex; flex-direction:column; max-width:1200px; padding:0 32px 32px; min-height:calc(100dvh - var(--app-header-height)); }
 .k12-mobile-nav { display:none; }
 .k12-history-dialog { width:min(760px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); border:var(--sl-border); border-radius:16px; background:var(--sl-surface); color:var(--sl-text); padding:20px 22px 18px; box-shadow:0 16px 64px #20212424; }
 .k12-history-dialog::backdrop { background:#20212460; }
@@ -269,7 +269,7 @@ body .app-shell[data-stage^="PRIMARY"] button { min-height:48px; }
 @media (max-width:1439px) { body .study-grid { gap:16px; } body .study-card { padding:24px; } }
 @media (max-width:1023px) {
   :root { --k12-sidebar:200px; }
-  body .app-topbar { padding:16px 24px; } body .app-content { padding:0 24px; }
+  body .app-topbar { padding:8px 24px; } body .app-content { padding:0 24px; }
   body .study-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   body .conv-welcome { padding-top:48px; } body .conv-prompt-card { padding:16px; }
 }
@@ -283,7 +283,7 @@ body .app-shell[data-stage^="PRIMARY"] button { min-height:48px; }
   body .app-sidebar.is-open { transform:none; }
   body .app-sidebar-backdrop { position:fixed; inset:0; display:block; border:0; border-radius:0; background:#20212460; z-index:70; }
   body .app-mobile-toggle { position:absolute; display:grid; place-items:center; top:20px; left:16px; min-width:44px; min-height:44px; z-index:85; padding:8px; color:var(--sl-primary); background:white; border:var(--sl-border); border-radius:8px; }
-  body .app-topbar { min-height:88px; padding:16px 16px 16px 72px; gap:8px; flex-wrap:wrap; }
+  body .app-topbar { min-height:var(--app-header-height); padding:8px 16px 8px 64px; gap:8px; flex-wrap:wrap; }
   body .app-topbar .app-topbar-page-title { font-size:18px; } body .app-topbar-account { margin-left:auto; gap:8px; }
   .k12-mobile-chat { display:inline-flex; align-items:center; justify-content:center; gap:4px; min-height:44px; padding:8px; border:var(--sl-border); border-radius:8px; color:var(--sl-text); background:var(--sl-primary-soft); font-size:14px; text-decoration:none; }
   .k12-mobile-chat.active { background:var(--k12-selected); }

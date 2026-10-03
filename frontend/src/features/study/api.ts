@@ -19,7 +19,7 @@ export type LearningItem = {
   created_at?: string | null;
   is_bookmarked?: boolean;
 };
-export function isStudentFacingLearningItem(item: LearningItem): boolean {
+export function isStudentFacingLearningItem(item: Pick<LearningItem, "is_test_fixture" | "slug" | "title">): boolean {
   return !(item.is_test_fixture && (item.slug?.startsWith("t06-") || item.title.includes("非教学")));
 }
 export type HistoryItem = Omit<LearningItem, "kind" | "id" | "created_at"> & {

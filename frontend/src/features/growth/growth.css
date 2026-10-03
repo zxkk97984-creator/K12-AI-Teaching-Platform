@@ -276,9 +276,9 @@ body .app-shell:not(.prototype-app) .growth-page--document {
 .memory-page-heading { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
 .memory-page-heading h1 { font-size: 28px; line-height: 1.3; margin: 0 0 8px; }
 .memory-page-heading > div { min-width: 0; flex: 1 1 300px; }
-.memory-tabs { display: flex; gap: 24px; border-bottom: var(--sl-border); }
-body .growth-page--document .memory-tabs button { border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: transparent; color: var(--sl-text-muted); padding: 12px 0; margin: 0 0 -1px; }
-body .growth-page--document .memory-tabs button[aria-selected="true"] { border-bottom-color: var(--sl-primary-ink); color: var(--sl-text); font-weight: 700; }
+.memory-tabs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; border: 0; }
+body .growth-page--document .memory-tabs > button { min-height: 44px; border: 0; border-radius: 8px; padding: 8px 12px; margin: 0; }
+body .app-shell[data-stage^="PRIMARY"] .memory-tabs > button { min-height: 48px; }
 body .growth-page--document :is(button,.memory-chat-link), .memory-panel button {
   min-height: 40px; padding: 8px 16px; border: 1px solid var(--sl-primary-ink); border-radius: var(--sl-radius-sm); background: var(--sl-primary-ink); color: var(--sl-surface); font: inherit; cursor: pointer; width: auto;
 }

@@ -21,6 +21,7 @@ from urllib.parse import urlsplit
 from app.integrations.knodo.errors import GatewayError, GatewayErrorCategory
 from app.integrations.knodo.operations import OPERATION_SPECS, Operation, Role
 from app.integrations.knodo.partial import partial_top_level_string
+from app.integrations.knodo.schema_models import default_registry
 from app.integrations.knodo.transport import Transport, UpstreamRequest
 from app.integrations.knodo.types import BackendOutcome
 
@@ -225,7 +226,15 @@ class KnodoWireMapper:
             sort_keys=True,
             separators=(",", ":"),
         )
-        content = f"{_protocol_instruction(operation)}\nREQUEST_JSON:\n{request_json}"
+        content = _protocol_instruction(operation)
+        if operation is Operation.QUIZ_DRAFT:
+            # The active remote Bot may have an older Skill. Carry the exact
+            # frozen output contract in this private Designer request too.
+            response_schema = default_registry().raw(OPERATION_SPECS[operation].response_schema)
+            content += "\nRESPONSE_SCHEMA_JSON:\n" + json.dumps(
+                response_schema, ensure_ascii=False, separators=(",", ":")
+            )
+        content += f"\nREQUEST_JSON:\n{request_json}"
         payload: dict[str, Any] = {
             "messages": [{"role": "user", "content": content}],
             "stream": streaming,
@@ -413,9 +422,13 @@ def _protocol_instruction(operation: Operation) -> str:
             f"{common} 顶层schema_version必须是k12.quiz.draft.v1；"
             "顶层只能包含schema_version、request_id、chapter_id、curriculum_revision、stage、"
             "difficulty、questions、warnings。每题使用question_key、objective_id、stem、"
-            "explanation、hints、source_refs、type以及对应题型字段；hints必须是字符串数组。"
+            "explanation、hints、source_refs、type以及对应题型字段；hints必须是恰好3条的字符串数组。"
             'SINGLE_CHOICE的options必须是[{"key":"A","text":"..."}]对象数组，'
-            "correct_answer必须是选项key字符串。不得输出question_id、answer_key、"
+            "correct_answer必须是选项key字符串。TRUE_FALSE只有布尔correct_answer，不能有options。"
+            'ORDERING必须使用items:[{"key":"step1","text":"..."}]和correct_order:["step1",...]，'
+            "排序题不能有options或correct_answer。题型只能从quiz_spec.question_types选取；"
+            "questions长度必须等于quiz_spec.count，复制请求中的身份、版本、objective_id和引用字段。"
+            "不得输出question_id、answer_key、"
             "题内difficulty、misconception_focus、顶层objective_ids、quiz_spec或"
             "suggested_resource_id。所有字段必须严格符合已绑定的quiz-draft.schema.json。"
         )

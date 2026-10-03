@@ -1,3 +1,4 @@
+import { PageHeading } from "../../app/layout/pageChrome";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,9 +28,9 @@ type CatalogFilter = LearningItem["kind"] | "BOOK" | "ALL";
 
 const STAGE_VIEW: Record<Stage, { headline: string; intro: string; library: string; practice: string; focus: string; paths: Array<{ title: string; detail: string; href: string }> }> = {
   PRIMARY_LOWER: { headline: "今天，想发现什么？", intro: "读一个故事，观察一个问题，再动手试一试。", library: "绘本书库", practice: "趣味练习", focus: "认识平面图形", paths: [{ title: "读绘本", detail: "跟着故事慢慢读", href: "/picturebooks" }, { title: "看动画", detail: "一步一步观察变化", href: "/animations" }, { title: "问老师", detail: "说出你想知道的", href: "/conversations" }] },
-  PRIMARY_UPPER: { headline: "让好奇心，带你向前一步", intro: "从知识点出发，读一读、看一看，再用练习检验理解。", library: "学习书库", practice: "趣味练习", focus: "比较分数大小", paths: [{ title: "查找资料", detail: "整理知识点与例子", href: "/resources" }, { title: "动画讲解", detail: "把步骤看清楚", href: "/animations" }, { title: "做小练习", detail: "按自己的节奏巩固", href: "/practice" }] },
-  JUNIOR: { headline: "理解之后，再向前一步", intro: "读懂原理，针对难点练习，留下自己的问题。", library: "学习书库", practice: "专项练习", focus: "食物链与生态关系", paths: [{ title: "课程与资料", detail: "先建立概念和关系", href: "/resources" }, { title: "专项练习", detail: "针对知识点检查理解", href: "/practice" }, { title: "向教师提问", detail: "回到原理与证据", href: "/conversations" }] },
-  SENIOR: { headline: "从理解，到独立解决问题", intro: "围绕学习目标整理资料，用情境问题巩固推理。", library: "学科资料", practice: "巩固练习", focus: "函数的单调性", paths: [{ title: "学科资料", detail: "梳理目标、定义与依据", href: "/resources" }, { title: "巩固练习", detail: "检验关键推理步骤", href: "/practice" }, { title: "复盘与记忆", detail: "回看解释并记录收获", href: "/growth" }] },
+  PRIMARY_UPPER: { headline: "让好奇心，带你向前一步", intro: "从知识点出发，读一读、看一看，再用练习检验理解。", library: "学习书库", practice: "趣味练习", focus: "比较分数大小", paths: [{ title: "查找资料", detail: "整理知识点与例子", href: "/resources" }, { title: "动画讲解", detail: "把步骤看清楚", href: "/animations" }, { title: "做小练习", detail: "按自己的节奏巩固", href: "/history?type=questions" }] },
+  JUNIOR: { headline: "理解之后，再向前一步", intro: "读懂原理，针对难点练习，留下自己的问题。", library: "学习书库", practice: "趣味练习", focus: "食物链与生态关系", paths: [{ title: "课程与资料", detail: "先建立概念和关系", href: "/resources" }, { title: "专项练习", detail: "针对知识点检查理解", href: "/history?type=questions" }, { title: "向教师提问", detail: "回到原理与证据", href: "/conversations" }] },
+  SENIOR: { headline: "从理解，到独立解决问题", intro: "围绕学习目标整理资料，用情境问题巩固推理。", library: "学科资料", practice: "趣味练习", focus: "函数的单调性", paths: [{ title: "学科资料", detail: "梳理目标、定义与依据", href: "/resources" }, { title: "巩固练习", detail: "检验关键推理步骤", href: "/history?type=questions" }, { title: "复盘与记忆", detail: "回看解释并记录收获", href: "/growth" }] },
 };
 const STAGE_EXPLAIN: Record<Stage, string> = {
   PRIMARY_LOWER: "先看看图形有没有直直的边。圆形没有直边；三角形有 3 条边；正方形有 4 条一样长的边和 4 个直角。",
@@ -261,10 +262,7 @@ export function StudyPage({
 
   return (
     <main className={`study-page od-stack${home ? " study-home" : ""} study-stage-${stage.toLowerCase()}`} data-testid={home ? "workbench-shell" : resourcesOnly ? "resource-center" : "study-center"}>
-      <header className="study-heading od-row">
-        <div className="od-field od-fill"><p className="eyebrow">{resourcesOnly ? stageView.library : home ? "学习首页" : "继续学习"}</p>
-          <h1>{resourcesOnly ? `探索${stageView.library}` : home ? stageView.headline : "从上次停下的地方，继续"}</h1>
-          <p>{resourcesOnly ? `围绕「${stageView.focus}」找内容，也可以搜索你感兴趣的主题。` : home ? stageView.intro : "继续学习、回顾收藏，按自己的节奏前进。"}</p></div>
+      <PageHeading title={resourcesOnly ? catalogKind === "COURSE" ? "课程讲义" : stageView.library : home ? "学习首页" : "学习书架"}>
         {home ? (
           <div className="study-home-header-actions od-fixed">
             <a className="secondary study-library-link" href="/resources">打开{stageView.library} →</a>
@@ -278,7 +276,7 @@ export function StudyPage({
             <button className="secondary od-fixed" type="button" disabled={loading} onClick={() => void refresh(query, kindFilter)}>{loading ? "读取中…" : "刷新内容"}</button>
           </>
         )}
-      </header>
+      </PageHeading>
       {home ? <section className="study-stage-paths" aria-label="本学段学习入口"><div className="study-stage-paths-heading"><p className="eyebrow">适合当前学段的学习路径</p><h2>{stageView.focus}</h2></div><div className="study-stage-paths-grid">{stageView.paths.map((path, index) => <a key={path.href} href={path.href}><span aria-hidden="true">0{index + 1}</span><strong>{path.title}</strong><small>{path.detail}</small><span aria-hidden="true">→</span></a>)}</div></section> : null}
       {error ? <div className="study-error od-row" role="alert"><span className="od-fill">{error}</span><button className="secondary" onClick={() => void refresh(query, kindFilter)}>重试</button></div> : null}
       {loading ? <div className="k12-loading" role="status" aria-busy="true">正在读取你的学习内容…</div> : null}
@@ -372,12 +370,12 @@ export function StudyPage({
         <section className="study-section shelf-section recent-practice-section" aria-label="最近练习">
           <div className="study-section-heading od-row">
             <div className="od-field od-fill"><h2>最近练习</h2><span className="k12-subtle">回到上次停下的题目，或看看完成记录</span></div>
-            <a href="/practice" className="study-text-link od-fixed">全部练习 →</a>
+            <a href="/history" className="study-text-link od-fixed">全部记录 →</a>
           </div>
           {practiceStatus === "loading" ? <div className="k12-loading" role="status">正在读取练习记录…</div> : null}
-          {practiceStatus === "error" ? <div className="shelf-empty" role="alert"><strong>练习记录暂时无法读取</strong><p>可以前往我的练习查看和继续。</p><button type="button" className="secondary" onClick={() => setPracticeAttempt((value) => value + 1)}>重试</button></div> : null}
+          {practiceStatus === "error" ? <div className="shelf-empty" role="alert"><strong>练习记录暂时无法读取</strong><p>可以前往历史记录查看和继续。</p><button type="button" className="secondary" onClick={() => setPracticeAttempt((value) => value + 1)}>重试</button></div> : null}
           {practiceStatus === "ready" && recentPractice.length === 0 ? <div className="shelf-empty"><strong>还没有练习记录</strong><p>完成一组练习后，记录会出现在这里。</p><a href="/practice">去做练习 →</a></div> : null}
-          {practiceStatus === "ready" && recentPractice.length > 0 ? <div className="shelf-list">{recentPractice.map((item) => <button type="button" className="shelf-row od-row" key={item.id} onClick={() => navigate(`/practice/sessions/${item.id}`)}><span className="shelf-row-icon od-fixed"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M8 3H4v18h16v-4M10 14l1-4L19 2l3 3-8 8z" /></svg></span><span className="od-field od-fill"><strong>{item.title || "章节练习"}</strong><span>{formatLearningTime(item.completed_at ?? item.created_at)} · 已答 {item.progress.answered} / {item.progress.total} 题</span></span><span className="shelf-row-status od-fixed">{item.status === "COMPLETED" ? "已完成" : "进行中"}</span></button>)}</div> : null}
+          {practiceStatus === "ready" && recentPractice.length > 0 ? <div className="shelf-list">{recentPractice.map((item) => <button type="button" className="shelf-row od-row" key={item.id} onClick={() => navigate(`/practice/sessions/${item.id}?returnTo=%2Fstudy`)}><span className="shelf-row-icon od-fixed"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M8 3H4v18h16v-4M10 14l1-4L19 2l3 3-8 8z" /></svg></span><span className="od-field od-fill"><strong>{item.title || "章节练习"}</strong><span>{formatLearningTime(item.completed_at ?? item.created_at)} · 已答 {item.progress.answered} / {item.progress.total} 题</span></span><span className="shelf-row-status od-fixed">{item.status === "COMPLETED" ? "已完成" : "进行中"}</span></button>)}</div> : null}
         </section>
       ) : null}
     </main>

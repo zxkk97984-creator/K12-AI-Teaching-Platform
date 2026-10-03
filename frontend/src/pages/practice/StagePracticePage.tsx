@@ -1,17 +1,21 @@
-import { useLocation } from "react-router-dom";
-import { useAccount } from "../../features/identity/AccountContext";
-import { InteractiveCatalogPage } from "../../features/interactive/InteractiveCatalogPage";
+import { Navigate, useLocation } from "react-router-dom";
 import { PracticeRoutePage } from "./PracticePage";
-import { WrongQuestionsPage } from "./WrongQuestionsPage";
+import { LegacyLearningEntry } from "../../features/lesson/LegacyLearningEntry";
+import { PracticeHub } from "./PracticeHub";
+import { historyLocation } from "./navigation";
 import "./stage-practice.css";
 
 export function StagePracticePage() {
-  const stage = useAccount()?.profile?.stage;
   const { pathname, search } = useLocation();
-  const tab = new URLSearchParams(search).get("tab");
-  if (pathname.startsWith("/practice/sessions/")) return <PracticeRoutePage />;
-  if (stage?.startsWith("PRIMARY")) {
-    return <main className="stage-practice"><nav className="interactive-tabs" aria-label="练习类型"><a href="/practice" aria-current={tab !== "teacher" ? "page" : undefined}>互动小游戏</a><a href="/practice?tab=teacher" aria-current={tab === "teacher" ? "page" : undefined}>老师给我的练习</a></nav>{tab === "teacher" ? <PracticeRoutePage /> : <InteractiveCatalogPage purposeOverride="GAME" />}</main>;
+  const query = new URLSearchParams(search);
+  if (!pathname.startsWith("/practice/sessions/") && (query.get("view") === "history" || query.get("tab") === "history")) return <Navigate to={historyLocation(query)} replace />;
+  if (pathname.startsWith("/practice/sessions/") || query.has("job")) return <PracticeRoutePage />;
+  if (query.has("chapter")) return <LegacyLearningEntry />;
+  if (query.get("tab") === "wrong") return <Navigate to={historyLocation(query)} replace />;
+  if (query.get("type") === "questions" || ["teacher", "active"].includes(query.get("tab") ?? "")) {
+    query.set("type", "questions");
+    if (query.get("tab") === "active") query.set("status", "active");
+    return <Navigate to={historyLocation(query)} replace />;
   }
-  return <main className="stage-practice"><nav className="interactive-tabs" aria-label="练习类型"><a href="/practice" aria-current={tab !== "wrong" ? "page" : undefined}>{stage === "SENIOR" ? "巩固训练" : "专项练习"}</a><a href="/practice?tab=wrong" aria-current={tab === "wrong" ? "page" : undefined}>错题回顾</a></nav>{tab === "wrong" ? <WrongQuestionsPage /> : <PracticeRoutePage />}</main>;
+  return <PracticeHub />;
 }

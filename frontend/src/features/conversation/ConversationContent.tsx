@@ -4,12 +4,13 @@ import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode,
 import { useConversation } from "./ConversationProvider";
 import { isTerminal, STATUS_TEXT } from "./controller";
 import { MessageView, StreamingMessageView } from "./MessageView";
+import { PracticeRequestCard, PracticeJobCard } from "./PracticeRequestCard";
 import { QuizGenerationCard } from "./QuizGenerationCard";
-import { getConversationQuizOptions, listConversationQuizJobs, type ConversationQuizOptions, type StudentGenerationJob } from "../quiz/api";
+
 import "./conversation.css";
 import { navigate } from "../identity/session";
 import { useAccount } from "../identity/AccountContext";
-import { BrowserVoiceInput } from "../voice/BrowserVoiceInput";
+import { ConversationComposer } from "./ConversationComposer";
 import { useReplyAutoNarration } from "../voice/useReplyAutoNarration";
 
 const FAILURE_TEXT: Record<string, string> = {
@@ -99,7 +100,7 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
   const replyVoice = useReplyAutoNarration();
   const welcomePrompts = stage === "PRIMARY_LOWER" ? YOUNG_PROMPTS : stage === "PRIMARY_UPPER" ? UPPER_PROMPTS : WELCOME_PROMPTS;
   const miniPrompts = stage === "PRIMARY_LOWER" ? YOUNG_PROMPTS : stage === "PRIMARY_UPPER" ? UPPER_PROMPTS : MINI_PROMPTS;
-  const { controller, sessions, chapters, detail, draft, run, transport, error, loading, selecting, sending } = useConversation();
+  const { controller, sessions, chapters, detail, draft, run, transport, error, loading, selecting, sending, quizRequest } = useConversation();
   const inputId = useId();
   const [preparingSend, setPreparingSend] = useState(false);
   const preparingRef = useRef(false);
@@ -153,7 +154,7 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
     {loading ? <p role="status" className="conv-mini-loading">正在读取对话…</p> : null}
     {detail ? <ConversationThread compact learningWorkspace={learningWorkspace} detail={detail} run={run} transport={transport} draft={draft} inputId={inputId} inputRef={input} busy={busy} sending={sending}
       onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void send()} onCancel={() => void controller.cancel()} /> : <>
-      <section className="conv-mini-welcome"><h2>今天想聊点什么？</h2><p>{stage === "PRIMARY_LOWER" ? "一个故事、一个发现，都可以。" : "一个知识点、一段思路，都可以。"}</p><div className="conv-mini-prompts od-stack" aria-label="快捷提问">{miniPrompts.map((prompt) => <button type="button" key={prompt.title} className="conv-mini-prompt od-row" onClick={() => applySuggestion(prompt.value)}><span className="conv-mini-prompt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={prompt.path} /></svg></span><span className="od-field od-fill"><strong>{prompt.title}</strong><span>{prompt.value}</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg></button>)}</div>{draftNotice ? <p className="conv-draft-notice" role="status">{draftNotice}</p> : null}</section>
+      <section className="conv-mini-welcome">{quizRequest ? <PracticeRequestCard /> : <><h2>今天想聊点什么？</h2><p>{stage === "PRIMARY_LOWER" ? "一个故事、一个发现，都可以。" : "一个知识点、一段思路，都可以。"}</p><div className="conv-mini-prompts od-stack" aria-label="快捷提问">{miniPrompts.map((prompt) => <button type="button" key={prompt.title} className="conv-mini-prompt od-row" onClick={() => applySuggestion(prompt.value)}><span className="conv-mini-prompt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={prompt.path} /></svg></span><span className="od-field od-fill"><strong>{prompt.title}</strong><span>{prompt.value}</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg></button>)}</div>{draftNotice ? <p className="conv-draft-notice" role="status">{draftNotice}</p> : null}</>}</section>
       <ConversationComposer compact inputId={inputId} inputRef={input} draft={draft} busy={busy} sending={sending} onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void send()} />
     </>}
   </div>;
@@ -178,10 +179,6 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
           onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void send()} onCancel={() => void controller.cancel()} /> :
           <>
             <div className="conv-welcome-scroll">
-            <section className="conv-welcome" data-testid="conversation-welcome">
-              <p className="k12-welcome-eyebrow conv-welcome-topline"><span className="conv-welcome-seal" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6m-5 3h4M8 15a6 6 0 1 1 8 0l-1 3H9z" /></svg></span><span>你好，我是霜铃</span></p>
-              <h2>今天想学什么？</h2>
-            </section>
             <section className="conv-prompt-section" aria-label="推荐问题">
               <div className="conv-prompt-label od-row"><span>试试这些</span><span className="conv-prompt-line od-fill" aria-hidden="true" /></div>
               <div className="conv-quick-prompts" role="group" aria-label="推荐问题">
@@ -203,6 +200,7 @@ export function ConversationContent({ chapterId, compact = false, showCompatibil
                 <button key={chapter.chapter_id} type="button" className="secondary" data-testid="start-session" onClick={() => { void controller.start(chapter.chapter_id).then((id) => id && navigate(`/conversations?session=${id}`)); }} disabled={busy}>{chapter.title}</button>)}</div></details> : null}
             </section> : null}
             </div>
+            <PracticeRequestCard />
             <ConversationComposer inputId={inputId} inputRef={input} draft={draft} busy={busy} sending={sending} onDraft={updateDraft} onVoice={updateDraftFromVoice} onSend={() => void send()} />
           </>}
       </section>
@@ -226,30 +224,10 @@ function ConversationThread({ detail, run, transport, draft, inputId, inputRef, 
   onSend: () => void;
   onCancel: () => void;
 }) {
-  const [quizJobs, setQuizJobs] = useState<StudentGenerationJob[]>([]);
-  const [quizOptions, setQuizOptions] = useState<ConversationQuizOptions | null>(null);
-  useEffect(() => { void getConversationQuizOptions().then(setQuizOptions).catch(() => setQuizOptions(null)); }, [detail.id]);
-  useEffect(() => {
-    let active = true;
-    const load = () => { void listConversationQuizJobs(detail.id).then((result) => {
-      if (active) setQuizJobs(result.items);
-    }).catch(() => { /* Keep the conversation available while quiz status is unavailable. */ }); };
-    load();
-    return () => { active = false; };
-  }, [detail.id, detail.messages.length]);
-  const hasPendingQuiz = quizJobs.some((item) => item.status === "QUEUED" || item.status === "RUNNING");
-  useEffect(() => {
-    if (!hasPendingQuiz) return;
-    let active = true;
-    const timer = window.setInterval(() => {
-      void listConversationQuizJobs(detail.id).then((result) => {
-        if (active) setQuizJobs(result.items);
-      }).catch(() => { /* The accepted job remains durable; retry the next poll. */ });
-    }, 4000);
-    return () => { active = false; window.clearInterval(timer); };
-  }, [detail.id, hasPendingQuiz]);
+  const { controller,quizJobs,reference,quizRequest } = useConversation();
   const messagesRef = useRef<HTMLOListElement>(null);
   const followBottom = useRef(true);
+  const previousScrollSignature = useRef("");
   // Chapter-bound teaching can contain protected exercise material. Only a
   // free chat exposes provisional prose before the final validated card.
   const freeConversation = (detail.conversation_type ?? detail.type) === "FREE" &&
@@ -267,15 +245,21 @@ function ConversationThread({ detail, run, transport, draft, inputId, inputRef, 
   const questionInDraft = Boolean(failedQuestion && draft.trim() === failedQuestion.trim());
   useEffect(() => {
     const messages = messagesRef.current;
-    if (messages && followBottom.current) {
+    const signature = `${detail.messages.length}:${run?.status ?? ""}:${run?.draft_markdown ?? ""}`;
+    const unchanged = previousScrollSignature.current === signature;
+    previousScrollSignature.current = signature;
+    // Job polling must preserve the question/feedback position managed by
+    // its inline card; new conversation messages still follow the bottom.
+    if (unchanged && !quizRequest && messages?.querySelector(".inline-quiz .quiz-card")) return;
+    if (messages && (followBottom.current || quizRequest)) {
       messages.scrollTop = messages.scrollHeight;
       if (learningWorkspace && run?.status === "SUCCEEDED") {
         const latest = messages.querySelector<HTMLElement>('.conv-message-assistant:last-child');
         if (latest) messages.scrollTop += latest.getBoundingClientRect().top - messages.getBoundingClientRect().top;
       }
     }
-  }, [detail.messages.length, learningWorkspace, run?.draft_markdown, run?.status]);
-  return <div className="conv-thread"><ol ref={messagesRef} className="conv-messages" aria-live="polite" aria-label="对话消息" onScroll={(event) => {
+  }, [detail.messages.length, learningWorkspace, run?.draft_markdown, run?.status, quizRequest, quizJobs]);
+  return <div className="conv-thread">{reference && <p className="conv-current-reference">当前参考：{reference}</p>}<ol ref={messagesRef} className="conv-messages" aria-live="polite" aria-label="对话消息" onScroll={(event) => {
     const element = event.currentTarget;
     followBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 80;
   }}>
@@ -291,10 +275,9 @@ function ConversationThread({ detail, run, transport, draft, inputId, inputRef, 
       const extra = message.role === "ASSISTANT" && message.card ? <QuizGenerationCard
         conversationId={detail.id} messageId={message.id}
         suggestedTopic={(detail.chapter_title || previousQuestion?.content_markdown || message.content_markdown).slice(0, 160)}
-        options={quizOptions}
-        job={job} onJob={(created) => setQuizJobs((current) => [created, ...current.filter((item) => item.id !== created.id)])}
+        job={job} onJob={() => void controller.refreshQuizJobs()}
       /> : null;
-      return <MessageView key={message.id} message={message} extra={extra} onRetryLookup={!busy && previousQuestion ? () => {
+      return <MessageView key={message.id} message={message} extra={message.role === "USER" && job ? <PracticeJobCard job={job} /> : extra} onRetryLookup={!busy && previousQuestion ? () => {
         onDraft(previousQuestion.content_markdown);
         inputRef.current?.focus();
       } : undefined} />;
@@ -302,11 +285,13 @@ function ConversationThread({ detail, run, transport, draft, inputId, inputRef, 
     {activeHere ? <StreamingMessageView text={run?.draft_markdown ?? null} /> : null}
     {finalCardPending && run?.card && run.result_message_id ? <MessageView message={{
       id: run.result_message_id,
+      source_label:run.source_label,
       role: "ASSISTANT",
       content_markdown: run.card.message_markdown,
       card: run.card,
       created_at: run.completed_at ?? run.created_at,
-    }} /> : null}</ol>
+    }} /> : null}
+    {quizRequest ? <li className="conv-message-assistant"><PracticeRequestCard /></li> : null}</ol>
     {run ? <div className="conv-run" role="status" data-testid="run-status"><span>{run.status === "FAILED" ? failureText(run.error_category) : STATUS_TEXT[run.status]}{run.session_id !== detail.id ? "（另一节课）" : ""}</span>
       {transport === "polling" && !isTerminal(run) ? <span className="conv-run-connection">连接不稳，继续读取中…</span> : null}
       {failedQuestion && !questionInDraft ? <button type="button" className="secondary" disabled={Boolean(draft.trim())} onClick={() => {
@@ -317,48 +302,6 @@ function ConversationThread({ detail, run, transport, draft, inputId, inputRef, 
       {!isTerminal(run) ? <button className="secondary" data-testid="cancel-run" onClick={onCancel}>取消</button> : null}</div> : null}
     <ConversationComposer compact={compact} inputId={inputId} inputRef={inputRef} draft={draft} busy={busy} sending={sending} contextLabel={detail.chapter_id ? `当前参考：${detail.chapter_title}` : undefined} onDraft={onDraft} onVoice={onVoice} onSend={onSend} />
   </div>;
-}
-
-const DEFAULT_MAX_LENGTH = 8000;
-
-function ConversationComposer({ inputId, inputRef, draft, busy, sending, contextLabel, compact = false, maxLength = DEFAULT_MAX_LENGTH, onDraft, onVoice, onSend }: {
-  compact?: boolean;
-  inputId: string;
-  inputRef: RefObject<HTMLTextAreaElement | null>;
-  draft: string;
-  busy: boolean;
-  sending: boolean;
-  contextLabel?: string;
-  maxLength?: number;
-  onDraft: (value: string) => void;
-  onVoice: (value: string) => void;
-  onSend: () => void;
-}) {
-  const account = useAccount();
-  const { detail, selecting } = useConversation();
-  const inputEnabled = !account || ["INPUT_ONLY", "INPUT_AND_OUTPUT"].includes(account.preferences?.voice_preference ?? "DISABLED");
-
-  useEffect(() => {
-    const element = inputRef.current;
-    if (!element) return;
-    element.style.height = "auto";
-    element.style.height = `${Math.min(element.scrollHeight, compact ? 96 : 112)}px`;
-  }, [compact, draft, inputRef]);
-  return <form className={`conv-composer${compact ? " conv-composer--compact" : ""}`} onSubmit={(event) => { event.preventDefault(); if (!busy && draft.trim()) onSend(); }}>
-    {!compact && contextLabel ? <div className="conv-composer-context"><span>{contextLabel}</span></div> : null}
-    {compact ? <label className="sr-only" htmlFor={inputId}>想对老师说什么</label> : <div className="conv-composer-heading od-row"><label className="k12-composer-label od-fill" htmlFor={inputId}>想对老师说什么</label><span className="conv-keyboard-hint">Enter 发送 · Shift + Enter 换行</span></div>}
-    <div className="conv-input-line od-row"><textarea ref={inputRef} id={inputId} maxLength={maxLength} value={draft} onChange={(event) => onDraft(event.target.value)}
-      onKeyDown={(event) => {
-        if (event.nativeEvent.isComposing || event.keyCode === 229) return;
-        if (event.key === "Enter" && !event.shiftKey) {
-          event.preventDefault();
-          if (!busy && draft.trim()) onSend();
-        }
-      }} placeholder={compact ? "问点什么…" : "输入你的问题…"} title={compact ? [contextLabel, "Enter 发送 · Shift + Enter 换行"].filter(Boolean).join(" · ") : undefined} rows={1} />
-    <div className="conv-composer-actions"><BrowserVoiceInput compact={compact} scopeKey={`${account?.user.id ?? "guest"}:${detail?.id ?? "new"}:${selecting}`} draft={draft} onDraft={onVoice} enabled={inputEnabled} disabled={busy} />
-      <button data-testid="send-turn" disabled={busy || !draft.trim()} type="submit">{sending ? "正在发送…" : "发送"}</button></div></div>
-    {!compact ? <p className="conv-composer-hint">AI 回答请结合课程核对。</p> : null}
-  </form>;
 }
 
 function SessionActions({ sessionId, title, controller }: { sessionId: string; title: string; controller: ReturnType<typeof useConversation>["controller"] }) {

@@ -67,6 +67,11 @@ class DesignerSession(Base):
     )
 
     __table_args__ = (
+        CheckConstraint(
+            "(chapter_id IS NOT NULL AND revision_id IS NOT NULL) OR "
+            "(chapter_id IS NULL AND revision_id IS NULL AND source_conversation_id IS NOT NULL)",
+            name=f"ck_{__tablename__}_source_target",
+        ),
         CheckConstraint("purpose = 'QUIZ_DRAFT'", name="ck_assessment_designer_purpose"),
         CheckConstraint(
             "stage IN ('PRIMARY_LOWER', 'PRIMARY_UPPER', 'JUNIOR', 'SENIOR')",
@@ -135,6 +140,11 @@ class GenerationJob(Base):
     )
 
     __table_args__ = (
+        CheckConstraint(
+            "(chapter_id IS NOT NULL AND revision_id IS NOT NULL) OR "
+            "(chapter_id IS NULL AND revision_id IS NULL AND source_conversation_id IS NOT NULL)",
+            name=f"ck_{__tablename__}_source_target",
+        ),
         CheckConstraint("operation = 'QUIZ_DRAFT'", name="ck_assessment_job_operation"),
         CheckConstraint("purpose IN ('ADMIN', 'STUDENT')", name="ck_assessment_job_purpose"),
         UniqueConstraint(
@@ -199,6 +209,11 @@ class QuizDraft(Base):
     )
 
     __table_args__ = (
+        CheckConstraint(
+            "(chapter_id IS NOT NULL AND revision_id IS NOT NULL) OR "
+            "(chapter_id IS NULL AND revision_id IS NULL AND source_conversation_id IS NOT NULL)",
+            name=f"ck_{__tablename__}_source_target",
+        ),
         UniqueConstraint("job_id", name="uq_assessment_draft_job"),
         CheckConstraint(
             "status IN ('DRAFT', 'AUTO_VALIDATED', 'HUMAN_APPROVED')",
@@ -211,7 +226,7 @@ class QuizDraft(Base):
             "difficulty IN ('EASY', 'MEDIUM', 'HARD')", name="ck_assessment_draft_difficulty"
         ),
         CheckConstraint(
-            "question_count BETWEEN 1 AND 5", name="ck_assessment_draft_question_count"
+            "question_count BETWEEN 1 AND 20", name="ck_assessment_draft_question_count"
         ),
         # AUTO_VALIDATED and HUMAN_APPROVED both require the deterministic rules.
         CheckConstraint(
@@ -283,6 +298,11 @@ class QuizSession(Base):
 
     __table_args__ = (
         CheckConstraint(
+            "(chapter_id IS NOT NULL AND revision_id IS NOT NULL) OR "
+            "(chapter_id IS NULL AND revision_id IS NULL AND source_conversation_id IS NOT NULL)",
+            name=f"ck_{__tablename__}_source_target",
+        ),
+        CheckConstraint(
             "status IN ('ACTIVE', 'COMPLETED')", name="ck_assessment_quiz_session_status"
         ),
         CheckConstraint(
@@ -294,7 +314,7 @@ class QuizSession(Base):
             name="ck_assessment_quiz_session_difficulty",
         ),
         CheckConstraint(
-            "question_count BETWEEN 1 AND 5", name="ck_assessment_quiz_session_question_count"
+            "question_count BETWEEN 1 AND 20", name="ck_assessment_quiz_session_question_count"
         ),
         CheckConstraint(
             "max_attempts BETWEEN 1 AND 5", name="ck_assessment_quiz_session_max_attempts"
