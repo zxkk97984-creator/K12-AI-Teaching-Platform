@@ -50,6 +50,7 @@ docs/acceptance/ui-reuse/*.png
 .herdr-control/
 # Local implementation plans and agent handoff records.
 /tasks/
+/plan.md
 
 # Local agent/editor state and temporary files
 .agents/
